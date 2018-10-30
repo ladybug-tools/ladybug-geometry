@@ -16,10 +16,10 @@ We looked into using other geometry computation libraries for the core including
 However, Rhino3dm lacks basic types of computation that is needed in the core (like generating a
 grid of points from a surface).
 Furthermore, Blender library only works in Python3 and this would break our workflows for the
-plugins for Grasshopper and Dynamo, which rely on IronPython.
+Grasshopper and Dynamo plugins, which rely on IronPython.
 
 After considering it further, we realized that many of the calculations that we need can be done
-easily as long as the geomtry is planar.  Since all of the geometry going to the engines (Radiance, E+)
+easily as long as the geometry is planar.  Since all of the geometry going to the engines (Radiance, E+)
 is eventually converted to a planar format anyway, we made the decision that the core libraries will support
 geometry computation for planar objects only.  With this, it should be possible to build out a good
 geometry library in pure python.  Thus this repository was born!
@@ -32,8 +32,8 @@ to build tis core library.
 # Things that Will be a Part of this Library (we can do in pure python):
 - [ ] Vectormath (already exists in Ladybug core)
 - [ ] Calculate Bounding Box (already exists in Butterfly core)
-- [ ] Check Concavity of a 2D Geometry (already exists in legacy [Find non-convex component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_Find%20Non-Convex.py))
-- [ ] Convert Concave 2D Geometry to a Series of Convex Geometries (should be possible with the [ear clipping method](https://en.wikipedia.org/wiki/Polygon_triangulation))
+- [ ] Check Concavity of a 2D Geometry (already exists in legacy [find non-convex component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_Find%20Non-Convex.py))
+- [ ] Convert Concave 2D Geometry to Convex Geometries (should be possible with the [ear clipping method](https://en.wikipedia.org/wiki/Polygon_triangulation))
 - [ ] Compute Triangle and Quad Areas (very basic math here)
 - [ ] Triangulate Planar Geometry (possible by converting convex geometry to concave and using [fan triangulation](https://en.wikipedia.org/wiki/Polygon_triangulation))
 - [ ] Compute Area of Planar Geometry (built by triangulating geometry and computing the area of each triangle)
@@ -51,8 +51,8 @@ to build tis core library.
 # Things that may require more expertise but we should be able to do in Python:
 - [ ] Check if a Point is Inside a Closed 3D Geometry
 
-# Things that we will rely on the Plugins to do:
-- Conversion of Curved Surfaces to Planar Surfaces
+# Things that We Will Rely on the Plugins For:
+- Conversion of Curved Surfaces to Planar Surfaces (Curved Geometry Meshing)
 - Extract Vertices from Planar Geometry
 - Split Closed 3D Volume to Floors (Intersection of a closed volume and a plane)
 
