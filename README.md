@@ -49,10 +49,10 @@ to build tis core library.
 - [ ] Solve Adjacencies (I think that OpenStudio team has some code for this)
 
 # Things that may require more expertise but we should be able to do in Python:
-- [ ] Check if a Point is Inside a Closed 3D Geometry
+- [ ] Check if a Point is Inside a Closed 3D Geometry (helpful for thermal comfort when one needs to know if a point is in a zone)
 
 # Things that We Will Rely on the Plugins For:
-- Conversion of Curved Surfaces to Planar Surfaces (Curved Geometry Meshing)
-- Extract Vertices from Planar Geometry
-- Split Closed 3D Volume to Floors (Intersection of a closed volume and a plane)
-
+- Conversion of Curved Surfaces to Planar Surfaces (curved geometry meshing)
+- Create Matching Zone Surfaces (intersection of surfaces with one another)
+- Split Closed 3D Volume to Floors (intersection of a volume and a plane)
+- Calculate Building Footprints (boolean union floors)
