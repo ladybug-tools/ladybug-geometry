@@ -32,7 +32,7 @@ to build tis core library.
 # Things that Will be a Part of this Library (we can do in pure python):
 - [ ] Vectormath (already exists in Ladybug core)
 - [ ] Calculate Bounding Box (already exists in Butterfly core)
-- [ ] Check Concavity of a 2D Geometry (already exists in legacy [find non-convex component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_Find%20Non-Convex.py))
+- [ ] Check Concavity of a 2D Geometry (already exists in legacy [find non-convex component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_Honeybee.py#L9340-L9410))
 - [ ] Convert Concave 2D Geometry to Convex Geometries (should be possible with the [ear clipping method](https://en.wikipedia.org/wiki/Polygon_triangulation))
 - [ ] Compute Triangle and Quad Areas (very basic math here)
 - [ ] Triangulate Planar Geometry (possible by converting convex geometry to concave and using [fan triangulation](https://en.wikipedia.org/wiki/Polygon_triangulation))
