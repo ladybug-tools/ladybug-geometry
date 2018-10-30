@@ -30,7 +30,7 @@ listed above (Rhino3dm and Blender), as well as other projects like
 to build tis core library.
 
 # Things that Will be a Part of this Library
-## We Can do Easily in Pure Python
+### (We Can do Easily in Pure Python)
 - [ ] Vectormath ([already exists in Ladybug core](https://github.com/ladybug-tools/ladybug/blob/master/ladybug/euclid.py))
 - [ ] Calculate Bounding Box ([already exists in Butterfly core](https://github.com/ladybug-tools/butterfly/blob/master/butterfly/geometry.py))
 - [ ] Compute Triangle + Quad Areas, Center Points + Normals ([partly exists in Butterfly core]((https://github.com/ladybug-tools/butterfly/blob/master/butterfly/geometry.py))
@@ -49,7 +49,7 @@ to build tis core library.
 - [ ] Straight Skeleton Methods (currently implemented in [legacy core/perimeter component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_SplitFloor2ThermalZones.py) but should be expanded to accept concave geometry)
 
 # Things That Should be a Part of this Library
-## We Think We Can Do Them But They Require Expertise
+### (We Think We Can Do Them But They Require Expertise)
 - [ ] Solve Adjacencies (I think that OpenStudio team has some code for this)
 - [ ] Check if a Point is Inside a Closed 3D Geometry (helpful for thermal comfort when one needs to know if a point is in a zone)
 
