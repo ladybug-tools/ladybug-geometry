@@ -29,26 +29,28 @@ listed above (Rhino3dm and Blender), as well as other projects like
 [this PhD on Grid Generation for Radiance](https://www.radiance-online.org/community/workshops/2015-philadelphia/presentations/day1/STADICUtilities-Radiance%20Workshop2015.pdf)
 to build tis core library.
 
-# Things that Will be a Part of this Library (we can do in pure python):
+# Things that Will be a Part of this Library
+## We Can do Easily in Pure Python
 - [ ] Vectormath ([already exists in Ladybug core](https://github.com/ladybug-tools/ladybug/blob/master/ladybug/euclid.py))
 - [ ] Calculate Bounding Box ([already exists in Butterfly core](https://github.com/ladybug-tools/butterfly/blob/master/butterfly/geometry.py))
-- [ ] Compute Triangle + Quad Areas, Center Points + Normals
+- [ ] Compute Triangle + Quad Areas, Center Points + Normals ([partly exists in Butterfly core]((https://github.com/ladybug-tools/butterfly/blob/master/butterfly/geometry.py))
 - [ ] Check Concavity of a 2D Geometry (already exists in legacy [find non-convex component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_Honeybee.py#L9340-L9410))
 - [ ] Convert Concave 2D Geometry to Convex Geometries (should be possible with the [ear clipping method](https://en.wikipedia.org/wiki/Polygon_triangulation))
-- [ ] Triangulate Planar Geometry (possible by converting convex geometry to concave and using [fan triangulation](https://en.wikipedia.org/wiki/Polygon_triangulation))
-- [ ] Compute Area of Planar Geometry (built by triangulating geometry and computing the area of each triangle)
-- [ ] Check if a 3D Geometry is Closed (should be possible by [creating a triangulated mesh](https://gamedev.stackexchange.com/questions/61878/how-check-if-an-arbitrary-given-mesh-is-a-single-closed-mesh/61886))
+- [ ] Triangulate Planar Geometry ([possible by converting convex geometry to concave and using fan triangulation](https://en.wikipedia.org/wiki/Polygon_triangulation))
+- [ ] Compute Area of Planar Geometry (triangulate planar geometry and compute the area of each triangle)
+- [ ] Check if a 3D Geometry is Closed ([should be possible by creating a 3D triangulated mesh](https://gamedev.stackexchange.com/questions/61878/how-check-if-an-arbitrary-given-mesh-is-a-single-closed-mesh/61886))
 - [ ] Move Geometry (can be taken from Rhino3dm)
 - [ ] Rotate Geometry Around a Base Point (can be taken from Rhino3dm)
 - [ ] Mirror Geometry (can be taken from Rhino3dm)
 - [ ] Scale Geometry from a Base Point (can be taken from Rhino3dm)
 - [ ] Is Point Inside 2D Polygon (look pretty straightforward from [this example](https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/))
-- [ ] Planar surface grid generation (per [this thesis](https://www.radiance-online.org/community/workshops/2015-philadelphia/presentations/day1/STADICUtilities-Radiance%20Workshop2015.pdf), which uses bounding box and is point inside)
+- [ ] Planar surface grid generation ([as done in this thesis](https://www.radiance-online.org/community/workshops/2015-philadelphia/presentations/day1/STADICUtilities-Radiance%20Workshop2015.pdf), which uses bounding box and is point inside)
 - [ ] Glazing Based on Ratio (currently implemented in legacy [glazing based on ratio component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_Glazing%20based%20on%20ratio.py))
 - [ ] Straight Skeleton Methods (currently implemented in [legacy core/perimeter component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_SplitFloor2ThermalZones.py))
-- [ ] Solve Adjacencies (I think that OpenStudio team has some code for this)
 
-# Things that may require more expertise but we should be able to do in Python:
+# Things That Should be a Part of this Library
+## We Think We Can Do Them But They Require Expertise
+- [ ] Solve Adjacencies (I think that OpenStudio team has some code for this)
 - [ ] Check if a Point is Inside a Closed 3D Geometry (helpful for thermal comfort when one needs to know if a point is in a zone)
 
 # Things that We Will Rely on the Plugins For:
