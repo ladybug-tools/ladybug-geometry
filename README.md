@@ -12,6 +12,7 @@ So we have decided to include geomtery computation as part of the Ladybug Tools 
 We looked into using other geometry computation libraries for the core including:
 - [Rhino3dm](https://github.com/mcneel/rhino3dm)
 - [Blender API (bpy)](https://docs.blender.org/api/current/)
+
 However, Rhino3dm lacks basic types of computation that is needed in the core (like generating a
 grid of points from a surface).
 Furthermore, Blender library only works in Python3 and this would break our workflows for the
