@@ -30,11 +30,11 @@ listed above (Rhino3dm and Blender), as well as other projects like
 to build tis core library.
 
 # Things that Will be a Part of this Library (we can do in pure python):
-- [ ] Vectormath (already exists in Ladybug core)
-- [ ] Calculate Bounding Box (already exists in Butterfly core)
+- [ ] Vectormath ([already exists in Ladybug core](https://github.com/ladybug-tools/ladybug/blob/master/ladybug/euclid.py))
+- [ ] Calculate Bounding Box ([already exists in Butterfly core](https://github.com/ladybug-tools/butterfly/blob/master/butterfly/geometry.py))
+- [ ] Compute Triangle + Quad Areas, Center Points + Normals
 - [ ] Check Concavity of a 2D Geometry (already exists in legacy [find non-convex component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_Honeybee.py#L9340-L9410))
 - [ ] Convert Concave 2D Geometry to Convex Geometries (should be possible with the [ear clipping method](https://en.wikipedia.org/wiki/Polygon_triangulation))
-- [ ] Compute Triangle and Quad Areas (very basic math here)
 - [ ] Triangulate Planar Geometry (possible by converting convex geometry to concave and using [fan triangulation](https://en.wikipedia.org/wiki/Polygon_triangulation))
 - [ ] Compute Area of Planar Geometry (built by triangulating geometry and computing the area of each triangle)
 - [ ] Check if a 3D Geometry is Closed (should be possible by [creating a triangulated mesh](https://gamedev.stackexchange.com/questions/61878/how-check-if-an-arbitrary-given-mesh-is-a-single-closed-mesh/61886))
