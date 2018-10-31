@@ -50,11 +50,11 @@ to build tis core library.
 
 # Things That Should be a Part of this Library
 ### (We Think We Can Do Them But They Require Expertise)
-- [ ] Solve Adjacencies (I think that OpenStudio team has some code for this)
+- [ ] Create Matching Zone Surfaces (intersection of surfaces with one another). OpenStudio has methods for this [as @saeranv shows here](https://github.com/mostaphaRoudsari/honeybee/issues/700)
+- [ ] Solve Adjacencies (I think the OpenStudio code can also address this)
 - [ ] Check if a Point is Inside a Closed 3D Geometry (helpful for thermal comfort when one needs to know if a point is in a zone)
 
 # Things that We Will Rely on the Plugins For:
 - Conversion of Curved Surfaces to Planar Surfaces (curved geometry meshing)
-- Create Matching Zone Surfaces (intersection of surfaces with one another)
 - Split Closed 3D Volume to Floors (intersection of a volume and a plane)
 - Calculate Building Footprints (boolean union floors)
