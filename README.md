@@ -34,7 +34,7 @@ to build tis core library.
 - [ ] Vectormath ([already exists in Ladybug core](https://github.com/ladybug-tools/ladybug/blob/master/ladybug/euclid.py))
 - [ ] Calculate Bounding Box ([already exists in Butterfly core](https://github.com/ladybug-tools/butterfly/blob/master/butterfly/geometry.py))
 - [ ] Compute Triangle + Quad Areas, Center Points + Normals ([partly exists in Butterfly core](https://github.com/ladybug-tools/butterfly/blob/master/butterfly/geometry.py))
-- [ ] Compute Area of Planar Geometry (should be doable [by using this formula](https://www.mathopenref.com/coordpolygonarea.html))
+- [ ] Compute Area + Perimeter of Planar Geometry (should be doable [by using this formula](https://www.mathopenref.com/coordpolygonarea.html))
 - [ ] Check Concavity of a 2D Geometry (already exists in legacy [find non-convex component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_Honeybee.py#L9340-L9410))
 - [ ] Convert Concave 2D Geometry to Convex Geometries (should be possible with the [ear clipping method](https://en.wikipedia.org/wiki/Polygon_triangulation))
 - [ ] Triangulate Planar Geometry ([possible by converting convex geometry to concave and using fan triangulation](https://en.wikipedia.org/wiki/Polygon_triangulation))
