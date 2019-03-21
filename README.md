@@ -1,22 +1,32 @@
+
+![Ladybug](http://www.ladybug.tools/assets/img/ladybug.png)
+
+
+[![Build Status](https://travis-ci.org/ladybug-tools/ladybug.svg?branch=master)](https://travis-ci.org/ladybug-tools/ladybug-comfort)
+[![Coverage Status](https://coveralls.io/repos/github/ladybug-tools/ladybug-comfort/badge.svg)](https://coveralls.io/github/ladybug-tools/ladybug-comfort)
+
+[![Python 2.7](https://img.shields.io/badge/python-2.7-green.svg)](https://www.python.org/downloads/release/python-270/) [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/) [![IronPython](https://img.shields.io/badge/ironpython-2.7-red.svg)](https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.8/)
+
 # ladybug-geometry
-A library to house all of the basic geometry computation needed for Ladybug Tools core libraries.
+Ladybug geometry is a Python library that adds geometry objects and basic geometric computation to Ladybug.
 
 # Reasons for this Library
-We initially debated whether geometry computation should be placed largely on the plugins or
+We initially debated whether geometry computation should be placed largely on the CAD plugins or
 whether it should be inincluded in the core.  As we developed the core libraries out, it became clear
 that there are large advantages to having it in the core (ie. cross compatability between
 the CAD plugins, ability to process more inputs from command line, and shear speed
-since many of the CAD libraries are made to address many more use cases than we have to).
+since the CAD libraries are made to address many more geometric use cases than are typically needed).
 So we have decided to include geomtery computation as part of the Ladybug Tools core.
 
 We looked into using other geometry computation libraries for the core including:
 - [Rhino3dm](https://github.com/mcneel/rhino3dm)
 - [Blender API (bpy)](https://docs.blender.org/api/current/)
+- [Blender API (bpy)](https://docs.blender.org/api/current/)
 
 However, Rhino3dm lacks basic types of computation that is needed in the core (like generating a
 grid of points from a surface).
 Furthermore, Blender library only works in Python3 and this would break our workflows for the
-Grasshopper and Dynamo plugins, which rely on IronPython.
+Grasshopper and Dynamo plugins, where rely on IronPython.
 
 After considering it further, we realized that many of the calculations that we need can be done
 easily as long as the geometry is planar.  Since all of the geometry going to the engines (Radiance, E+)
@@ -51,9 +61,9 @@ to build tis core library.
 
 # Things That Should be a Part of this Library
 ### (We Think We Can Do Them But They Require Expertise)
-- [ ] Create Matching Zone Surfaces (intersection of surfaces with one another). OpenStudio has methods for this [as @saeranv shows here](https://github.com/mostaphaRoudsari/honeybee/issues/700)
 - [ ] Solve Adjacencies (I think the OpenStudio code can also address this)
 - [ ] Check if a Point is Inside a Closed 3D Geometry (helpful for thermal comfort when one needs to know if a point is in a zone)
+- [ ] Create Matching Zone Surfaces (intersection of surfaces with one another). OpenStudio has methods for this [as @saeranv shows here](https://github.com/mostaphaRoudsari/honeybee/issues/700)
 
 # Things that We Will Rely on the Plugins For:
 - Conversion of Curved Surfaces to Planar Surfaces (curved geometry meshing)
