@@ -23,7 +23,7 @@ setuptools.setup(
     version=version,
     author="Ladybug Tools",
     author_email="info@ladybug.tools",
-    description="Ladybug geometry is a Python library that adds simply geometry computation to Ladybug.",
+    description="Ladybug geometry is a Python library that adds geometry objects and basic geometric computation to Ladybug.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ladybug-tools/ladybug-geometry",
