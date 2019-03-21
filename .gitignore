@@ -1,0 +1,11 @@
+*.pyc
+test.py
+.coverage
+.pytest_cache
+.ipynb_checkpoints
+*.ipynb
+.tox
+*.egg-info
+build
+dist
+venv
