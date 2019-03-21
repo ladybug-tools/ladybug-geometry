@@ -21,18 +21,22 @@ So we have decided to include geomtery computation as part of the Ladybug Tools 
 We looked into using other geometry computation libraries for the core including:
 - [Rhino3dm](https://github.com/mcneel/rhino3dm)
 - [Blender API (bpy)](https://docs.blender.org/api/current/)
-- [Blender API (bpy)](https://docs.blender.org/api/current/)
+- [Topologic](https://topologic.app/Software/)
 
 However, Rhino3dm lacks basic types of computation that is needed in the core (like generating a
 grid of points from a surface).
 Furthermore, Blender library only works in Python3 and this would break our workflows for the
 Grasshopper and Dynamo plugins, where rely on IronPython.
+Topologic seems to have many things that we need but it appears that it has C dependencies, making
+it unusable from ironpython.  Furthermore, its dual license may create some difficulties for certain
+use cases of Ladybug Tools.
 
 After considering it further, we realized that many of the calculations that we need can be done
-easily as long as the geometry is planar.  Since all of the geometry going to the engines (Radiance, E+)
+fairly easily as long as the geometry is planar.  Since all of the geometry going to the engines (Radiance, E+)
 is eventually converted to a planar format anyway, we made the decision that the core libraries will support
-geometry computation for planar objects only.  With this, it should be possible to build out a good
-geometry library in pure python.  Thus this repository was born!
+certain basic types of geometry computation for planar objects only.  We planned to do this by taking the 
+most relevant parts of existing open source geometry libraries, including [euclid](https://pypi.org/project/euclid/)
+and OpenStudio. Thus this repository was born!
 
 For this library, we can borrow some of the math from the previous open source libaraies 
 listed above (Rhino3dm and Blender), as well as other projects like 
