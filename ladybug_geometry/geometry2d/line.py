@@ -3,11 +3,11 @@
 from __future__ import division
 
 from .._immutable import immutable
-from .pointvector import Point2D, Point2DImmutable, Vector2D, Vector2DImmutable
-from ..intersection2d import intersect_line2d_line2d, closest_point2d_on_line2d
+from .pointvector import Point2D
+from ._1d import Base1D
 
 
-class LineSegment2D(object):
+class LineSegment2D(Base1D):
     """2D line segment object.
 
     Properties:
@@ -18,15 +18,13 @@ class LineSegment2D(object):
         length: The length of the line segement
         length_squared: The length of the line segment squared.
     """
-    __slots__ = ('_p', '_v')
-    _mutable = True
 
     def __init__(self, p, v):
         """Initilize LineSegment2D.
 
         Args:
             p: A Point2D representing the first point of the line segment.
-            v: A Vector2D representing the direction of the ray.
+            v: A Vector2D representing the vector to the seconf point.
         """
         self.p = p
         self.v = v
@@ -53,33 +51,6 @@ class LineSegment2D(object):
         return cls(s, d * length / d.magnitude)
 
     @property
-    def is_mutable(self):
-        """Boolean to note whether the object is mutable."""
-        return self._mutable
-
-    @property
-    def p(self):
-        """Base point."""
-        return self._p
-
-    @p.setter
-    def p(self, p):
-        assert isinstance(p, (Point2D, Point2DImmutable)), \
-            "Expected Point2D. Got {}.".format(type(p))
-        self._p = p.duplicate()
-
-    @property
-    def v(self):
-        """Direction vector."""
-        return self._v
-
-    @v.setter
-    def v(self, v):
-        assert isinstance(v, (Vector2D, Vector2DImmutable)), \
-            "Expected Vector2D. Got {}.".format(type(v))
-        self._v = v.duplicate()
-
-    @property
     def p1(self):
         """First point (same as p)."""
         return self.p
@@ -88,6 +59,11 @@ class LineSegment2D(object):
     def p2(self):
         """Second point."""
         return Point2D(self.p.x + self.v.x, self.p.y + self.v.y)
+
+    @property
+    def midpoint(self):
+        """Midpoint."""
+        return self.point_at(0.5)
 
     @property
     def length(self):
@@ -108,86 +84,108 @@ class LineSegment2D(object):
         return LineSegment2D(self.p2, self.v.reversed())
 
     def move(self, moving_vec):
-        """Get a ray that has been moved along a vector.
+        """Get a line segment that has been moved along a vector.
 
         Args:
             moving_vec: A Vector2D with the direction and distance to move the ray.
         """
-        return LineSegment2D(self.p + moving_vec, self.v)
-
-    def scale(self, factor, origin):
-        """Scale a ray by a factor from an origin point.
-
-        Args:
-            factor: A number representing how much the point should be scaled.
-            origin: A Point2D representing the origin from which to scale.
-        """
-        return LineSegment2D(self.p.scale(factor, origin), self.v * factor)
+        return LineSegment2D(self.p.move(moving_vec), self.v)
 
     def rotate(self, angle, origin):
-        """Get a ray that is rotated counterclockwise by a certain angle.
+        """Get a line segment that is rotated counterclockwise by a certain angle.
 
         Args:
             angle: An angle for rotation in radians.
-            origin: A Point2D for the origin around which the point will be rotated.
+            origin: A Point2D for the origin around which the line segment will
+                be rotated.
         """
         return LineSegment2D(self.p.rotate(angle, origin), self.v.rotate(angle))
 
     def reflect(self, normal, origin):
-        """Get a ray reflected across a plane with the input normal vector and origin.
+        """Get a line segment reflected across a plane with the input normal vector and origin.
 
         Args:
             normal: A Vector2D representing the normal vector for the plane across
-                which the ray will be reflected. THIS VECTOR MUST BE NORMALIZED.
+                which the line segment will be reflected. THIS VECTOR MUST BE NORMALIZED.
             origin: A Point2D representing the origin from which to reflect.
         """
         return LineSegment2D(self.p.reflect(normal, origin), self.v.reflect(normal))
 
-    def intersect_line2(self, other):
-        """Get the intersection between this line segment and another Ray2 or LineSegment2D.
+    def scale(self, factor, origin):
+        """Scale a line segment by a factor from an origin point.
 
         Args:
-            other: Another LineSegment2D or Ray2 or to intersect.
-
-        Returns:
-            Point2D of intersection if it exists. None if no intersection exists.
+            factor: A number representing how much the line segment should be scaled.
+            origin: A Point2D representing the origin from which to scale.
         """
-        return intersect_line2d_line2d(self, other)
+        return LineSegment2D(self.p.scale(factor, origin), self.v * factor)
 
-    def closest_point(self, point):
-        """Get the closest Point2D on this line segment to the input point.
+    def scale_world_origin(self, factor):
+        """Scale a line segment by a factor from the world origin. Faster than scale().
 
         Args:
-            point: A Point2D object to which the closest point on this line segment
-                will be computed.
-
-        Returns:
-            Point2D for the closest point on this line to the input point.
+            factor: A number representing how much the line segment should be scaled.
         """
-        return closest_point2d_on_line2d(point, self)
+        return LineSegment2D(self.p.scale_world_origin(factor), self.v * factor)
 
-    def distance_to_point(self, point):
-        """Get the minimum distance between this line segment and the input point.
+    def subdivide(self, distances):
+        """Get Point2D values along the line that subdivide it based on input distances.
 
         Args:
-            point: A Point2D object to which the minimum distance will be computed.
-
-        Returns:
-            The distance to the input point.
+            distances: A list of distances along the line at which to subdivide it.
+                This can also be a single number that will be repeated unitl the end of
+                the line.
         """
-        close_pt = self.closest_point(point)
-        return point.distance_to_point(close_pt)
+        if isinstance(distances, (float, int)):
+            distances = [distances]
+        line_length = self.length
+        dist = distances[0]
+        index = 0
+        sub_pts = [self.p]
+        while dist < line_length:
+            sub_pts.append(self.point_at_length(dist))
+            if index < len(distances) - 1:
+                index += 1
+            dist += distances[index]
+        sub_pts.append(self.p2)
+        return sub_pts
+
+    def subdivide_evenly(self, number):
+        """Get Point2D values along the line that divide it into evenly-spaced segments.
+
+        Args:
+            number: The number of segments into which the line will be divided.
+        """
+        interval = 1 / number
+        parameter = interval
+        sub_pts = [self.p]
+        while parameter < 1:
+            sub_pts.append(self.point_at(parameter))
+            parameter += interval
+        sub_pts.append(self.p2)
+        return sub_pts
+
+    def point_at(self, parameter):
+        """Get a point at a given fraction along the line segment.
+
+        Args:
+            parameter: The fraction between the start and end point where the
+                desired point lies. For example, 0.5 will yield the midpoint.
+        """
+        return self.p + self.v * parameter
+
+    def point_at_length(self, length):
+        """Get a point at a given distance along the line segment.
+
+        Args:
+            length: The distance along the line from the start point where the
+                desired point lies.
+        """
+        return self.p + self.v * (length / self.length)
 
     def to_immutable(self):
         """Get an immutable version of this object."""
         return LineSegment2DImmutable(self.p, self.v)
-
-    def duplicate(self):
-        """Get a copy of this object."""
-        return self.__copy__()
-
-    def __copy__(self):
-        return self.__class__(self.p, self.v)
 
     def __abs__(self):
         return abs(self.v)
@@ -216,5 +214,9 @@ class LineSegment2DImmutable(LineSegment2D):
         self.v = v.to_immutable()
 
     def to_mutable(self):
-        """Get a mutable version of this vector."""
+        """Get a mutable version of this object."""
         return LineSegment2D(self.p.to_mutable(), self.v.to_mutable())
+
+    def to_immutable(self):
+        """Get an immutable version of this object."""
+        return self

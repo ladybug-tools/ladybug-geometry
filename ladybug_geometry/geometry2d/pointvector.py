@@ -20,7 +20,6 @@ class Vector2D(object):
     __slots__ = ('_x', '_y')
     __hash__ = None
     _mutable = True
-    _type = 'Vector2D'
 
     def __init__(self, x=0, y=0):
         """Initialize 2D Vector."""
@@ -139,7 +138,7 @@ class Vector2D(object):
         return Vector2D._reflect(self, normal)
 
     def to_immutable(self):
-        """Get an immutable version of this vector."""
+        """Get an immutable version of this object."""
         return Vector2DImmutable(self.x, self.y)
 
     def duplicate(self):
@@ -168,8 +167,6 @@ class Vector2D(object):
         if isinstance(other, (Vector2D, Vector2DImmutable, Point2D, Point2DImmutable)):
             return self.x == other.x and self.y == other.y
         else:
-            if hasattr(other, '__len__') and len(other) == 2:
-                return self.x == other[0] and self.y == other[1]
             return False
 
     def __ne__(self, other):
@@ -188,19 +185,14 @@ class Vector2D(object):
         return iter((self.x, self.y))
 
     def __add__(self, other):
-        if isinstance(other, (Vector2D, Vector2DImmutable, Point2D, Point2DImmutable)):
-            # Vector + Vector -> Vector
-            # Vector + Point -> Point
-            # Point + Point -> Vector
-            if self._type == other._type:
-                _class = Vector2D
-            else:
-                _class = Point2D
-            return _class(self.x + other.x, self.y + other.y)
+        # Vector + Point -> Point
+        # Vector + Vector -> Vector
+        if isinstance(other, (Point2D, Point2DImmutable)):
+            return Point2D(self.x + other.x, self.y + other.y)
+        elif isinstance(other, (Vector2D, Vector2DImmutable)):
+            return Vector2D(self.x + other.x, self.y + other.y)
         else:
-            assert hasattr(other, '__len__') and len(other) == 2, \
-                'Cannot add types {} and {}'.format(type(self), type(other))
-            return Vector2D(self.x + other[0], self.y + other[1])
+            raise TypeError('Cannot add Vector2D and {}'.format(type(other)))
 
     __radd__ = __add__
 
@@ -214,19 +206,14 @@ class Vector2D(object):
         return self
 
     def __sub__(self, other):
-        if isinstance(other, (Vector2D, Vector2DImmutable, Point2D, Point2DImmutable)):
-            # Vector - Vector -> Vector
-            # Vector - Point -> Point
-            # Point - Point -> Vector
-            if self._type == other._type:
-                _class = Vector2D
-            else:
-                _class = Point2D
-            return _class(self.x - other.x, self.y - other.y)
+        # Vector - Point -> Point
+        # Vector - Vector -> Vector
+        if isinstance(other, (Point2D, Point2DImmutable)):
+            return Point2D(self.x - other.x, self.y - other.y)
+        elif isinstance(other, (Vector2D, Vector2DImmutable)):
+            return Vector2D(self.x - other.x, self.y - other.y)
         else:
-            assert hasattr(other, '__len__') and len(other) == 2, \
-                'Cannot subtract types {} and {}'.format(type(self), type(other))
-            return Vector2D(self.x - other[0], self.y - other[1])
+            raise TypeError('Cannot subtract Vector2D and {}'.format(type(other)))
 
     def __rsub__(self, other):
         if isinstance(other, (Vector2D, Vector2DImmutable, Point2D, Point2DImmutable)):
@@ -253,14 +240,12 @@ class Vector2D(object):
     def __div__(self, other):
         assert type(other) in (int, float), \
             'Cannot divide types {} and {}'.format(type(self), type(other))
-        return Vector2D(operator.div(self.x, other),
-                        operator.div(self.y, other))
+        return Vector2D(operator.div(self.x, other), operator.div(self.y, other))
 
     def __rdiv__(self, other):
         assert type(other) in (int, float), \
             'Cannot divide types {} and {}'.format(type(self), type(other))
-        return Vector2D(operator.div(other, self.x),
-                        operator.div(other, self.y))
+        return Vector2D(operator.div(other, self.x), operator.div(other, self.y))
 
     def __floordiv__(self, other):
         assert type(other) in (int, float), \
@@ -310,7 +295,6 @@ class Point2D(Vector2D):
         x
         y
     """
-    _type = 'Point2D'
 
     def move(self, moving_vec):
         """Get a point that has been moved along a vector.
@@ -319,15 +303,6 @@ class Point2D(Vector2D):
             moving_vec: A Vector2D with the direction and distance to move the point.
         """
         return self + moving_vec
-
-    def scale(self, factor, origin):
-        """Scale a point by a factor from an origin point.
-
-        Args:
-            factor: A number representing how much the point should be scaled.
-            origin: A Point2D representing the origin from which to scale.
-        """
-        return (factor * (self - origin)) + origin
 
     def rotate(self, angle, origin):
         """Rotate a point counterclockwise by a certain angle around an origin.
@@ -348,6 +323,23 @@ class Point2D(Vector2D):
         """
         return Point2D._reflect(self - origin, normal) + origin
 
+    def scale(self, factor, origin):
+        """Scale a point by a factor from an origin point.
+
+        Args:
+            factor: A number representing how much the point should be scaled.
+            origin: A Point2D representing the origin from which to scale.
+        """
+        return (factor * (self - origin)) + origin
+
+    def scale_world_origin(self, factor):
+        """Scale a point by a factor from the world origin. Faster than Point2D.scale.
+
+        Args:
+            factor: A number representing how much the point should be scaled.
+        """
+        return Point2D(self.x * factor, self.y * factor)
+
     def distance_to_point(self, point):
         """Get the distance from this point to another Point2D."""
         vec = (self.x - point.x, self.y - point.y)
@@ -356,6 +348,26 @@ class Point2D(Vector2D):
     def to_immutable(self):
         """Get an immutable version of this object."""
         return Point2DImmutable(self.x, self.y)
+
+    def __add__(self, other):
+        # Point + Vector -> Point
+        # Point + Point -> Vector
+        if isinstance(other, (Vector2D, Vector2DImmutable)):
+            return Point2D(self.x + other.x, self.y + other.y)
+        elif isinstance(other, (Point2D, Point2DImmutable)):
+            return Vector2D(self.x + other.x, self.y + other.y)
+        else:
+            raise TypeError('Cannot add Point2D and {}'.format(type(other)))
+
+    def __sub__(self, other):
+        # Point - Vector -> Point
+        # Point - Point -> Vector
+        if isinstance(other, (Vector2D, Vector2DImmutable)):
+            return Point2D(self.x - other.x, self.y - other.y)
+        elif isinstance(other, (Point2D, Point2DImmutable)):
+            return Vector2D(self.x - other.x, self.y - other.y)
+        else:
+            raise TypeError('Cannot subtract Point2D and {}'.format(type(other)))
 
     def __repr__(self):
         """Point2D representation."""
@@ -368,8 +380,12 @@ class Vector2DImmutable(Vector2D):
     _mutable = False
 
     def to_mutable(self):
-        """Get a mutable version of this vector."""
+        """Get a mutable version of this object."""
         return Vector2D(self.x, self.y)
+
+    def to_immutable(self):
+        """Get an immutable version of this object."""
+        return self
 
 
 @immutable
@@ -378,5 +394,9 @@ class Point2DImmutable(Point2D):
     _mutable = False
 
     def to_mutable(self):
-        """Get a mutable version of this point."""
+        """Get a mutable version of this object."""
         return Point2D(self.x, self.y)
+
+    def to_immutable(self):
+        """Get an immutable version of this object."""
+        return self

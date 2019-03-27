@@ -5,8 +5,8 @@ from __future__ import division
 from .geometry2d.pointvector import Point2D
 
 
-def intersect_line2d_line2d(A, B):
-    """Get the intersection between any Ray2D or LineSegment2D objects.
+def intersect_line2d(A, B):
+    """Get the intersection between any Ray2D or LineSegment2D objects as a Point2D.
 
     Args:
         A: A LineSegment2D or Ray2D object.
@@ -18,7 +18,6 @@ def intersect_line2d_line2d(A, B):
     d = B.v.y * A.v.x - B.v.x * A.v.y
     if d == 0:
         return None
-
     dy = A.p.y - B.p.y
     dx = A.p.x - B.p.x
     ua = (B.v.x * dy - B.v.y * dx) / d
@@ -27,8 +26,34 @@ def intersect_line2d_line2d(A, B):
     ub = (A.v.x * dy - A.v.y * dx) / d
     if not B._u_in(ub):
         return None
-
     return Point2D(A.p.x + ua * A.v.x, A.p.y + ua * A.v.y)
+
+
+def does_intersection_exist_line2d(A, B):
+    """Boolean denoting whether an intersection exists between Ray2D or LineSegment2D.
+
+    This is slightly faster than actually computing the intersection but should only be
+    used in cases where the actual point of intersection is not needed.
+
+    Args:
+        A: A LineSegment2D or Ray2D object.
+        B: Another LineSegment2D or Ray2D to intersect.
+
+    Returns:
+        True if an intersection exists. False if no intersection exists.
+    """
+    d = B.v.y * A.v.x - B.v.x * A.v.y
+    if d == 0:
+        return False
+    dy = A.p.y - B.p.y
+    dx = A.p.x - B.p.x
+    ua = (B.v.x * dy - B.v.y * dx) / d
+    if not A._u_in(ua):
+        return False
+    ub = (A.v.x * dy - A.v.y * dx) / d
+    if not B._u_in(ub):
+        return False
+    return True
 
 
 def closest_point2d_on_line2d(P, L):
@@ -36,7 +61,7 @@ def closest_point2d_on_line2d(P, L):
 
     Args:
         P: A Point2D object.
-        B: A LineSegment2D or Ray2D object along wich the closest point
+        L: A LineSegment2D or Ray2D object along wich the closest point
             will be determined.
 
     Returns:
@@ -48,3 +73,22 @@ def closest_point2d_on_line2d(P, L):
     if not L._u_in(u):
         u = max(min(u, 1.0), 0.0)
     return Point2D(L.p.x + u * L.v.x, L.p.y + u * L.v.y)
+
+
+def is_point2d_on_line2d(P, L, tol):
+    """Boolean denoting whether Point2D P lies on Ray2D or LineSegment2D L.
+
+    Args:
+        P: A Point2D object.
+        L: A LineSegment2D or Ray2D object along wich the closest point
+            will be determined.
+        tol: Tolerance at which point is considered to lie on the line.
+
+    Returns:
+        True if an P lies on L. False P does not lie on L.
+    """
+    p1 = L.p1
+    p2 = L.p2
+    if abs((P.y - p1.y) * (p2.x - P.x) - (P.x - p1.x) * (p2.y - P.y)) <= tol:
+        return True
+    return False
