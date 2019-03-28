@@ -20,7 +20,7 @@ class Mesh2D(Base2D):
         vertices
         faces
         colors
-        color_by_face
+        is_color_by_face
         face_areas
         area
         face_centroids
@@ -31,7 +31,7 @@ class Mesh2D(Base2D):
     """
     _check_required = True
     _colors = None
-    _color_by_face = None
+    _is_color_by_face = False
     _face_areas = None
     _area = None
     _face_centroids = None
@@ -57,14 +57,14 @@ class Mesh2D(Base2D):
 
     @classmethod
     def from_faces(cls, faces, purge=True):
-        """Create a mesh from a list of faces each defined by Point2D objects.
+        """Create a mesh from a list of faces with each face defined by a list of Point2Ds.
 
         Args:
             faces: A list of faces with each face defined as a list of 3 or 4 Point2D.
             purge: A boolean to indicate if duplicate vertices should be shared between
                 faces. Default is True to purge duplicate vertices, which can be slow
-                for large lists of faces but results in a higher-quality mesh.
-                Default is True.
+                for large lists of faces but results in a higher-quality mesh with
+                a smaller size in memory. Default is True.
         """
         vertices = []  # collection of vertices as Point2D
         face_collector = []  # collection of face indices
@@ -94,14 +94,17 @@ class Mesh2D(Base2D):
     def from_polygon_triangulated(cls, polygon, purge=True):
         """Initialize a triangulated Mesh2D from a Polygon2D.
 
+        Such a triangulated mesh will completely fill the polygon since any
+        polygon can be subdivided into a set of triangles.
+
         Args:
             polygon: A Polygon2D.
             purge: A boolean to indicate if duplicate vertices should be shared between
                 faces. This has no bearing on the triagnulation of convex polygons
                 and only affects concave polygons with more than 4 sides.
                 Default is True to purge duplicate vertices, which can be slow
-                for large lists of faces but results in a higher-quality mesh.
-                Default is True.
+                for convace polygons composed of a large number of triangles but
+                ultimately results in a higher-quality mesh. Default is True.
         """
         assert isinstance(polygon, Polygon2D), 'polygon must be a Polygon2D to use ' \
             'from_polygon_triangulated. Got {}.'.format(type(polygon))
@@ -125,17 +128,85 @@ class Mesh2D(Base2D):
         return _new_mesh
 
     @classmethod
-    def from_polygon_grid(cls, polygon, x_dim, y_dim):
+    def from_polygon_grid(cls, polygon, x_dim, y_dim, generate_centroids=True):
         """Initialize a gridded Mesh2D from a Polygon2D.
 
-        Note that this gridded mesh will not completely fill the polygon unless it
-        is perfectly rectangular. Essentially this method generates a grid over
-        the domain of the polygon and then removes any points that do not lie within
-        the polygon."""
+        Note that this gridded mesh will likely not completely fill the polygon.
+        Essentially, this method generates a grid over the domain of the polygon
+        and then removes any points that do not lie within the polygon.
+
+        Args:
+            polygon: A Polygon2D object.
+            x_dim: The x dimension of the grid cells as a number.
+            y_dim: The y dimension of the grid cells as a number.
+            generate_centroids: Set to True to have the face centroids generated
+                alongside the grid of vertices, which is much faster than having
+                them generated upon request as they typically are. However, if you
+                have no need for the face centroids, you would save memory by setting
+                this to False. Default is True.
+        """
+        assert isinstance(polygon, Polygon2D), 'Expected Polygon2D for' \
+            ' Mesh2D.from_polygon_grid. Got {}'.format(type(polygon))
+        # figure out how many x and y cells to make
+        _x_dim, _num_x = Mesh2D._domain_dimensions(polygon.max.x - polygon.min.x, x_dim)
+        _y_dim, _num_y = Mesh2D._domain_dimensions(polygon.max.y - polygon.min.y, y_dim)
+
+        # for tolerance reasons, we shrink the x dimension by a very small amount
+        # this is done because Polygon2D.is_point_inside uses an X Vector (1,0)
+        _x_dim = _x_dim * 0.999999
+        _min_pt = Point2D(polygon.min.x + 0.0000001, polygon.min.y)
+
+        # generate the gid of points and faces
+        _verts = Mesh2D._grid_vertices(_min_pt, _num_x, _num_y, _x_dim, _y_dim)
+        _faces = Mesh2D._grid_faces(_num_x, _num_y)
+        _centroids = None
+        if generate_centroids is True:  # calculate centroids if requested
+            _centroids = Mesh2D._grid_centroids(_min_pt, _num_x, _num_y, _x_dim, _y_dim)
+
+        # figure out which vertices lie inside the polygon
+        _pattern = [polygon.is_point_inside(_v) for _v in _verts]
+
+        # build the mesh
+        cls._check_required = False  # Turn off checks since we know the mesh is valid
+        _mesh_init = cls(_verts, _faces)
+        cls._check_required = True  # Turn the checks back on
+        _mesh_init._face_centroids = _centroids
+        _new_mesh, _face_pattern = _mesh_init.remove_vertices(_pattern)
+        _new_mesh._face_areas = x_dim * y_dim
+        return _new_mesh
 
     @classmethod
-    def from_grid(cls, num_x, num_y, x_dim, y_dim):
-        """Initialize a Mesh2D from parameters that define a grid."""
+    def from_grid(cls, base_point=Point2D(), num_x=1, num_y=1, x_dim=1, y_dim=1,
+                  generate_centroids=True):
+        """Initialize a Mesh2D from parameters that define a grid.
+
+        Args:
+            base_point: The base point from which the mesh grid will be generated.
+                Default is (0, 0).
+            num_x: An integer for the number of mesh cells to generate in the
+                x direction. Default is 1.
+            num_y: An integer for the number of mesh cells to generate in the
+                y direction. Default is 1.
+            x_dim: The x dimension of the grid cells as a number. Default is 1.
+            y_dim: The y dimension of the grid cells as a number. Default is 1.
+            generate_centroids: Set to True to have the face centroids generated
+                alongside the grid of vertices, which is much faster than having
+                them generated upon request as they typically are. However, if you
+                have no need for the face centroids, you would save memory by setting
+                this to False. Default is True.
+        """
+        _verts = Mesh2D._grid_vertices(base_point, num_x, num_y, x_dim, y_dim)
+        _faces = Mesh2D._grid_faces(num_x, num_y)
+        _centroids = None
+        if generate_centroids is True:
+            _centroids = Mesh2D._grid_centroids(base_point, num_x, num_y, x_dim, y_dim)
+
+        cls._check_required = False  # Turn off checks since we know the mesh is valid
+        _new_mesh = cls(tuple(_verts), tuple(_faces))
+        cls._check_required = True  # Turn the checks back on
+        _new_mesh._face_areas = x_dim * y_dim
+        _new_mesh._face_centroids = _centroids
+        return _new_mesh
 
     @property
     def vertices(self):
@@ -149,7 +220,8 @@ class Mesh2D(Base2D):
 
     @property
     def colors(self):
-        """Tuple of all colors in the mesh or None if no colors assigned."""
+        """Get or set a list of colors for the mesh. Will be None if no colors assigned.
+        """
         return self._colors
 
     @colors.setter
@@ -158,22 +230,38 @@ class Mesh2D(Base2D):
             assert isinstance(col, (list, tuple)), \
                 'colors should be a list or tuple. Got {}'.format(type(col))
             if len(col) == len(self.faces):
-                self._color_by_face = True
+                self._is_color_by_face = True
             elif len(col) == len(self.vertices):
-                self._color_by_face = False
+                self._is_color_by_face = False
             else:
                 raise ValueError('Number of colors ({}) does not match the number of'
                                  ' mesh faces ({}) nor the number of vertices ({}).'
                                  .format(len(col), len(self.faces), len(self.vertices)))
+            if isinstance(col, list):
+                col = tuple(col)
             self._colors = col
 
     @property
-    def color_by_face(self):
+    def is_color_by_face(self):
         """Boolean for whether colors are face-by-face (True) or vertex-by-vertex (False)
 
-        Will be None if no colors are assigned.
+        When colors are assigned to the mesh, this property is linked to the colors
+        and cannot be set. However, when no colors are assigned, it can be set
+        because it affects how the mesh is translated to external interfaces.
+        In such cases, this property notes whether the mesh will be translated
+        in a format that can accept face-by-face colors.
+        Default is False when no colors are assigned.
         """
-        return self._color_by_face
+        return self._is_color_by_face
+
+    @is_color_by_face.setter
+    def is_color_by_face(self, by_face):
+        assert isinstance(by_face, bool), \
+            'is_color_by_face must be a boolean. Got {}'.format(type(by_face))
+        if self._colors is not None and self._is_color_by_face is not by_face:
+            raise AttributeError('is_color_by_face cannot be set when colors are'
+                                 ' already assinged to the mesh.')
+        self._is_color_by_face = by_face
 
     @property
     def face_areas(self):
@@ -183,6 +271,8 @@ class Mesh2D(Base2D):
             for face in self.faces:
                 _f_areas.append(self._face_area(face))
             self._face_areas = tuple(_f_areas)
+        elif isinstance(self._face_areas, (float, int)):
+            self._face_areas = [self._face_areas] * len(self.faces)
         return self._face_areas
 
     @property
@@ -236,7 +326,7 @@ class Mesh2D(Base2D):
         _new_faces = tuple(_new_faces)
 
         _new_colors = self.colors
-        if self.color_by_face is True:
+        if self.is_color_by_face is True:
             _new_colors = []
             for i, face in enumerate(self.faces):
                 if len(face) == 3:
@@ -249,6 +339,142 @@ class Mesh2D(Base2D):
         _new_mesh = Mesh2D(self.vertices, _new_faces, _new_colors)
         Mesh2D._check_required = True  # Turn the checks back on
         return _new_mesh
+
+    def remove_vertices(self, pattern):
+        """Get a version of this mesh where vertices are removed according to a pattern.
+
+        Args:
+            pattern: A list of boolean values denoting whether a vertex should
+                remain in the mesh (True) or be removed from the mesh (False).
+                The length of this list must match the number of this mesh's vertices.
+
+        Returns:
+            new_mesh: A mesh where the vertices have been removed according
+                to the input pattern.
+            face_pattern: A list of boolean values that corresponds to the
+                original mesh faces noting whether the face is in the new mesh
+                (True) or has been removed from the new mesh (False).
+        """
+        assert isinstance(pattern, (list, tuple)), 'pattern for remove_vertices must' \
+            ' be a list or tuple. Got {}.'.format(type(pattern))
+        assert len(pattern) == len(self), 'Length of pattern for remove_vertices ({})' \
+            ' must match the number of vertices in the mesh ({}).'.format(
+                len(pattern), len(self))
+        _new_verts = []
+        _new_faces = []
+        # make a dictionary that maps old vertex indices to new ones
+        _vdict = {}
+        _vcount = 0
+        for i, _in_mesh in enumerate(pattern):
+            if _in_mesh is True:
+                _vdict[i] = _vcount
+                _vcount += 1
+                _new_verts.append(self._vertices[i])
+
+        # get the new faces
+        face_pattern = []
+        for _f in self.faces:
+            try:
+                if len(_f) == 3:
+                    _new_f = (_vdict[_f[0]], _vdict[_f[1]], _vdict[_f[2]])
+                else:
+                    _new_f = (_vdict[_f[0]], _vdict[_f[1]], _vdict[_f[2]], _vdict[_f[3]])
+                    _new_faces.append(_new_f)
+                    face_pattern.append(True)
+            except KeyError:
+                face_pattern.append(False)
+
+        # remove colors if they are assigned
+        _new_colors = None
+        if self._colors is not None:
+            _new_col = []
+            if self._is_color_by_face is True:
+                for i, _p in enumerate(face_pattern):
+                    if _p is True:
+                        _new_col.append(self._colors[i])
+            else:
+                for i, _p in enumerate(pattern):
+                    if _p is True:
+                        _new_col.append(self._colors[i])
+            _new_colors = tuple(_new_col)
+
+        # transfer face centroids and areas if they exist so they don't get re-computed
+        _new_f_cent, _new_f_area = self._transfer_face_centroids_areas(pattern)
+
+        Mesh2D._check_required = False  # Turn off checks since we know the mesh is valid
+        new_mesh = Mesh2D(tuple(_new_verts), tuple(_new_faces), _new_colors)
+        Mesh2D._check_required = True  # Turn the checks back on
+        new_mesh._face_centroids = _new_f_cent
+        new_mesh._face_areas = _new_f_area
+        return new_mesh, face_pattern
+
+    def remove_faces(self, pattern):
+        """Get a version of this mesh where faces are removed according to a pattern.
+
+        Args:
+            pattern: A list of boolean values denoting whether a face should
+                remain in the mesh (True) or be removed from the mesh (False).
+                The length of this list must match the number of this mesh's faces.
+
+        Returns:
+            new_mesh: A mesh where the faces have been removed according
+                to the input pattern.
+            vertex_pattern: A list of boolean values that corresponds to the
+                original mesh vertices noting whether the vertex is in the new mesh
+                (True) or has been removed from the new mesh (False).
+        """
+        self._check_face_pattern(pattern)
+        # make a pattern of vertices that will be in the new mesh
+        vertex_pattern = [False for _v in self.vertices]
+        for i, _in_mesh in enumerate(pattern):
+            if _in_mesh is True:
+                _face = self._faces[i]
+                for _v in _face:
+                    vertex_pattern[i] = True
+        new_mesh, face_pattern = self.remove_vertices(vertex_pattern)
+        return new_mesh, vertex_pattern
+
+    def remove_faces_only(self, pattern):
+        """Get a version of this mesh where faces are removed and vertices are not altered.
+
+        This is faster than the Mesh2D.remove_faces method but will likely result
+        a lower-quality mesh where several vertices exist in the mesh that are not
+        referenced by any face. This may be preferred if pure speed of removing
+        faces is a priorty over smallest size of the mesh in memory.
+
+        Args:
+            pattern: A list of boolean values denoting whether a face should
+                remain in the mesh (True) or be removed from the mesh (False).
+                The length of this list must match the number of this mesh's faces.
+
+        Returns:
+            new_mesh: A mesh where the faces have been removed according
+                to the input pattern.
+        """
+        self._check_face_pattern(pattern)
+        _new_faces = []
+        for i, _in_mesh in enumerate(pattern):
+            if _in_mesh is True:
+                _new_faces.append(self._faces[i])
+
+        # transfer the colors over to the new mesh if they are assigned face-by-face
+        _new_colors = self._colors
+        if self._colors is not None and self._is_color_by_face is True:
+            _new_col = []
+            for i, _p in enumerate(pattern):
+                if _p is True:
+                    _new_col.append(self._colors[i])
+            _new_colors = _new_col
+
+        # transfer face centroids and areas if they exist so they don't get re-computed
+        _new_f_cent, _new_f_area = self._transfer_face_centroids_areas(pattern)
+
+        Mesh2D._check_required = False  # Turn off checks since we know the mesh is valid
+        new_mesh = Mesh2D(self.vertices, tuple(_new_faces), _new_colors)
+        Mesh2D._check_required = True  # Turn the checks back on
+        new_mesh._face_centroids = _new_f_cent
+        new_mesh._face_areas = _new_f_area
+        return new_mesh
 
     def _check_vertices_input(self, vertices):
         assert isinstance(vertices, (list, tuple)), \
@@ -274,6 +500,37 @@ class Mesh2D(Base2D):
         if isinstance(faces, list):
             faces = tuple(faces)
         self._faces = faces
+
+    def _check_face_pattern(self, pattern):
+        assert isinstance(pattern, (list, tuple)), 'pattern for remove_faces must' \
+            ' be a list or tuple. Got {}.'.format(type(pattern))
+        assert len(pattern) == len(self.faces), 'Length of pattern for remove_faces'\
+            ' ({}) must match the number of faces in the mesh ({}).'.format(
+                len(pattern), len(self.faces))
+
+    def _transfer_face_centroids_areas(self, face_pattern):
+        """Get face centroids and areas when removing faces.
+
+        This is so they can be transferred to the new mesh.
+        """
+        _new_f_cent = None
+        if self._face_centroids is not None:
+            _f_cent = []
+            for i, _p in enumerate(face_pattern):
+                if _p is True:
+                    _f_cent.append(self._face_centroids[i])
+            _new_f_cent = tuple(_f_cent)
+        _new_f_area = None
+        if self._face_areas is not None:
+            if isinstance(self._face_areas, (float, int)):
+                _new_f_area = self._face_areas
+            else:
+                _f_area = []
+                for i, _p in enumerate(face_pattern):
+                    if _p is True:
+                        _f_area.append(self._face_areas[i])
+                _new_f_area = tuple(_f_area)
+        return _new_f_cent, _new_f_area
 
     def _face_area(self, face):
         """Return the area of a face."""
@@ -383,6 +640,54 @@ class Mesh2D(Base2D):
         for i, pt in enumerate(verts):
             _a += verts[i - 1].x * pt.y - verts[i - 1].y * pt.x
         return abs(_a / 2)
+
+    @staticmethod
+    def _domain_dimensions(_dom, _dim):
+        """Get corrected dimensions and number of cells over a domain."""
+        _num = int(_dom / _dim)
+        _num = 1 if _num == 0 else _num
+        _dim = _dom / _num
+        return _dim, _num
+
+    @staticmethod
+    def _grid_vertices(base_point, num_x, num_y, x_dim, y_dim):
+        """Generate Point2D vertices for a grid."""
+        _verts = []
+        _x = base_point.x
+        for i in xrange(num_x + 1):
+            _y = base_point.y
+            for j in xrange(num_y + 1):
+                _verts.append(Point2DImmutable(_x, _y))
+                _y += y_dim
+            _x += x_dim
+        return _verts
+
+    @staticmethod
+    def _grid_faces(num_x, num_y):
+        """Generate face tuples for a grid."""
+        _faces = []
+        _c = 0
+        for i in xrange(num_x):
+            for j in xrange(num_y):
+                _faces.append((_c, _c + 1, _c + num_y + 2, _c + num_y + 1))
+                _c += 1
+            _c += 1
+        return _faces
+
+    @staticmethod
+    def _grid_centroids(base_point, num_x, num_y, x_dim, y_dim):
+        """Generate Point2D centroids for a grid."""
+        _centroids = []
+        _x_half = x_dim / 2
+        _y_half = y_dim / 2
+        _x = base_point.x
+        for i in xrange(num_x):
+            _y = base_point.y
+            for j in xrange(num_y):
+                _centroids.append(Point2DImmutable(_x + _x_half, _y + _y_half))
+                _y += y_dim
+            _x += x_dim
+        return tuple(_centroids)
 
     def __copy__(self):
         Mesh2D._check_required = False  # Turn off check since we know the mesh is valid

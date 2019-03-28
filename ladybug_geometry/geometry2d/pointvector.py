@@ -17,7 +17,7 @@ class Vector2D(object):
         magnitude
         magnitude_squared
     """
-    __slots__ = ('_x', '_y')
+    __slots__ = ('x', 'y')
     __hash__ = None
     _mutable = True
 
@@ -30,26 +30,6 @@ class Vector2D(object):
     def is_mutable(self):
         """Boolean to note whether the object is mutable."""
         return self._mutable
-
-    @property
-    def x(self):
-        """X coordinate."""
-        return self._x
-
-    @x.setter
-    def x(self, x):
-        assert isinstance(x, (int, float)), "Expected number. Got {}.".format(type(x))
-        self._x = x
-
-    @property
-    def y(self):
-        """Y coordinate."""
-        return self._y
-
-    @y.setter
-    def y(self, y):
-        assert isinstance(y, (int, float)), "Expected number. Got {}.".format(type(y))
-        self._y = y
 
     @property
     def magnitude(self):
