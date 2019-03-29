@@ -1,14 +1,14 @@
 # coding=utf-8
-"""2D Line Segment"""
+"""3D Line Segment"""
 from __future__ import division
 
 from .._immutable import immutable
-from .pointvector import Point2D
-from ._1d import Base1DIn2D
+from .pointvector import Point3D
+from ._1d import Base1DIn3D
 
 
-class LineSegment2D(Base1DIn2D):
-    """2D line segment object.
+class LineSegment3D(Base1DIn3D):
+    """3D line segment object.
 
     Properties:
         p: Base point
@@ -19,11 +19,11 @@ class LineSegment2D(Base1DIn2D):
     """
 
     def __init__(self, p, v):
-        """Initilize LineSegment2D.
+        """Initilize LineSegment3D.
 
         Args:
-            p: A Point2D representing the first point of the line segment.
-            v: A Vector2D representing the vector to the second point.
+            p: A Point3D representing the first point of the line segment.
+            v: A Vector3D representing the vector to the second point.
         """
         self.p = p
         self.v = v
@@ -33,8 +33,8 @@ class LineSegment2D(Base1DIn2D):
         """Initialize a line segment from a start point and and end point.
 
         Args:
-            p1: A Point2D representing the first point of the line segment.
-            p2: A Point2D representing the second point of the line segment.
+            p1: A Point3D representing the first point of the line segment.
+            p2: A Point3D representing the second point of the line segment.
         """
         return cls(p1, p2 - p1)
 
@@ -43,8 +43,8 @@ class LineSegment2D(Base1DIn2D):
         """Initialize a line segment from a start point, direction, and length.
 
         Args:
-            s: A Point2D representing the start point of the line segment.
-            d: A Vector2D representing the direction of the line segment.
+            s: A Point3D representing the start point of the line segment.
+            d: A Vector3D representing the direction of the line segment.
             length: A number representing the length of the line segment.
         """
         return cls(s, d * length / d.magnitude)
@@ -57,7 +57,7 @@ class LineSegment2D(Base1DIn2D):
     @property
     def p2(self):
         """Second point."""
-        return Point2D(self.p.x + self.v.x, self.p.y + self.v.y)
+        return Point3D(self.p.x + self.v.x, self.p.y + self.v.y, self.p.z + self.v.z)
 
     @property
     def midpoint(self):
@@ -76,44 +76,59 @@ class LineSegment2D(Base1DIn2D):
 
     def flipped(self):
         """Get a copy of this line segment that is flipped."""
-        return LineSegment2D(self.p2, self.v.reversed())
+        return LineSegment3D(self.p2, self.v.reversed())
 
     def move(self, moving_vec):
         """Get a line segment that has been moved along a vector.
 
         Args:
-            moving_vec: A Vector2D with the direction and distance to move the ray.
+            moving_vec: A Vector3D with the direction and distance to move the ray.
         """
-        return LineSegment2D(self.p.move(moving_vec), self.v)
+        return LineSegment3D(self.p.move(moving_vec), self.v)
 
-    def rotate(self, angle, origin):
-        """Get a line segment that is rotated counterclockwise by a certain angle.
+    def rotate(self, axis, angle, origin):
+        """Rotate a line segment by a certain angle around an axis and origin.
+
+        Right hand rule applies:
+        If axis has a positive orientation, rotation will be clockwise.
+        If axis has a negative orientation, rotation will be counterclockwise.
 
         Args:
+            axis: A Vector3D axis representing the axis of rotation.
             angle: An angle for rotation in radians.
-            origin: A Point2D for the origin around which the line segment will
-                be rotated.
+            origin: A Point3D for the origin around which the object will be rotated.
         """
-        return LineSegment2D(self.p.rotate(angle, origin), self.v.rotate(angle))
+        return LineSegment3D(self.p.rotate(axis, angle, origin),
+                             self.v.rotate(axis, angle))
+
+    def rotate_xy(self, angle, origin):
+        """Get a line segment rotated counterclockwise in the XY plane by a certain angle.
+
+        Args:
+            angle: An angle in radians.
+            origin: A Point3D for the origin around which the object will be rotated.
+        """
+        return LineSegment3D(self.p.rotate_xy(angle, origin),
+                             self.v.rotate_xy(angle))
 
     def reflect(self, normal, origin):
         """Get a line segment reflected across a plane with the input normal vector and origin.
 
         Args:
-            normal: A Vector2D representing the normal vector for the plane across
+            normal: A Vector3D representing the normal vector for the plane across
                 which the line segment will be reflected. THIS VECTOR MUST BE NORMALIZED.
-            origin: A Point2D representing the origin from which to reflect.
+            origin: A Point3D representing the origin from which to reflect.
         """
-        return LineSegment2D(self.p.reflect(normal, origin), self.v.reflect(normal))
+        return LineSegment3D(self.p.reflect(normal, origin), self.v.reflect(normal))
 
     def scale(self, factor, origin):
         """Scale a line segment by a factor from an origin point.
 
         Args:
             factor: A number representing how much the line segment should be scaled.
-            origin: A Point2D representing the origin from which to scale.
+            origin: A Point3D representing the origin from which to scale.
         """
-        return LineSegment2D(self.p.scale(factor, origin), self.v * factor)
+        return LineSegment3D(self.p.scale(factor, origin), self.v * factor)
 
     def scale_world_origin(self, factor):
         """Scale a line segment by a factor from the world origin. Faster than scale().
@@ -121,10 +136,10 @@ class LineSegment2D(Base1DIn2D):
         Args:
             factor: A number representing how much the line segment should be scaled.
         """
-        return LineSegment2D(self.p.scale_world_origin(factor), self.v * factor)
+        return LineSegment3D(self.p.scale_world_origin(factor), self.v * factor)
 
     def subdivide(self, distances):
-        """Get Point2D values along the line that subdivide it based on input distances.
+        """Get Point3D values along the line that subdivide it based on input distances.
 
         Args:
             distances: A list of distances along the line at which to subdivide it.
@@ -146,7 +161,7 @@ class LineSegment2D(Base1DIn2D):
         return sub_pts
 
     def subdivide_evenly(self, number):
-        """Get Point2D values along the line that divide it into evenly-spaced segments.
+        """Get Point3D values along the line that divide it into evenly-spaced segments.
 
         Args:
             number: The number of segments into which the line will be divided.
@@ -161,7 +176,7 @@ class LineSegment2D(Base1DIn2D):
         return sub_pts
 
     def point_at(self, parameter):
-        """Get a point at a given fraction along the line segment.
+        """Get a Point3D at a given fraction along the line segment.
 
         Args:
             parameter: The fraction between the start and end point where the
@@ -170,7 +185,7 @@ class LineSegment2D(Base1DIn2D):
         return self.p + self.v * parameter
 
     def point_at_length(self, length):
-        """Get a point at a given distance along the line segment.
+        """Get a Point3D at a given distance along the line segment.
 
         Args:
             length: The distance along the line from the start point where the
@@ -180,7 +195,7 @@ class LineSegment2D(Base1DIn2D):
 
     def to_immutable(self):
         """Get an immutable version of this object."""
-        return LineSegment2DImmutable(self.p, self.v)
+        return LineSegment3DImmutable(self.p, self.v)
 
     def __abs__(self):
         return abs(self.v)
@@ -189,28 +204,29 @@ class LineSegment2D(Base1DIn2D):
         return u >= 0.0 and u <= 1.0
 
     def __repr__(self):
-        return 'Ladybug LineSegment2D (<%.2f, %.2f> to <%.2f, %.2f>)' % \
-            (self.p.x, self.p.y, self.p.x + self.v.x, self.p.y + self.v.y)
+        return 'Ladybug LineSegment3D (<%.2f, %.2f, %.2f> to <%.2f, %.2f, %.2f>)' % \
+            (self.p.x, self.p.y, self.p.z,
+             self.p.x + self.v.x, self.p.y + self.v.y, self.p.z + self.v.z)
 
 
 @immutable
-class LineSegment2DImmutable(LineSegment2D):
-    """Immutable 2D Line Segment object."""
+class LineSegment3DImmutable(LineSegment3D):
+    """Immutable 3D Line Segment object."""
     _mutable = False
 
     def __init__(self, p, v):
         """Initilize LineSegment2D.
 
         Args:
-            p: A Point2D representing the base of the ray.
-            v: A Vector2D representing the direction of the ray.
+            p: A Point3D representing the base of the ray.
+            v: A Vector3D representing the direction of the ray.
         """
         self.p = p.to_immutable()
         self.v = v.to_immutable()
 
     def to_mutable(self):
         """Get a mutable version of this object."""
-        return LineSegment2D(self.p.to_mutable(), self.v.to_mutable())
+        return LineSegment3D(self.p.to_mutable(), self.v.to_mutable())
 
     def to_immutable(self):
         """Get an immutable version of this object."""

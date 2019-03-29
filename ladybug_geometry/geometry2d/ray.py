@@ -3,10 +3,10 @@
 from __future__ import division
 
 from .._immutable import immutable
-from ._1d import Base1D
+from ._1d import Base1DIn2D
 
 
-class Ray2D(Base1D):
+class Ray2D(Base1DIn2D):
     """2D Ray object.
 
     Properties:
@@ -84,7 +84,7 @@ class Ray2D(Base1D):
         return u >= 0.0
 
     def __repr__(self):
-        return 'Ray2D(<%.2f, %.2f> + u<%.2f, %.2f>)' % \
+        return 'Ladybug Ray2D (<%.2f, %.2f> + u<%.2f, %.2f>)' % \
             (self.p.x, self.p.y, self.v.x, self.v.y)
 
 

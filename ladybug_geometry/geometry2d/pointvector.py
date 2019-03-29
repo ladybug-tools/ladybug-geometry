@@ -282,7 +282,7 @@ class Point2D(Vector2D):
         Args:
             moving_vec: A Vector2D with the direction and distance to move the point.
         """
-        return self + moving_vec
+        return Point2D(self.x + moving_vec.x, self.y + moving_vec.y)
 
     def rotate(self, angle, origin):
         """Rotate a point counterclockwise by a certain angle around an origin.

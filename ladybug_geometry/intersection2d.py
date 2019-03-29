@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Utility functions for computing intersections between geometry objects."""
+"""Utility functions for computing intersections between geometry in 2D space."""
 from __future__ import division
 
 from .geometry2d.pointvector import Point2D
@@ -57,11 +57,11 @@ def does_intersection_exist_line2d(A, B):
 
 
 def closest_point2d_on_line2d(P, L):
-    """Get the closest Point2D on a LineSegment2 or Ray2 to the input P.
+    """Get the closest Point2D on a LineSegment2D or Ray2D to the input P.
 
     Args:
         P: A Point2D object.
-        L: A LineSegment2D or Ray2D object along wich the closest point
+        L: A LineSegment2D or Ray2D object along which the closest point
             will be determined.
 
     Returns:
@@ -73,22 +73,3 @@ def closest_point2d_on_line2d(P, L):
     if not L._u_in(u):
         u = max(min(u, 1.0), 0.0)
     return Point2D(L.p.x + u * L.v.x, L.p.y + u * L.v.y)
-
-
-def is_point2d_on_line2d(P, L, tol):
-    """Boolean denoting whether Point2D P lies on Ray2D or LineSegment2D L.
-
-    Args:
-        P: A Point2D object.
-        L: A LineSegment2D or Ray2D object along wich the closest point
-            will be determined.
-        tol: Tolerance at which point is considered to lie on the line.
-
-    Returns:
-        True if an P lies on L. False P does not lie on L.
-    """
-    p1 = L.p1
-    p2 = L.p2
-    if abs((P.y - p1.y) * (p2.x - P.x) - (P.x - p1.x) * (p2.y - P.y)) <= tol:
-        return True
-    return False

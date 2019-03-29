@@ -5,7 +5,7 @@ from __future__ import division
 from .pointvector import Point2D, Point2DImmutable
 from .line import LineSegment2D
 from .polygon import Polygon2D
-from ._2d import Base2D
+from ._2d import Base2DIn2D
 
 try:
     from itertools import izip as zip  # python 2
@@ -13,7 +13,7 @@ except ImportError:
     xrange = range  # python 3
 
 
-class Mesh2D(Base2D):
+class Mesh2D(Base2DIn2D):
     """2D Mesh object.
 
     Properties:

@@ -1,19 +1,17 @@
 # coding=utf-8
-"""Base class for all 1D geometries (Ray2D and LineSegment2D)."""
+"""Base class for all 1D geometries in 2D space (Ray2D and LineSegment2D)."""
 from __future__ import division
 
 from .pointvector import Point2D, Point2DImmutable, Vector2D, Vector2DImmutable
 from ..intersection2d import intersect_line2d, closest_point2d_on_line2d
 
 
-class Base1D(object):
-    """Base class for all 1D geometries (Ray2D and LineSegment2D).
+class Base1DIn2D(object):
+    """Base class for all 1D geometries in 2D space (Ray2D and LineSegment2D).
 
     Properties:
-        vertices
-        min
-        max
-        center
+        p: End Point2D of object
+        v: Vector2D along object
     """
     __slots__ = ('_p', '_v')
     _mutable = True
@@ -73,7 +71,7 @@ class Base1D(object):
         """Get the intersection between this object and another Ray2 or LineSegment2D.
 
         Args:
-            other: Another LineSegment2D or Ray2 or to intersect.
+            other: Another LineSegment2D or Ray2D or to intersect.
 
         Returns:
             Point2D of intersection if it exists. None if no intersection exists.

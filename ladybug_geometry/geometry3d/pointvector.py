@@ -310,7 +310,9 @@ class Point3D(Vector3D):
         Args:
             moving_vec: A Vector3D with the direction and distance to move the point.
         """
-        return self + moving_vec
+        return Point3D(self.x + moving_vec.x,
+                       self.y + moving_vec.y,
+                       self.z + moving_vec.z)
 
     def rotate(self, axis, angle, origin):
         """Rotate a point by a certain angle around an axis and origin.

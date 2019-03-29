@@ -6,11 +6,11 @@ from .pointvector import Point2D, Point2DImmutable, Vector2D, Vector2DImmutable
 from .line import LineSegment2DImmutable
 from .ray import Ray2D
 from ..intersection2d import intersect_line2d, does_intersection_exist_line2d, \
-    is_point2d_on_line2d
-from ._2d import Base2D
+    closest_point2d_on_line2d
+from ._2d import Base2DIn2D
 
 
-class Polygon2D(Base2D):
+class Polygon2D(Base2DIn2D):
     """2D polygon object.
 
     Properties:
@@ -264,7 +264,8 @@ class Polygon2D(Base2D):
                 or not on the edges (False).
         """
         for _s in self.segments:
-            if is_point2d_on_line2d(point, _s, tolerance):
+            close_pt = closest_point2d_on_line2d(point, _s)
+            if point.distance_to_point(close_pt) < tolerance:
                 return True
         return False
 

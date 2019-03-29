@@ -1,12 +1,12 @@
 # coding=utf-8
-"""Base class for all 2D geometries (Polygon2D and Mesh2D)."""
+"""Base class for all 2D geometries in 2D space (Polygon2D and Mesh2D)."""
 from __future__ import division
 
 from .pointvector import Point2DImmutable
 
 
-class Base2D(object):
-    """Base class for all 2D geometries (Polygon2D and Mesh2D).
+class Base2DIn2D(object):
+    """Base class for all 2D geometries in 2D space (Polygon2D and Mesh2D).
 
     Properties:
         vertices
