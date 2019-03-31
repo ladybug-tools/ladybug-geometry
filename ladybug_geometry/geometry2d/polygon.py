@@ -291,23 +291,31 @@ class Polygon2D(Base2DIn2D):
                 return True
         return False
 
-    def is_point_inside_check(self, point):
-        """Test whether a Point2D lies inside the polygon with checks for edge cases.
+    def is_point_inside_check(self, point, complete_check=True):
+        """Test whether a Point2D lies inside the polygon with checks for fringe cases.
 
         This method uses the same calculation as the the `is_point_inside` method
-        but it includes additional checks for the edge cases noted in the
+        but it includes additional checks for the fringe cases noted in the
         `is_point_inside` description.
-        This particular method is good enough to always yeild the right result for
-        polygons with up to two concave turns.
-        While this method covers these edge cases, it will not test for whether
-        a point lies perfectly on the edge of the polygon so it will assess whether
-        a point lies inside the polygon up to Python floating point tolerance (1e-16).
-        If distinguishing edge conditions from inside/ outside is important,
-        the point_relationship method should be used.
+        While this method covers these fringe cases, it will not test for whether
+        a point lies perfectly on the edge of the polygon so it assesses whether
+        a point lies inside the polygon up to Python floating point tolerance
+        (1e-16). If distinguishing edge conditions from inside/ outside is
+        important, the `point_relationship` method should be used.
 
         Args:
             point: A Point2D for which the inside/ outside relationship will be tested.
-
+            complete_check: Set to True to have this method check for the case that
+                a point outside the polygon is co-linear with an edge in the x direction.
+                This check is not necessary when using this function to generate mesh
+                grids. Running this check means that this method will always yeild the
+                right result for polygons with up to two concave turns. This is good
+                for nearly all practical purposes and the only cases that could
+                yield incorrect results are when a point is co-linear with two or
+                more polygon edges along the X vector like so:
+                                  _____     _____     _____
+                                 |  .  |___|     |___|     |
+                                 |_________________________|
         Returns:
             A boolean denoting whether the point lies inside (True) or outside (False).
         """
@@ -329,7 +337,10 @@ class Polygon2D(Base2DIn2D):
         if self.is_convex is False and len(inters) == 2:
             for _s in self.segments:
                 if _s.p1 == inters[0] and _s.p2 == inters[1]:
-                    return True
+                    if complete_check is False:
+                        return True
+                    else:
+                        return self.is_point_inside(point, Vector2D(0, 1))
         elif len(inters) == 3:
             for _s in self.segments:
                 if _s.p1 == inters[0] and _s.p2 == inters[1]:
@@ -340,26 +351,38 @@ class Polygon2D(Base2DIn2D):
             return False
         return True
 
-    def is_point_inside(self, point):
+    def is_point_inside(self, point, test_vector=Vector2D(1, 0)):
         """Test whether a Point2D lies inside or outside the polygon.
 
         This method is the fastest way to tell if a point is inside a polygon when
         the given point lies inside the boundary rectangle of the polygon.
         However, while this method gives the correct result in 99.9% of cases,
-        there are a few edge cases where it will not give the correct result.
+        there are a few fringe cases where it will not give the correct result.
         Specifically these are:
         1 - When the test_ray intersects perfectly with a polygon vertex.
-        2 - When there are two polygon vertices that are colinear with the test_ray.
-        Use the `is_point_inside_check` method if a result that covers these edge
+            For example, this case with an X-unit test_vector:
+                                _____________
+                               |      .      |
+                               |            /
+                               |___________/
+        2 - When there are two polygon vertices that are colinear with the point
+            along the test_ray. For example, this case with an X-unit test_vector:
+                                  _____
+                                 |  .  |____
+                                 |__________|
+        Use the `is_point_inside_check` method if a result that covers these fringe
         cases is needed.
 
         Args:
-            point: A Point2D for which the inside/ outside relationship will be tested.
+            point: A Point2D for which the inside/outside relationship will be tested.
+            test_vector: Optional vector to set the direction in which intersections
+                with the polygon edges will be evaluated to determine if the
+                point is inside. Default is the X-unit vector.
 
         Returns:
             A boolean denoting whether the point lies inside (True) or outside (False).
         """
-        test_ray = Ray2D(point, Vector2D(1, 0))
+        test_ray = Ray2D(point, test_vector)
         n_int = 0
         for _s in self.segments:
             if does_intersection_exist_line2d(_s, test_ray):
@@ -368,7 +391,7 @@ class Polygon2D(Base2DIn2D):
             return False
         return True
 
-    def is_point_inside_bound_rect(self, point):
+    def is_point_inside_bound_rect(self, point, test_vector=Vector2D(1, 0)):
         """Test whether a Point2D lies roughly inside or outside the polygon.
 
         This function is virtually identical to the `is_point_inside`
@@ -378,6 +401,9 @@ class Polygon2D(Base2DIn2D):
 
         Args:
             point: A Point2D for which the inside/ outside relationship will be tested.
+            test_vector: Optional vector to set the direction in which intersections
+                with the polygon edges will be evaluated to determine if the
+                point is inside. Default is the x unit vector.
 
         Returns:
             A boolean denoting whether the point lies inside (True) or outside (False).
@@ -386,7 +412,7 @@ class Polygon2D(Base2DIn2D):
         max = self.max
         if point.x < min.x or point.y < min.y or point.x > max.x or point.y > max.y:
             return False
-        return self.is_point_inside(point)
+        return self.is_point_inside(point, test_vector)
 
     def _check_vertices_input(self, vertices):
         assert isinstance(vertices, (list, tuple)), \
