@@ -140,7 +140,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
             _centroids = Mesh2D._grid_centroids(_min_pt, _num_x, _num_y, _x_dim, _y_dim)
 
         # figure out which vertices lie inside the polygon
-        _pattern = [polygon.is_point_inside(_v) for _v in _verts]
+        _pattern = [polygon.is_point_inside_check(_v) for _v in _verts]
 
         # build the mesh
         cls._check_required = False  # Turn off checks since we know the mesh is valid

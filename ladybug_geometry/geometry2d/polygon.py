@@ -251,6 +251,10 @@ class Polygon2D(Base2DIn2D):
     def point_relationship(self, point, tolerance):
         """Test whether a Point2D lies inside, outside or on the boundary of the polygon.
 
+        This is the slowest of the methods for understanding the relationship
+        of a given point to a polygon. However, it covers all edge cases, including
+        the literal edge of the polygon.
+
         Args:
             point: A Point2D for which the relationship to the polygon will be tested.
             tolerance: The minimum distance from the edge at wich a point is
@@ -265,7 +269,7 @@ class Polygon2D(Base2DIn2D):
         """
         if self.is_point_on_edge(point, tolerance):
             return 0
-        if self.is_point_inside(point):
+        if self.is_point_inside_check(point):
             return 1
         return -1
 
@@ -287,14 +291,19 @@ class Polygon2D(Base2DIn2D):
                 return True
         return False
 
-    def is_point_inside(self, point):
-        """Test whether a Point2D lies inside or outside the polygon.
+    def is_point_inside_check(self, point):
+        """Test whether a Point2D lies inside the polygon with checks for edge cases.
 
-        This method will not test for whether a point lies on the edge of the
-        polygon so it can only assess whether a point lies inside up to Python
-        floating point tolerance (1e-16).
-        If distinguishing edge conditions from inside/ outside is
-        important, the point_relationship method should be used.
+        This method uses the same calculation as the the `is_point_inside` method
+        but it includes additional checks for the edge cases noted in the
+        `is_point_inside` description.
+        This particular method is good enough to always yeild the right result for
+        polygons with up to two concave turns.
+        While this method covers these edge cases, it will not test for whether
+        a point lies perfectly on the edge of the polygon so it will assess whether
+        a point lies inside the polygon up to Python floating point tolerance (1e-16).
+        If distinguishing edge conditions from inside/ outside is important,
+        the point_relationship method should be used.
 
         Args:
             point: A Point2D for which the inside/ outside relationship will be tested.
@@ -302,10 +311,58 @@ class Polygon2D(Base2DIn2D):
         Returns:
             A boolean denoting whether the point lies inside (True) or outside (False).
         """
-        ray = Ray2D(point, Vector2D(1, 0))
+        test_ray = Ray2D(point, Vector2D(1, 0))
+        inters = []
         n_int = 0
         for _s in self.segments:
-            if does_intersection_exist_line2d(_s, ray):
+            inter = intersect_line2d(_s, test_ray)
+            if inter is not None:
+                try:
+                    if inter != inters[-1]:  # ensure intersection is not duplicated
+                        n_int += 1
+                        inters.append(inter)
+                except IndexError:
+                    n_int += 1
+                    inters.append(inter)
+
+        # check that intersections do not form a polygon segment co-linear with test_ray
+        if self.is_convex is False and len(inters) == 2:
+            for _s in self.segments:
+                if _s.p1 == inters[0] and _s.p2 == inters[1]:
+                    return True
+        elif len(inters) == 3:
+            for _s in self.segments:
+                if _s.p1 == inters[0] and _s.p2 == inters[1]:
+                    if inters[0].x > inters[2].x and inters[1].x > inters[2].x:
+                        return False
+
+        if n_int % 2 == 0:
+            return False
+        return True
+
+    def is_point_inside(self, point):
+        """Test whether a Point2D lies inside or outside the polygon.
+
+        This method is the fastest way to tell if a point is inside a polygon when
+        the given point lies inside the boundary rectangle of the polygon.
+        However, while this method gives the correct result in 99.9% of cases,
+        there are a few edge cases where it will not give the correct result.
+        Specifically these are:
+        1 - When the test_ray intersects perfectly with a polygon vertex.
+        2 - When there are two polygon vertices that are colinear with the test_ray.
+        Use the `is_point_inside_check` method if a result that covers these edge
+        cases is needed.
+
+        Args:
+            point: A Point2D for which the inside/ outside relationship will be tested.
+
+        Returns:
+            A boolean denoting whether the point lies inside (True) or outside (False).
+        """
+        test_ray = Ray2D(point, Vector2D(1, 0))
+        n_int = 0
+        for _s in self.segments:
+            if does_intersection_exist_line2d(_s, test_ray):
                 n_int += 1
         if n_int % 2 == 0:
             return False
@@ -314,10 +371,10 @@ class Polygon2D(Base2DIn2D):
     def is_point_inside_bound_rect(self, point):
         """Test whether a Point2D lies roughly inside or outside the polygon.
 
-        This function is virtually identical to the Polygon2D.is_point_inside
+        This function is virtually identical to the `is_point_inside`
         method but will first do a check to see if the point lies inside the
         polygon bounding rectangle. As such, it is a faster approach when one
-        expects many of the tested points to lie far away from the polygon.
+        expects many of tested points to lie far away from the polygon.
 
         Args:
             point: A Point2D for which the inside/ outside relationship will be tested.

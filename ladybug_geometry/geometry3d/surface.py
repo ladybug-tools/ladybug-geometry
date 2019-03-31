@@ -80,7 +80,6 @@ class Surface3D(Base2DIn3D):
         except Exception as e:
             raise ValueError('Incorrect vertices input for Surface3D:\n\t{}'.format(e))
         plane = Plane(n, pt1)
-        # TODO: set the is_clockwise property to always be True (or False?)
         return cls(vertices, plane)
 
     @classmethod
