@@ -131,7 +131,7 @@ class LineSegment3D(Base1DIn3D):
         return LineSegment3D(self.p.scale(factor, origin), self.v * factor)
 
     def scale_world_origin(self, factor):
-        """Scale a line segment by a factor from the world origin. Faster than scale().
+        """Scale a line segment by a factor from the world origin. Faster than scale.
 
         Args:
             factor: A number representing how much the line segment should be scaled.

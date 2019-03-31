@@ -29,6 +29,27 @@ def intersect_line2d(A, B):
     return Point2D(A.p.x + ua * A.v.x, A.p.y + ua * A.v.y)
 
 
+def intersect_line2d_infinite(A, B):
+    """Get the intersection between a Ray2D/LineSegment2D and another extended infinitely.
+
+    Args:
+        A: A LineSegment2D or Ray2D object.
+        B: ALineSegment2D or Ray2D that will be extended infinitely for intersection.
+
+    Returns:
+        Point2D of intersection if it exists. None if no intersection exists.
+    """
+    d = B.v.y * A.v.x - B.v.x * A.v.y
+    if d == 0:
+        return None
+    dy = A.p.y - B.p.y
+    dx = A.p.x - B.p.x
+    ua = (B.v.x * dy - B.v.y * dx) / d
+    if not A._u_in(ua):
+        return None
+    return Point2D(A.p.x + ua * A.v.x, A.p.y + ua * A.v.y)
+
+
 def does_intersection_exist_line2d(A, B):
     """Boolean denoting whether an intersection exists between Ray2D or LineSegment2D.
 

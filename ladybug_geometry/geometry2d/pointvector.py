@@ -66,8 +66,6 @@ class Vector2D(object):
 
     def dot(self, other):
         """Get the dot product of this vector with another."""
-        assert isinstance(other, (Vector2D, Vector2DImmutable)), \
-            'other must be a Vector2D to use `dot()` with {}'.format(self.__class__)
         return self.x * other.x + self.y * other.y
 
     def determinant(self, other):

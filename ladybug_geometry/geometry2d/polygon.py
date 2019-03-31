@@ -5,8 +5,8 @@ from __future__ import division
 from .pointvector import Point2D, Point2DImmutable, Vector2D, Vector2DImmutable
 from .line import LineSegment2DImmutable
 from .ray import Ray2D
-from ..intersection2d import intersect_line2d, does_intersection_exist_line2d, \
-    closest_point2d_on_line2d
+from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
+    does_intersection_exist_line2d, closest_point2d_on_line2d
 from ._2d import Base2DIn2D
 
 
@@ -16,14 +16,14 @@ class Polygon2D(Base2DIn2D):
     Properties:
         vertices
         segments
+        min
+        max
+        center
         perimeter
         area
         is_clockwise
         is_convex
         is_self_intersecting
-        min
-        max
-        center
     """
     _check_required = True
     _segments = None
@@ -145,8 +145,8 @@ class Polygon2D(Base2DIn2D):
     def is_self_intersecting(self):
         """Boolean noting whether the polygon has self-intersecting edges.
 
-        Note that this property is computationally intense and most CAD programs forbid
-        surfaces with self-intersecting edges.
+        Note that this property is relatively computationally intense to obtain and
+        most CAD programs forbid surfaces with self-intersecting edges.
         So this property should only be used in quality control scripts where the
         origin of the geometry is unknown.
         """
@@ -165,7 +165,7 @@ class Polygon2D(Base2DIn2D):
                         break
         return self._is_complex
 
-    def reversed(self):
+    def reverse(self):
         """Get a copy of this polygon where the vertices are reversed."""
         return Polygon2D([pt for pt in reversed(self.vertices)])
 
@@ -213,11 +213,11 @@ class Polygon2D(Base2DIn2D):
         """
         return Polygon2D([pt.scale_world_origin(factor) for pt in self.vertices])
 
-    def intersect_line2(self, line_ray):
-        """Get the intersections between this polygon and a Ray2 or LineSegment2D.
+    def intersect_line(self, line_ray):
+        """Get the intersections between this polygon and a Ray2D or LineSegment2D.
 
         Args:
-            line_ray: A LineSegment2D or Ray2 or to intersect.
+            line_ray: A LineSegment2D or Ray2D or to intersect.
 
         Returns:
             A list with Point2D objects for the intersections. List will be empty if no
@@ -226,6 +226,24 @@ class Polygon2D(Base2DIn2D):
         intersections = []
         for _s in self.segments:
             inters = intersect_line2d(_s, line_ray)
+            if inters is not None:
+                intersections.append(inters)
+        return intersections
+
+    def intersect_line_infinite(self, ray):
+        """Get the intersections between this polygon and a Ray2D extended infintiely.
+
+        Args:
+            ray: A Ray2D or to intersect. This will be extended in both
+                directions infinetly for the intersection.
+
+        Returns:
+            A list with Point2D objects for the intersections. List will be empty if no
+                intersection exists.
+        """
+        intersections = []
+        for _s in self.segments:
+            inters = intersect_line2d_infinite(_s, ray)
             if inters is not None:
                 intersections.append(inters)
         return intersections

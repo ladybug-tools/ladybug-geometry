@@ -105,8 +105,8 @@ class Base1DIn3D(object):
         Returns:
             Point3D for the intersection. Will be None if no intersection exists.
         """
-        close_pt_a, cloase_pt_b = self.closest_point_on_line(line_ray)
-        if close_pt_a.distance_to_point(cloase_pt_b) <= tolerance:
+        close_pt_a, close_pt_b = self.closest_point_on_line(line_ray)
+        if close_pt_a.distance_to_point(close_pt_b) <= tolerance:
             return close_pt_a
         return None
 

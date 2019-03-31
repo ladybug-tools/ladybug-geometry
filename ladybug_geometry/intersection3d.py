@@ -19,12 +19,12 @@ def intersect_line3d_plane(L, PL):
     if not d:  # parallel
         return None
     u = (PL.k - PL.n.dot(L.p)) / d
-    if not L._u_in(u):  # line or ray never intersects plane
+    if not L._u_in(u):  # line or ray does not have its domain in the plane
         return None
     return Point3D(L.p.x + u * L.v.x, L.p.y + u * L.v.y, L.p.z + u * L.v.z)
 
 
-def intersect_plane(A, B):
+def intersect_plane_plane(A, B):
     """Get the intersection between two Plane objects.
 
     Args:
@@ -62,7 +62,7 @@ def closest_point3d_on_line3d(P, L):
         Point3D for the closest point on L to P.
     """
     d = L.v.magnitude_squared
-    assert d != 0
+    assert d != 0, 'Length of LineSegment3D must be greater than 0.'
     u = ((P.x - L.p.x) * L.v.x +
          (P.y - L.p.y) * L.v.y +
          (P.z - L.p.z) * L.v.z) / d
@@ -106,7 +106,7 @@ def closest_point3d_between_line3d(A, B):
     d1321 = p13.dot(A.v)
     d4343 = B.v.magnitude_squared
     denom = A.v.magnitude_squared * d4343 - d4321 ** 2
-    if denom == 0:  # parallel, connect an endpoint with a line
+    if denom == 0:  # parallel, return a line endpoint and the closest point to it
         return A.p, closest_point3d_on_line3d(A.p, B)
 
     ua = (d1343 * d4321 - d1321 * d4343) / denom
@@ -130,8 +130,8 @@ def closest_point3d_between_line3d_plane(L, PL):
 
     Returns:
         Two Point3D objects representing:
-            1) The point on A that is closest to B
-            2) The point on B that is closest to A
+            1) The point on L that is closest to PL
+            2) The point on PL that is closest to L
         Will be None if there is an intersection between L and PL
     """
     d = PL.n.dot(L.v)
@@ -142,4 +142,4 @@ def closest_point3d_between_line3d_plane(L, PL):
         u = max(min(u, 1.0), 0.0)
         return closest_point3d_on_plane(
             Point3D(L.p.x + u * L.v.x, L.p.y + u * L.v.y, L.p.z + u * L.v.z), PL)
-    return None  # Intersection
+    return None  # intersection

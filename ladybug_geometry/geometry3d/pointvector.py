@@ -9,7 +9,7 @@ import math
 import operator
 
 
-class Vector3D:
+class Vector3D(object):
     """3D Vector object.
 
     Properties:
@@ -24,6 +24,7 @@ class Vector3D:
     _mutable = True
 
     def __init__(self, x=0, y=0, z=0):
+        """Initialize 3D Vector."""
         self.x = x
         self.y = y
         self.z = z
@@ -70,14 +71,10 @@ class Vector3D:
 
     def dot(self, other):
         """Get the dot product of this vector with another."""
-        assert isinstance(other, (Vector3D, Vector3DImmutable)), \
-            'other must be a Vector3D to use `dot()` with {}'.format(self.__class__)
         return self.x * other.x + self.y * other.y + self.z * other.z
 
     def cross(self, other):
         """Get the cross product of this vector and another vector."""
-        assert isinstance(other, (Vector3D, Vector3DImmutable)), \
-            'other must be a Vector3D to use `cross()` with {}'.format(self.__class__)
         return Vector3D(self.y * other.z - self.z * other.y,
                         -self.x * other.z + self.z * other.x,
                         self.x * other.y - self.y * other.x)
@@ -382,24 +379,6 @@ class Point3D(Vector3D):
         """Get the distance from this point to another Point3D."""
         vec = (self.x - point.x, self.y - point.y, self.z - point.z)
         return math.sqrt(vec[0] ** 2 + vec[1] ** 2 + vec[2] ** 2)
-
-    def distance_to_line_segment(self, line):
-        """Get the minimum distance between this point and a LineSegment3."""
-        close_pt = self.closest_point_line_segment(line)
-        return self.distance_to_point(close_pt)
-
-    def closest_point_line_segment(self, line):
-        """Get the closest point on a LineSegment3 to this point."""
-        d = line.v.magnitude_squared
-        assert d != 0, 'Line segment length must not equal 0.'
-        u = ((self.x - line.p.x) * line.v.x +
-             (self.y - line.p.y) * line.v.y +
-             (self.z - line.p.z) * line.v.z) / d
-        if not line._u_in(u):
-            u = max(min(u, 1.0), 0.0)
-        return Point3D(line.p.x + u * line.v.x,
-                       line.p.y + u * line.v.y,
-                       line.p.z + u * line.v.z)
 
     def to_immutable(self):
         """Get an immutable version of this object."""

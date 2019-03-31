@@ -1,6 +1,8 @@
 # coding=utf-8
-"""2D Mesh and 2D Mesh Face"""
+"""2D Mesh"""
 from __future__ import division
+
+from .._mesh import MeshBase
 
 from .pointvector import Point2D, Point2DImmutable
 from .line import LineSegment2D
@@ -13,7 +15,7 @@ except ImportError:
     xrange = range  # python 3
 
 
-class Mesh2D(Base2DIn2D):
+class Mesh2D(MeshBase, Base2DIn2D):
     """2D Mesh object.
 
     Properties:
@@ -21,20 +23,15 @@ class Mesh2D(Base2DIn2D):
         faces
         colors
         is_color_by_face
+        min
+        max
+        center
         face_areas
         area
         face_centroids
         centroid
-        min
-        max
-        center
     """
     _check_required = True
-    _colors = None
-    _is_color_by_face = False
-    _face_areas = None
-    _area = None
-    _face_centroids = None
     _centroid = None
 
     def __init__(self, vertices, faces, colors=None):
@@ -66,28 +63,7 @@ class Mesh2D(Base2DIn2D):
                 for large lists of faces but results in a higher-quality mesh with
                 a smaller size in memory. Default is True.
         """
-        vertices = []  # collection of vertices as Point2D
-        face_collector = []  # collection of face indices
-        if purge:
-            for f in faces:
-                ind = []
-                for v in f:
-                    try:  # this can get very slow for large number of vertices.
-                        index = vertices.index(v)
-                        ind.append(index)
-                    except ValueError:  # add new point
-                        vertices.append(v)
-                        ind.append(len(vertices) - 1)
-                face_collector.append(ind)
-        else:
-            ver_counter = 0
-            for f in faces:
-                ind = []
-                for v in f:
-                    vertices.append(v)
-                    ind.append(ver_counter)
-                    ver_counter += 1
-                face_collector.append(ind)
+        vertices, face_collector = cls._interpret_input_from_faces(faces, purge)
         return cls(tuple(vertices), tuple(face_collector))
 
     @classmethod
@@ -209,91 +185,13 @@ class Mesh2D(Base2DIn2D):
         return _new_mesh
 
     @property
-    def vertices(self):
-        """Tuple of all vertices in this geometry."""
-        return self._vertices
-
-    @property
-    def faces(self):
-        """Tuple of all faces in the mesh."""
-        return self._faces
-
-    @property
-    def colors(self):
-        """Get or set a list of colors for the mesh. Will be None if no colors assigned.
-        """
-        return self._colors
-
-    @colors.setter
-    def colors(self, col):
-        if col is not None:
-            assert isinstance(col, (list, tuple)), \
-                'colors should be a list or tuple. Got {}'.format(type(col))
-            if len(col) == len(self.faces):
-                self._is_color_by_face = True
-            elif len(col) == len(self.vertices):
-                self._is_color_by_face = False
-            else:
-                raise ValueError('Number of colors ({}) does not match the number of'
-                                 ' mesh faces ({}) nor the number of vertices ({}).'
-                                 .format(len(col), len(self.faces), len(self.vertices)))
-            if isinstance(col, list):
-                col = tuple(col)
-            self._colors = col
-
-    @property
-    def is_color_by_face(self):
-        """Boolean for whether colors are face-by-face (True) or vertex-by-vertex (False)
-
-        When colors are assigned to the mesh, this property is linked to the colors
-        and cannot be set. However, when no colors are assigned, it can be set
-        because it affects how the mesh is translated to external interfaces.
-        In such cases, this property notes whether the mesh will be translated
-        in a format that can accept face-by-face colors.
-        Default is False when no colors are assigned.
-        """
-        return self._is_color_by_face
-
-    @is_color_by_face.setter
-    def is_color_by_face(self, by_face):
-        assert isinstance(by_face, bool), \
-            'is_color_by_face must be a boolean. Got {}'.format(type(by_face))
-        if self._colors is not None and self._is_color_by_face is not by_face:
-            raise AttributeError('is_color_by_face cannot be set when colors are'
-                                 ' already assinged to the mesh.')
-        self._is_color_by_face = by_face
-
-    @property
     def face_areas(self):
-        """A tuple of face areas that parallels the Mesh2D.Faces property."""
+        """A tuple of face areas that parallels the faces property."""
         if self._face_areas is None:
-            _f_areas = []
-            for face in self.faces:
-                _f_areas.append(self._face_area(face))
-            self._face_areas = tuple(_f_areas)
-        elif isinstance(self._face_areas, (float, int)):
-            self._face_areas = [self._face_areas] * len(self.faces)
+            self._face_areas = tuple(self._face_area(face) for face in self.faces)
+        elif isinstance(self._face_areas, (float, int)):  # grid of faces with same area
+            self._face_areas = tuple(self._face_areas for face in self.faces)
         return self._face_areas
-
-    @property
-    def area(self):
-        """The area of the entire mesh."""
-        if self._area is None:
-            self._area = sum(self.face_areas)
-        return self._area
-
-    @property
-    def face_centroids(self):
-        """A tuple of face centroids that parallels the Mesh2D.Faces property."""
-        if self._face_centroids is None:
-            _f_cent = []
-            for face in self.faces:
-                if len(face) == 3:
-                    _f_cent.append(self._tri_face_centroid(face))
-                else:
-                    _f_cent.append(self._quad_face_centroid(face))
-            self._face_centroids = tuple(_f_cent)
-        return self._face_centroids
 
     @property
     def centroid(self):
@@ -355,54 +253,11 @@ class Mesh2D(Base2DIn2D):
                 original mesh faces noting whether the face is in the new mesh
                 (True) or has been removed from the new mesh (False).
         """
-        assert isinstance(pattern, (list, tuple)), 'pattern for remove_vertices must' \
-            ' be a list or tuple. Got {}.'.format(type(pattern))
-        assert len(pattern) == len(self), 'Length of pattern for remove_vertices ({})' \
-            ' must match the number of vertices in the mesh ({}).'.format(
-                len(pattern), len(self))
-        _new_verts = []
-        _new_faces = []
-        # make a dictionary that maps old vertex indices to new ones
-        _vdict = {}
-        _vcount = 0
-        for i, _in_mesh in enumerate(pattern):
-            if _in_mesh is True:
-                _vdict[i] = _vcount
-                _vcount += 1
-                _new_verts.append(self._vertices[i])
-
-        # get the new faces
-        face_pattern = []
-        for _f in self.faces:
-            try:
-                if len(_f) == 3:
-                    _new_f = (_vdict[_f[0]], _vdict[_f[1]], _vdict[_f[2]])
-                else:
-                    _new_f = (_vdict[_f[0]], _vdict[_f[1]], _vdict[_f[2]], _vdict[_f[3]])
-                    _new_faces.append(_new_f)
-                    face_pattern.append(True)
-            except KeyError:
-                face_pattern.append(False)
-
-        # remove colors if they are assigned
-        _new_colors = None
-        if self._colors is not None:
-            _new_col = []
-            if self._is_color_by_face is True:
-                for i, _p in enumerate(face_pattern):
-                    if _p is True:
-                        _new_col.append(self._colors[i])
-            else:
-                for i, _p in enumerate(pattern):
-                    if _p is True:
-                        _new_col.append(self._colors[i])
-            _new_colors = tuple(_new_col)
-
-        # transfer face centroids and areas if they exist so they don't get re-computed
-        _new_f_cent, _new_f_area = self._transfer_face_centroids_areas(pattern)
+        _new_verts, _new_faces, _new_colors, _new_f_cent, _new_f_area, face_pattern = \
+            self._remove_vertices(pattern)
 
         Mesh2D._check_required = False  # Turn off checks since we know the mesh is valid
-        new_mesh = Mesh2D(tuple(_new_verts), tuple(_new_faces), _new_colors)
+        new_mesh = Mesh2D(_new_verts, _new_faces, _new_colors)
         Mesh2D._check_required = True  # Turn the checks back on
         new_mesh._face_centroids = _new_f_cent
         new_mesh._face_areas = _new_f_area
@@ -423,14 +278,7 @@ class Mesh2D(Base2DIn2D):
                 original mesh vertices noting whether the vertex is in the new mesh
                 (True) or has been removed from the new mesh (False).
         """
-        self._check_face_pattern(pattern)
-        # make a pattern of vertices that will be in the new mesh
-        vertex_pattern = [False for _v in self.vertices]
-        for i, _in_mesh in enumerate(pattern):
-            if _in_mesh is True:
-                _face = self._faces[i]
-                for _v in _face:
-                    vertex_pattern[i] = True
+        vertex_pattern = self._vertex_pattern_from_remove_faces(pattern)
         new_mesh, face_pattern = self.remove_vertices(vertex_pattern)
         return new_mesh, vertex_pattern
 
@@ -451,32 +299,70 @@ class Mesh2D(Base2DIn2D):
             new_mesh: A mesh where the faces have been removed according
                 to the input pattern.
         """
-        self._check_face_pattern(pattern)
-        _new_faces = []
-        for i, _in_mesh in enumerate(pattern):
-            if _in_mesh is True:
-                _new_faces.append(self._faces[i])
-
-        # transfer the colors over to the new mesh if they are assigned face-by-face
-        _new_colors = self._colors
-        if self._colors is not None and self._is_color_by_face is True:
-            _new_col = []
-            for i, _p in enumerate(pattern):
-                if _p is True:
-                    _new_col.append(self._colors[i])
-            _new_colors = _new_col
-
-        # transfer face centroids and areas if they exist so they don't get re-computed
-        _new_f_cent, _new_f_area = self._transfer_face_centroids_areas(pattern)
+        _new_faces, _new_colors, _new_f_cent, _new_f_area = \
+            self._remove_faces_only(pattern)
 
         Mesh2D._check_required = False  # Turn off checks since we know the mesh is valid
-        new_mesh = Mesh2D(self.vertices, tuple(_new_faces), _new_colors)
+        new_mesh = Mesh2D(self.vertices, _new_faces, _new_colors)
         Mesh2D._check_required = True  # Turn the checks back on
         new_mesh._face_centroids = _new_f_cent
         new_mesh._face_areas = _new_f_area
         return new_mesh
 
+    def move(self, moving_vec):
+        """Get a mesh that has been moved along a vector.
+
+        Args:
+            moving_vec: A Vector2D with the direction and distance to move the mesh.
+        """
+        _verts = tuple([pt.move(moving_vec).to_immutable() for pt in self.vertices])
+        return self._mesh_transform(_verts)
+
+    def rotate(self, angle, origin):
+        """Get a mesh that is rotated counterclockwise by a certain angle.
+
+        Args:
+            angle: An angle for rotation in radians.
+            origin: A Point2D for the origin around which the point will be rotated.
+        """
+        _verts = tuple([pt.rotate(angle, origin).to_immutable() for pt in self.vertices])
+        return self._mesh_transform(_verts)
+
+    def reflect(self, normal, origin):
+        """Get a mesh reflected across a plane with the input normal vector and origin.
+
+        Args:
+            normal: A Vector2D representing the normal vector for the plane across
+                which the mesh will be reflected. THIS VECTOR MUST BE NORMALIZED.
+            origin: A Point2D representing the origin from which to reflect.
+        """
+        _verts = tuple([pt.reflect(normal, origin).to_immutable()
+                        for pt in self.vertices])
+        return self._mesh_transform(_verts)
+
+    def scale(self, factor, origin):
+        """Scale a mesh by a factor from an origin point.
+
+        Args:
+            factor: A number representing how much the mesh should be scaled.
+            origin: A Point2D representing the origin from which to scale.
+        """
+        _verts = tuple([pt.scale(factor, origin).to_immutable()
+                        for pt in self.vertices])
+        return self._mesh_scale(_verts, factor)
+
+    def scale_world_origin(self, factor, origin):
+        """Scale a mesh by a factor from the world origin. Faster than Mesh2D.scale.
+
+        Args:
+            factor: A number representing how much the mesh should be scaled.
+        """
+        _verts = tuple([pt.scale_world_origin(factor).to_immutable()
+                        for pt in self.vertices])
+        return self._mesh_scale(_verts, factor)
+
     def _check_vertices_input(self, vertices):
+        """Check input vertices for correct formatting and immutability."""
         assert isinstance(vertices, (list, tuple)), \
             'vertices should be a list or tuple. Got {}'.format(type(vertices))
         _verts_immutable = []
@@ -486,63 +372,33 @@ class Mesh2D(Base2DIn2D):
             _verts_immutable.append(p.to_immutable())
         self._vertices = tuple(_verts_immutable)
 
-    def _check_faces_input(self, faces):
-        assert isinstance(faces, (list, tuple)), \
-            'faces should be a list or tuple. Got {}'.format(type(faces))
-        assert len(faces) > 0, 'Mesh2D must have at least one face.'
-        for f in faces:
-            assert isinstance(f, tuple), \
-                'Expected tuple for Mesh2D face. Got {}.'.format(type(f))
-            assert len(f) == 3 or len(f) == 4, \
-                'Mesh2D face can only have 3 or 4 vertices. Got {}.'.format(len(f))
-        assert isinstance(faces[0][0], int), 'Mesh2D face must use integers to ' \
-            'reference vertices. Got {}.'.format(type(faces[0][0]))
-        if isinstance(faces, list):
-            faces = tuple(faces)
-        self._faces = faces
-
-    def _check_face_pattern(self, pattern):
-        assert isinstance(pattern, (list, tuple)), 'pattern for remove_faces must' \
-            ' be a list or tuple. Got {}.'.format(type(pattern))
-        assert len(pattern) == len(self.faces), 'Length of pattern for remove_faces'\
-            ' ({}) must match the number of faces in the mesh ({}).'.format(
-                len(pattern), len(self.faces))
-
-    def _transfer_face_centroids_areas(self, face_pattern):
-        """Get face centroids and areas when removing faces.
-
-        This is so they can be transferred to the new mesh.
-        """
-        _new_f_cent = None
-        if self._face_centroids is not None:
-            _f_cent = []
-            for i, _p in enumerate(face_pattern):
-                if _p is True:
-                    _f_cent.append(self._face_centroids[i])
-            _new_f_cent = tuple(_f_cent)
-        _new_f_area = None
-        if self._face_areas is not None:
-            if isinstance(self._face_areas, (float, int)):
-                _new_f_area = self._face_areas
-            else:
-                _f_area = []
-                for i, _p in enumerate(face_pattern):
-                    if _p is True:
-                        _f_area.append(self._face_areas[i])
-                _new_f_area = tuple(_f_area)
-        return _new_f_cent, _new_f_area
-
     def _face_area(self, face):
         """Return the area of a face."""
-        return Mesh2D._get_area([self._vertices[i] for i in face])
+        return Mesh2D._get_area(tuple(self._vertices[i] for i in face))
 
     def _tri_face_centroid(self, face):
         """Compute the centroid of a triangular face."""
-        return Mesh2D._tri_centroid([self._vertices[i] for i in face])
+        return Mesh2D._tri_centroid(tuple(self._vertices[i] for i in face))
 
     def _quad_face_centroid(self, face):
         """Compute the centroid of a quadrilateral face."""
-        return Mesh2D._quad_centroid([self._vertices[i] for i in face])
+        return Mesh2D._quad_centroid(tuple(self._vertices[i] for i in face))
+
+    def _mesh_transform(self, verts):
+        """Transform mesh in a way that transfers properties and avoids extra checks."""
+        Mesh2D._check_required = False  # Turn off check since input is valid
+        _new_mesh = Mesh2D(verts, self.faces)
+        Mesh2D._check_required = True  # Turn the checks back on
+        self._transfer_properties(_new_mesh)
+        return _new_mesh
+
+    def _mesh_scale(self, verts, factor):
+        """Scale mesh in a way that transfers properties and avoids extra checks."""
+        Mesh2D._check_required = False  # Turn off check since input is valid
+        _new_mesh = Mesh2D(verts, self.faces)
+        Mesh2D._check_required = True  # Turn the checks back on
+        self._transfer_properties_scale(_new_mesh, factor)
+        return _new_mesh
 
     @staticmethod
     def _ear_clipping_triangulation(polygon):
@@ -572,7 +428,7 @@ class Mesh2D(Base2DIn2D):
         for i in xrange(0, len(polygon) - 1):
             diagonal = LineSegment2D.from_end_points(polygon[i - 1], polygon[i + 1])
             if polygon.is_point_inside(diagonal.midpoint):
-                if len(polygon.intersect_line2(diagonal)) < 5:
+                if len(polygon.intersect_line(diagonal)) < 5:
                     ear = (polygon[i - 1], polygon[i], polygon[i + 1])  # found an ear!
                     break
         return ear, i
@@ -691,8 +547,11 @@ class Mesh2D(Base2DIn2D):
 
     def __copy__(self):
         Mesh2D._check_required = False  # Turn off check since we know the mesh is valid
-        _new_mesh = Mesh2D(self.vertices, self.faces, self.colors)
+        _new_mesh = Mesh2D(self.vertices, self.faces)
         Mesh2D._check_required = True  # Turn the checks back on
+        self._transfer_properties(_new_mesh)
+        _new_mesh._face_centroids = self._face_centroids
+        _new_mesh._centroid = self._centroid
         return _new_mesh
 
     def __repr__(self):
