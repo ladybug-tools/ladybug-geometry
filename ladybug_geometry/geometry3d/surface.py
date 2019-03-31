@@ -62,7 +62,7 @@ class Surface3D(Base2DIn3D):
                 ' Got {}.'.format(type(plane))
         else:
             self._vertices = vertices
-            self._plane = plane
+        self._plane = plane
 
     @classmethod
     def from_vertices(cls, vertices):
@@ -79,7 +79,7 @@ class Surface3D(Base2DIn3D):
             n = v1.cross(v2)
         except Exception as e:
             raise ValueError('Incorrect vertices input for Surface3D:\n\t{}'.format(e))
-        plane = Plane(pt1, n)
+        plane = Plane(n, pt1)
         # TODO: set the is_clockwise property to always be True (or False?)
         return cls(vertices, plane)
 
