@@ -289,7 +289,7 @@ class Vector3D(object):
 
     def __repr__(self):
         """Vector3D representation."""
-        return 'Ladybug Vector3D (%.2f, %.2f, %.2f)' % (self.x, self.y, self.z)
+        return 'Vector3D (%.2f, %.2f, %.2f)' % (self.x, self.y, self.z)
 
 
 class Point3D(Vector3D):
@@ -406,7 +406,7 @@ class Point3D(Vector3D):
 
     def __repr__(self):
         """Point3D representation."""
-        return 'Ladybug Point3D (%.2f, %.2f, %.2f)' % (self.x, self.y, self.z)
+        return 'Point3D (%.2f, %.2f, %.2f)' % (self.x, self.y, self.z)
 
 
 @immutable

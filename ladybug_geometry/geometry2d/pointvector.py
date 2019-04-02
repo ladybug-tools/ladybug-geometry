@@ -263,7 +263,7 @@ class Vector2D(object):
 
     def __repr__(self):
         """Vector2D representation."""
-        return 'Ladybug Vector2D (%.2f, %.2f)' % (self.x, self.y)
+        return 'Vector2D (%.2f, %.2f)' % (self.x, self.y)
 
 
 class Point2D(Vector2D):
@@ -349,7 +349,7 @@ class Point2D(Vector2D):
 
     def __repr__(self):
         """Point2D representation."""
-        return 'Ladybug Point2D (%.2f, %.2f)' % (self.x, self.y)
+        return 'Point2D (%.2f, %.2f)' % (self.x, self.y)
 
 
 @immutable

@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Surface in 3D Space"""
+"""Planar Face in 3D Space"""
 from __future__ import division
 
 from .pointvector import Point3D, Point3DImmutable, Vector3D, Vector3DImmutable
@@ -16,57 +16,66 @@ from ..geometry2d.mesh import Mesh2D
 import math
 
 
-class Surface3D(Base2DIn3D):
-    """Surface in 3D space.
+class Face3D(Base2DIn3D):
+    """Planar Face in 3D space.
 
     Properties:
         vertices
         plane
+        segments
+        polygon2d
+        triangulated_mesh2d
+        triangulated_mesh3d
         normal
         min
         max
         center
-        segments
         perimeter
         area
         centroid
         is_clockwise
         is_convex
         is_self_intersecting
-        polygon2d
-        triangulated_mesh2d
-        triangulated_mesh3d
     """
+    __slots__ = ('_vertices', '_plane', '_segments', '_polygon2d',
+                 '_triangulated_mesh2d', '_triangulated_mesh3d',
+                 '_min', '_max', '_center', '_perimeter', '_area', '_centroid',
+                 '_is_clockwise', '_is_convex', '_is_complex')
     _check_required = True
-    _segments = None
-    _polygon2d = None
-    _mesh2d = None
-    _mesh3d = None
-    _perimeter = None
-    _area = None
-    _centroid = None
-    _is_clockwise = None
-    _is_convex = None
-    _is_complex = None
 
     def __init__(self, vertices, plane):
-        """Initilize Surface3D.
+        """Initilize Face3D.
 
         Args:
-            vertices: A list of Point3D objects representing the vertices of the surface.
-            plane: A Plane object indicating the plane in which the surface exists.
+            vertices: A list of Point3D objects representing the vertices of the sface.
+            plane: A Plane object indicating the plane in which the face exists.
         """
         if self._check_required:
             self._check_vertices_input(vertices)
-            assert isinstance(plane, Plane), 'Expected Plane for Surface3D.' \
+            assert isinstance(plane, Plane), 'Expected Plane for Face3D.' \
                 ' Got {}.'.format(type(plane))
         else:
             self._vertices = vertices
         self._plane = plane
 
+        self._segments = None
+        self._polygon2d = None
+        self._mesh2d = None
+        self._mesh3d = None
+
+        self._min = None
+        self._max = None
+        self._center = None
+        self._perimeter = None
+        self._area = None
+        self._centroid = None
+        self._is_clockwise = None
+        self._is_convex = None
+        self._is_complex = None
+
     @classmethod
     def from_vertices(cls, vertices):
-        """Initialize Surface3D from only a list of vertices.
+        """Initialize Face3D from only a list of vertices.
 
         The Plane normal will automatically be calculated by analyzing the first
         three vertices and the origin of the plane will be the first vertex of
@@ -78,15 +87,15 @@ class Surface3D(Base2DIn3D):
             v2 = pt3 - pt1
             n = v1.cross(v2)
         except Exception as e:
-            raise ValueError('Incorrect vertices input for Surface3D:\n\t{}'.format(e))
+            raise ValueError('Incorrect vertices input for Face3D:\n\t{}'.format(e))
         plane = Plane(n, pt1)
         return cls(vertices, plane)
 
     @classmethod
     def from_extrusion(cls, line_segment, extrusion_vector):
-        """Initialize Surface3D by extruding a line segment.
+        """Initialize Face3D by extruding a line segment.
 
-        Initializing a surface this way has the added benefit of having its
+        Initializing a face this way has the added benefit of having its
         properties quickly computed.
 
         Args:
@@ -102,26 +111,26 @@ class Surface3D(Base2DIn3D):
         _p2 = line_segment.p2
         _verts = (_p1, _p1 + extrusion_vector, _p2 + extrusion_vector, _p2)
         _plane = Plane(line_segment.v.cross(extrusion_vector), _p1)
-        Surface3D._check_required = False  # Turn off check since input is valid
-        surface = cls(_verts, _plane)
-        Surface3D._check_required = True  # Turn the checks back on
+        Face3D._check_required = False  # Turn off check since input is valid
+        face = cls(_verts, _plane)
+        Face3D._check_required = True  # Turn the checks back on
         _base = line_segment.length
         _dist = extrusion_vector.magnitude
         _height = _dist * math.sin(extrusion_vector.angle(line_segment.v))
-        surface._perimeter = _base * 2 + _dist * 2
-        surface._area = _base * _height
+        face._perimeter = _base * 2 + _dist * 2
+        face._area = _base * _height
         _cent = _p1 + (line_segment.v * 0.5) + (extrusion_vector * 0.5)
-        surface._centroid = _cent.to_immutable()
-        surface._is_clockwise = True
-        surface._is_convex = False
-        surface._is_complex = False
-        return surface
+        face._centroid = _cent.to_immutable()
+        face._is_clockwise = True
+        face._is_convex = False
+        face._is_complex = False
+        return face
 
     @classmethod
     def from_rectangle(cls, base, height, base_plane=None):
-        """Initialize Surface3D from rectangle parameters (base + height) and a base plane.
+        """Initialize Face3D from rectangle parameters (base + height) and a base plane.
 
-        Initializing a surface this way has the added benefit of having its
+        Initializing a face this way has the added benefit of having its
         properties quickly computed.
 
         Args:
@@ -143,36 +152,31 @@ class Surface3D(Base2DIn3D):
         _b_vec = base_plane.x * base
         _h_vec = base_plane.y * height
         _verts = (_o, _o + _h_vec, _o + _h_vec + _b_vec, _o + _b_vec)
-        Surface3D._check_required = False  # Turn off check since input is valid
-        surface = cls(_verts, base_plane)
-        Surface3D._check_required = True  # Turn the checks back on
-        surface._perimeter = base * 2 + height * 2
-        surface._area = base * height
+        Face3D._check_required = False  # Turn off check since input is valid
+        face = cls(_verts, base_plane)
+        Face3D._check_required = True  # Turn the checks back on
+        face._perimeter = base * 2 + height * 2
+        face._area = base * height
         _cent = _o + (_b_vec * 0.5) + (_h_vec * 0.5)
-        surface._centroid = _cent.to_immutable()
-        surface._is_clockwise = True
-        surface._is_convex = False
-        surface._is_complex = False
-        return surface
+        face._centroid = _cent.to_immutable()
+        face._is_clockwise = True
+        face._is_convex = False
+        face._is_complex = False
+        return face
 
     @property
     def vertices(self):
-        """Tuple of all vertices in this surface."""
+        """Tuple of all vertices in this face."""
         return self._vertices
 
     @property
     def plane(self):
-        """Tuple of all vertices in this geometry."""
+        """Tuple of all vertices in this face."""
         return self._plane
 
     @property
-    def normal(self):
-        """Normal vector for the plane in which the surface exists."""
-        return self._plane.n
-
-    @property
     def segments(self):
-        """Tuple of all line segments in the polygon."""
+        """Tuple of all line segments bordering the face."""
         if self._segments is None:
             _segs = []
             for i, vert in enumerate(self.vertices):
@@ -183,28 +187,32 @@ class Surface3D(Base2DIn3D):
         return self._segments
 
     @property
+    def normal(self):
+        """Normal vector for the plane in which the face exists."""
+        return self._plane.n
+
+    @property
     def perimeter(self):
-        """The perimeter of the polygon."""
+        """The perimeter of the face."""
         if self._perimeter is None:
             self._perimeter = sum([seg.length for seg in self.segments])
         return self._perimeter
 
     @property
     def area(self):
-        """The area of the surface."""
+        """The area of the face."""
         if self._area is None:
             self._area = self.polygon2d.area
         return self._area
 
     @property
     def centroid(self):
-        """The centroid of the surface as a Point3D (aka. center of mass).
+        """The centroid of the face as a Point3D (aka. center of mass).
 
         Note that the centroid is more time consuming to compute than the center
-        (or the middle point of the surface bounding box). So the center might be
+        (or the middle point of the face bounding box). So the center might be
         preferred over the centroid if you just need a rough point for the middle
-        of the surface. Also note that, if the surface is convex, the center will
-        always lie within or on the edge of the surface.
+        of the face.
         """
         if self._centroid is None:
             _cent2d = self.triangulated_mesh2d.centroid
@@ -213,24 +221,24 @@ class Surface3D(Base2DIn3D):
 
     @property
     def is_clockwise(self):
-        """Boolean for whether the surface vertices are in clockwise order."""
+        """Boolean for whether the face vertices are in clockwise order."""
         if self._is_clockwise is None:
             self._is_clockwise = self.polygon2d.is_clockwise
         return self._is_clockwise
 
     @property
     def is_convex(self):
-        """Boolean noting whether the polygon is convex (True) or non-convex (False)."""
+        """Boolean noting whether the face is convex (True) or non-convex (False)."""
         if self._is_convex is None:
             self._is_convex = self.polygon2d.is_convex
         return self._is_convex
 
     @property
     def is_self_intersecting(self):
-        """Boolean noting whether the surface has self-intersecting edges.
+        """Boolean noting whether the face has self-intersecting edges.
 
         Note that this property is relatively computationally intense to obtain and
-        most CAD programs forbid surfaces with self-intersecting edges.
+        most CAD programs forbid all surfaces with self-intersecting edges.
         So this property should only be used in quality control scripts where the
         origin of the geometry is unknown.
         """
@@ -240,7 +248,7 @@ class Surface3D(Base2DIn3D):
 
     @property
     def polygon2d(self):
-        """A Polygon2D of this surface in the 2D space of the surface's plane."""
+        """A Polygon2D of this face in the 2D space of the face's plane."""
         if self._polygon2d is None:
             _vert2d = [self._plane.xyz_to_xy_immutable(_v) for _v in self.vertices]
             Polygon2D._check_required = False  # Turn off check since input is valid
@@ -252,14 +260,14 @@ class Surface3D(Base2DIn3D):
 
     @property
     def triangulated_mesh2d(self):
-        """A triagulated Mesh2D in the 2D space of the surface's plane."""
+        """A triagulated Mesh2D in the 2D space of the face's plane."""
         if self._mesh2d is None:
             self._mesh2d = Mesh2D.from_polygon_triangulated(self.polygon2d)
         return self._mesh2d
 
     @property
     def triangulated_mesh3d(self):
-        """A triagulated Mesh3D of this surface."""
+        """A triagulated Mesh3D of this face."""
         if self._mesh3d is None:
             _vert3d = [self._plane.xy_to_xyz_immutable(_v) for _v in
                        self.triangulated_mesh2d.vertices]
@@ -267,21 +275,21 @@ class Surface3D(Base2DIn3D):
         return self._mesh3d
 
     def validate_planarity(self, tolerance, raise_exception=True):
-        """Validate that all of the surface's vertices lie within the surface's plane.
+        """Validate that all of the face's vertices lie within the face's plane.
 
-        This check is not done by default when creating the surface since
-        it is assumed that there is likely a check for planarity before the surface
-        is created (ie. in CAD software where the surface might originate from).
+        This check is not done by default when creating the face since
+        it is assumed that there is likely a check for planarity before the face
+        is created (ie. in CAD software where the face likely originates from).
         This method is intended for quality control checking when the origin of
-        surface geometry is unkown or is known to come from a place where no
+        face geometry is unkown or is known to come from a place where no
         planarity check was performed.
 
         Args:
             tolerance: The minimum distance between a given vertex and a the
-                surface's plane at which the vertex is said to lie in the plane.
+                face's plane at which the vertex is said to lie in the plane.
             raise_exception: Boolean to note whether an exception should be raised
-                if a vertex does not lie within the surface's plane. If True, an
-                exception message will be given in such cases, which notes the
+                if a vertex does not lie within the face's plane. If True, an
+                exception message will be given in such cases, which notes the non-planar
                 vertex and its distance from the plane. If False, this method will
                 simply return a False boolean if a vertex is found that is out
                 of plane. Default is True to raise an exception.
@@ -290,35 +298,35 @@ class Surface3D(Base2DIn3D):
             if self._plane.distance_to_point(_v) > tolerance:
                 if raise_exception is True:
                     raise AttributeError(
-                        'Vertex {} is out of plane with its parent surface.\nDistance '
+                        'Vertex {} is out of plane with its parent face.\nDistance '
                         'to plane is {}'.format(_v, self._plane.distance_to_point(_v)))
                 else:
                     return False
         return True
 
     def flip(self):
-        """Get a surface with a flipped direction from this one."""
-        Surface3D._check_required = False  # Turn off check since input is valid
-        _new_srf = Surface3D(self.vertices, self.plane.flip())
-        Surface3D._check_required = True  # Turn the checks back on
+        """Get a face with a flipped direction from this one."""
+        Face3D._check_required = False  # Turn off check since input is valid
+        _new_srf = Face3D(self.vertices, self.plane.flip())
+        Face3D._check_required = True  # Turn the checks back on
         self._transfer_properties(_new_srf)
         if self._is_clockwise is not None:
             _new_srf._is_clockwise = not self._is_clockwise
         return _new_srf
 
     def move(self, moving_vec):
-        """Get a surface that has been moved along a vector.
+        """Get a face that has been moved along a vector.
 
         Args:
-            moving_vec: A Vector3D with the direction and distance to move the surface.
+            moving_vec: A Vector3D with the direction and distance to move the face.
         """
         _verts = tuple([Point3DImmutable(
             pt.x + moving_vec.x, pt.y + moving_vec.y, pt.z + moving_vec.z)
                         for pt in self.vertices])
-        return self._surface_transform(_verts, self.plane.move(moving_vec))
+        return self._face_transform(_verts, self.plane.move(moving_vec))
 
     def rotate(self, axis, angle, origin):
-        """Rotate a surface by a certain angle around an axis and origin.
+        """Rotate a face by a certain angle around an axis and origin.
 
         Right hand rule applies:
         If axis has a positive orientation, rotation will be clockwise.
@@ -331,10 +339,10 @@ class Surface3D(Base2DIn3D):
         """
         _verts = tuple([pt.rotate(axis, angle, origin).to_immutable()
                         for pt in self.vertices])
-        return self._surface_transform(_verts, self.plane.rotate(axis, angle, origin))
+        return self._face_transform(_verts, self.plane.rotate(axis, angle, origin))
 
     def rotate_xy(self, angle, origin):
-        """Get a surface rotated counterclockwise in the world XY plane by a certain angle.
+        """Get a face rotated counterclockwise in the world XY plane by a certain angle.
 
         Args:
             angle: An angle in radians.
@@ -342,44 +350,44 @@ class Surface3D(Base2DIn3D):
         """
         _verts = tuple([pt.rotate_xy(angle, origin).to_immutable()
                         for pt in self.vertices])
-        return self._surface_transform(_verts, self.plane.rotate_xy(angle, origin))
+        return self._face_transform(_verts, self.plane.rotate_xy(angle, origin))
 
     def reflect(self, normal, origin):
-        """Get a surface reflected across a plane with the input normal vector and origin.
+        """Get a face reflected across a plane with the input normal vector and origin.
 
         Args:
             normal: A Vector3D representing the normal vector for the plane across
-                which the surface will be reflected. THIS VECTOR MUST BE NORMALIZED.
+                which the face will be reflected. THIS VECTOR MUST BE NORMALIZED.
             origin: A Point3D representing the origin from which to reflect.
         """
         _verts = tuple([pt.reflect(normal, origin).to_immutable()
                         for pt in self.vertices])
-        return self._surface_transform(_verts, self.plane.reflect(normal, origin))
+        return self._face_transform(_verts, self.plane.reflect(normal, origin))
 
     def scale(self, factor, origin):
-        """Scale a surface by a factor from an origin point.
+        """Scale a face by a factor from an origin point.
 
         Args:
-            factor: A number representing how much the surface should be scaled.
+            factor: A number representing how much the face should be scaled.
             origin: A Point3D representing the origin from which to scale.
         """
         _verts = tuple([pt.scale(factor, origin).to_immutable() for pt in self.vertices])
-        return self._surface_transform_scale(
+        return self._face_transform_scale(
             _verts, self.plane.scale(factor, origin), factor)
 
     def scale_world_origin(self, factor):
-        """Scale a surface by a factor from the world origin. Faster than Surface3D.scale.
+        """Scale a face by a factor from the world origin. Faster than Face3D.scale.
 
         Args:
             factor: A number representing how much the line segment should be scaled.
         """
         _verts = tuple([pt.scale_world_origin(factor).to_immutable()
                         for pt in self.vertices])
-        return self._surface_transform_scale(
+        return self._face_transform_scale(
             _verts, self.plane.scale_world_origin(factor), factor)
 
     def intersect_line_ray(self, line_ray):
-        """Get the intersection between this surface and the input Line3D or Ray3D.
+        """Get the intersection between this face and the input Line3D or Ray3D.
 
         Args:
             line_ray: A Line3D or Ray3D object for which intersection will be computed.
@@ -395,7 +403,7 @@ class Surface3D(Base2DIn3D):
         return None
 
     def intersect_plane(self, plane):
-        """Get the intersection between this surface and the input plane.
+        """Get the intersection between this face and the input plane.
 
         Args:
             plane: A Plane object for which intersection will be computed.
@@ -421,19 +429,19 @@ class Surface3D(Base2DIn3D):
         return None
 
     def project_point(self, point):
-        """Project a Point3D onto this surface.
+        """Project a Point3D onto this face.
 
         Note that this method does a check to see if the point can be projected to
-        within this surface's boundary. If all that is needed is a point projected
-        into the plane of this surface, the Plane.project_point() method should be
-        used with this surface's plane property.
+        within this face's boundary. If all that is needed is a point projected
+        into the plane of this face, the Plane.project_point() method should be
+        used with this face's plane property.
 
         Args:
             point: A Point3D object to project.
 
         Returns:
-            Point3D for the point projected onto this surface. Will be None if the
-                point cannot be projected to within the boundary of the surface.
+            Point3D for the point projected onto this face. Will be None if the
+                point cannot be projected to within the boundary of the face.
         """
         _plane_int = self._plane.project_point(point)
         _plane_int2d = self._plane.xyz_to_xy(_plane_int)
@@ -443,21 +451,24 @@ class Surface3D(Base2DIn3D):
 
     def get_mesh_grid(self, x_dim, y_dim=None, offset=None, flip=False,
                       generate_centroids=True):
-        """Get a gridded Mesh3D from over this surface.
+        """Get a gridded Mesh3D from over this face.
 
-        Note that this gridded mesh will likely not completely fill the surface.
-        Essentially, this method generates a grid over the domain of the surface
-        and then removes any points that do not lie within it.
+        This method generates a mesh grid over the domain of the face
+        and then removes any vertices that do not lie within it.
+
+        Note that the x_dim and y_dim refer to dimensions within the X and Y
+        coordinate system of this faces's plane. So rotating this plane will
+        result in rotated grid cells.
 
         Args:
             x_dim: The x dimension of the grid cells as a number.
             y_dim: The y dimension of the grid cells as a number. Default is None,
                 which will assume the same cell dimension for y as is set for x.
-            offset: A number for how far to offset the grid from the base surface.
+            offset: A number for how far to offset the grid from the base face.
                 Default is None, which will not offset the grid at all.
             flip: Set to True to have the mesh normals reversed from the direction
-                of this surface and to have the offset input move the mesh in the
-                opposite direction from this surface's normal.
+                of this face and to have the offset input move the mesh in the
+                opposite direction from this face's normal.
             generate_centroids: Set to True to have the face centroids generated
                 alongside the grid of vertices, which is much faster than having
                 them generated upon request as they typically are. However, if you
@@ -487,7 +498,7 @@ class Surface3D(Base2DIn3D):
         Mesh3D._check_required = True  # Turn the checks back on
         grid_mesh3d._face_areas = grid_mesh2d._face_areas
 
-        # assign the surface plane normal to the mesh normals
+        # assign the face plane normal to the mesh normals
         if flip is True:
             grid_mesh3d._face_normals = self._plane.n.reversed().to_immutable()
             grid_mesh3d._vertex_normals = self._plane.n.reversed().to_immutable()
@@ -507,7 +518,7 @@ class Surface3D(Base2DIn3D):
     def _check_vertices_input(self, vertices):
         assert isinstance(vertices, (list, tuple)), \
             'vertices should be a list or tuple. Got {}'.format(type(vertices))
-        assert len(vertices) > 2, 'There must be at least 3 vertices for a Surface.' \
+        assert len(vertices) > 2, 'There must be at least 3 vertices for a Face3D.' \
             ' Got {}'.format(len(vertices))
         _verts_immutable = []
         for p in vertices:
@@ -517,30 +528,30 @@ class Surface3D(Base2DIn3D):
         self._vertices = tuple(_verts_immutable)
 
     def _check_number_mesh_grid(self, input, name):
-        assert isinstance(input, (float, int)), '{} for Surface3D.get_mesh_grid' \
+        assert isinstance(input, (float, int)), '{} for Face3D.get_mesh_grid' \
             ' must be a number. Got {}.'.format(name, type(input))
 
-    def _surface_transform(self, verts, plane):
-        """Transform surface in a way that transfers properties and avoids checks."""
-        Surface3D._check_required = False  # Turn off check since input is valid
-        _new_srf = Surface3D(verts, plane)
-        Surface3D._check_required = True  # Turn the checks back on
+    def _face_transform(self, verts, plane):
+        """Transform face in a way that transfers properties and avoids checks."""
+        Face3D._check_required = False  # Turn off check since input is valid
+        _new_srf = Face3D(verts, plane)
+        Face3D._check_required = True  # Turn the checks back on
         self._transfer_properties(_new_srf)
         return _new_srf
 
-    def _surface_transform_scale(self, verts, plane, factor):
-        """Scale surface in a way that transfers properties and avoids checks."""
-        Surface3D._check_required = False  # Turn off check since input is valid
-        _new_srf = Surface3D(verts, plane)
-        Surface3D._check_required = True  # Turn the checks back on
+    def _face_transform_scale(self, verts, plane, factor):
+        """Scale face in a way that transfers properties and avoids checks."""
+        Face3D._check_required = False  # Turn off check since input is valid
+        _new_srf = Face3D(verts, plane)
+        Face3D._check_required = True  # Turn the checks back on
         self._transfer_properties_scale(_new_srf, factor)
         return _new_srf
 
     def _transfer_properties(self, new_srf):
-        """Transfer properties from this surface to a new surface.
+        """Transfer properties from this face to a new face.
 
         This is used by the transform methods that don't alter the relationship of
-        surface vertices to one another (move, rotate, reflect).
+        face vertices to one another (move, rotate, reflect).
         """
         new_srf._perimeter = self._perimeter
         new_srf._area = self._area
@@ -551,9 +562,9 @@ class Surface3D(Base2DIn3D):
         new_srf._mesh2d = self._mesh2d
 
     def _transfer_properties_scale(self, new_srf, factor):
-        """Transfer properties from this surface to a new surface.
+        """Transfer properties from this face to a new face.
 
-        This is used by the methods that scale the surface.
+        This is used by the methods that scale the face.
         """
         new_srf._is_convex = self._is_convex
         new_srf._is_complex = self._is_complex
@@ -564,10 +575,10 @@ class Surface3D(Base2DIn3D):
             new_srf._area = self._area * factor
 
     def __copy__(self):
-        Surface3D._check_required = False  # Turn off check since we know input is valid
-        _new_poly = Surface3D(self.vertices, self.plane)
-        Surface3D._check_required = True  # Turn the checks back on
+        Face3D._check_required = False  # Turn off check since we know input is valid
+        _new_poly = Face3D(self.vertices, self.plane)
+        Face3D._check_required = True  # Turn the checks back on
         return _new_poly
 
     def __repr__(self):
-        return 'Ladybug Surface3D ({} vertices)'.format(len(self))
+        return 'Face3D ({} vertices)'.format(len(self))

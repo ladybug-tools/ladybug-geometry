@@ -31,8 +31,7 @@ class Plane(object):
             o: A Point3D representing the origin point of the plane.
             x: An optional Vector3D for the X-Axis of the Plane.
                 Note that this vector must be orthagonal to the input normal vector.
-                If None, the default will find an X-Axis in the world XY plane that
-                is to the right to the normal vector.
+                If None, the default will find an X-Axis in the world XY plane.
         """
         assert isinstance(n, (Vector3D, Vector3DImmutable)), \
             "Expected Vector3D for plane normal. Got {}.".format(type(n))
@@ -316,5 +315,5 @@ class Plane(object):
         return self.__repr__()
 
     def __repr__(self):
-        return 'Ladybug Plane (n = <%.2f, %.2f, %.2f>, o = <%.2f, %.2f, %.2f>)' % \
+        return 'Plane (<%.2f, %.2f, %.2f> normal) (<%.2f, %.2f, %.2f> origin)' % \
             (self.n.x, self.n.y, self.n.z, self.o.x, self.o.y, self.o.z)

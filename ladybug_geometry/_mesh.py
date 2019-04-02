@@ -15,11 +15,6 @@ class MeshBase(object):
         area
         face_centroids
     """
-    _colors = None
-    _is_color_by_face = False
-    _face_areas = None
-    _area = None
-    _face_centroids = None
 
     @property
     def vertices(self):
@@ -52,7 +47,7 @@ class MeshBase(object):
                                  .format(len(col), len(self.faces), len(self.vertices)))
             if isinstance(col, list):
                 col = tuple(col)
-            self._colors = col
+        self._colors = col
 
     @property
     def is_color_by_face(self):

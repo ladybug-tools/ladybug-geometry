@@ -26,13 +26,15 @@ class Mesh2D(MeshBase, Base2DIn2D):
         min
         max
         center
-        face_areas
         area
-        face_centroids
         centroid
+        face_areas
+        face_centroids
     """
+    __slots__ = ('_vertices', '_faces', '_colors', '_is_color_by_face',
+                 '_min', '_max', '_center', '_area', '_centroid',
+                 '_face_areas', '_face_centroids')
     _check_required = True
-    _centroid = None
 
     def __init__(self, vertices, faces, colors=None):
         """Initilize Mesh2D.
@@ -50,7 +52,17 @@ class Mesh2D(MeshBase, Base2DIn2D):
         else:
             self._vertices = vertices
             self._faces = faces
+
+        self._is_color_by_face = False  # default if colors is None
         self.colors = colors
+
+        self._min = None
+        self._max = None
+        self._center = None
+        self._area = None
+        self._centroid = None
+        self._face_areas = None
+        self._face_centroids = None
 
     @classmethod
     def from_faces(cls, faces, purge=True):

@@ -24,15 +24,17 @@ class Mesh3D(MeshBase, Base2DIn3D):
         min
         max
         center
-        face_areas
         area
+        face_areas
         face_centroids
         face_normals
         vertex_normals
     """
+    __slots__ = ('_vertices', '_faces', '_colors', '_is_color_by_face',
+                 '_min', '_max', '_center', '_area',
+                 '_face_areas', '_face_centroids', '_face_normals',
+                 '_vertex_normals')
     _check_required = True
-    _face_normals = None
-    _vertex_normals = None
 
     def __init__(self, vertices, faces, colors=None):
         """Initilize Mesh3D.
@@ -50,7 +52,18 @@ class Mesh3D(MeshBase, Base2DIn3D):
         else:
             self._vertices = vertices
             self._faces = faces
+
+        self._is_color_by_face = False  # default if colors is None
         self.colors = colors
+
+        self._min = None
+        self._max = None
+        self._center = None
+        self._area = None
+        self._face_areas = None
+        self._face_centroids = None
+        self._face_normals = None
+        self._vertex_normals = None
 
     @classmethod
     def from_faces(cls, faces, purge=True):
@@ -347,5 +360,5 @@ class Mesh3D(MeshBase, Base2DIn3D):
         return _new_mesh
 
     def __repr__(self):
-        return 'Ladybug Mesh3D ({} faces) ({} vertices)'.format(
+        return 'Mesh3D ({} faces) ({} vertices)'.format(
             len(self.faces), len(self))

@@ -25,15 +25,10 @@ class Polygon2D(Base2DIn2D):
         is_convex
         is_self_intersecting
     """
+    __slots__ = ('_vertices', '_segments', '_triangulated_mesh',
+                 '_min', '_max', '_center', '_perimeter', '_area',
+                 '_is_clockwise', '_is_convex', '_is_complex')
     _check_required = True
-    _segments = None
-    _triangulated_mesh = None
-    _perimeter = None
-    _area = None
-    _centroid = None
-    _is_clockwise = None
-    _is_convex = None
-    _is_complex = None
 
     def __init__(self, vertices):
         """Initilize Polygon2D.
@@ -45,6 +40,16 @@ class Polygon2D(Base2DIn2D):
             self._check_vertices_input(vertices)
         else:
             self._vertices = vertices
+        self._segments = None
+        self._triangulated_mesh = None
+        self._min = None
+        self._max = None
+        self._center = None
+        self._perimeter = None
+        self._area = None
+        self._is_clockwise = None
+        self._is_convex = None
+        self._is_complex = None
 
     @classmethod
     def from_rectangle(cls, base_point, height_vector, base, height):
@@ -433,4 +438,4 @@ class Polygon2D(Base2DIn2D):
         return _new_poly
 
     def __repr__(self):
-        return 'Ladybug Polygon2D ({} vertices)'.format(len(self))
+        return 'Polygon2D ({} vertices)'.format(len(self))

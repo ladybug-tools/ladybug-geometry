@@ -13,6 +13,7 @@ class Ray3D(Base1DIn3D):
         p: Base point
         v: Direction vector
     """
+    __slots__ = ('_p', '_v')
 
     def __init__(self, p, v):
         """Initilize Ray3D.
@@ -98,7 +99,7 @@ class Ray3D(Base1DIn3D):
         return u >= 0.0
 
     def __repr__(self):
-        return 'Ladybug Ray3D (<%.2f, %.2f, %.2f> + u<%.2f, %.2f, %.2f>)' % \
+        return 'Ray3D (<%.2f, %.2f, %.2f> point) (<%.2f, %.2f, %.2f> vector)' % \
             (self.p.x, self.p.y, self.p.z, self.v.x, self.v.y, self.v.z)
 
 

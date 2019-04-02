@@ -14,9 +14,6 @@ class Base2DIn2D(object):
         max
         center
     """
-    _min = None
-    _max = None
-    _center = None
 
     @property
     def min(self):

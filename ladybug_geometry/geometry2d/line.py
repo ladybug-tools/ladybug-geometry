@@ -17,6 +17,7 @@ class LineSegment2D(Base1DIn2D):
         p2: Second point
         length: The length of the line segement
     """
+    __slots__ = ('_p', '_v')
 
     def __init__(self, p, v):
         """Initilize LineSegment2D.
@@ -189,7 +190,7 @@ class LineSegment2D(Base1DIn2D):
         return u >= 0.0 and u <= 1.0
 
     def __repr__(self):
-        return 'Ladybug LineSegment2D (<%.2f, %.2f> to <%.2f, %.2f>)' % \
+        return 'LineSegment2D (<%.2f, %.2f> to <%.2f, %.2f>)' % \
             (self.p.x, self.p.y, self.p.x + self.v.x, self.p.y + self.v.y)
 
 

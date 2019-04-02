@@ -13,6 +13,7 @@ class Ray2D(Base1DIn2D):
         p: Base point
         v: Direction vector
     """
+    __slots__ = ('_p', '_v')
 
     def __init__(self, p, v):
         """Initilize Ray2D.
@@ -84,7 +85,7 @@ class Ray2D(Base1DIn2D):
         return u >= 0.0
 
     def __repr__(self):
-        return 'Ladybug Ray2D (<%.2f, %.2f> + u<%.2f, %.2f>)' % \
+        return 'Ray2D (<%.2f, %.2f> point) (<%.2f, %.2f> vector)' % \
             (self.p.x, self.p.y, self.v.x, self.v.y)
 
 
