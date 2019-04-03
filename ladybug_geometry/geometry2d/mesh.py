@@ -139,10 +139,11 @@ class Mesh2D(MeshBase, Base2DIn2D):
         _x_dim, _num_x = Mesh2D._domain_dimensions(polygon.max.x - polygon.min.x, x_dim)
         _y_dim, _num_y = Mesh2D._domain_dimensions(polygon.max.y - polygon.min.y, y_dim)
 
-        # for tolerance reasons, we shrink the x dimension by a very small amount
-        # this is done because Polygon2D.is_point_inside uses an X Vector (1,0)
+        # for tolerance reasons, we shrink the x and y dimensions by a very small amount
+        # this avoids the fringe cases noted in the Polygon2d.is_point_inside description
         _x_dim = _x_dim * 0.999999
-        _min_pt = Point2D(polygon.min.x + 0.0000001, polygon.min.y)
+        _y_dim = _y_dim * 0.999999
+        _min_pt = Point2D(polygon.min.x + 0.0000001, polygon.min.y + 0.0000001)
 
         # generate the gid of points and faces
         _verts = Mesh2D._grid_vertices(_min_pt, _num_x, _num_y, _x_dim, _y_dim)
@@ -152,7 +153,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
             _centroids = Mesh2D._grid_centroids(_min_pt, _num_x, _num_y, _x_dim, _y_dim)
 
         # figure out which vertices lie inside the polygon
-        _pattern = [polygon.is_point_inside_check(_v, False) for _v in _verts]
+        _pattern = [polygon.is_point_inside(_v) for _v in _verts]
 
         # build the mesh
         cls._check_required = False  # Turn off checks since we know the mesh is valid

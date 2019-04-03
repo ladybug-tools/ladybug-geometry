@@ -296,13 +296,20 @@ class Polygon2D(Base2DIn2D):
                 return True
         return False
 
-    def is_point_inside_check(self, point, complete_check=True):
+    def is_point_inside_check(self, point):
         """Test whether a Point2D lies inside the polygon with checks for fringe cases.
 
         This method uses the same calculation as the the `is_point_inside` method
         but it includes additional checks for the fringe cases noted in the
-        `is_point_inside` description.
-        While this method covers these fringe cases, it will not test for whether
+        `is_point_inside` description. Using this method means that it will always
+        yeild the right result for polygons with up to two concave turns. This is
+        good for nearly all practical purposes and the only cases that could
+        yield an incorrect result are when a point is co-linear with two or
+        more polygon edges along the X vector like so:
+                          _____     _____     _____
+                         |  .  |___|     |___|     |
+                         |_________________________|
+        While this method covers most fringe cases, it will not test for whether
         a point lies perfectly on the edge of the polygon so it assesses whether
         a point lies inside the polygon up to Python floating point tolerance
         (1e-16). If distinguishing edge conditions from inside/ outside is
@@ -310,17 +317,6 @@ class Polygon2D(Base2DIn2D):
 
         Args:
             point: A Point2D for which the inside/ outside relationship will be tested.
-            complete_check: Set to True to have this method check for the case that
-                a point outside the polygon is co-linear with an edge in the x direction.
-                This check is not necessary when using this function to generate mesh
-                grids. Running this check means that this method will always yeild the
-                right result for polygons with up to two concave turns. This is good
-                for nearly all practical purposes and the only cases that could
-                yield incorrect results are when a point is co-linear with two or
-                more polygon edges along the X vector like so:
-                                  _____     _____     _____
-                                 |  .  |___|     |___|     |
-                                 |_________________________|
         Returns:
             A boolean denoting whether the point lies inside (True) or outside (False).
         """
@@ -342,10 +338,7 @@ class Polygon2D(Base2DIn2D):
         if self.is_convex is False and len(inters) == 2:
             for _s in self.segments:
                 if _s.p1 == inters[0] and _s.p2 == inters[1]:
-                    if complete_check is False:
-                        return True
-                    else:
-                        return self.is_point_inside(point, Vector2D(0, 1))
+                    return self.is_point_inside(point, Vector2D(0, 1))
         elif len(inters) == 3:
             for _s in self.segments:
                 if _s.p1 == inters[0] and _s.p2 == inters[1]:
