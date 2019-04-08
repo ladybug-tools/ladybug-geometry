@@ -267,7 +267,7 @@ class Plane(object):
         else:
             return result[0].distance_to_point(result[1])
 
-    def intersect_line(self, line_ray):
+    def intersect_line_ray(self, line_ray):
         """Get the intersection between this plane and the input Line3D or Ray3D.
 
         Args:

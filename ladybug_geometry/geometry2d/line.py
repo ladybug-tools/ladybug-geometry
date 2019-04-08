@@ -5,6 +5,7 @@ from __future__ import division
 from .._immutable import immutable
 from .pointvector import Point2D
 from ._1d import Base1DIn2D
+from ..intersection2d import closest_point2d_between_line2d
 
 
 class LineSegment2D(Base1DIn2D):
@@ -178,6 +179,37 @@ class LineSegment2D(Base1DIn2D):
                 desired point lies.
         """
         return self.p + self.v * (length / self.length)
+
+    def closest_points_between_line(self, line):
+        """Get the two closest Point2D between this object to another LineSegment2D.
+
+        Note that the line segments should not intersect for the result to be valid.
+
+        Args:
+            line: A LineSegment2D object to which the closest points
+                will be computed.
+
+        Returns:
+            Two Point2D objects representing:
+                1) The closest point on this object to the input line.
+                2) The closest point on the input line to this object.
+        """
+        dist, pts = closest_point2d_between_line2d(self, line)
+        return pts
+
+    def distance_to_line(self, line):
+        """Get the minimum distance between this object and the input LineSegment2D.
+
+        Note that the line segments should not intersect for the result to be valid.
+
+        Args:
+            line: A LineSegment2D object to which the minimum distance will be computed.
+
+        Returns:
+            The minimum distance to the input line.
+        """
+        dist, pts = closest_point2d_between_line2d(self, line)
+        return dist
 
     def to_immutable(self):
         """Get an immutable version of this object."""

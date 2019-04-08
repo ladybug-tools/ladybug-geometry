@@ -94,3 +94,38 @@ def closest_point2d_on_line2d(P, L):
     if not L._u_in(u):
         u = max(min(u, 1.0), 0.0)
     return Point2D(L.p.x + u * L.v.x, L.p.y + u * L.v.y)
+
+
+def closest_point2d_between_line2d(A, B):
+    """Get the two closest Point2D between two LineSegment2D objects.
+
+    Note that the line segments should not intersect for the result to be valid.
+
+    Args:
+        Args:
+            A: A LineSegment2D object.
+            B: Another LineSegment2D to which closest points will be determined.
+
+    Returns:
+        dists[0]: The distance between the two LineSegment2D objects.
+        pts[0]: A tuple of two Point2D objects representing:
+            1) The point on A that is closest to B
+            2) The point on B that is closest to A
+    """
+    # one of the 4 endpoints must be a closest point
+    pt_1 = closest_point2d_on_line2d(A.p, B)
+    dist_1 = pt_1.distance_to_point(A.p)
+    a_p2 = A.p2
+    pt_2 = closest_point2d_on_line2d(a_p2, B)
+    dist_2 = pt_2.distance_to_point(a_p2)
+    pt_3 = closest_point2d_on_line2d(B.p, A)
+    dist_3 = pt_3.distance_to_point(B.p)
+    b_p2 = B.p2
+    pt_4 = closest_point2d_on_line2d(b_p2, A)
+    dist_4 = pt_4.distance_to_point(b_p2)
+
+    # sort the closest points based on their distance
+    dists = [dist_1, dist_2, dist_3, dist_4]
+    pts = [(A.p, pt_1), (a_p2, pt_2), (pt_3, B.p), (pt_4, b_p2)]
+    dists, pts = zip(*sorted(zip(dists, pts)))
+    return dists[0], pts[0]

@@ -9,6 +9,8 @@ from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
     does_intersection_exist_line2d, closest_point2d_on_line2d
 from ._2d import Base2DIn2D
 
+from collections import deque
+
 
 class Polygon2D(Base2DIn2D):
     """2D polygon object.
@@ -53,7 +55,7 @@ class Polygon2D(Base2DIn2D):
 
     @classmethod
     def from_rectangle(cls, base_point, height_vector, base, height):
-        """Initialize Polygon from rectangle parameters.
+        """Initialize Polygon2D from rectangle parameters.
 
         Initializing a polygon this way has the added benefit of having its properties
         quickly computed.
@@ -82,6 +84,36 @@ class Polygon2D(Base2DIn2D):
         polygon._is_complex = False
         return polygon
 
+    @classmethod
+    def from_shape_with_hole(cls, boundary, hole):
+        """Initialize aPolygon2D from a boundary shape with holes inside of it.
+
+        This method will convert the shape into a single concave polygon by drawing
+        lines from the holes to the outer boundary.
+
+        Args:
+            boundary: A list of Point2D objects for the outer boundary of the polygon
+                inside of which all of the holes are contained.
+            hole: A list of Point2D objects for the hole that the shape contains.
+        """
+        assert isinstance(boundary, (list, tuple)), \
+            '{} should be a list or tuple. Got {}'.format(type(boundary))
+        assert isinstance(hole, (list, tuple)), \
+            'hole should be a list or tuple. Got {}'.format(type(hole))
+        dist_dict = {}
+        for i, b_pt in enumerate(boundary):
+            for j, h_pt in enumerate(hole):
+                dist_dict[b_pt.distance_to_point(h_pt)] = (i, j)
+        dists = dist_dict.keys()
+        dists.sort()
+        min_indexes = dist_dict[dists[0]]
+        hole_deque = deque(hole)
+        hole_deque.rotate(-min_indexes[1])
+        hole_insert = [boundary[min_indexes[0]]] + list(hole_deque) + \
+            [hole[min_indexes[1]]]
+        boundary[min_indexes[0]:min_indexes[0]] = hole_insert
+        return cls(boundary)
+
     @property
     def vertices(self):
         """Tuple of all vertices in this geometry."""
@@ -91,11 +123,7 @@ class Polygon2D(Base2DIn2D):
     def segments(self):
         """Tuple of all line segments in the polygon."""
         if self._segments is None:
-            _segs = []
-            for i, vert in enumerate(self.vertices):
-                _seg = LineSegment2DImmutable.from_end_points(self.vertices[i - 1], vert)
-                _segs.append(_seg)
-            _segs.append(_segs.pop(0))  # segments will start from the base point
+            _segs = Polygon2D._segments_from_vertices(self.vertices)
             self._segments = tuple(_segs)
         return self._segments
 
@@ -163,7 +191,7 @@ class Polygon2D(Base2DIn2D):
                     _skip = (i, i + 1, i + 2)
                     _other_segs = [x for j, x in enumerate(_segs) if j not in _skip]
                     for _oth_s in _other_segs:
-                        if _s.intersect_line2(_oth_s) is not None:  # Found intersection
+                        if _s.intersect_line_ray(_oth_s) is not None:  # intersection!
                             self._is_complex = True
                             break
                     if self._is_complex is True:
@@ -218,7 +246,7 @@ class Polygon2D(Base2DIn2D):
         """
         return Polygon2D([pt.scale_world_origin(factor) for pt in self.vertices])
 
-    def intersect_line(self, line_ray):
+    def intersect_line_ray(self, line_ray):
         """Get the intersections between this polygon and a Ray2D or LineSegment2D.
 
         Args:
@@ -411,6 +439,15 @@ class Polygon2D(Base2DIn2D):
         if point.x < min.x or point.y < min.y or point.x > max.x or point.y > max.y:
             return False
         return self.is_point_inside(point, test_vector)
+
+    @staticmethod
+    def _segments_from_vertices(vertices):
+        _segs = []
+        for i, vert in enumerate(vertices):
+            _seg = LineSegment2DImmutable.from_end_points(vertices[i - 1], vert)
+            _segs.append(_seg)
+        _segs.append(_segs.pop(0))  # segments will start from the first point
+        return _segs
 
     def _check_vertices_input(self, vertices):
         assert isinstance(vertices, (list, tuple)), \

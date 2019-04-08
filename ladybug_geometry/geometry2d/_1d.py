@@ -66,16 +66,16 @@ class Base1DIn2D(object):
         close_pt = self.closest_point(point)
         return point.distance_to_point(close_pt)
 
-    def intersect_line2(self, other):
+    def intersect_line_ray(self, line_ray):
         """Get the intersection between this object and another Ray2 or LineSegment2D.
 
         Args:
-            other: Another LineSegment2D or Ray2D or to intersect.
+            line_ray: Another LineSegment2D or Ray2D or to intersect.
 
         Returns:
             Point2D of intersection if it exists. None if no intersection exists.
         """
-        return intersect_line2d(self, other)
+        return intersect_line2d(self, line_ray)
 
     def duplicate(self):
         """Get a copy of this object."""

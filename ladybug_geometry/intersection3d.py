@@ -86,39 +86,6 @@ def closest_point3d_on_plane(P, PL):
     return Point3D(P.x - n.x * d, P.y - n.y * d, P.z - n.z * d)
 
 
-def closest_point3d_between_line3d(A, B):
-    """Get the two closest Point3D between two LineSegment3D or Ray3D objects.
-
-    Args:
-        Args:
-            A: A LineSegment2D or Ray2D object.
-            B: Another LineSegment2D or Ray2D to which closest points will be determined.
-
-    Returns:
-        Two Point3D objects representing:
-            1) The point on A that is closest to B
-            2) The point on B that is closest to A
-    """
-    assert A.v and B.v
-    p13 = A.p - B.p
-    d1343 = p13.dot(B.v)
-    d4321 = B.v.dot(A.v)
-    d1321 = p13.dot(A.v)
-    d4343 = B.v.magnitude_squared
-    denom = A.v.magnitude_squared * d4343 - d4321 ** 2
-    if denom == 0:  # parallel, return a line endpoint and the closest point to it
-        return A.p, closest_point3d_on_line3d(A.p, B)
-
-    ua = (d1343 * d4321 - d1321 * d4343) / denom
-    if not A._u_in(ua):
-        ua = max(min(ua, 1.0), 0.0)
-    ub = (d1343 + d4321 * ua) / d4343
-    if not B._u_in(ub):
-        ub = max(min(ub, 1.0), 0.0)
-    return Point3D(A.p.x + ua * A.v.x, A.p.y + ua * A.v.y, A.p.z + ua * A.v.z), \
-        Point3D(B.p.x + ub * B.v.x, B.p.y + ub * B.v.y, B.p.z + ub * B.v.z)
-
-
 def closest_point3d_between_line3d_plane(L, PL):
     """Get the two closest Point3D between a LineSegment3D/Ray3D and a Plane.
 

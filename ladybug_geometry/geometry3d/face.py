@@ -395,7 +395,7 @@ class Face3D(Base2DIn3D):
         Returns:
             Point3D for the intersection. Will be None if no intersection exists.
         """
-        _plane_int = self._plane.intersect_line(line_ray)
+        _plane_int = self._plane.intersect_line_ray(line_ray)
         if _plane_int is not None:
             _int2d = self._plane.xyz_to_xy(_plane_int)
             if self.polygon2d.is_point_inside_bound_rect(_int2d):
