@@ -66,12 +66,13 @@ class Polygon2D(Base2DIn2D):
             base: A number indicating the length of the base of the rectangle.
             height: A number indicating the length of the height of the rectangle.
         """
-        assert isinstance(base_point, (Point2D, Point2DImmutable)), \
-            'base_point must be Point2D. Got {}.'.format(type(base_point))
-        assert isinstance(height_vector, (Vector2D, Vector2DImmutable)), \
-            'height_vector must be Vector2D. Got {}.'.format(type(height_vector))
-        assert isinstance(base, (float, int)), 'base must be a number.'
-        assert isinstance(height, (float, int)), 'height must be a number.'
+        if cls._check_required:
+            assert isinstance(base_point, (Point2D, Point2DImmutable)), \
+                'base_point must be Point2D. Got {}.'.format(type(base_point))
+            assert isinstance(height_vector, (Vector2D, Vector2DImmutable)), \
+                'height_vector must be Vector2D. Got {}.'.format(type(height_vector))
+            assert isinstance(base, (float, int)), 'base must be a number.'
+            assert isinstance(height, (float, int)), 'height must be a number.'
         _hv_norm = height_vector.normalized()
         _bv = Vector2D(_hv_norm.y, -_hv_norm.x) * base
         _hv = _hv_norm * height
@@ -86,7 +87,45 @@ class Polygon2D(Base2DIn2D):
 
     @classmethod
     def from_shape_with_hole(cls, boundary, hole):
-        """Initialize aPolygon2D from a boundary shape with holes inside of it.
+        """Initialize a Polygon2D from a boundary shape with a hole inside of it.
+
+        This method will convert the shape into a single concave polygon by drawing
+        a line from the hole to the outer boundary.
+
+        Args:
+            boundary: A list of Point2D objects for the outer boundary of the polygon
+                inside of which the hole is contained.
+            hole: A list of Point2D objects for the hole.
+        """
+        # check that the inputs are in the correct format
+        if cls._check_required:
+            assert isinstance(boundary, list), \
+                'boundary should be a list. Got {}'.format(type(boundary))
+            assert isinstance(hole, list), \
+                'hole should be a list. Got {}'.format(type(hole))
+
+        # check that the direction of vertices for the hole is opposite the boundary
+        bound_direction = Polygon2D._are_clockwise(boundary)
+        if cls._are_clockwise(hole) is bound_direction:
+            hole.reverse()
+
+        # join the hole with the boundary at the closest point
+        dist_dict = {}
+        for i, b_pt in enumerate(boundary):
+            for j, h_pt in enumerate(hole):
+                dist_dict[b_pt.distance_to_point(h_pt)] = (i, j)
+        boundary = cls._merge_boundary_and_hole(boundary, hole, dist_dict)
+
+        # return the polygon with some properties set based on what we know
+        _new_poly = cls(tuple(boundary))
+        _new_poly._is_clockwise = bound_direction
+        _new_poly._is_convex = False
+        _new_poly._is_complex = False
+        return _new_poly
+
+    @classmethod
+    def from_shape_with_holes(cls, boundary, holes):
+        """Initialize a Polygon2D from a boundary shape with holes inside of it.
 
         This method will convert the shape into a single concave polygon by drawing
         lines from the holes to the outer boundary.
@@ -94,25 +133,37 @@ class Polygon2D(Base2DIn2D):
         Args:
             boundary: A list of Point2D objects for the outer boundary of the polygon
                 inside of which all of the holes are contained.
-            hole: A list of Point2D objects for the hole that the shape contains.
+            holes: A list of lists with one list for each hole in the shape. Each hole
+                should be a list of at least 3 Point2D objects.
         """
-        assert isinstance(boundary, (list, tuple)), \
-            '{} should be a list or tuple. Got {}'.format(type(boundary))
-        assert isinstance(hole, (list, tuple)), \
-            'hole should be a list or tuple. Got {}'.format(type(hole))
-        dist_dict = {}
-        for i, b_pt in enumerate(boundary):
-            for j, h_pt in enumerate(hole):
-                dist_dict[b_pt.distance_to_point(h_pt)] = (i, j)
-        dists = dist_dict.keys()
-        dists.sort()
-        min_indexes = dist_dict[dists[0]]
-        hole_deque = deque(hole)
-        hole_deque.rotate(-min_indexes[1])
-        hole_insert = [boundary[min_indexes[0]]] + list(hole_deque) + \
-            [hole[min_indexes[1]]]
-        boundary[min_indexes[0]:min_indexes[0]] = hole_insert
-        return cls(boundary)
+        # check that the inputs are in the correct format.
+        if cls._check_required:
+            assert isinstance(boundary, list), \
+                'boundary should be a list. Got {}'.format(type(boundary))
+            assert isinstance(holes, list), \
+                'holes should be a list. Got {}'.format(type(holes))
+            for hole in holes:
+                assert isinstance(hole, list), \
+                    'hole should be a list. Got {}'.format(type(hole))
+                assert len(hole) >= 3, \
+                    'hole should have at least 3 vertices. Got {}'.format(len(hole))
+
+        # check that the direction of vertices for the hole is opposite the boundary
+        bound_direction = Polygon2D._are_clockwise(boundary)
+        for hole in holes:
+            if Polygon2D._are_clockwise(hole) is bound_direction:
+                hole.reverse()
+
+        # recursively add the nearest hole to the boundary until there are none left.
+        while len(holes) > 0:
+            boundary, holes = Polygon2D._merge_boundary_and_closest_hole(boundary, holes)
+
+        # return the polygon with some properties set based on what we know
+        _new_poly = cls(tuple(boundary))
+        _new_poly._is_clockwise = bound_direction
+        _new_poly._is_convex = False
+        _new_poly._is_complex = False
+        return _new_poly
 
     @property
     def vertices(self):
@@ -440,15 +491,6 @@ class Polygon2D(Base2DIn2D):
             return False
         return self.is_point_inside(point, test_vector)
 
-    @staticmethod
-    def _segments_from_vertices(vertices):
-        _segs = []
-        for i, vert in enumerate(vertices):
-            _seg = LineSegment2DImmutable.from_end_points(vertices[i - 1], vert)
-            _segs.append(_seg)
-        _segs.append(_segs.pop(0))  # segments will start from the first point
-        return _segs
-
     def _check_vertices_input(self, vertices):
         assert isinstance(vertices, (list, tuple)), \
             'vertices should be a list or tuple. Got {}'.format(type(vertices))
@@ -460,6 +502,65 @@ class Polygon2D(Base2DIn2D):
                 'Expected Point2D. Got {}.'.format(type(p))
             _verts_immutable.append(p.to_immutable())
         self._vertices = tuple(_verts_immutable)
+
+    @staticmethod
+    def _segments_from_vertices(vertices):
+        _segs = []
+        for i, vert in enumerate(vertices):
+            _seg = LineSegment2DImmutable.from_end_points(vertices[i - 1], vert)
+            _segs.append(_seg)
+        _segs.append(_segs.pop(0))  # segments will start from the first point
+        return _segs
+
+    @staticmethod
+    def _merge_boundary_and_closest_hole(boundary, holes):
+        """Return a list of points for a boundary merged with the closest hole."""
+        hole_dicts = []
+        min_dists = []
+        for hole in holes:
+            dist_dict = {}
+            for i, b_pt in enumerate(boundary):
+                for j, h_pt in enumerate(hole):
+                    dist_dict[b_pt.distance_to_point(h_pt)] = (i, j)
+            hole_dicts.append(dist_dict)
+            min_dists.append(min(dist_dict.keys()))
+        hole_index = min_dists.index(min(min_dists))
+        new_boundary = Polygon2D._merge_boundary_and_hole(
+            boundary, holes[hole_index], hole_dicts[hole_index])
+        holes.pop(hole_index)
+        return new_boundary, holes
+
+    @staticmethod
+    def _merge_boundary_and_hole(boundary, hole, dist_dict):
+        """Create a single list of points describing a boundary shape with a hole.
+
+        Args:
+            boundary: A list of Point2D objects for the outer boundary inside of
+                which the hole is contained.
+            hole: A list of Point2D objects for the hole.
+            dist_dict: A dictionary with keys of distances between each of the points
+                in the boundary and hole lists and values as tuples with two values:
+                (the index of the boundary point, the index of the hole point)
+        """
+        min_dist = min(dist_dict.keys())
+        min_indexes = dist_dict[min_dist]
+        hole_deque = deque(hole)
+        hole_deque.rotate(-min_indexes[1])
+        hole_insert = [boundary[min_indexes[0]]] + list(hole_deque) + \
+            [hole[min_indexes[1]]]
+        boundary[min_indexes[0]:min_indexes[0]] = hole_insert
+        return boundary
+
+    @staticmethod
+    def _are_clockwise(vertices):
+        """Check if a list of vertices are clockwise.
+
+        This is a quicker calculation when all you need is the direction and not area.
+        """
+        _a = 0
+        for i, pt in enumerate(vertices):
+            _a += vertices[i - 1].x * pt.y - vertices[i - 1].y * pt.x
+        return _a < 0
 
     def __copy__(self):
         Polygon2D._check_required = False  # Turn off check since we know input is valid

@@ -22,10 +22,13 @@ class Face3D(Base2DIn3D):
     Properties:
         vertices
         plane
-        segments
         polygon2d
         triangulated_mesh2d
         triangulated_mesh3d
+        boundary
+        holes
+        boundary_segments
+        hole_segments
         normal
         min
         max
@@ -37,8 +40,9 @@ class Face3D(Base2DIn3D):
         is_convex
         is_self_intersecting
     """
-    __slots__ = ('_vertices', '_plane', '_segments', '_polygon2d',
-                 '_triangulated_mesh2d', '_triangulated_mesh3d',
+    __slots__ = ('_vertices', '_plane', '_polygon2d', '_triangulated_mesh2d',
+                 '_triangulated_mesh3d', '_boundary', '_holes',
+                 '_boundary_segments', '_hole_segments'
                  '_min', '_max', '_center', '_perimeter', '_area', '_centroid',
                  '_is_clockwise', '_is_convex', '_is_complex')
     _check_required = True
@@ -58,10 +62,13 @@ class Face3D(Base2DIn3D):
             self._vertices = vertices
         self._plane = plane
 
-        self._segments = None
         self._polygon2d = None
         self._mesh2d = None
         self._mesh3d = None
+        self._boundary = self._vertices
+        self._holes = None
+        self._boundary_segments = None
+        self._hole_segments = None
 
         self._min = None
         self._max = None
@@ -81,14 +88,7 @@ class Face3D(Base2DIn3D):
         three vertices and the origin of the plane will be the first vertex of
         the input vertices.
         """
-        try:
-            pt1, pt2, pt3 = vertices[:3]
-            v1 = pt2 - pt1
-            v2 = pt3 - pt1
-            n = v1.cross(v2)
-        except Exception as e:
-            raise ValueError('Incorrect vertices input for Face3D:\n\t{}'.format(e))
-        plane = Plane(n, pt1)
+        plane = cls._plane_from_vertices(vertices)
         return cls(vertices, plane)
 
     @classmethod
@@ -103,10 +103,13 @@ class Face3D(Base2DIn3D):
             extrusion_vector: A vector denoting the direction and distance to
                 extrude the line segment.
         """
-        assert isinstance(line_segment, (LineSegment3D, LineSegment3DImmutable)), \
-            'line_segment must be LineSegment3D. Got {}.'.format(type(line_segment))
-        assert isinstance(extrusion_vector, (Vector3D, Vector3DImmutable)), \
-            'extrusion_vector must be Vector3D. Got {}.'.format(type(extrusion_vector))
+        if cls._check_required:
+            assert isinstance(line_segment, (LineSegment3D, LineSegment3DImmutable)), \
+                'line_segment must be LineSegment3D. Got {}.'.format(
+                    type(line_segment))
+            assert isinstance(extrusion_vector, (Vector3D, Vector3DImmutable)), \
+                'extrusion_vector must be Vector3D. Got {}.'.format(
+                    type(extrusion_vector))
         _p1 = line_segment.p1
         _p2 = line_segment.p2
         _verts = (_p1, _p1 + extrusion_vector, _p2 + extrusion_vector, _p2)
@@ -141,8 +144,9 @@ class Face3D(Base2DIn3D):
                 rectangle and the X and Y axes will form the sides.
                 Default is the world XY plane.
         """
-        assert isinstance(base, (float, int)), 'Rectangle base must be a number.'
-        assert isinstance(height, (float, int)), 'Rectangle height must be a number.'
+        if cls._check_required:
+            assert isinstance(base, (float, int)), 'Rectangle base must be a number.'
+            assert isinstance(height, (float, int)), 'Rectangle height must be a number.'
         if base_plane is not None:
             assert isinstance(base_plane, Plane), \
                 'base_plane must be Plane. Got {}.'.format(type(base_plane))
@@ -164,9 +168,68 @@ class Face3D(Base2DIn3D):
         face._is_complex = False
         return face
 
+    @classmethod
+    def from_shape_with_holes(cls, boundary, holes, plane=None):
+        """Initialize a Face3D from a boundary vertex list with holes inside of it.
+
+        This method will separately store the list of Point2Ds representing the
+        boundary and holes on the `boundary` and `holes` properties of this object.
+        However, under the hood, the polygon_2d for the face will be a single
+        concave polygon made by drawing lines from the holes to the outer boundary.
+        This allows for ease of use with the other methods including intersections,
+        generating triangulated meshes, and generating grid meshes.
+
+        Args:
+            boundary: A list of Point3D objects for the outer boundary of the face
+                inside of which all of the holes are contained.
+            holes: A list of lists with one list for each hole in the face. Each hole
+                should be a list of at least 3 Point3D objects.
+            plane: A Plane object indicating the plane in which the face exists.
+                If left as none, the Plane normal will automatically be calculated
+                by analyzing the first three vertices of the boundary and the origin
+                of the plane will be the first vertex of the boundary vertices.
+        """
+        # check the inputs
+        if cls._check_required:
+            assert isinstance(boundary, list), \
+                'boundary should be a list. Got {}'.format(type(boundary))
+            assert isinstance(holes, list), \
+                'holes should be a list. Got {}'.format(type(holes))
+            for hole in holes:
+                assert isinstance(hole, list), \
+                    'hole should be a list. Got {}'.format(type(hole))
+                assert len(hole) >= 3, \
+                    'hole should have at least 3 vertices. Got {}'.format(len(hole))
+        if plane is None:
+            plane = cls._plane_from_vertices(boundary)
+
+        # create a Polygon2D from the vertices
+        _boundary2d = [plane.xyz_to_xy_immutable(_v) for _v in boundary]
+        _holes2d = [[plane.xyz_to_xy_immutable(_v) for _v in hole] for hole in holes]
+        Polygon2D._check_required = False  # Turn off check since input is valid
+        _polygon2d = Polygon2D.from_shape_with_holes(_boundary2d, _holes2d)
+        Polygon2D._check_required = True  # Turn the checks back on
+
+        # convert Polygon2D vertices to 3D to become the vertices of the face.
+        _vert3d = tuple(plane.xy_to_xyz_immutable(_v) for _v in _polygon2d.vertices)
+        Face3D._check_required = False  # Turn off check since input is valid
+        _face = cls(_vert3d, plane)
+        Face3D._check_required = True  # Turn the checks back on
+
+        # assign extra properties that we know to the face
+        _face._polygon2d = _polygon2d
+        _face._boundary = tuple(pt.to_immutable() for pt in boundary)
+        _face._holes = tuple(tuple(pt.to_immutable() for pt in hole) for hole in holes)
+        return _face
+
     @property
     def vertices(self):
-        """Tuple of all vertices in this face."""
+        """Tuple of all vertices in this face.
+
+        Note that, in the case of a face with holes, some vertices will be repeated
+        since this property effectively traces out a single boundary around the
+        whole shape, winding inward to cut out the holes.
+        """
         return self._vertices
 
     @property
@@ -175,16 +238,89 @@ class Face3D(Base2DIn3D):
         return self._plane
 
     @property
-    def segments(self):
-        """Tuple of all line segments bordering the face."""
-        if self._segments is None:
+    def polygon2d(self):
+        """A Polygon2D of this face in the 2D space of the face's plane.
+
+        Note that this is a single polygon object even when there are holes in the
+        face since such a polygon can be made by drawing a line from the holes to
+        the outer boundary.
+        """
+        if self._polygon2d is None:
+            _vert2d = tuple(self._plane.xyz_to_xy_immutable(_v) for _v in self.vertices)
+            Polygon2D._check_required = False  # Turn off check since input is valid
+            self._polygon2d = Polygon2D(_vert2d)
+            Polygon2D._check_required = True  # Turn the checks back on
+            if self._is_clockwise is not None:
+                self._polygon2d._is_clockwise = self._is_clockwise
+        return self._polygon2d
+
+    @property
+    def triangulated_mesh2d(self):
+        """A triagulated Mesh2D in the 2D space of the face's plane."""
+        if self._mesh2d is None:
+            self._mesh2d = Mesh2D.from_polygon_triangulated(self.polygon2d)
+        return self._mesh2d
+
+    @property
+    def triangulated_mesh3d(self):
+        """A triagulated Mesh3D of this face."""
+        if self._mesh3d is None:
+            _vert3d = [self._plane.xy_to_xyz_immutable(_v) for _v in
+                       self.triangulated_mesh2d.vertices]
+            self._mesh3d = Mesh3D(_vert3d, self.triangulated_mesh2d.faces)
+        return self._mesh3d
+
+    @property
+    def boundary(self):
+        """Tuple of vertices on the boundary of this face.
+
+        For most Face3D objects, this will be identical to the vertices property.
+        However, when the Face3D has holes within it, this property stores
+        the outer boundary of the shape.
+        """
+        return self._boundary
+
+    @property
+    def holes(self):
+        """Tuple with one tuple of vertices for each hole within this face.
+
+        This property will be None when the face has no holes in it.
+        """
+        return self._holes
+
+    @property
+    def boundary_segments(self):
+        """Tuple of all line segments bordering the face.
+
+        Note that this does not include segments for any holes in the face.
+        Just the outer boundary.
+        """
+        if self._boundary_segments is None:
             _segs = []
-            for i, vert in enumerate(self.vertices):
-                _seg = LineSegment3DImmutable.from_end_points(self.vertices[i - 1], vert)
+            for i, vert in enumerate(self.boundary):
+                _seg = LineSegment3DImmutable.from_end_points(self.boundary[i - 1], vert)
                 _segs.append(_seg)
             _segs.append(_segs.pop(0))  # segments will start from the first vertex
-            self._segments = tuple(_segs)
-        return self._segments
+            self._boundary_segments = tuple(_segs)
+        return self._boundary_segments
+
+    @property
+    def hole_segments(self):
+        """Tuple with a tuple of line segments for each hole in the face.
+
+        This will be None if there are no holes in the face.
+        """
+        if self._holes is not None and self._hole_segments is None:
+            _all_segs = []
+            for hole in self.holes:
+                _segs = []
+                for i, vert in enumerate(hole):
+                    _seg = LineSegment3DImmutable.from_end_points(hole[i - 1], vert)
+                    _segs.append(_seg)
+                _segs.append(_segs.pop(0))  # segments will start from the first vertex
+                _all_segs.append(_segs)
+            self._hole_segments = tuple(tuple(_s) for _s in _all_segs)
+        return self._hole_segments
 
     @property
     def normal(self):
@@ -193,9 +329,12 @@ class Face3D(Base2DIn3D):
 
     @property
     def perimeter(self):
-        """The perimeter of the face."""
+        """The perimeter of the face. This includes the length of holes in the face."""
         if self._perimeter is None:
-            self._perimeter = sum([seg.length for seg in self.segments])
+            self._perimeter = sum([seg.length for seg in self.boundary_segments])
+            if self._holes is not None:
+                for hole in self.hole_segments:
+                    self._perimeter += sum([seg.length for seg in hole])
         return self._perimeter
 
     @property
@@ -221,14 +360,21 @@ class Face3D(Base2DIn3D):
 
     @property
     def is_clockwise(self):
-        """Boolean for whether the face vertices are in clockwise order."""
+        """Boolean for whether the face vertices and boundary are in clockwise order.
+
+        Note that this does not describe the orientation of any holes in the face.
+        """
         if self._is_clockwise is None:
             self._is_clockwise = self.polygon2d.is_clockwise
         return self._is_clockwise
 
     @property
     def is_convex(self):
-        """Boolean noting whether the face is convex (True) or non-convex (False)."""
+        """Boolean noting whether the face is convex (True) or non-convex (False).
+
+        Note that any face with holes will be automatically considered non-convex
+        since the underlying polygon_2d is always non-convex in this case.
+        """
         if self._is_convex is None:
             self._is_convex = self.polygon2d.is_convex
         return self._is_convex
@@ -247,32 +393,9 @@ class Face3D(Base2DIn3D):
         return self._is_complex
 
     @property
-    def polygon2d(self):
-        """A Polygon2D of this face in the 2D space of the face's plane."""
-        if self._polygon2d is None:
-            _vert2d = [self._plane.xyz_to_xy_immutable(_v) for _v in self.vertices]
-            Polygon2D._check_required = False  # Turn off check since input is valid
-            self._polygon2d = Polygon2D(tuple(_vert2d))
-            Polygon2D._check_required = True  # Turn the checks back on
-            if self._is_clockwise is not None:
-                self._polygon2d._is_clockwise = self._is_clockwise
-        return self._polygon2d
-
-    @property
-    def triangulated_mesh2d(self):
-        """A triagulated Mesh2D in the 2D space of the face's plane."""
-        if self._mesh2d is None:
-            self._mesh2d = Mesh2D.from_polygon_triangulated(self.polygon2d)
-        return self._mesh2d
-
-    @property
-    def triangulated_mesh3d(self):
-        """A triagulated Mesh3D of this face."""
-        if self._mesh3d is None:
-            _vert3d = [self._plane.xy_to_xyz_immutable(_v) for _v in
-                       self.triangulated_mesh2d.vertices]
-            self._mesh3d = Mesh3D(_vert3d, self.triangulated_mesh2d.faces)
-        return self._mesh3d
+    def has_holes(self):
+        """Boolean noting whther the face has holes within it."""
+        return self._holes is not None
 
     def validate_planarity(self, tolerance, raise_exception=True):
         """Validate that all of the face's vertices lie within the face's plane.
@@ -305,14 +428,19 @@ class Face3D(Base2DIn3D):
         return True
 
     def flip(self):
-        """Get a face with a flipped direction from this one."""
+        """Get a face with a flipped direction from this one.
+
+        Note that this only flips the plane of the face and does not change the vertices.
+        """
         Face3D._check_required = False  # Turn off check since input is valid
-        _new_srf = Face3D(self.vertices, self.plane.flip())
+        _new_face = Face3D(self.vertices, self.plane.flip())
         Face3D._check_required = True  # Turn the checks back on
-        self._transfer_properties(_new_srf)
+        self._transfer_properties(_new_face)
+        _new_face._boundary = self._boundary
+        _new_face._holes = self._holes
         if self._is_clockwise is not None:
-            _new_srf._is_clockwise = not self._is_clockwise
-        return _new_srf
+            _new_face._is_clockwise = not self._is_clockwise
+        return _new_face
 
     def move(self, moving_vec):
         """Get a face that has been moved along a vector.
@@ -320,10 +448,12 @@ class Face3D(Base2DIn3D):
         Args:
             moving_vec: A Vector3D with the direction and distance to move the face.
         """
-        _verts = tuple([Point3DImmutable(
-            pt.x + moving_vec.x, pt.y + moving_vec.y, pt.z + moving_vec.z)
-                        for pt in self.vertices])
-        return self._face_transform(_verts, self.plane.move(moving_vec))
+        _verts = self._move(self.vertices, moving_vec)
+        _new_face = self._face_transform(_verts, self.plane.move(moving_vec))
+        if self._holes is not None:
+            _new_face._boundary = self._move(self._boundary, moving_vec)
+            _new_face._holes = self._move(self._holes, moving_vec)
+        return _new_face
 
     def rotate(self, axis, angle, origin):
         """Rotate a face by a certain angle around an axis and origin.
@@ -337,9 +467,12 @@ class Face3D(Base2DIn3D):
             angle: An angle for rotation in radians.
             origin: A Point3D for the origin around which the object will be rotated.
         """
-        _verts = tuple([pt.rotate(axis, angle, origin).to_immutable()
-                        for pt in self.vertices])
-        return self._face_transform(_verts, self.plane.rotate(axis, angle, origin))
+        _verts = self._rotate(self.vertices, axis, angle, origin)
+        _new_face = self._face_transform(_verts, self.plane.rotate(axis, angle, origin))
+        if self._holes is not None:
+            _new_face._boundary = self._rotate(self._boundary, axis, angle, origin)
+            _new_face._holes = self._rotate(self._holes, axis, angle, origin)
+        return _new_face
 
     def rotate_xy(self, angle, origin):
         """Get a face rotated counterclockwise in the world XY plane by a certain angle.
@@ -348,9 +481,12 @@ class Face3D(Base2DIn3D):
             angle: An angle in radians.
             origin: A Point3D for the origin around which the object will be rotated.
         """
-        _verts = tuple([pt.rotate_xy(angle, origin).to_immutable()
-                        for pt in self.vertices])
-        return self._face_transform(_verts, self.plane.rotate_xy(angle, origin))
+        _verts = self._rotate_xy(self.vertices, angle, origin)
+        _new_face = self._face_transform(_verts, self.plane.rotate_xy(angle, origin))
+        if self._holes is not None:
+            _new_face._boundary = self._rotate_xy(self._boundary, angle, origin)
+            _new_face._holes = self._rotate_xy(self._holes, angle, origin)
+        return _new_face
 
     def reflect(self, normal, origin):
         """Get a face reflected across a plane with the input normal vector and origin.
@@ -360,9 +496,12 @@ class Face3D(Base2DIn3D):
                 which the face will be reflected. THIS VECTOR MUST BE NORMALIZED.
             origin: A Point3D representing the origin from which to reflect.
         """
-        _verts = tuple([pt.reflect(normal, origin).to_immutable()
-                        for pt in self.vertices])
-        return self._face_transform(_verts, self.plane.reflect(normal, origin))
+        _verts = self._reflect(self.vertices, normal, origin)
+        _new_face = self._face_transform(_verts, self.plane.reflect(normal, origin))
+        if self._holes is not None:
+            _new_face._boundary = self._reflect(self._boundary, normal, origin)
+            _new_face._holes = self._reflect(self._holes, normal, origin)
+        return _new_face
 
     def scale(self, factor, origin):
         """Scale a face by a factor from an origin point.
@@ -371,9 +510,13 @@ class Face3D(Base2DIn3D):
             factor: A number representing how much the face should be scaled.
             origin: A Point3D representing the origin from which to scale.
         """
-        _verts = tuple([pt.scale(factor, origin).to_immutable() for pt in self.vertices])
-        return self._face_transform_scale(
+        _verts = self._scale(self.vertices, factor, origin)
+        _new_face = self._face_transform_scale(
             _verts, self.plane.scale(factor, origin), factor)
+        if self._holes is not None:
+            _new_face._boundary = self._scale(self._boundary, factor, origin)
+            _new_face._holes = self._scale(self._holes, factor, origin)
+        return _new_face
 
     def scale_world_origin(self, factor):
         """Scale a face by a factor from the world origin. Faster than Face3D.scale.
@@ -381,10 +524,13 @@ class Face3D(Base2DIn3D):
         Args:
             factor: A number representing how much the line segment should be scaled.
         """
-        _verts = tuple([pt.scale_world_origin(factor).to_immutable()
-                        for pt in self.vertices])
-        return self._face_transform_scale(
+        _verts = self._scale_world_origin(self.vertices, factor)
+        _new_face = self._face_transform_scale(
             _verts, self.plane.scale_world_origin(factor), factor)
+        if self._holes is not None:
+            _new_face._boundary = self._scale_world_origin(self._boundary, factor)
+            _new_face._holes = self._scale_world_origin(self._holes, factor)
+        return _new_face
 
     def intersect_line_ray(self, line_ray):
         """Get the intersection between this face and the input Line3D or Ray3D.
@@ -531,48 +677,82 @@ class Face3D(Base2DIn3D):
         assert isinstance(input, (float, int)), '{} for Face3D.get_mesh_grid' \
             ' must be a number. Got {}.'.format(name, type(input))
 
+    def _move(self, vertices, mov_vec):
+        return tuple(Point3DImmutable(
+            pt.x + mov_vec.x, pt.y + mov_vec.y, pt.z + mov_vec.z) for pt in vertices)
+
+    def _rotate(self, vertices, axis, angle, origin):
+        return tuple([pt.rotate(axis, angle, origin).to_immutable() for pt in vertices])
+
+    def _rotate_xy(self, vertices, angle, origin):
+        return tuple([pt.rotate_xy(angle, origin).to_immutable() for pt in vertices])
+
+    def _reflect(self, vertices, normal, origin):
+        return tuple([pt.reflect(normal, origin).to_immutable() for pt in vertices])
+
+    def _scale(self, vertices, factor, origin):
+        return tuple([pt.scale(factor, origin).to_immutable() for pt in vertices])
+
+    def _scale_world_origin(self, vertices, factor):
+        return tuple([pt.scale_world_origin(factor).to_immutable() for pt in vertices])
+
     def _face_transform(self, verts, plane):
         """Transform face in a way that transfers properties and avoids checks."""
         Face3D._check_required = False  # Turn off check since input is valid
-        _new_srf = Face3D(verts, plane)
+        _new_face = Face3D(verts, plane)
         Face3D._check_required = True  # Turn the checks back on
-        self._transfer_properties(_new_srf)
-        return _new_srf
+        self._transfer_properties(_new_face)
+        _new_face._polygon2d = self._polygon2d
+        _new_face._mesh2d = self._mesh2d
+        return _new_face
 
     def _face_transform_scale(self, verts, plane, factor):
         """Scale face in a way that transfers properties and avoids checks."""
         Face3D._check_required = False  # Turn off check since input is valid
-        _new_srf = Face3D(verts, plane)
+        _new_face = Face3D(verts, plane)
         Face3D._check_required = True  # Turn the checks back on
-        self._transfer_properties_scale(_new_srf, factor)
-        return _new_srf
+        self._transfer_properties_scale(_new_face, factor)
+        return _new_face
 
-    def _transfer_properties(self, new_srf):
+    def _transfer_properties(self, new_face):
         """Transfer properties from this face to a new face.
 
         This is used by the transform methods that don't alter the relationship of
         face vertices to one another (move, rotate, reflect).
         """
-        new_srf._perimeter = self._perimeter
-        new_srf._area = self._area
-        new_srf._is_convex = self._is_convex
-        new_srf._is_complex = self._is_complex
-        new_srf._is_clockwise = self._is_clockwise
-        new_srf._polygon2d = self._polygon2d
-        new_srf._mesh2d = self._mesh2d
+        new_face._perimeter = self._perimeter
+        new_face._area = self._area
+        new_face._is_convex = self._is_convex
+        new_face._is_complex = self._is_complex
+        new_face._is_clockwise = self._is_clockwise
 
-    def _transfer_properties_scale(self, new_srf, factor):
+    def _transfer_properties_scale(self, new_face, factor):
         """Transfer properties from this face to a new face.
 
         This is used by the methods that scale the face.
         """
-        new_srf._is_convex = self._is_convex
-        new_srf._is_complex = self._is_complex
-        new_srf._is_clockwise = self._is_clockwise
+        new_face._is_convex = self._is_convex
+        new_face._is_complex = self._is_complex
+        new_face._is_clockwise = self._is_clockwise
         if self._perimeter is not None:
-            new_srf._perimeter = self._perimeter * factor
+            new_face._perimeter = self._perimeter * factor
         if self._area is not None:
-            new_srf._area = self._area * factor
+            new_face._area = self._area * factor
+
+    @staticmethod
+    def _plane_from_vertices(vertices):
+        """Get a plane from a list of vertices.
+
+        The first 3 vertices will be used to make the plane.
+        """
+        try:
+            pt1, pt2, pt3 = vertices[:3]
+            v1 = pt2 - pt1
+            v2 = pt3 - pt1
+            n = v1.cross(v2)
+        except Exception as e:
+            raise ValueError('Incorrect vertices input for Face3D:\n\t{}'.format(e))
+        return Plane(n, pt1)
 
     def __copy__(self):
         Face3D._check_required = False  # Turn off check since we know input is valid
