@@ -127,5 +127,5 @@ def closest_point2d_between_line2d(A, B):
     # sort the closest points based on their distance
     dists = [dist_1, dist_2, dist_3, dist_4]
     pts = [(A.p, pt_1), (a_p2, pt_2), (pt_3, B.p), (pt_4, b_p2)]
-    dists, pts = zip(*sorted(zip(dists, pts)))
-    return dists[0], pts[0]
+    dists, i = zip(*sorted(zip(dists, range(len(pts)))))
+    return dists[0], pts[i[0]]

@@ -12,7 +12,7 @@ class LineSegment2DTestCase(unittest.TestCase):
     """Test for LineSegment2D"""
 
     def test_linesegment2_init(self):
-        """Test the initalization of LineSegement2 objects and basic properties."""
+        """Test the initalization of LineSegement2D objects and basic properties."""
         pt = Point2D(2, 0)
         vec = Vector2D(0, 2)
         seg = LineSegment2D(pt, vec)
@@ -22,8 +22,10 @@ class LineSegment2DTestCase(unittest.TestCase):
         assert seg.v == Vector2D(0, 2)
         assert seg.p1 == Point2D(2, 0)
         assert seg.p2 == Point2D(2, 2)
+        assert seg.midpoint == Point2D(2, 1)
+        assert seg.point_at(0.25) == Point2D(2, 0.5)
+        assert seg.point_at_length(1) == Point2D(2, 1)
         assert seg.length == 2
-        assert seg.length_squared == 4
 
         flip_seg = seg.flipped()
         assert flip_seg.p == Point2D(2, 2)
@@ -35,7 +37,7 @@ class LineSegment2DTestCase(unittest.TestCase):
         assert seg.v == Vector2D(0, -2)
 
     def test_init_from_endpoints(self):
-        """Test the initalization of LineSegement2 from end points."""
+        """Test the initalization of LineSegement2D from end points."""
         pt_1 = Point2D(2, 0)
         pt_2 = Point2D(2, 2)
         seg = LineSegment2D.from_end_points(pt_1, pt_2)
@@ -45,10 +47,9 @@ class LineSegment2DTestCase(unittest.TestCase):
         assert seg.p1 == Point2D(2, 0)
         assert seg.p2 == Point2D(2, 2)
         assert seg.length == 2
-        assert seg.length_squared == 4
 
     def test_init_from_sdl(self):
-        """Test the initalization of LineSegement2 from start, direction, length."""
+        """Test the initalization of LineSegement2D from start, direction, length."""
         pt = Point2D(2, 0)
         vec = Vector2D(0, 1)
         seg = LineSegment2D.from_sdl(pt, vec, 2)
@@ -58,10 +59,9 @@ class LineSegment2DTestCase(unittest.TestCase):
         assert seg.p1 == Point2D(2, 0)
         assert seg.p2 == Point2D(2, 2)
         assert seg.length == 2
-        assert seg.length_squared == 4
 
     def test_linesegment2_mutability(self):
-        """Test the mutability and immutability of LineSegement2 objects."""
+        """Test the mutability and immutability of LineSegement2D objects."""
         pt = Point2D(2, 0)
         vec = Vector2D(0, 2)
         seg = LineSegment2D(pt, vec)
@@ -104,7 +104,7 @@ class LineSegment2DTestCase(unittest.TestCase):
         assert seg_mut.p.x == 1
 
     def test_move(self):
-        """Test the LineSegement2 move method."""
+        """Test the LineSegement2D move method."""
         pt = Point2D(2, 0)
         vec = Vector2D(0, 2)
         seg = LineSegment2D(pt, vec)
@@ -117,7 +117,7 @@ class LineSegment2DTestCase(unittest.TestCase):
         assert new_seg.p2 == Point2D(4, 4)
 
     def test_scale(self):
-        """Test the LineSegement2 scale method."""
+        """Test the LineSegement2D scale method."""
         pt = Point2D(2, 2)
         vec = Vector2D(0, 2)
         seg = LineSegment2D(pt, vec)
@@ -133,8 +133,19 @@ class LineSegment2DTestCase(unittest.TestCase):
         assert new_seg.p == Point2D(3, 3)
         assert new_seg.v == Point2D(0, 4)
 
+    def test_scale_world_origin(self):
+        """Test the LineSegement2D scale_world_origin method."""
+        pt = Point2D(2, 2)
+        vec = Vector2D(0, 2)
+        seg = LineSegment2D(pt, vec)
+
+        new_seg = seg.scale_world_origin(2)
+        assert new_seg.p == Point2D(4, 4)
+        assert new_seg.v == Point2D(0, 4)
+        assert new_seg.length == 4
+
     def test_rotate(self):
-        """Test the LineSegement2 rotate method."""
+        """Test the LineSegement2D rotate method."""
         pt = Point2D(2, 2)
         vec = Vector2D(0, 2)
         seg = LineSegment2D(pt, vec)
@@ -153,7 +164,7 @@ class LineSegment2DTestCase(unittest.TestCase):
         assert test_2.v.y == pytest.approx(0, rel=1e-3)
 
     def test_reflect(self):
-        """Test the Point2D reflect method."""
+        """Test the LineSegement2D reflect method."""
         pt = Point2D(2, 2)
         vec = Vector2D(0, 2)
         seg = LineSegment2D(pt, vec)
@@ -179,6 +190,98 @@ class LineSegment2DTestCase(unittest.TestCase):
         assert test_1.v.x == pytest.approx(2, rel=1e-3)
         assert test_1.v.y == pytest.approx(0, rel=1e-3)
 
+    def test_subdivide(self):
+        """Test the LineSegement2D subdivide methods."""
+        pt = Point2D(2, 2)
+        vec = Vector2D(0, 2)
+        seg = LineSegment2D(pt, vec)
+
+        divisions = seg.subdivide(0.5)
+        assert len(divisions) == 5
+        assert divisions[0] == pt
+        assert divisions[1] == Point2D(2, 2.5)
+        assert divisions[2] == Point2D(2, 3)
+        assert divisions[3] == Point2D(2, 3.5)
+        assert divisions[4] == Point2D(2, 4)
+
+        divisions = seg.subdivide([1, 0.5, 0.25])
+        assert len(divisions) == 5
+        assert divisions[0] == pt
+        assert divisions[1] == Point2D(2, 3)
+        assert divisions[2] == Point2D(2, 3.5)
+        assert divisions[3] == Point2D(2, 3.75)
+        assert divisions[4] == Point2D(2, 4)
+
+        divisions = seg.subdivide_evenly(4)
+        assert len(divisions) == 5
+        assert divisions[0] == pt
+        assert divisions[1] == Point2D(2, 2.5)
+        assert divisions[2] == Point2D(2, 3)
+        assert divisions[3] == Point2D(2, 3.5)
+        assert divisions[4] == Point2D(2, 4)
+
+    def test_closest_point(self):
+        """Test the LineSegement2D closest_point method."""
+        pt = Point2D(2, 2)
+        vec = Vector2D(0, 2)
+        seg = LineSegment2D(pt, vec)
+
+        near_pt = Point2D(3, 3)
+        assert seg.closest_point(near_pt) == Point2D(2, 3)
+        near_pt = Point2D(2, 0)
+        assert seg.closest_point(near_pt) == Point2D(2, 2)
+        near_pt = Point2D(2, 5)
+        assert seg.closest_point(near_pt) == Point2D(2, 4)
+
+    def test_distance_to_point(self):
+        """Test the LineSegement2D distance_to_point method."""
+        pt = Point2D(2, 2)
+        vec = Vector2D(0, 2)
+        seg = LineSegment2D(pt, vec)
+
+        near_pt = Point2D(3, 3)
+        assert seg.distance_to_point(near_pt) == 1
+        near_pt = Point2D(2, 0)
+        assert seg.distance_to_point(near_pt) == 2
+        near_pt = Point2D(2, 5)
+        assert seg.distance_to_point(near_pt) == 1
+
+    def test_intersect_line_ray(self):
+        """Test the LineSegement2D distance_to_point method."""
+        pt_1 = Point2D(2, 2)
+        vec_1 = Vector2D(0, 2)
+        seg_1 = LineSegment2D(pt_1, vec_1)
+
+        pt_2 = Point2D(0, 3)
+        vec_2 = Vector2D(4, 0)
+        seg_2 = LineSegment2D(pt_2, vec_2)
+
+        pt_3 = Point2D(0, 0)
+        vec_3 = Vector2D(1, 1)
+        seg_3 = LineSegment2D(pt_3, vec_3)
+
+        assert seg_1.intersect_line_ray(seg_2) == Point2D(2, 3)
+        assert seg_1.intersect_line_ray(seg_3) is None
+
+    def test_closest_points_between_line(self):
+        """Test the LineSegement2D distance_to_point method."""
+        pt_1 = Point2D(2, 2)
+        vec_1 = Vector2D(0, 2)
+        seg_1 = LineSegment2D(pt_1, vec_1)
+
+        pt_2 = Point2D(0, 3)
+        vec_2 = Vector2D(1, 0)
+        seg_2 = LineSegment2D(pt_2, vec_2)
+
+        pt_3 = Point2D(0, 0)
+        vec_3 = Vector2D(1, 1)
+        seg_3 = LineSegment2D(pt_3, vec_3)
+
+        assert seg_1.closest_points_between_line(seg_2) == (Point2D(2, 3), Point2D(1, 3))
+        assert seg_1.closest_points_between_line(seg_3) == (Point2D(2, 2), Point2D(1, 1))
+
+        assert seg_1.distance_to_line(seg_2) == 1
+        assert seg_1.distance_to_line(seg_3) == pytest.approx(1.41421, rel=1e-3)
 
 if __name__ == "__main__":
     unittest.main()
