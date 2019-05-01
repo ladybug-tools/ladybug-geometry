@@ -201,7 +201,7 @@ class Vector3D(object):
         if isinstance(other, (Point3D, Point3DImmutable)):
             return Point3D(self.x - other.x, self.y - other.y, self.z - other.z)
         elif isinstance(other, (Vector3D, Vector3DImmutable)):
-            Vector3D(self.x - other.x, self.y - other.y, self.z - other.z)
+            return Vector3D(self.x - other.x, self.y - other.y, self.z - other.z)
         else:
             raise TypeError('Cannot subtract Vector3D and {}'.format(type(other)))
 

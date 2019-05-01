@@ -18,8 +18,14 @@ class Point2DTestCase(unittest.TestCase):
 
         assert vec.x == 0
         assert vec.y == 2
+        assert vec[0] == 0
+        assert vec[1] == 2
         assert vec.magnitude == 2
         assert vec.magnitude_squared == 4
+
+        assert len(vec) == 2
+        pt_tuple = tuple(i for i in vec)
+        assert pt_tuple == (0, 2)
 
         norm_vec = vec.normalized()
         assert norm_vec.x == 0
@@ -113,6 +119,32 @@ class Point2DTestCase(unittest.TestCase):
         pt_mut.x = 1
         assert pt_mut.x == 1
 
+    def test_vector2_dot_cross_determinant_reverse(self):
+        """Test the methods for dot, cross, and determinant."""
+        vec_1 = Vector2D(0, 2)
+        vec_2 = Vector2D(2, 0)
+        vec_3 = Vector2D(1, 1)
+
+        assert vec_1.dot(vec_2) == 0
+        assert vec_2.dot(vec_1) == 0
+        assert vec_1.dot(vec_3) == 2
+        assert vec_3.dot(vec_1) == 2
+
+        assert vec_1.determinant(vec_2) == -4
+        assert vec_2.determinant(vec_1) == 4
+        assert vec_1.determinant(vec_3) == -2
+        assert vec_3.determinant(vec_1) == 2
+
+        assert vec_1.cross() == Vector2D(2, 0)
+        assert vec_2.cross() == Vector2D(0, -2)
+        assert vec_3.cross() == Vector2D(1, -1)
+
+        assert vec_1.reversed() == Vector2D(0, -2)
+        assert vec_2.reversed() == Vector2D(-2, 0)
+
+        vec_1.reverse()
+        assert vec_1 == Vector2D(0, -2)
+
     def test_vector2_angle(self):
         """Test the methods that get the angle between Vector2D objects."""
         vec_1 = Vector2D(0, 2)
@@ -153,6 +185,33 @@ class Point2DTestCase(unittest.TestCase):
         assert vec_1 - pt_1 == Point2D(-2, 2)
         assert pt_1 - pt_2 == Vector2D(2, -2)
 
+        assert -vec_1 == Vector2D(0, -2)
+
+        vec_1 += vec_2
+        assert isinstance(vec_1, Vector2D)
+        assert vec_1 == Vector2D(2, 2)
+
+    def test_multiplication_division(self):
+        """Test the multiplication and division methods."""
+        vec_1 = Vector2D(0, 2)
+        vec_2 = Vector2D(2, 0)
+        pt_1 = Point2D(2, 0)
+        pt_2 = Point2D(0, 2)
+        assert vec_1 * 2 == Vector2D(0, 4)
+        assert vec_2 * 2 == Vector2D(4, 0)
+        assert pt_2 * 2 == Vector2D(0, 4)
+        assert pt_1 * 2 == Vector2D(4, 0)
+        assert vec_1 / 2 == Vector2D(0, 1)
+        assert vec_2 / 2 == Vector2D(1, 0)
+        assert pt_2 / 2 == Vector2D(0, 1)
+        assert pt_1 / 2 == Vector2D(1, 0)
+
+        vec_1 *= 2
+        assert vec_1 == Vector2D(0, 4)
+
+        vec_1 /= 2
+        assert vec_1 == Vector2D(0, 2)
+
     def test_move(self):
         """Test the Point2D move method."""
         pt_1 = Point2D(2, 2)
@@ -166,6 +225,16 @@ class Point2DTestCase(unittest.TestCase):
         origin_2 = Point2D(1, 1)
         assert pt_1.scale(2, origin_1) == Point2D(4, 2)
         assert pt_1.scale(2, origin_2) == Point2D(3, 3)
+
+    def test_scale_world_origin(self):
+        """Test the Point2D scale_world_origin method."""
+        pt_1 = Point2D(2, 2)
+        pt_2 = Point2D(-2, -2)
+        assert pt_1.scale_world_origin(2) == Point2D(4, 4)
+        assert pt_1.scale_world_origin(0.5) == Point2D(1, 1)
+        assert pt_1.scale_world_origin(-2) == Point2D(-4, -4)
+        assert pt_2.scale_world_origin(2) == Point2D(-4, -4)
+        assert pt_2.scale_world_origin(-2) == Point2D(4, 4)
 
     def test_rotate(self):
         """Test the Point2D rotate method."""
