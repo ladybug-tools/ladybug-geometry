@@ -1,7 +1,7 @@
 # coding=utf-8
 
-from ladybug_geometry.geometry2d.pointvector import Point2D, Vector2D
-from ladybug_geometry.geometry2d.line import LineSegment2D, LineSegment2DImmutable
+from ladybug_geometry.geometry2d.pointvector import Point2D
+from ladybug_geometry.geometry2d.polygon import Polygon2D
 
 import unittest
 import pytest
@@ -13,26 +13,13 @@ class Polygon2DTestCase(unittest.TestCase):
 
     def test_polygon2_init(self):
         """Test the initalization of Polygon2D objects and basic properties."""
-        pt = Point2D(2, 0)
-        vec = Vector2D(0, 2)
-        seg = LineSegment2D(pt, vec)
-        str(seg)  # test the string representation of the line segment
+        pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+        polygon = Polygon2D(pts)
 
-        assert seg.p == Point2D(2, 0)
-        assert seg.v == Vector2D(0, 2)
-        assert seg.p1 == Point2D(2, 0)
-        assert seg.p2 == Point2D(2, 2)
-        assert seg.length == 2
-        assert seg.length_squared == 4
+        str(polygon)  # test the string representation of the ray
 
-        flip_seg = seg.flipped()
-        assert flip_seg.p == Point2D(2, 2)
-        assert flip_seg.v == Vector2D(0, -2)
-
-        assert seg.p == Point2D(2, 0)
-        seg.flip()
-        assert seg.p == Point2D(2, 2)
-        assert seg.v == Vector2D(0, -2)
+        assert isinstance(polygon.vertices, tuple)
+        assert len(polygon.vertices) == 4
 
 
 if __name__ == "__main__":
