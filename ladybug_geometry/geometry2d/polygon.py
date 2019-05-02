@@ -31,7 +31,6 @@ class Polygon2D(Base2DIn2D):
     __slots__ = ('_vertices', '_segments', '_triangulated_mesh',
                  '_min', '_max', '_center', '_perimeter', '_area',
                  '_is_clockwise', '_is_convex', '_is_complex')
-    _check_required = True
 
     def __init__(self, vertices):
         """Initilize Polygon2D.
@@ -39,10 +38,7 @@ class Polygon2D(Base2DIn2D):
         Args:
             vertices: A list of Point2D objects representing the vertices of the polygon.
         """
-        if self._check_required:
-            self._check_vertices_input(vertices)
-        else:
-            self._vertices = vertices
+        self._check_vertices_input(vertices)
         self._segments = None
         self._triangulated_mesh = None
         self._min = None
@@ -67,18 +63,16 @@ class Polygon2D(Base2DIn2D):
             base: A number indicating the length of the base of the rectangle.
             height: A number indicating the length of the height of the rectangle.
         """
-        if cls._check_required:
-            assert isinstance(base_point, (Point2D, Point2DImmutable)), \
-                'base_point must be Point2D. Got {}.'.format(type(base_point))
-            assert isinstance(height_vector, (Vector2D, Vector2DImmutable)), \
-                'height_vector must be Vector2D. Got {}.'.format(type(height_vector))
-            assert isinstance(base, (float, int)), 'base must be a number.'
-            assert isinstance(height, (float, int)), 'height must be a number.'
+        assert isinstance(base_point, (Point2D, Point2DImmutable)), \
+            'base_point must be Point2D. Got {}.'.format(type(base_point))
+        assert isinstance(height_vector, (Vector2D, Vector2DImmutable)), \
+            'height_vector must be Vector2D. Got {}.'.format(type(height_vector))
+        assert isinstance(base, (float, int)), 'base must be a number.'
+        assert isinstance(height, (float, int)), 'height must be a number.'
         _hv_norm = height_vector.normalized()
         _bv = Vector2D(_hv_norm.y, -_hv_norm.x) * base
         _hv = _hv_norm * height
-        _vert = (base_point, base_point + _hv, base_point + _hv + _bv, base_point + _bv)
-        _verts = tuple(pt.to_immutable() for pt in _vert)
+        _verts = (base_point, base_point + _hv, base_point + _hv + _bv, base_point + _bv)
         polygon = cls(_verts)
         polygon._perimeter = base * 2 + height * 2
         polygon._area = base * height
@@ -99,14 +93,13 @@ class Polygon2D(Base2DIn2D):
                 where the vertices of the polygon will lie.
                 The default is set to 1.
         """
-        if cls._check_required:
-            assert isinstance(number_of_sides, int), 'number_of_sides must be an ' \
-                'integer. Got {}.'.format(type(number_of_sides))
-            assert number_of_sides > 2, 'number_of_sides must be greater than 2. ' \
-                'Got {}.'.format(number_of_sides)
-            assert isinstance(base_point, (Point2D, Point2DImmutable)), \
-                'base_point must be Point2D. Got {}.'.format(type(base_point))
-            assert isinstance(radius, (float, int)), 'height must be a number.'
+        assert isinstance(number_of_sides, int), 'number_of_sides must be an ' \
+            'integer. Got {}.'.format(type(number_of_sides))
+        assert number_of_sides > 2, 'number_of_sides must be greater than 2. ' \
+            'Got {}.'.format(number_of_sides)
+        assert isinstance(base_point, (Point2D, Point2DImmutable)), \
+            'base_point must be Point2D. Got {}.'.format(type(base_point))
+        assert isinstance(radius, (float, int)), 'height must be a number.'
 
         # calculate angle at which each vertex is rotated from the previous one
         angle = (math.pi * 2) / number_of_sides
@@ -129,7 +122,7 @@ class Polygon2D(Base2DIn2D):
             _vertices.append(Point2DImmutable(qx + base_point.x, qy + base_point.y))
 
         # build the new polygon and set the properties that we know.
-        _new_poly = cls(tuple(_vertices))
+        _new_poly = cls(_vertices)
         _new_poly._is_clockwise = False
         _new_poly._is_convex = True
         _new_poly._is_complex = False
@@ -148,11 +141,10 @@ class Polygon2D(Base2DIn2D):
             hole: A list of Point2D objects for the hole.
         """
         # check that the inputs are in the correct format
-        if cls._check_required:
-            assert isinstance(boundary, list), \
-                'boundary should be a list. Got {}'.format(type(boundary))
-            assert isinstance(hole, list), \
-                'hole should be a list. Got {}'.format(type(hole))
+        assert isinstance(boundary, list), \
+            'boundary should be a list. Got {}'.format(type(boundary))
+        assert isinstance(hole, list), \
+            'hole should be a list. Got {}'.format(type(hole))
 
         # check that the direction of vertices for the hole is opposite the boundary
         bound_direction = Polygon2D._are_clockwise(boundary)
@@ -167,7 +159,7 @@ class Polygon2D(Base2DIn2D):
         boundary = cls._merge_boundary_and_hole(boundary, hole, dist_dict)
 
         # return the polygon with some properties set based on what we know
-        _new_poly = cls(tuple(boundary))
+        _new_poly = cls(boundary)
         _new_poly._is_clockwise = bound_direction
         _new_poly._is_convex = False
         _new_poly._is_complex = False
@@ -187,16 +179,15 @@ class Polygon2D(Base2DIn2D):
                 should be a list of at least 3 Point2D objects.
         """
         # check that the inputs are in the correct format.
-        if cls._check_required:
-            assert isinstance(boundary, list), \
-                'boundary should be a list. Got {}'.format(type(boundary))
-            assert isinstance(holes, list), \
-                'holes should be a list. Got {}'.format(type(holes))
-            for hole in holes:
-                assert isinstance(hole, list), \
-                    'hole should be a list. Got {}'.format(type(hole))
-                assert len(hole) >= 3, \
-                    'hole should have at least 3 vertices. Got {}'.format(len(hole))
+        assert isinstance(boundary, list), \
+            'boundary should be a list. Got {}'.format(type(boundary))
+        assert isinstance(holes, list), \
+            'holes should be a list. Got {}'.format(type(holes))
+        for hole in holes:
+            assert isinstance(hole, list), \
+                'hole should be a list. Got {}'.format(type(hole))
+            assert len(hole) >= 3, \
+                'hole should have at least 3 vertices. Got {}'.format(len(hole))
 
         # check that the direction of vertices for the hole is opposite the boundary
         bound_direction = Polygon2D._are_clockwise(boundary)
@@ -209,7 +200,7 @@ class Polygon2D(Base2DIn2D):
             boundary, holes = Polygon2D._merge_boundary_and_closest_hole(boundary, holes)
 
         # return the polygon with some properties set based on what we know
-        _new_poly = cls(tuple(boundary))
+        _new_poly = cls(boundary)
         _new_poly._is_clockwise = bound_direction
         _new_poly._is_convex = False
         _new_poly._is_complex = False
@@ -546,12 +537,10 @@ class Polygon2D(Base2DIn2D):
             'vertices should be a list or tuple. Got {}'.format(type(vertices))
         assert len(vertices) > 2, 'There must be at least 3 vertices for a Polygon.' \
             ' Got {}'.format(len(vertices))
-        _verts_immutable = []
         for p in vertices:
             assert isinstance(p, (Point2D, Point2DImmutable)), \
                 'Expected Point2D. Got {}.'.format(type(p))
-            _verts_immutable.append(p.to_immutable())
-        self._vertices = tuple(_verts_immutable)
+        self._vertices = tuple(p.to_immutable() for p in vertices)
 
     @staticmethod
     def _segments_from_vertices(vertices):
@@ -613,9 +602,7 @@ class Polygon2D(Base2DIn2D):
         return _a < 0
 
     def __copy__(self):
-        Polygon2D._check_required = False  # Turn off check since we know input is valid
         _new_poly = Polygon2D(self.vertices)
-        Polygon2D._check_required = True  # Turn the checks back on
         return _new_poly
 
     def __repr__(self):

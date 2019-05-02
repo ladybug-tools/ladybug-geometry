@@ -3,6 +3,7 @@
 from ladybug_geometry.geometry2d.polygon import Polygon2D
 from ladybug_geometry.geometry2d.pointvector import Point2D, Point2DImmutable, Vector2D
 from ladybug_geometry.geometry2d.line import LineSegment2DImmutable
+from ladybug_geometry.geometry2d.ray import Ray2D
 
 import unittest
 import pytest
@@ -130,7 +131,7 @@ class Polygon2DTestCase(unittest.TestCase):
         pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
         polygon_1 = Polygon2D(pts_1)
         pts_2 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 1), Point2D(1, 1),
-                 Point2D(1, 2), Point2D(0, 2))
+                 Point2D(1, 2), Point2D(2, 0))
         polygon_2 = Polygon2D(pts_2)
 
         assert polygon_1.is_convex is True
@@ -286,6 +287,21 @@ class Polygon2DTestCase(unittest.TestCase):
         assert test_2[0].y == pytest.approx(0, rel=1e-3)
         assert test_2[2].x == pytest.approx(-1, rel=1e-3)
         assert test_2[2].y == pytest.approx(-1, rel=1e-3)
+
+    def test_intersect_line_ray(self):
+        """Test the Polygon2D intersect_line_ray method."""
+        pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+        polygon = Polygon2D(pts)
+
+        ray_1 = Ray2D(Point2D(-1, 1), Vector2D(1, 0))
+        ray_2 = Ray2D(Point2D(1, 1), Vector2D(1, 0))
+        ray_3 = Ray2D(Point2D(1, 1), Vector2D(11, 0))
+        ray_4 = Ray2D(Point2D(-1, 1), Vector2D(-1, 0))
+
+        assert len(polygon.intersect_line_ray(ray_1)) == 2
+        assert len(polygon.intersect_line_ray(ray_2)) == 1
+        assert len(polygon.intersect_line_ray(ray_3)) == 1
+        assert len(polygon.intersect_line_ray(ray_4)) == 0
 
 
 if __name__ == "__main__":

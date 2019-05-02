@@ -115,6 +115,10 @@ class Vector2D(object):
         """
         return Vector2D._reflect(self, normal)
 
+    def to_mutable(self):
+        """Get a mutable version of this object."""
+        return self
+
     def to_immutable(self):
         """Get an immutable version of this object."""
         return Vector2DImmutable(self.x, self.y)

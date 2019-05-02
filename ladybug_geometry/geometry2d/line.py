@@ -211,6 +211,10 @@ class LineSegment2D(Base1DIn2D):
         dist, pts = closest_point2d_between_line2d(self, line)
         return dist
 
+    def to_mutable(self):
+        """Get a mutable version of this object."""
+        return self
+
     def to_immutable(self):
         """Get an immutable version of this object."""
         return LineSegment2DImmutable(self.p, self.v)

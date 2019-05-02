@@ -34,7 +34,6 @@ class Mesh2D(MeshBase, Base2DIn2D):
     __slots__ = ('_vertices', '_faces', '_colors', '_is_color_by_face',
                  '_min', '_max', '_center', '_area', '_centroid',
                  '_face_areas', '_face_centroids')
-    _check_required = True
 
     def __init__(self, vertices, faces, colors=None):
         """Initilize Mesh2D.
@@ -46,13 +45,8 @@ class Mesh2D(MeshBase, Base2DIn2D):
             colors: An optional list of colors that correspond to either the faces
                 of the mesh or the vertices of the mesh. Default is None.
         """
-        if self._check_required:
-            self._check_vertices_input(vertices)
-            self._check_faces_input(faces)
-        else:
-            self._vertices = vertices
-            self._faces = faces
-
+        self._check_vertices_input(vertices)
+        self._check_faces_input(faces)
         self._is_color_by_face = False  # default if colors is None
         self.colors = colors
 
@@ -96,7 +90,6 @@ class Mesh2D(MeshBase, Base2DIn2D):
         """
         assert isinstance(polygon, Polygon2D), 'polygon must be a Polygon2D to use ' \
             'from_polygon_triangulated. Got {}.'.format(type(polygon))
-        cls._check_required = False  # Turn off checks since we know the mesh is valid
 
         if polygon.is_convex:
             # super-fast fan triangulation!
@@ -112,7 +105,6 @@ class Mesh2D(MeshBase, Base2DIn2D):
             _faces = Mesh2D._ear_clipping_triangulation(polygon)
             _new_mesh = cls.from_faces(_faces, purge)
 
-        cls._check_required = True  # Turn the checks back on
         return _new_mesh
 
     @classmethod
@@ -156,9 +148,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
         _pattern = [polygon.is_point_inside(_v) for _v in _verts]
 
         # build the mesh
-        cls._check_required = False  # Turn off checks since we know the mesh is valid
         _mesh_init = cls(_verts, _faces)
-        cls._check_required = True  # Turn the checks back on
         _mesh_init._face_centroids = _centroids
         _new_mesh, _face_pattern = _mesh_init.remove_vertices(_pattern)
         _new_mesh._face_areas = x_dim * y_dim
@@ -190,9 +180,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
         if generate_centroids is True:
             _centroids = Mesh2D._grid_centroids(base_point, num_x, num_y, x_dim, y_dim)
 
-        cls._check_required = False  # Turn off checks since we know the mesh is valid
         _new_mesh = cls(tuple(_verts), tuple(_faces))
-        cls._check_required = True  # Turn the checks back on
         _new_mesh._face_areas = x_dim * y_dim
         _new_mesh._face_centroids = _centroids
         return _new_mesh
@@ -246,9 +234,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
                     _new_colors.extend([self.colors[i]] * 2)
             _new_colors = tuple(_new_colors)
 
-        Mesh2D._check_required = False  # Turn off checks since we know the mesh is valid
         _new_mesh = Mesh2D(self.vertices, _new_faces, _new_colors)
-        Mesh2D._check_required = True  # Turn the checks back on
         return _new_mesh
 
     def remove_vertices(self, pattern):
@@ -269,9 +255,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
         _new_verts, _new_faces, _new_colors, _new_f_cent, _new_f_area, face_pattern = \
             self._remove_vertices(pattern)
 
-        Mesh2D._check_required = False  # Turn off checks since we know the mesh is valid
         new_mesh = Mesh2D(_new_verts, _new_faces, _new_colors)
-        Mesh2D._check_required = True  # Turn the checks back on
         new_mesh._face_centroids = _new_f_cent
         new_mesh._face_areas = _new_f_area
         return new_mesh, face_pattern
@@ -315,9 +299,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
         _new_faces, _new_colors, _new_f_cent, _new_f_area = \
             self._remove_faces_only(pattern)
 
-        Mesh2D._check_required = False  # Turn off checks since we know the mesh is valid
         new_mesh = Mesh2D(self.vertices, _new_faces, _new_colors)
-        Mesh2D._check_required = True  # Turn the checks back on
         new_mesh._face_centroids = _new_f_cent
         new_mesh._face_areas = _new_f_area
         return new_mesh
@@ -378,12 +360,10 @@ class Mesh2D(MeshBase, Base2DIn2D):
         """Check input vertices for correct formatting and immutability."""
         assert isinstance(vertices, (list, tuple)), \
             'vertices should be a list or tuple. Got {}'.format(type(vertices))
-        _verts_immutable = []
         for p in vertices:
             assert isinstance(p, (Point2D, Point2DImmutable)), \
                 'Expected Point2D for Mesh2D vertex. Got {}.'.format(type(p))
-            _verts_immutable.append(p.to_immutable())
-        self._vertices = tuple(_verts_immutable)
+        self._vertices = tuple(p.to_immutable() for p in vertices)
 
     def _face_area(self, face):
         """Return the area of a face."""
@@ -399,17 +379,13 @@ class Mesh2D(MeshBase, Base2DIn2D):
 
     def _mesh_transform(self, verts):
         """Transform mesh in a way that transfers properties and avoids extra checks."""
-        Mesh2D._check_required = False  # Turn off check since input is valid
         _new_mesh = Mesh2D(verts, self.faces)
-        Mesh2D._check_required = True  # Turn the checks back on
         self._transfer_properties(_new_mesh)
         return _new_mesh
 
     def _mesh_scale(self, verts, factor):
         """Scale mesh in a way that transfers properties and avoids extra checks."""
-        Mesh2D._check_required = False  # Turn off check since input is valid
         _new_mesh = Mesh2D(verts, self.faces)
-        Mesh2D._check_required = True  # Turn the checks back on
         self._transfer_properties_scale(_new_mesh, factor)
         return _new_mesh
 
@@ -418,7 +394,6 @@ class Mesh2D(MeshBase, Base2DIn2D):
         """Triangulate a polygon using the ear clipping method."""
         _faces = []
         _clipping_poly = polygon.duplicate()
-        Polygon2D._check_required = False  # Turn off check since we know input is valid
         while len(_clipping_poly) > 3:
             _ear, _index = Mesh2D._find_ear(_clipping_poly)
             _faces.append(_ear)
@@ -426,7 +401,6 @@ class Mesh2D(MeshBase, Base2DIn2D):
             del new_verts[_index]
             _clipping_poly = Polygon2D(new_verts)
         _faces.append(_clipping_poly.vertices)
-        Polygon2D._check_required = True  # Turn the checks back on
         return _faces
 
     @staticmethod
@@ -447,7 +421,6 @@ class Mesh2D(MeshBase, Base2DIn2D):
         try:
             return ear, i
         except UnboundLocalError:
-            Mesh2D._check_required = True
             raise ValueError(
                 'Polygon {} is not in a valid format for triangulation.'
                 ' The polygon likely has self-intersecting edges.'.format(polygon))
@@ -478,9 +451,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
     @staticmethod
     def _concave_quad_to_triangles(verts):
         """Return two triangles that represent a concave quadrilateral."""
-        Polygon2D._check_required = False  # Turn off check. We know input is valid
         quad_poly = Polygon2D(verts)
-        Polygon2D._check_required = True  # Turn the checks back on
         diagonal = LineSegment2D.from_end_points(quad_poly[0], quad_poly[2])
         if quad_poly.is_point_inside(diagonal.midpoint):
             # if the diagonal midpoint is inside the quad, it splits it into two ears
@@ -565,9 +536,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
         return tuple(_centroids)
 
     def __copy__(self):
-        Mesh2D._check_required = False  # Turn off check since we know the mesh is valid
         _new_mesh = Mesh2D(self.vertices, self.faces)
-        Mesh2D._check_required = True  # Turn the checks back on
         self._transfer_properties(_new_mesh)
         _new_mesh._face_centroids = self._face_centroids
         _new_mesh._centroid = self._centroid
