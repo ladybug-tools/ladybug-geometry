@@ -130,7 +130,7 @@ class Polygon2DTestCase(unittest.TestCase):
         pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
         polygon_1 = Polygon2D(pts_1)
         pts_2 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 1), Point2D(1, 1),
-                 Point2D(1, 2), Point2D(2, 0))
+                 Point2D(1, 2), Point2D(0, 2))
         polygon_2 = Polygon2D(pts_2)
 
         assert polygon_1.is_convex is True

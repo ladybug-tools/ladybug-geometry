@@ -444,7 +444,13 @@ class Mesh2D(MeshBase, Base2DIn2D):
                 if len(polygon.intersect_line_ray(diagonal)) < 5:
                     ear = (polygon[i - 1], polygon[i], polygon[i + 1])  # found an ear!
                     break
-        return ear, i
+        try:
+            return ear, i
+        except UnboundLocalError:
+            Mesh2D._check_required = True
+            raise ValueError(
+                'Polygon {} is not in a valid format for triangulation.'
+                ' The polygon likely has self-intersecting edges.'.format(polygon))
 
     @staticmethod
     def _quad_to_triangles(verts):

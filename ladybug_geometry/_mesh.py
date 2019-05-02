@@ -254,7 +254,7 @@ class MeshBase(object):
                     except ValueError:  # add new point
                         vertices.append(v)
                         ind.append(len(vertices) - 1)
-                face_collector.append(ind)
+                face_collector.append(tuple(ind))
         else:
             ver_counter = 0
             for f in faces:
@@ -263,5 +263,5 @@ class MeshBase(object):
                     vertices.append(v)
                     ind.append(ver_counter)
                     ver_counter += 1
-                face_collector.append(ind)
+                face_collector.append(tuple(ind))
         return vertices, face_collector

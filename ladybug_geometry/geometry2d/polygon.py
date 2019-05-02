@@ -10,6 +10,7 @@ from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
 from ._2d import Base2DIn2D
 
 from collections import deque
+import math
 
 
 class Polygon2D(Base2DIn2D):
@@ -76,7 +77,8 @@ class Polygon2D(Base2DIn2D):
         _hv_norm = height_vector.normalized()
         _bv = Vector2D(_hv_norm.y, -_hv_norm.x) * base
         _hv = _hv_norm * height
-        _verts = (base_point, base_point + _hv, base_point + _hv + _bv, base_point + _bv)
+        _vert = (base_point, base_point + _hv, base_point + _hv + _bv, base_point + _bv)
+        _verts = tuple(pt.to_immutable() for pt in _vert)
         polygon = cls(_verts)
         polygon._perimeter = base * 2 + height * 2
         polygon._area = base * height
@@ -84,6 +86,54 @@ class Polygon2D(Base2DIn2D):
         polygon._is_convex = True
         polygon._is_complex = False
         return polygon
+
+    @classmethod
+    def from_regular_polygon(cls, number_of_sides, base_point=Point2D(), radius=1):
+        """Initialize Polygon2D from regular polygon parameters.
+
+        Args:
+            number_of_sides: An integer for the number of sides on the regular
+                polgygon. This number must be greater than 2.
+            base_point: A Point2D for the center of the regular polygon.
+            radius: A number indicating the distance from the polygon's center
+                where the vertices of the polygon will lie.
+                The default is set to 1.
+        """
+        if cls._check_required:
+            assert isinstance(number_of_sides, int), 'number_of_sides must be an ' \
+                'integer. Got {}.'.format(type(number_of_sides))
+            assert number_of_sides > 2, 'number_of_sides must be greater than 2. ' \
+                'Got {}.'.format(number_of_sides)
+            assert isinstance(base_point, (Point2D, Point2DImmutable)), \
+                'base_point must be Point2D. Got {}.'.format(type(base_point))
+            assert isinstance(radius, (float, int)), 'height must be a number.'
+
+        # calculate angle at which each vertex is rotated from the previous one
+        angle = (math.pi * 2) / number_of_sides
+        cos_a = math.cos(angle)
+        sin_a = math.sin(angle)
+
+        # pick a starting bertex that makes sense for the number of sides
+        if number_of_sides % 2 == 0:
+            start_vert = Point2D(base_point.x - radius, base_point.y)
+            start_vert = start_vert.rotate(angle / 2, base_point).to_immutable()
+        else:
+            start_vert = Point2DImmutable(base_point.x, base_point.y + radius)
+        _vertices = [start_vert]
+
+        # generate the vertices
+        for i in range(number_of_sides):
+            last_pt = _vertices[-1]
+            qx = cos_a * (last_pt.x - base_point.x) - sin_a * (last_pt.y - base_point.y)
+            qy = sin_a * (last_pt.x - base_point.x) + cos_a * (last_pt.y - base_point.y)
+            _vertices.append(Point2DImmutable(qx + base_point.x, qy + base_point.y))
+
+        # build the new polygon and set the properties that we know.
+        _new_poly = cls(tuple(_vertices))
+        _new_poly._is_clockwise = False
+        _new_poly._is_convex = True
+        _new_poly._is_complex = False
+        return _new_poly
 
     @classmethod
     def from_shape_with_hole(cls, boundary, hole):
