@@ -289,7 +289,7 @@ class Polygon2D(Base2DIn2D):
         """
         return Polygon2D([pt.scale(factor, origin) for pt in self.vertices])
 
-    def scale_world_origin(self, factor, origin):
+    def scale_world_origin(self, factor):
         """Scale a polygon by a factor from the world origin. Faster than Polygon2D.scale.
 
         Args:
