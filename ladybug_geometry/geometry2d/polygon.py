@@ -81,7 +81,7 @@ class Polygon2D(Base2DIn2D):
         polygon._perimeter = base * 2 + height * 2
         polygon._area = base * height
         polygon._is_clockwise = True
-        polygon._is_convex = False
+        polygon._is_convex = True
         polygon._is_complex = False
         return polygon
 

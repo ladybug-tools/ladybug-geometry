@@ -2,7 +2,6 @@
 
 from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
 from ladybug_geometry.geometry3d.line import LineSegment3D, LineSegment3DImmutable
-from ladybug_geometry.geometry3d.ray import Ray3D
 
 import unittest
 import pytest
@@ -12,7 +11,7 @@ import math
 class LineSegment3DTestCase(unittest.TestCase):
     """Test for LineSegment3D"""
 
-    def test_linesegment2_init(self):
+    def test_linesegment3d_init(self):
         """Test the initalization of LineSegment3D objects and basic properties."""
         pt = Point3D(2, 0, 2)
         vec = Vector3D(0, 2, 0)
@@ -61,7 +60,7 @@ class LineSegment3DTestCase(unittest.TestCase):
         assert seg.p2 == Point3D(2, 2, 2)
         assert seg.length == 2
 
-    def test_linesegment2_mutability(self):
+    def test_linesegment3d_mutability(self):
         """Test the mutability and immutability of LineSegment3D objects."""
         pt = Point3D(2, 0, 0)
         vec = Vector3D(0, 2, 0)
