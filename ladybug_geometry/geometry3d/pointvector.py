@@ -114,6 +114,10 @@ class Vector3D(object):
         """
         return Vector3D._reflect(self, normal)
 
+    def to_mutable(self):
+        """Get a mutable version of this object."""
+        return self
+
     def to_immutable(self):
         """Get an immutable version of this vector."""
         return Vector3DImmutable(self.x, self.y, self.z)

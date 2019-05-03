@@ -360,9 +360,10 @@ class Mesh2D(MeshBase, Base2DIn2D):
         """Check input vertices for correct formatting and immutability."""
         assert isinstance(vertices, (list, tuple)), \
             'vertices should be a list or tuple. Got {}'.format(type(vertices))
-        for p in vertices:
-            assert isinstance(p, (Point2D, Point2DImmutable)), \
-                'Expected Point2D for Mesh2D vertex. Got {}.'.format(type(p))
+        assert len(vertices) >= 3, 'Mesh2D should have at least 3 vertices. ' \
+            'Got {}'.format(len(vertices))
+        assert isinstance(vertices[0], (Point2D, Point2DImmutable)), \
+            'Expected Point2D for Mesh2D vertex. Got {}.'.format(type(vertices[0]))
         self._vertices = tuple(p.to_immutable() for p in vertices)
 
     def _face_area(self, face):

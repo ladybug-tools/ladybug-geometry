@@ -91,6 +91,10 @@ class Ray3D(Base1DIn3D):
         """
         return Ray3D(self.p.scale_world_origin(factor), self.v * factor)
 
+    def to_mutable(self):
+        """Get a mutable version of this object."""
+        return self
+
     def to_immutable(self):
         """Get an immutable version of this object."""
         return Ray3DImmutable(self.p, self.v)

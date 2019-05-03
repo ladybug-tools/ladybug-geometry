@@ -115,7 +115,7 @@ class Polygon2D(Base2DIn2D):
         _vertices = [start_vert]
 
         # generate the vertices
-        for i in range(number_of_sides):
+        for i in range(number_of_sides - 1):
             last_pt = _vertices[-1]
             qx = cos_a * (last_pt.x - base_point.x) - sin_a * (last_pt.y - base_point.y)
             qy = sin_a * (last_pt.x - base_point.x) + cos_a * (last_pt.y - base_point.y)
@@ -422,10 +422,11 @@ class Polygon2D(Base2DIn2D):
         This method uses the same calculation as the the `is_point_inside` method
         but it includes additional checks for the fringe cases noted in the
         `is_point_inside` description. Using this method means that it will always
-        yeild the right result for polygons with up to two concave turns. This is
-        good for nearly all practical purposes and the only cases that could
-        yield an incorrect result are when a point is co-linear with two or
-        more polygon edges along the X vector like so:
+        yeild the right result for all convex polygons and concave polygons with
+        one concave turn (provided that they do not have colinear vertices).
+        This is suitable for nearly all practical purposes and the only cases
+        that could yield an incorrect result are when a point is co-linear with
+        two or more polygon edges along the X vector like so:
                           _____     _____     _____
                          |  .  |___|     |___|     |
                          |_________________________|
@@ -440,31 +441,36 @@ class Polygon2D(Base2DIn2D):
         Returns:
             A boolean denoting whether the point lies inside (True) or outside (False).
         """
-        test_ray = Ray2D(point, Vector2D(1, 0))
-        inters = []
-        n_int = 0
-        for _s in self.segments:
-            inter = intersect_line2d(_s, test_ray)
-            if inter is not None:
-                try:
-                    if inter != inters[-1]:  # ensure intersection is not duplicated
+        def non_duplicate_intersect(test_ray):
+            inters = []
+            n_int = 0
+            for _s in self.segments:
+                inter = intersect_line2d(_s, test_ray)
+                if inter is not None:
+                    try:
+                        if inter != inters[-1]:  # ensure intersection is not duplicated
+                            n_int += 1
+                            inters.append(inter)
+                    except IndexError:
                         n_int += 1
                         inters.append(inter)
-                except IndexError:
-                    n_int += 1
-                    inters.append(inter)
+            return n_int, inters
 
+        n_int, inters = non_duplicate_intersect(Ray2D(point, Vector2D(1, 0)))
         # check that intersections do not form a polygon segment co-linear with test_ray
-        if self.is_convex is False and len(inters) == 2:
+        if self.is_convex is False and n_int == 2:
             for _s in self.segments:
                 if _s.p1 == inters[0] and _s.p2 == inters[1]:
                     return self.is_point_inside(point, Vector2D(0, 1))
-        elif len(inters) == 3:
+        if n_int % 2 == 0:
+            return False
+
+        n_int, inters = non_duplicate_intersect(Ray2D(point, Vector2D(0, 1)))
+        # check that intersections do not form a polygon segment co-linear with test_ray
+        if self.is_convex is False and n_int == 2:
             for _s in self.segments:
                 if _s.p1 == inters[0] and _s.p2 == inters[1]:
-                    if inters[0].x > inters[2].x and inters[1].x > inters[2].x:
-                        return False
-
+                    return self.is_point_inside(point, Vector2D(1, 0))
         if n_int % 2 == 0:
             return False
         return True
@@ -535,11 +541,10 @@ class Polygon2D(Base2DIn2D):
     def _check_vertices_input(self, vertices):
         assert isinstance(vertices, (list, tuple)), \
             'vertices should be a list or tuple. Got {}'.format(type(vertices))
-        assert len(vertices) > 2, 'There must be at least 3 vertices for a Polygon.' \
+        assert len(vertices) >= 3, 'There must be at least 3 vertices for a Polygon2D.' \
             ' Got {}'.format(len(vertices))
-        for p in vertices:
-            assert isinstance(p, (Point2D, Point2DImmutable)), \
-                'Expected Point2D. Got {}.'.format(type(p))
+        assert isinstance(vertices[0], (Point2D, Point2DImmutable)), \
+            'Expected Point2D. Got {}.'.format(type(vertices[0]))
         self._vertices = tuple(p.to_immutable() for p in vertices)
 
     @staticmethod

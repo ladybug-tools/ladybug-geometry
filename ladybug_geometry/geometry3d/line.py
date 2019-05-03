@@ -194,6 +194,10 @@ class LineSegment3D(Base1DIn3D):
         """
         return self.p + self.v * (length / self.length)
 
+    def to_mutable(self):
+        """Get a mutable version of this object."""
+        return self
+
     def to_immutable(self):
         """Get an immutable version of this object."""
         return LineSegment3DImmutable(self.p, self.v)

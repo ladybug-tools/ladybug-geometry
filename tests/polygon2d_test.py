@@ -2,7 +2,7 @@
 
 from ladybug_geometry.geometry2d.polygon import Polygon2D
 from ladybug_geometry.geometry2d.pointvector import Point2D, Point2DImmutable, Vector2D
-from ladybug_geometry.geometry2d.line import LineSegment2DImmutable
+from ladybug_geometry.geometry2d.line import LineSegment2D, LineSegment2DImmutable
 from ladybug_geometry.geometry2d.ray import Ray2D
 
 import unittest
@@ -44,8 +44,6 @@ class Polygon2DTestCase(unittest.TestCase):
         """Test the initalization of Polygon2D from_rectangle."""
         polygon = Polygon2D.from_rectangle(Point2D(0, 0), Vector2D(0, 1), 2, 2)
 
-        str(polygon)  # test the string representation of the ray
-
         assert isinstance(polygon.vertices, tuple)
         assert len(polygon.vertices) == 4
         for point in polygon.vertices:
@@ -62,6 +60,33 @@ class Polygon2DTestCase(unittest.TestCase):
         assert polygon.is_clockwise is True
         assert polygon.is_convex is True
         assert polygon.is_self_intersecting is False
+
+    def test_polygon2d_init_from_regular_polygon(self):
+        """Test the initalization of Polygon2D from_regular_polygon."""
+        polygon = Polygon2D.from_regular_polygon(8, Point2D(0, 1), 2)
+
+        assert isinstance(polygon.vertices, tuple)
+        assert len(polygon.vertices) == 8
+        for point in polygon.vertices:
+            assert isinstance(point, Point2DImmutable)
+        assert isinstance(polygon.segments, tuple)
+        assert len(polygon.segments) == 8
+        for seg in polygon.segments:
+            assert isinstance(seg, LineSegment2DImmutable)
+            assert seg.length == pytest.approx(1.5307337, rel=1e-3)
+
+        assert polygon.area == pytest.approx(11.3137084, rel=1e-3)
+        assert polygon.perimeter == pytest.approx(1.5307337 * 8, rel=1e-3)
+        assert polygon.is_clockwise is False
+        assert polygon.is_convex is True
+        assert polygon.is_self_intersecting is False
+
+        polygon = Polygon2D.from_regular_polygon(3)
+        assert len(polygon.vertices) == 3
+        polygon = Polygon2D.from_regular_polygon(20)
+        assert len(polygon.vertices) == 20
+        with pytest.raises(AssertionError):
+            polygon = Polygon2D.from_regular_polygon(2, Point2D(0, 1), 2)
 
     def test_polygon2d_init_from_shape_with_hole(self):
         """Test the initalization of Polygon2D from_shape_with_hole."""
@@ -131,7 +156,7 @@ class Polygon2DTestCase(unittest.TestCase):
         pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
         polygon_1 = Polygon2D(pts_1)
         pts_2 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 1), Point2D(1, 1),
-                 Point2D(1, 2), Point2D(2, 0))
+                 Point2D(1, 2), Point2D(0, 2))
         polygon_2 = Polygon2D(pts_2)
 
         assert polygon_1.is_convex is True
@@ -302,6 +327,86 @@ class Polygon2DTestCase(unittest.TestCase):
         assert len(polygon.intersect_line_ray(ray_2)) == 1
         assert len(polygon.intersect_line_ray(ray_3)) == 1
         assert len(polygon.intersect_line_ray(ray_4)) == 0
+
+        line_1 = LineSegment2D(Point2D(-1, 1), Vector2D(0.5, 0))
+        line_2 = LineSegment2D(Point2D(-1, 1), Vector2D(2, 0))
+        line_3 = LineSegment2D(Point2D(-1, 1), Vector2D(3, 0))
+
+        assert len(polygon.intersect_line_ray(line_1)) == 0
+        assert len(polygon.intersect_line_ray(line_2)) == 1
+        assert len(polygon.intersect_line_ray(line_3)) == 2
+
+    def test_intersect_line_infinite(self):
+        """Test the Polygon2D intersect_line_infinite method."""
+        pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+        polygon = Polygon2D(pts)
+
+        ray_1 = Ray2D(Point2D(-1, 1), Vector2D(1, 0))
+        ray_2 = Ray2D(Point2D(1, 1), Vector2D(1, 0))
+        ray_3 = Ray2D(Point2D(1, 1), Vector2D(11, 0))
+        ray_4 = Ray2D(Point2D(-1, 1), Vector2D(-1, 0))
+        ray_5 = Ray2D(Point2D(-1, 3), Vector2D(-1, 0))
+        ray_6 = Ray2D(Point2D(0, 2), Vector2D(-1, -1))
+
+        assert len(polygon.intersect_line_infinite(ray_1)) == 2
+        assert len(polygon.intersect_line_infinite(ray_2)) == 2
+        assert len(polygon.intersect_line_infinite(ray_3)) == 2
+        assert len(polygon.intersect_line_infinite(ray_4)) == 2
+        assert len(polygon.intersect_line_infinite(ray_5)) == 0
+        assert len(polygon.intersect_line_infinite(ray_6)) > 0
+
+    def test_point_relationship(self):
+        """Test the Polygon2D point_relationship method."""
+        pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+        polygon = Polygon2D(pts)
+
+        assert polygon.point_relationship(Point2D(-1, 1), 0.0001) == -1
+        assert polygon.point_relationship(Point2D(1, 1), 0.0001) == 1
+        assert polygon.point_relationship(Point2D(0, 1), 0.0001) == 0
+        assert polygon.point_relationship(Point2D(2, 2), 0.0001) == 0
+
+        pts_2 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 1), Point2D(1, 1),
+                 Point2D(1, 2), Point2D(0, 2))
+        polygon_2 = Polygon2D(pts_2)
+        assert polygon_2.point_relationship(Point2D(0.5, 1), 0.0001) == 1
+        assert polygon_2.point_relationship(Point2D(0.5, 0.5), 0.0001) == 1
+        assert polygon_2.point_relationship(Point2D(1, 0.5), 0.0001) == 1
+        assert polygon_2.point_relationship(Point2D(0, 1), 0.0001) == 0
+        assert polygon_2.point_relationship(Point2D(0, 2), 0.0001) == 0
+        assert polygon_2.point_relationship(Point2D(-2, 0.5), 0.0001) == -1
+        assert polygon_2.point_relationship(Point2D(-2, 2), 0.0001) == -1
+        assert polygon_2.point_relationship(Point2D(-1, 1), 0.0001) == -1
+        assert polygon_2.point_relationship(Point2D(-1, 1), 0.0001) == -1
+
+    def test_is_point_inside(self):
+        """Test the Polygon2D is_point_inside method."""
+        pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+        polygon = Polygon2D(pts)
+
+        assert polygon.is_point_inside(Point2D(-1, 1)) is False
+        assert polygon.is_point_inside(Point2D(1, -1)) is False
+        assert polygon.is_point_inside(Point2D(1, 3)) is False
+        assert polygon.is_point_inside(Point2D(3, 1)) is False
+        assert polygon.is_point_inside(Point2D(1, 1)) is True
+
+        assert polygon.is_point_inside(Point2D(-1, 1), Vector2D(0, 1)) is False
+        assert polygon.is_point_inside(Point2D(1, -1), Vector2D(0, 1)) is False
+        assert polygon.is_point_inside(Point2D(1, 3), Vector2D(0, 1)) is False
+        assert polygon.is_point_inside(Point2D(3, 1), Vector2D(0, 1)) is False
+        assert polygon.is_point_inside(Point2D(1, 1), Vector2D(0, 1)) is True
+
+    def test_is_point_inside_bound_rect(self):
+        """Test the Polygon2D is_point_inside_bound_rect method."""
+        pts = (Point2D(0, 0), Point2D(4, 0), Point2D(4, 2), Point2D(2, 2),
+               Point2D(2, 4), Point2D(0, 4))
+        polygon = Polygon2D(pts)
+
+        assert polygon.is_point_inside_bound_rect(Point2D(-1, 1)) is False
+        assert polygon.is_point_inside_bound_rect(Point2D(1, -1)) is False
+        assert polygon.is_point_inside_bound_rect(Point2D(1, 5)) is False
+        assert polygon.is_point_inside_bound_rect(Point2D(5, 1)) is False
+        assert polygon.is_point_inside_bound_rect(Point2D(3, 3)) is False
+        assert polygon.is_point_inside(Point2D(1, 1)) is True
 
 
 if __name__ == "__main__":
