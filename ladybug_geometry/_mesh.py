@@ -91,6 +91,48 @@ class MeshBase(object):
             self._face_centroids = tuple(_f_cent)
         return self._face_centroids
 
+    def move(self, moving_vec):
+        """Get a mesh that has been moved along a vector.
+
+        Args:
+            moving_vec: A Vector with the direction and distance to move the mesh.
+        """
+        _verts = tuple([pt.move(moving_vec).to_immutable() for pt in self.vertices])
+        return self._mesh_transform(_verts)
+
+    def reflect(self, normal, origin):
+        """Get a mesh reflected across a plane with the input normal vector and origin.
+
+        Args:
+            normal: A Vector representing the normal vector for the plane across
+                which the mesh will be reflected. THIS VECTOR MUST BE NORMALIZED.
+            origin: A Point representing the origin from which to reflect.
+        """
+        _verts = tuple([pt.reflect(normal, origin).to_immutable()
+                        for pt in self.vertices])
+        return self._mesh_transform(_verts)
+
+    def scale(self, factor, origin):
+        """Scale a mesh by a factor from an origin point.
+
+        Args:
+            factor: A number representing how much the mesh should be scaled.
+            origin: A Point representing the origin from which to scale.
+        """
+        _verts = tuple([pt.scale(factor, origin).to_immutable()
+                        for pt in self.vertices])
+        return self._mesh_scale(_verts, factor)
+
+    def scale_world_origin(self, factor):
+        """Scale a mesh by a factor from the world origin. Faster than scale.
+
+        Args:
+            factor: A number representing how much the mesh should be scaled.
+        """
+        _verts = tuple([pt.scale_world_origin(factor).to_immutable()
+                        for pt in self.vertices])
+        return self._mesh_scale(_verts, factor)
+
     def _check_faces_input(self, faces):
         """Check input faces for correct formatting."""
         assert isinstance(faces, (list, tuple)), \
@@ -101,8 +143,17 @@ class MeshBase(object):
                 'Expected tuple for Mesh face. Got {}.'.format(type(f))
             assert len(f) == 3 or len(f) == 4, \
                 'Mesh face can only have 3 or 4 vertices. Got {}.'.format(len(f))
-        assert isinstance(faces[0][0], int), 'Mesh face must use integers to ' \
-            'reference vertices. Got {}.'.format(type(faces[0][0]))
+            for ind in f:
+                try:
+                    self._vertices[ind]
+                except IndexError:
+                    raise IndexError(
+                        'mesh face index {} does not correspond to any vertex. There '
+                        'are {} vertices in the mesh.'.format(ind, len(self._vertices)))
+                except TypeError:
+                    raise TypeError(
+                        'Mesh face must use integers to reference vertices. '
+                        'Got {}.'.format(type(ind)))
         if isinstance(faces, list):
             faces = tuple(faces)
         self._faces = faces
@@ -115,7 +166,7 @@ class MeshBase(object):
             ' ({}) must match the number of faces in the mesh ({}).'.format(
                 len(pattern), len(self.faces))
 
-    def _remove_vertices(self, pattern):
+    def _remove_vertices(self, pattern, face_pattern=None):
         """Get new faces, colors, centroids, and areas when removing vertices."""
         assert isinstance(pattern, (list, tuple)), 'pattern for remove_vertices must' \
             ' be a list or tuple. Got {}.'.format(type(pattern))
@@ -134,17 +185,28 @@ class MeshBase(object):
                 _new_verts.append(self._vertices[i])
 
         # get the new faces
-        face_pattern = []
-        for _f in self.faces:
-            try:
-                if len(_f) == 3:
-                    _new_f = (_vdict[_f[0]], _vdict[_f[1]], _vdict[_f[2]])
-                else:
-                    _new_f = (_vdict[_f[0]], _vdict[_f[1]], _vdict[_f[2]], _vdict[_f[3]])
+        if face_pattern is None:
+            face_pattern = []
+            for _f in self.faces:
+                try:
+                    if len(_f) == 3:
+                        _new_f = (_vdict[_f[0]], _vdict[_f[1]], _vdict[_f[2]])
+                    else:
+                        _new_f = (_vdict[_f[0]], _vdict[_f[1]], _vdict[_f[2]],
+                                  _vdict[_f[3]])
                     _new_faces.append(_new_f)
                     face_pattern.append(True)
-            except KeyError:
-                face_pattern.append(False)
+                except KeyError:
+                    face_pattern.append(False)
+        else:
+            for i, _f in enumerate(self.faces):
+                if face_pattern[i] is True:
+                    if len(_f) == 3:
+                        _new_f = (_vdict[_f[0]], _vdict[_f[1]], _vdict[_f[2]])
+                    else:
+                        _new_f = (_vdict[_f[0]], _vdict[_f[1]], _vdict[_f[2]],
+                                  _vdict[_f[3]])
+                    _new_faces.append(_new_f)
 
         # remove colors if they are assigned
         _new_colors = None
@@ -197,8 +259,8 @@ class MeshBase(object):
         for i, _in_mesh in enumerate(pattern):
             if _in_mesh is True:
                 _face = self._faces[i]
-                for _v in _face:
-                    vertex_pattern[i] = True
+                for j in _face:
+                    vertex_pattern[j] = True
         return vertex_pattern
 
     def _remove_faces_only(self, pattern):

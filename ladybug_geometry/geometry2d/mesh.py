@@ -216,7 +216,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
     def triangulated(self):
         """Get a version of this Mesh2D where all quads have been triangulated."""
         _new_faces = []
-        for face in enumerate(self.faces):
+        for face in self.faces:
             if len(face) == 3:
                 _new_faces.append(face)
             else:
@@ -276,7 +276,12 @@ class Mesh2D(MeshBase, Base2DIn2D):
                 (True) or has been removed from the new mesh (False).
         """
         vertex_pattern = self._vertex_pattern_from_remove_faces(pattern)
-        new_mesh, face_pattern = self.remove_vertices(vertex_pattern)
+        _new_verts, _new_faces, _new_colors, _new_f_cent, _new_f_area, face_pattern = \
+            self._remove_vertices(vertex_pattern, pattern)
+
+        new_mesh = Mesh2D(_new_verts, _new_faces, _new_colors)
+        new_mesh._face_centroids = _new_f_cent
+        new_mesh._face_areas = _new_f_area
         return new_mesh, vertex_pattern
 
     def remove_faces_only(self, pattern):
@@ -304,15 +309,6 @@ class Mesh2D(MeshBase, Base2DIn2D):
         new_mesh._face_areas = _new_f_area
         return new_mesh
 
-    def move(self, moving_vec):
-        """Get a mesh that has been moved along a vector.
-
-        Args:
-            moving_vec: A Vector2D with the direction and distance to move the mesh.
-        """
-        _verts = tuple([pt.move(moving_vec).to_immutable() for pt in self.vertices])
-        return self._mesh_transform(_verts)
-
     def rotate(self, angle, origin):
         """Get a mesh that is rotated counterclockwise by a certain angle.
 
@@ -322,39 +318,6 @@ class Mesh2D(MeshBase, Base2DIn2D):
         """
         _verts = tuple([pt.rotate(angle, origin).to_immutable() for pt in self.vertices])
         return self._mesh_transform(_verts)
-
-    def reflect(self, normal, origin):
-        """Get a mesh reflected across a plane with the input normal vector and origin.
-
-        Args:
-            normal: A Vector2D representing the normal vector for the plane across
-                which the mesh will be reflected. THIS VECTOR MUST BE NORMALIZED.
-            origin: A Point2D representing the origin from which to reflect.
-        """
-        _verts = tuple([pt.reflect(normal, origin).to_immutable()
-                        for pt in self.vertices])
-        return self._mesh_transform(_verts)
-
-    def scale(self, factor, origin):
-        """Scale a mesh by a factor from an origin point.
-
-        Args:
-            factor: A number representing how much the mesh should be scaled.
-            origin: A Point2D representing the origin from which to scale.
-        """
-        _verts = tuple([pt.scale(factor, origin).to_immutable()
-                        for pt in self.vertices])
-        return self._mesh_scale(_verts, factor)
-
-    def scale_world_origin(self, factor, origin):
-        """Scale a mesh by a factor from the world origin. Faster than Mesh2D.scale.
-
-        Args:
-            factor: A number representing how much the mesh should be scaled.
-        """
-        _verts = tuple([pt.scale_world_origin(factor).to_immutable()
-                        for pt in self.vertices])
-        return self._mesh_scale(_verts, factor)
 
     def _check_vertices_input(self, vertices):
         """Check input vertices for correct formatting and immutability."""

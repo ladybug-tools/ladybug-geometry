@@ -45,7 +45,6 @@ class Face3D(Base2DIn3D):
                  '_boundary_segments', '_hole_segments'
                  '_min', '_max', '_center', '_perimeter', '_area', '_centroid',
                  '_is_clockwise', '_is_convex', '_is_complex')
-    _check_required = True
 
     def __init__(self, vertices, plane):
         """Initilize Face3D.
@@ -54,12 +53,9 @@ class Face3D(Base2DIn3D):
             vertices: A list of Point3D objects representing the vertices of the sface.
             plane: A Plane object indicating the plane in which the face exists.
         """
-        if self._check_required:
-            self._check_vertices_input(vertices)
-            assert isinstance(plane, Plane), 'Expected Plane for Face3D.' \
-                ' Got {}.'.format(type(plane))
-        else:
-            self._vertices = vertices
+        self._check_vertices_input(vertices)
+        assert isinstance(plane, Plane), 'Expected Plane for Face3D.' \
+            ' Got {}.'.format(type(plane))
         self._plane = plane
 
         self._polygon2d = None
@@ -103,20 +99,17 @@ class Face3D(Base2DIn3D):
             extrusion_vector: A vector denoting the direction and distance to
                 extrude the line segment.
         """
-        if cls._check_required:
-            assert isinstance(line_segment, (LineSegment3D, LineSegment3DImmutable)), \
-                'line_segment must be LineSegment3D. Got {}.'.format(
-                    type(line_segment))
-            assert isinstance(extrusion_vector, (Vector3D, Vector3DImmutable)), \
-                'extrusion_vector must be Vector3D. Got {}.'.format(
-                    type(extrusion_vector))
+        assert isinstance(line_segment, (LineSegment3D, LineSegment3DImmutable)), \
+            'line_segment must be LineSegment3D. Got {}.'.format(
+                type(line_segment))
+        assert isinstance(extrusion_vector, (Vector3D, Vector3DImmutable)), \
+            'extrusion_vector must be Vector3D. Got {}.'.format(
+                type(extrusion_vector))
         _p1 = line_segment.p1
         _p2 = line_segment.p2
         _verts = (_p1, _p1 + extrusion_vector, _p2 + extrusion_vector, _p2)
         _plane = Plane(line_segment.v.cross(extrusion_vector), _p1)
-        Face3D._check_required = False  # Turn off check since input is valid
         face = cls(_verts, _plane)
-        Face3D._check_required = True  # Turn the checks back on
         _base = line_segment.length
         _dist = extrusion_vector.magnitude
         _height = _dist * math.sin(extrusion_vector.angle(line_segment.v))
@@ -144,9 +137,8 @@ class Face3D(Base2DIn3D):
                 rectangle and the X and Y axes will form the sides.
                 Default is the world XY plane.
         """
-        if cls._check_required:
-            assert isinstance(base, (float, int)), 'Rectangle base must be a number.'
-            assert isinstance(height, (float, int)), 'Rectangle height must be a number.'
+        assert isinstance(base, (float, int)), 'Rectangle base must be a number.'
+        assert isinstance(height, (float, int)), 'Rectangle height must be a number.'
         if base_plane is not None:
             assert isinstance(base_plane, Plane), \
                 'base_plane must be Plane. Got {}.'.format(type(base_plane))
@@ -156,9 +148,7 @@ class Face3D(Base2DIn3D):
         _b_vec = base_plane.x * base
         _h_vec = base_plane.y * height
         _verts = (_o, _o + _h_vec, _o + _h_vec + _b_vec, _o + _b_vec)
-        Face3D._check_required = False  # Turn off check since input is valid
         face = cls(_verts, base_plane)
-        Face3D._check_required = True  # Turn the checks back on
         face._perimeter = base * 2 + height * 2
         face._area = base * height
         _cent = _o + (_b_vec * 0.5) + (_h_vec * 0.5)
@@ -190,31 +180,26 @@ class Face3D(Base2DIn3D):
                 of the plane will be the first vertex of the boundary vertices.
         """
         # check the inputs
-        if cls._check_required:
-            assert isinstance(boundary, list), \
-                'boundary should be a list. Got {}'.format(type(boundary))
-            assert isinstance(holes, list), \
-                'holes should be a list. Got {}'.format(type(holes))
-            for hole in holes:
-                assert isinstance(hole, list), \
-                    'hole should be a list. Got {}'.format(type(hole))
-                assert len(hole) >= 3, \
-                    'hole should have at least 3 vertices. Got {}'.format(len(hole))
+        assert isinstance(boundary, list), \
+            'boundary should be a list. Got {}'.format(type(boundary))
+        assert isinstance(holes, list), \
+            'holes should be a list. Got {}'.format(type(holes))
+        for hole in holes:
+            assert isinstance(hole, list), \
+                'hole should be a list. Got {}'.format(type(hole))
+            assert len(hole) >= 3, \
+                'hole should have at least 3 vertices. Got {}'.format(len(hole))
         if plane is None:
             plane = cls._plane_from_vertices(boundary)
 
         # create a Polygon2D from the vertices
         _boundary2d = [plane.xyz_to_xy_immutable(_v) for _v in boundary]
         _holes2d = [[plane.xyz_to_xy_immutable(_v) for _v in hole] for hole in holes]
-        Polygon2D._check_required = False  # Turn off check since input is valid
         _polygon2d = Polygon2D.from_shape_with_holes(_boundary2d, _holes2d)
-        Polygon2D._check_required = True  # Turn the checks back on
 
         # convert Polygon2D vertices to 3D to become the vertices of the face.
         _vert3d = tuple(plane.xy_to_xyz_immutable(_v) for _v in _polygon2d.vertices)
-        Face3D._check_required = False  # Turn off check since input is valid
         _face = cls(_vert3d, plane)
-        Face3D._check_required = True  # Turn the checks back on
 
         # assign extra properties that we know to the face
         _face._polygon2d = _polygon2d
@@ -247,9 +232,7 @@ class Face3D(Base2DIn3D):
         """
         if self._polygon2d is None:
             _vert2d = tuple(self._plane.xyz_to_xy_immutable(_v) for _v in self.vertices)
-            Polygon2D._check_required = False  # Turn off check since input is valid
             self._polygon2d = Polygon2D(_vert2d)
-            Polygon2D._check_required = True  # Turn the checks back on
             if self._is_clockwise is not None:
                 self._polygon2d._is_clockwise = self._is_clockwise
         return self._polygon2d
@@ -432,9 +415,7 @@ class Face3D(Base2DIn3D):
 
         Note that this only flips the plane of the face and does not change the vertices.
         """
-        Face3D._check_required = False  # Turn off check since input is valid
         _new_face = Face3D(self.vertices, self.plane.flip())
-        Face3D._check_required = True  # Turn the checks back on
         self._transfer_properties(_new_face)
         _new_face._boundary = self._boundary
         _new_face._holes = self._holes
@@ -639,9 +620,7 @@ class Face3D(Base2DIn3D):
             _off_num = -offset if flip is True else offset
             _off_vec = self.plane.n * _off_num
             vert_3d = tuple(pt.move(_off_vec).to_immutable() for pt in vert_3d)
-        Mesh3D._check_required = False  # Turn off check since input is valid
         grid_mesh3d = Mesh3D(vert_3d, grid_mesh2d.faces)
-        Mesh3D._check_required = True  # Turn the checks back on
         grid_mesh3d._face_areas = grid_mesh2d._face_areas
 
         # assign the face plane normal to the mesh normals
@@ -664,14 +643,11 @@ class Face3D(Base2DIn3D):
     def _check_vertices_input(self, vertices):
         assert isinstance(vertices, (list, tuple)), \
             'vertices should be a list or tuple. Got {}'.format(type(vertices))
-        assert len(vertices) > 2, 'There must be at least 3 vertices for a Face3D.' \
+        assert len(vertices) >= 3, 'There must be at least 3 vertices for a Face3D.' \
             ' Got {}'.format(len(vertices))
-        _verts_immutable = []
-        for p in vertices:
-            assert isinstance(p, (Point3D, Point3DImmutable)), \
-                'Expected Point3D. Got {}.'.format(type(p))
-            _verts_immutable.append(p.to_immutable())
-        self._vertices = tuple(_verts_immutable)
+        assert isinstance(vertices[0], (Point3D, Point3DImmutable)), \
+            'Expected Point3D for Face3D vertex. Got {}.'.format(type(vertices[0]))
+        self._vertices = tuple(p.to_immutable() for p in vertices)
 
     def _check_number_mesh_grid(self, input, name):
         assert isinstance(input, (float, int)), '{} for Face3D.get_mesh_grid' \
@@ -698,9 +674,7 @@ class Face3D(Base2DIn3D):
 
     def _face_transform(self, verts, plane):
         """Transform face in a way that transfers properties and avoids checks."""
-        Face3D._check_required = False  # Turn off check since input is valid
         _new_face = Face3D(verts, plane)
-        Face3D._check_required = True  # Turn the checks back on
         self._transfer_properties(_new_face)
         _new_face._polygon2d = self._polygon2d
         _new_face._mesh2d = self._mesh2d
@@ -708,9 +682,7 @@ class Face3D(Base2DIn3D):
 
     def _face_transform_scale(self, verts, plane, factor):
         """Scale face in a way that transfers properties and avoids checks."""
-        Face3D._check_required = False  # Turn off check since input is valid
         _new_face = Face3D(verts, plane)
-        Face3D._check_required = True  # Turn the checks back on
         self._transfer_properties_scale(_new_face, factor)
         return _new_face
 
@@ -755,9 +727,7 @@ class Face3D(Base2DIn3D):
         return Plane(n, pt1)
 
     def __copy__(self):
-        Face3D._check_required = False  # Turn off check since we know input is valid
         _new_poly = Face3D(self.vertices, self.plane)
-        Face3D._check_required = True  # Turn the checks back on
         return _new_poly
 
     def __repr__(self):

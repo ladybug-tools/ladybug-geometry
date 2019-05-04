@@ -34,7 +34,6 @@ class Mesh3D(MeshBase, Base2DIn3D):
                  '_min', '_max', '_center', '_area',
                  '_face_areas', '_face_centroids', '_face_normals',
                  '_vertex_normals')
-    _check_required = True
 
     def __init__(self, vertices, faces, colors=None):
         """Initilize Mesh3D.
@@ -46,12 +45,8 @@ class Mesh3D(MeshBase, Base2DIn3D):
             colors: An optional list of colors that correspond to either the faces
                 of the mesh or the vertices of the mesh. Default is None.
         """
-        if self._check_required:
-            self._check_vertices_input(vertices)
-            self._check_faces_input(faces)
-        else:
-            self._vertices = vertices
-            self._faces = faces
+        self._check_vertices_input(vertices)
+        self._check_faces_input(faces)
 
         self._is_color_by_face = False  # default if colors is None
         self.colors = colors
@@ -126,9 +121,7 @@ class Mesh3D(MeshBase, Base2DIn3D):
         _new_verts, _new_faces, _new_colors, _new_f_cent, _new_f_area, face_pattern = \
             self._remove_vertices(pattern)
 
-        Mesh3D._check_required = False  # Turn off checks since we know the mesh is valid
         new_mesh = Mesh3D(_new_verts, _new_faces, _new_colors)
-        Mesh3D._check_required = True  # Turn the checks back on
         new_mesh._face_centroids = _new_f_cent
         new_mesh._face_areas = _new_f_area
         return new_mesh, face_pattern
@@ -172,23 +165,47 @@ class Mesh3D(MeshBase, Base2DIn3D):
         _new_faces, _new_colors, _new_f_cent, _new_f_area = \
             self._remove_faces_only(pattern)
 
-        Mesh3D._check_required = False  # Turn off checks since we know the mesh is valid
         new_mesh = Mesh3D(self.vertices, _new_faces, _new_colors)
-        Mesh3D._check_required = True  # Turn the checks back on
         new_mesh._face_centroids = _new_f_cent
         new_mesh._face_areas = _new_f_area
         return new_mesh
+
+    def rotate(self, axis, angle, origin):
+        """Rotate a mesh by a certain angle around an axis and origin.
+
+        Right hand rule applies:
+        If axis has a positive orientation, rotation will be clockwise.
+        If axis has a negative orientation, rotation will be counterclockwise.
+
+        Args:
+            axis: A Vector3D axis representing the axis of rotation.
+            angle: An angle for rotation in radians.
+            origin: A Point3D for the origin around which the point will be rotated.
+        """
+        _verts = tuple([pt.rotate(axis, angle, origin).to_immutable()
+                        for pt in self.vertices])
+        return self._mesh_transform(_verts)
+
+    def rotate_xy(self, angle, origin):
+        """Get a mesh rotated counterclockwise in the XY plane by a certain angle.
+
+        Args:
+            angle: An angle for rotation in radians.
+            origin: A Point3D for the origin around which the point will be rotated.
+        """
+        _verts = tuple([pt.rotate_xy(angle, origin).to_immutable()
+                        for pt in self.vertices])
+        return self._mesh_transform(_verts)
 
     def _check_vertices_input(self, vertices):
         """Check input vertices for correct formatting and immutability."""
         assert isinstance(vertices, (list, tuple)), \
             'vertices should be a list or tuple. Got {}'.format(type(vertices))
-        _verts_immutable = []
-        for p in vertices:
-            assert isinstance(p, (Point3D, Point3DImmutable)), \
-                'Expected Point3D for Mesh3D vertex. Got {}.'.format(type(p))
-            _verts_immutable.append(p.to_immutable())
-        self._vertices = tuple(_verts_immutable)
+        assert len(vertices) >= 3, 'Mesh3D should have at least 3 vertices. ' \
+            'Got {}'.format(len(vertices))
+        assert isinstance(vertices[0], (Point3D, Point3DImmutable)), \
+            'Expected Point3D for Mesh3D vertex. Got {}.'.format(type(vertices[0]))
+        self._vertices = tuple(p.to_immutable() for p in vertices)
 
     def _calculate_face_areas_and_normals(self):
         """Calculate face areas and normals from vertices."""
@@ -244,17 +261,13 @@ class Mesh3D(MeshBase, Base2DIn3D):
 
     def _mesh_transform(self, verts):
         """Transform mesh in a way that transfers properties and avoids extra checks."""
-        Mesh3D._check_required = False  # Turn off check since input is valid
         _new_mesh = Mesh3D(verts, self.faces)
-        Mesh3D._check_required = True  # Turn the checks back on
         self._transfer_properties(_new_mesh)
         return _new_mesh
 
     def _mesh_transform_move(self, verts):
         """Move mesh in a way that transfers properties and avoids extra checks."""
-        Mesh3D._check_required = False  # Turn off check since input is valid
         _new_mesh = Mesh3D(verts, self.faces)
-        Mesh3D._check_required = True  # Turn the checks back on
         self._transfer_properties(_new_mesh)
         _new_mesh._face_normals = self._face_normals
         _new_mesh._vertex_normals = self._vertex_normals
@@ -262,9 +275,7 @@ class Mesh3D(MeshBase, Base2DIn3D):
 
     def _mesh_scale(self, verts, factor):
         """Scale mesh in a way that transfers properties and avoids extra checks."""
-        Mesh3D._check_required = False  # Turn off check since input is valid
         _new_mesh = Mesh3D(verts, self.faces)
-        Mesh3D._check_required = True  # Turn the checks back on
         self._transfer_properties_scale(_new_mesh, factor)
         _new_mesh._face_normals = self._face_normals
         _new_mesh._vertex_normals = self._vertex_normals
@@ -350,9 +361,7 @@ class Mesh3D(MeshBase, Base2DIn3D):
         return n1.magnitude / 2
 
     def __copy__(self):
-        Mesh3D._check_required = False  # Turn off check since we know the mesh is valid
         _new_mesh = Mesh3D(self.vertices, self.faces)
-        Mesh3D._check_required = True  # Turn the checks back on
         self._transfer_properties(_new_mesh)
         _new_mesh._face_centroids = self._face_centroids
         _new_mesh._face_normals = self._face_normals
