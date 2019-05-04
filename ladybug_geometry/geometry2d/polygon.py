@@ -82,16 +82,17 @@ class Polygon2D(Base2DIn2D):
         return polygon
 
     @classmethod
-    def from_regular_polygon(cls, number_of_sides, base_point=Point2D(), radius=1):
+    def from_regular_polygon(cls, number_of_sides, radius=1, base_point=Point2D()):
         """Initialize Polygon2D from regular polygon parameters.
 
         Args:
             number_of_sides: An integer for the number of sides on the regular
                 polgygon. This number must be greater than 2.
-            base_point: A Point2D for the center of the regular polygon.
             radius: A number indicating the distance from the polygon's center
                 where the vertices of the polygon will lie.
                 The default is set to 1.
+            base_point: A Point2D for the center of the regular polygon.
+                The default is the Origin at (0, 0).
         """
         assert isinstance(number_of_sides, int), 'number_of_sides must be an ' \
             'integer. Got {}.'.format(type(number_of_sides))
@@ -106,7 +107,7 @@ class Polygon2D(Base2DIn2D):
         cos_a = math.cos(angle)
         sin_a = math.sin(angle)
 
-        # pick a starting bertex that makes sense for the number of sides
+        # pick a starting vertex that makes sense for the number of sides
         if number_of_sides % 2 == 0:
             start_vert = Point2D(base_point.x - radius, base_point.y)
             start_vert = start_vert.rotate(angle / 2, base_point).to_immutable()

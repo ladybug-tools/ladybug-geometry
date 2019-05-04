@@ -159,6 +159,41 @@ class Face3D(Base2DIn3D):
         return face
 
     @classmethod
+    def from_regular_polygon(cls, number_of_sides, radius=1, base_plane=None):
+        """Initialize Face3D from regular polygon parameters and a base_plane.
+
+        Args:
+            number_of_sides: An integer for the number of sides on the regular
+                polgygon. This number must be greater than 2.
+            radius: A number indicating the distance from the polygon's center
+                where the vertices of the polygon will lie.
+                The default is set to 1.
+            base_plane: A Plane object for the plane in which the face exists.
+                The origin of this plane will be used as the center of the polygon.
+                If None, the default will be the WorldXY plane.
+        """
+        # set the default base_plane
+        if base_plane is None:
+            base_plane = Plane()
+        else:
+            assert isinstance(base_plane, Plane), 'Expected Plane. Got {}'.format(
+                type(base_plane))
+
+        # create the regular polygon face
+        _polygon2d = Polygon2D.from_regular_polygon(number_of_sides, radius)
+        _vert3d = tuple(base_plane.xy_to_xyz_immutable(_v) for _v in _polygon2d.vertices)
+        _face = cls(_vert3d, base_plane)
+
+        # assign extra properties that we know to the face
+        _face._polygon2d = _polygon2d
+        _face._center = base_plane.o
+        _face._centroid = base_plane.o
+        _face._is_clockwise = False
+        _face._is_convex = True
+        _face._is_complex = False
+        return _face
+
+    @classmethod
     def from_shape_with_holes(cls, boundary, holes, plane=None):
         """Initialize a Face3D from a boundary vertex list with holes inside of it.
 

@@ -3,8 +3,10 @@
 from __future__ import division
 
 from .._mesh import MeshBase
+from ..geometry2d.mesh import Mesh2D
 
 from .pointvector import Point3D, Point3DImmutable, Vector3D, Vector3DImmutable
+from .plane import Plane
 from ._2d import Base2DIn3D
 
 try:
@@ -74,6 +76,25 @@ class Mesh3D(MeshBase, Base2DIn3D):
         vertices, face_collector = cls._interpret_input_from_faces(faces, purge)
         return cls(tuple(vertices), tuple(face_collector))
 
+    @classmethod
+    def from_mesh2d(cls, mesh_2d, plane=None):
+        """Create a Mesh3D from a Mesh2D and a Plane in which the mesh exists.
+
+        Args:
+            mesh_2d: A Mesh2D object.
+            plane: A Plane object to represent the plane in which the Mesh2D exists
+                within 3D space. If None, the WorldXY plane will be used.
+        """
+        assert isinstance(mesh_2d, Mesh2D), 'Expected Mesh2D for from_mesh_2d. ' \
+            'Got {}.'.format(type(mesh_2d))
+        if plane is None:
+            return cls(tuple(Point3DImmutable(pt.x, pt.y, 0) for pt in mesh_2d.vertices),
+                       mesh_2d.faces, mesh_2d.colors)
+        else:
+            assert isinstance(plane, Plane), 'Expected Plane. Got {}'.format(type(plane))
+            _verts3d = tuple(plane.xy_to_xyz_immutable(_v) for _v in mesh_2d.vertices)
+            return cls(_verts3d, mesh_2d.faces, mesh_2d.colors)
+
     @property
     def face_areas(self):
         """A tuple of face areas that parallels the faces property."""
@@ -142,7 +163,12 @@ class Mesh3D(MeshBase, Base2DIn3D):
                 (True) or has been removed from the new mesh (False).
         """
         vertex_pattern = self._vertex_pattern_from_remove_faces(pattern)
-        new_mesh, face_pattern = self.remove_vertices(vertex_pattern)
+        _new_verts, _new_faces, _new_colors, _new_f_cent, _new_f_area, face_pattern = \
+            self._remove_vertices(vertex_pattern, pattern)
+
+        new_mesh = Mesh3D(_new_verts, _new_faces, _new_colors)
+        new_mesh._face_centroids = _new_f_cent
+        new_mesh._face_areas = _new_f_area
         return new_mesh, vertex_pattern
 
     def remove_faces_only(self, pattern):

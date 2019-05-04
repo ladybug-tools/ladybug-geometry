@@ -63,7 +63,7 @@ class Polygon2DTestCase(unittest.TestCase):
 
     def test_polygon2d_init_from_regular_polygon(self):
         """Test the initalization of Polygon2D from_regular_polygon."""
-        polygon = Polygon2D.from_regular_polygon(8, Point2D(0, 1), 2)
+        polygon = Polygon2D.from_regular_polygon(8, 2, Point2D(0, 1))
 
         assert isinstance(polygon.vertices, tuple)
         assert len(polygon.vertices) == 8
@@ -86,7 +86,7 @@ class Polygon2DTestCase(unittest.TestCase):
         polygon = Polygon2D.from_regular_polygon(20)
         assert len(polygon.vertices) == 20
         with pytest.raises(AssertionError):
-            polygon = Polygon2D.from_regular_polygon(2, Point2D(0, 1), 2)
+            polygon = Polygon2D.from_regular_polygon(2)
 
     def test_polygon2d_init_from_shape_with_hole(self):
         """Test the initalization of Polygon2D from_shape_with_hole."""
