@@ -118,7 +118,7 @@ class Face3D(Base2DIn3D):
         _cent = _p1 + (line_segment.v * 0.5) + (extrusion_vector * 0.5)
         face._centroid = _cent.to_immutable()
         face._is_clockwise = True
-        face._is_convex = False
+        face._is_convex = True
         face._is_complex = False
         return face
 
@@ -154,7 +154,7 @@ class Face3D(Base2DIn3D):
         _cent = _o + (_b_vec * 0.5) + (_h_vec * 0.5)
         face._centroid = _cent.to_immutable()
         face._is_clockwise = True
-        face._is_convex = False
+        face._is_convex = True
         face._is_complex = False
         return face
 

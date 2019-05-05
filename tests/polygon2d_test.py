@@ -18,7 +18,7 @@ class Polygon2DTestCase(unittest.TestCase):
         pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
         polygon = Polygon2D(pts)
 
-        str(polygon)  # test the string representation of the ray
+        str(polygon)  # test the string representation of the polygon
 
         assert isinstance(polygon.vertices, tuple)
         assert len(polygon.vertices) == 4
