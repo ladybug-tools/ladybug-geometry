@@ -264,6 +264,90 @@ class Mesh3DTestCase(unittest.TestCase):
         assert len(mesh.vertices) == len(new_mesh_1.vertices)
         assert len(mesh.faces) == len(new_mesh_1.faces)
 
+    def test_rotate(self):
+        """Test the Mesh3D rotate method."""
+        pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2),
+               Point3D(2, 0, 2), Point3D(4, 0, 2))
+        mesh = Mesh3D(pts, [(0, 1, 2, 3), (2, 3, 4)])
+        origin = Point3D(0, 0, 0)
+        axis = Vector3D(1, 0, 0)
+
+        test_1 = mesh.rotate(axis, math.pi, origin)
+        assert test_1[0].x == pytest.approx(0, rel=1e-3)
+        assert test_1[0].y == pytest.approx(0, rel=1e-3)
+        assert test_1[0].z == pytest.approx(-2, rel=1e-3)
+        assert test_1[2].x == pytest.approx(2, rel=1e-3)
+        assert test_1[2].y == pytest.approx(-2, rel=1e-3)
+        assert test_1[2].z == pytest.approx(-2, rel=1e-3)
+        assert mesh.area == test_1.area
+        assert len(mesh.vertices) == len(test_1.vertices)
+        assert len(mesh.faces) == len(test_1.faces)
+
+        test_2 = mesh.rotate(axis, math.pi/2, origin)
+        assert test_2[0].x == pytest.approx(0, rel=1e-3)
+        assert test_2[0].y == pytest.approx(-2, rel=1e-3)
+        assert test_2[0].z == pytest.approx(0, rel=1e-3)
+        assert test_2[2].x == pytest.approx(2, rel=1e-3)
+        assert test_2[2].y == pytest.approx(-2, rel=1e-3)
+        assert test_2[2].z == pytest.approx(2, rel=1e-3)
+        assert mesh.area == test_2.area
+        assert len(mesh.vertices) == len(test_2.vertices)
+        assert len(mesh.faces) == len(test_2.faces)
+
+    def test_rotate_xy(self):
+        """Test the Mesh3D rotate_xy method."""
+        pts = (Point3D(1, 1, 2), Point3D(2, 1, 2), Point3D(2, 2, 2), Point3D(1, 2, 2))
+        mesh = Mesh3D(pts, [(0, 1, 2, 3)])
+        origin_1 = Point3D(1, 1, 0)
+
+        test_1 = mesh.rotate_xy(math.pi, origin_1)
+        assert test_1[0].x == pytest.approx(1, rel=1e-3)
+        assert test_1[0].y == pytest.approx(1, rel=1e-3)
+        assert test_1[0].z == pytest.approx(2, rel=1e-3)
+        assert test_1[2].x == pytest.approx(0, rel=1e-3)
+        assert test_1[2].y == pytest.approx(0, rel=1e-3)
+        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+
+        test_2 = mesh.rotate_xy(math.pi/2, origin_1)
+        assert test_2[0].x == pytest.approx(1, rel=1e-3)
+        assert test_2[0].y == pytest.approx(1, rel=1e-3)
+        assert test_1[0].z == pytest.approx(2, rel=1e-3)
+        assert test_2[2].x == pytest.approx(0, rel=1e-3)
+        assert test_2[2].y == pytest.approx(2, rel=1e-3)
+        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+
+    def test_reflect(self):
+        """Test the Mesh3D reflect method."""
+        pts = (Point3D(1, 1, 2), Point3D(2, 1, 2), Point3D(2, 2, 2), Point3D(1, 2, 2))
+        mesh = Mesh3D(pts, [(0, 1, 2, 3)])
+        origin_1 = Point3D(1, 0, 2)
+        normal_1 = Vector3D(1, 0, 0)
+        normal_2 = Vector3D(-1, -1, 0).normalized()
+
+        test_1 = mesh.reflect(normal_1, origin_1)
+        assert test_1[0].x == pytest.approx(1, rel=1e-3)
+        assert test_1[0].y == pytest.approx(1, rel=1e-3)
+        assert test_1[0].z == pytest.approx(2, rel=1e-3)
+        assert test_1[2].x == pytest.approx(0, rel=1e-3)
+        assert test_1[2].y == pytest.approx(2, rel=1e-3)
+        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+
+        test_1 = mesh.reflect(normal_2, Point3D(0, 0, 0))
+        assert test_1[0].x == pytest.approx(-1, rel=1e-3)
+        assert test_1[0].y == pytest.approx(-1, rel=1e-3)
+        assert test_1[0].z == pytest.approx(2, rel=1e-3)
+        assert test_1[2].x == pytest.approx(-2, rel=1e-3)
+        assert test_1[2].y == pytest.approx(-2, rel=1e-3)
+        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+
+        test_2 = mesh.reflect(normal_2, origin_1)
+        assert test_2[0].x == pytest.approx(0, rel=1e-3)
+        assert test_2[0].y == pytest.approx(0, rel=1e-3)
+        assert test_2[0].z == pytest.approx(2, rel=1e-3)
+        assert test_2[2].x == pytest.approx(-1, rel=1e-3)
+        assert test_2[2].y == pytest.approx(-1, rel=1e-3)
+        assert test_2[2].z == pytest.approx(2, rel=1e-3)
+
 
 if __name__ == "__main__":
     unittest.main()
