@@ -261,7 +261,7 @@ class Plane(object):
         Returns:
             The minimum distance to the input line_ray.
         """
-        result = self.closest_point_on_line(line_ray)
+        result = self.closest_points_between_line(line_ray)
         if result is None:  # intersection
             return 0
         else:
@@ -292,16 +292,20 @@ class Plane(object):
             return Ray3D(result[0], result[1])
         return None
 
-    def project_point(self, point):
-        """Project a Point3D into this plane.
+    def is_coplanar(self, plane):
+        """Test if another Plane object is coplanar with this Plane.
 
         Args:
-            point: A Point3D object to project.
+            plane: A Plane object for which coplanartiy will be tested.
 
         Returns:
-            Point3D for the point projected into this plane.
+            True if plane is coplanar. False if it is not coplanar.
         """
-        return point.project(self.n, self.o)
+        if self.n == plane.n:
+            return self.k == plane.k
+        elif self.n == plane.n.reversed():
+            return self.k == -plane.k
+        return False
 
     def duplicate(self):
         """Get a copy of this object."""

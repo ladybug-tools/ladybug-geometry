@@ -88,8 +88,17 @@ class Ray2D(Base1DIn2D):
     def _u_in(self, u):
         return u >= 0.0
 
+    def __eq__(self, other):
+        if isinstance(other, Ray2D):
+            return self.p == other.p and self.v == other.v
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
-        return 'Ray2D (<%.2f, %.2f> point) (<%.2f, %.2f> vector)' % \
+        return 'Ray2D (point <%.2f, %.2f>) (vector <%.2f, %.2f>)' % \
             (self.p.x, self.p.y, self.v.x, self.v.y)
 
 

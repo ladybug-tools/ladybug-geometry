@@ -634,8 +634,8 @@ class Face3D(Base2DIn3D):
             generate_centroids: Set to True to have the face centroids generated
                 alongside the grid of vertices, which is much faster than having
                 them generated upon request as they typically are. However, if you
-                have no need for the face centroids, you would save memory by setting
-                this to False. Default is True.
+                have no need for the face centroids, you would save time and memory
+                by setting this to False. Default is True.
         """
         # check the inputs and set defaults
         self._check_number_mesh_grid(x_dim, 'x_dim')
@@ -649,12 +649,14 @@ class Face3D(Base2DIn3D):
         # generate the mesh grid and convert it to a 3D mesh
         grid_mesh2d = Mesh2D.from_polygon_grid(
             self.polygon2d, x_dim, y_dim, generate_centroids)
-        vert_3d = tuple(self._plane.xy_to_xyz_immutable(pt)
-                        for pt in grid_mesh2d.vertices)
-        if offset is not None:
+        if offset is None or offset == 0:
+            vert_3d = tuple(self._plane.xy_to_xyz_immutable(pt)
+                            for pt in grid_mesh2d.vertices)
+        else:
             _off_num = -offset if flip is True else offset
-            _off_vec = self.plane.n * _off_num
-            vert_3d = tuple(pt.move(_off_vec).to_immutable() for pt in vert_3d)
+            _off_plane = self.plane.move(self.plane.n * _off_num)
+            vert_3d = tuple(_off_plane.xy_to_xyz_immutable(pt)
+                            for pt in grid_mesh2d.vertices)
         grid_mesh3d = Mesh3D(vert_3d, grid_mesh2d.faces)
         grid_mesh3d._face_areas = grid_mesh2d._face_areas
 
@@ -663,15 +665,17 @@ class Face3D(Base2DIn3D):
             grid_mesh3d._face_normals = self._plane.n.reversed().to_immutable()
             grid_mesh3d._vertex_normals = self._plane.n.reversed().to_immutable()
         else:
-            grid_mesh3d._face_normals = grid_mesh3d._vertex_normals = self._plane.n
+            grid_mesh3d._face_normals = self._plane.n
+            grid_mesh3d._vertex_normals = self._plane.n
 
         # transform the centroids to 3D space if they were generated
         if generate_centroids is True:
-            cent_3d = tuple(self._plane.xy_to_xyz_immutable(pt)
-                            for pt in grid_mesh2d.face_centroids)
-            if offset is not None:
-                cent_3d = tuple(pt.move(_off_vec).to_immutable() for pt in cent_3d)
-            grid_mesh3d._face_centroids = cent_3d
+            if offset is None or offset == 0:
+                grid_mesh3d._face_centroids = tuple(self._plane.xy_to_xyz_immutable(pt)
+                                                    for pt in grid_mesh2d.face_centroids)
+            else:
+                grid_mesh3d._face_centroids = tuple(_off_plane.xy_to_xyz_immutable(pt)
+                                                    for pt in grid_mesh2d.face_centroids)
 
         return grid_mesh3d
 

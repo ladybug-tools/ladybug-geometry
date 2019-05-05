@@ -102,8 +102,17 @@ class Ray3D(Base1DIn3D):
     def _u_in(self, u):
         return u >= 0.0
 
+    def __eq__(self, other):
+        if isinstance(other, Ray3D):
+            return self.p == other.p and self.v == other.v
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def __repr__(self):
-        return 'Ray3D (<%.2f, %.2f, %.2f> point) (<%.2f, %.2f, %.2f> vector)' % \
+        return 'Ray3D (point <%.2f, %.2f, %.2f>) (vector <%.2f, %.2f, %.2f>)' % \
             (self.p.x, self.p.y, self.p.z, self.v.x, self.v.y, self.v.z)
 
 

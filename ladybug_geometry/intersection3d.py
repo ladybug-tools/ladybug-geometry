@@ -37,8 +37,8 @@ def intersect_plane_plane(A, B):
             2) A Vector3D that describes the direction of the intersection.
         Will be None if no intersection exists (planes are parallel).
     """
-    n1_m = A.n.magnitude_squared()
-    n2_m = B.n.magnitude_squared()
+    n1_m = A.n.magnitude_squared
+    n2_m = B.n.magnitude_squared
     n1d2 = A.n.dot(B.n)
     det = n1_m * n2_m - n1d2 ** 2
     if det == 0:  # parallel
@@ -103,10 +103,10 @@ def closest_point3d_between_line3d_plane(L, PL):
     """
     d = PL.n.dot(L.v)
     if not d:  # parallel, choose an endpoint
-        return closest_point3d_on_plane(L.p, PL)
+        return L.p, closest_point3d_on_plane(L.p, PL)
     u = (PL.k - PL.n.dot(L.p)) / d
     if not L._u_in(u):  # intersects out of range of L, choose the nearest endpoint
         u = max(min(u, 1.0), 0.0)
-        return closest_point3d_on_plane(
-            Point3D(L.p.x + u * L.v.x, L.p.y + u * L.v.y, L.p.z + u * L.v.z), PL)
+        close_pt = Point3D(L.p.x + u * L.v.x, L.p.y + u * L.v.y, L.p.z + u * L.v.z)
+        return close_pt, closest_point3d_on_plane(close_pt, PL)
     return None  # intersection
