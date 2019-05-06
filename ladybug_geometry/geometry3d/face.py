@@ -605,7 +605,7 @@ class Face3D(Base2DIn3D):
             Point3D for the point projected onto this face. Will be None if the
                 point cannot be projected to within the boundary of the face.
         """
-        _plane_int = self._plane.project_point(point)
+        _plane_int = point.project(self._plane.n, self._plane.o)
         _plane_int2d = self._plane.xyz_to_xy(_plane_int)
         if self.polygon2d.is_point_inside_bound_rect(_plane_int2d):
             return _plane_int

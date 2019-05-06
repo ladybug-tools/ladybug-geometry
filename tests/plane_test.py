@@ -402,6 +402,29 @@ class PlaneTestCase(unittest.TestCase):
         assert plane_1.is_coplanar(plane_4) is True
         assert plane_1.is_coplanar(plane_5) is True
 
+    def test_is_coplanar_tolerance(self):
+        """Test the Plane is_coplanar_tolerance method."""
+        pt_1 = Point3D(2, 2, 2)
+        vec_1 = Vector3D(0, 2, 0)
+        plane_1 = Plane(vec_1, pt_1)
+        pt_2 = Point3D(0, 0, 0)
+        vec_2 = Vector3D(2, 0, 0)
+        plane_2 = Plane(vec_2, pt_2)
+        pt_3 = Point3D(0, 0, 0)
+        vec_3 = Vector3D(0, 2, 0)
+        plane_3 = Plane(vec_3, pt_3)
+        pt_4 = Point3D(0, 2, 0)
+        vec_4 = Vector3D(0, 2, 0)
+        plane_4 = Plane(vec_4, pt_4)
+        pt_5 = Point3D(0, 2, 0)
+        vec_5 = Vector3D(0, -2, 0)
+        plane_5 = Plane(vec_5, pt_5)
+
+        assert plane_1.is_coplanar_tolerance(plane_2, 0.0001, 0.0001) is False
+        assert plane_1.is_coplanar_tolerance(plane_3, 0.0001, 0.0001) is False
+        assert plane_1.is_coplanar_tolerance(plane_4, 0.0001, 0.0001) is True
+        assert plane_1.is_coplanar_tolerance(plane_5, 0.0001, 0.0001) is True
+
 
 if __name__ == "__main__":
     unittest.main()

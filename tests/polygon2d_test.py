@@ -94,8 +94,6 @@ class Polygon2DTestCase(unittest.TestCase):
         hole_pts = [Point2D(1, 1), Point2D(3, 1), Point2D(3, 3), Point2D(1, 3)]
         polygon = Polygon2D.from_shape_with_hole(bound_pts, hole_pts)
 
-        str(polygon)  # test the string representation of the ray
-
         assert isinstance(polygon.vertices, tuple)
         assert len(polygon.vertices) == 10
         for point in polygon.vertices:
@@ -118,8 +116,6 @@ class Polygon2DTestCase(unittest.TestCase):
         hole_pts_1 = [Point2D(1, 1), Point2D(1.5, 1), Point2D(1.5, 1.5), Point2D(1, 1.5)]
         hole_pts_2 = [Point2D(2, 2), Point2D(3, 2), Point2D(3, 3), Point2D(2, 3)]
         polygon = Polygon2D.from_shape_with_holes(bound_pts, [hole_pts_1, hole_pts_2])
-
-        str(polygon)  # test the string representation of the ray
 
         assert isinstance(polygon.vertices, tuple)
         assert len(polygon.vertices) == 16
@@ -152,7 +148,7 @@ class Polygon2DTestCase(unittest.TestCase):
         assert polygon_2.area == 4
 
     def test_is_convex(self):
-        """Test the clockwise property."""
+        """Test the convex property."""
         pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
         polygon_1 = Polygon2D(pts_1)
         pts_2 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 1), Point2D(1, 1),
@@ -215,11 +211,11 @@ class Polygon2DTestCase(unittest.TestCase):
         assert new_polygon[2] == Point2D(4, 4)
         assert new_polygon[3] == Point2D(2, 4)
 
-        assert polygon.area == polygon.area
-        assert polygon.perimeter == polygon.perimeter
-        assert polygon.is_clockwise is polygon.is_clockwise
-        assert polygon.is_convex is polygon.is_convex
-        assert polygon.is_self_intersecting is polygon.is_self_intersecting
+        assert polygon.area == new_polygon.area
+        assert polygon.perimeter == new_polygon.perimeter
+        assert polygon.is_clockwise is new_polygon.is_clockwise
+        assert polygon.is_convex is new_polygon.is_convex
+        assert polygon.is_self_intersecting is new_polygon.is_self_intersecting
 
     def test_scale(self):
         """Test the Polygon2D scale method."""

@@ -293,7 +293,7 @@ class Plane(object):
         return None
 
     def is_coplanar(self, plane):
-        """Test if another Plane object is coplanar with this Plane.
+        """Test if another Plane object is perfectly coplanar with this Plane.
 
         Args:
             plane: A Plane object for which coplanartiy will be tested.
@@ -305,6 +305,25 @@ class Plane(object):
             return self.k == plane.k
         elif self.n == plane.n.reversed():
             return self.k == -plane.k
+        return False
+
+    def is_coplanar_tolerance(self, plane, tolerance, angle_tolerance):
+        """Test if another Plane object is coplanar within a certain tolerance.
+
+        Args:
+            plane: A Plane object for which coplanartiy will be tested.
+            tolerance: The distance between the two planes at which point they can
+                be considered coplanar.
+            angle_tolerance: The angle in radians that the plane normals can
+                differ from one another in order for the planes to be considered
+                coplanar.
+
+        Returns:
+            True if plane is coplanar. False if it is not coplanar.
+        """
+        if self.n.angle(plane.n) < angle_tolerance or \
+                self.n.angle(plane.n.reversed()) < angle_tolerance:
+            return self.distance_to_point(plane.o) < tolerance
         return False
 
     def duplicate(self):
