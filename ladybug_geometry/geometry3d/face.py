@@ -14,6 +14,10 @@ from ..geometry2d.polygon import Polygon2D
 from ..geometry2d.mesh import Mesh2D
 
 import math
+try:
+    from itertools import izip as zip  # python 2
+except ImportError:
+    xrange = range  # python 3
 
 
 class Face3D(Base2DIn3D):
@@ -443,6 +447,50 @@ class Face3D(Base2DIn3D):
                         'to plane is {}'.format(_v, self._plane.distance_to_point(_v)))
                 else:
                     return False
+        return True
+
+    def is_geometrically_equivalent(self, face, tolerance):
+        """Check whether a given face is geometrically equivalent to this Face.
+
+        Geometrical equivalence is definied as being coplananar with this face,
+        having the same number of vertices, and having each vertex map-able between
+        the faces. Clockwise relationships do not have to match nor does the normal
+        direction of the face.  However, all other properties will be matching to
+        within the input tolerance.
+
+        Args:
+            face: Another face for which geometric equivalency will be tested.
+            tolerance: The minimum difference between the coordinate values of two
+                vertices at which they can be considered geometrically equivalent.
+        Returns:
+            True if geometrically equivalent.  False if not geometrically equivalent.
+        """
+        # rule out surfaces if they don't fit key criteria
+        if not self.center.is_equivalent(face.center, tolerance):
+            return False
+        if len(self.vertices) != len(face.vertices):
+            return False
+
+        # see if we can find a matching vertex
+        match_i = None
+        for i, pt in enumerate(self.vertices):
+            if pt.is_equivalent(face[0], tolerance):
+                match_i = i
+                break
+
+        # check equivalency of each vertex
+        if match_i is None:
+            return False
+        elif self[match_i + 1].is_equivalent(face[1], tolerance):
+            for i in xrange(0, -len(self.vertices), -1):
+                if self[match_i + i].is_equivalent(face[i], tolerance) is False:
+                    return False
+        elif self[match_i - 1].is_equivalent(face[1], tolerance):
+            for i in xrange(len(self.vertices)):
+                if self[match_i - i].is_equivalent(face[i], tolerance) is False:
+                    return False
+        else:
+            return False
         return True
 
     def flip(self):

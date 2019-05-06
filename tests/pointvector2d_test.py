@@ -45,6 +45,16 @@ class Point2DTestCase(unittest.TestCase):
         pt_2 = Point2D(2, 2)
         assert pt_1.distance_to_point(pt_2) == 2
 
+    def test_is_equivalent(self):
+        """Test the is_equivalent method."""
+        pt_1 = Point2D(0, 2)
+        pt_2 = Point2D(0.00001, 2)
+        pt_3 = Point2D(0, 1)
+
+        assert pt_1.is_equivalent(pt_2, 0.0001) is True
+        assert pt_1.is_equivalent(pt_2, 0.0000001) is False
+        assert pt_1.is_equivalent(pt_3, 0.0001) is False
+
     def test_vector2_mutability(self):
         """Test the mutability and immutability of Vector2D objects."""
         vec = Vector2D(0, 2)

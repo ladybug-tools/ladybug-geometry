@@ -384,6 +384,23 @@ class Point3D(Vector3D):
         vec = (self.x - point.x, self.y - point.y, self.z - point.z)
         return math.sqrt(vec[0] ** 2 + vec[1] ** 2 + vec[2] ** 2)
 
+    def is_equivalent(self, point, tolerance):
+        """Test whether this point is equivalent to another within a certain tolerance.
+
+        Note that if you want to test whether the coordinate values are perfectly
+        equal to one another, the == operator can be used.
+
+        Args:
+            point: Another Point3D for which geometric equivalency will be tested.
+            tolerance: The minimum difference between the coordinate values of two
+                points at which they can be considered geometrically equivalent.
+        Returns:
+            True if equivalent.  False if not equivalent.
+        """
+        return abs(self.x - point.x) < tolerance and \
+            abs(self.y - point.y) < tolerance and \
+            abs(self.z - point.z) < tolerance
+
     def to_immutable(self):
         """Get an immutable version of this object."""
         return Point3DImmutable(self.x, self.y, self.z)
