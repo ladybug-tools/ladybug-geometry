@@ -633,6 +633,24 @@ class Face3DTestCase(unittest.TestCase):
         assert face.project_point(pt_3) is None
         assert face.project_point(pt_4) is None
 
+    def test_sub_faces_by_ratio(self):
+        """Test the sub_faces_by_ratio method."""
+        pts_1 = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
+        pts_2 = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 1), Point3D(1, 1),
+                 Point3D(1, 2), Point3D(0, 2))
+        plane = Plane(Vector3D(0, 0, 1))
+        face_1 = Face3D(pts_1, plane)
+        face_2 = Face3D(pts_2, plane)
+
+        sub_faces_1 = face_1.sub_faces_by_ratio(0.5)
+        assert len(sub_faces_1) == 1
+        assert sub_faces_1[0].area == pytest.approx(face_1.area * 0.5, rel=1e-3)
+
+        sub_faces_2 = face_2.sub_faces_by_ratio(0.5)
+        assert len(sub_faces_2) == 4
+        areas = [srf.area for srf in sub_faces_2]
+        assert sum(areas) == pytest.approx(face_2.area * 0.5, rel=1e-3)
+
     def test_get_mesh_grid(self):
         """Test the Face3D get_mesh_grid method."""
         pts = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))

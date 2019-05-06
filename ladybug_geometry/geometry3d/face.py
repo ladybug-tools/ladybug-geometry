@@ -660,6 +660,32 @@ class Face3D(Base2DIn3D):
             return _plane_int
         return None
 
+    def sub_faces_by_ratio(self, ratio):
+        """Get a list of sub faces to this one using a ratio between 0 and 1.
+
+        The combined area of the sub faces will be equal to the area of this
+        face multiplied by the ratio.  All sub faces will lie inside the
+        boundaries of this face.
+
+        Args:
+            ratio: A number between 0 and 1 for the ratio between the area of
+                the sub faces and the area of this face.
+
+        Returns:
+            A list of Face3D objects for sub faces.
+        """
+        scale_factor = ratio ** .5
+        if self.is_convex:
+            return [self.scale(scale_factor, self.centroid)]
+        else:
+            _tri_mesh = self.triangulated_mesh3d
+            _tri_faces = [[_tri_mesh[i] for i in face] for face in _tri_mesh.faces]
+            _scaled_verts = []
+            for i, _tri in enumerate(_tri_faces):
+                _scaled_verts.append(
+                    [pt.scale(scale_factor, _tri_mesh.face_centroids[i]) for pt in _tri])
+            return [Face3D(_t, self.plane) for _t in _scaled_verts]
+
     def get_mesh_grid(self, x_dim, y_dim=None, offset=None, flip=False,
                       generate_centroids=True):
         """Get a gridded Mesh3D from over this face.
