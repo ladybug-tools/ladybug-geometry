@@ -4,11 +4,13 @@ from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D, \
     Point3DImmutable
 from ladybug_geometry.geometry3d.plane import Plane
 from ladybug_geometry.geometry3d.line import LineSegment3D, LineSegment3DImmutable
+from ladybug_geometry.geometry3d.ray import Ray3D
 from ladybug_geometry.geometry3d.face import Face3D
 
 
 import unittest
 import pytest
+import math
 
 
 class Face3DTestCase(unittest.TestCase):
@@ -402,6 +404,238 @@ class Face3DTestCase(unittest.TestCase):
         assert face_1.is_clockwise is new_face.is_clockwise
         assert face_1.is_convex is new_face.is_convex
         assert face_1.is_self_intersecting is new_face.is_self_intersecting
+        assert new_face.normal == face_1.normal
+
+    def test_scale(self):
+        """Test the Face3D scale method."""
+        pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
+        plane_1 = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+        face_1 = Face3D(pts_1, plane_1)
+        pts_2 = (Point3D(1, 1), Point3D(2, 1), Point3D(2, 2), Point3D(1, 2))
+        plane_2 = Plane(Vector3D(0, 0, 1))
+        face_2 = Face3D(pts_2, plane_2)
+        origin_1 = Point3D(2, 0)
+        origin_2 = Point3D(1, 1)
+
+        new_face_1 = face_1.scale(2, origin_1)
+        assert new_face_1[0] == Point3D(-2, 0, 4)
+        assert new_face_1[1] == Point3D(2, 0, 4)
+        assert new_face_1[2] == Point3D(2, 4, 4)
+        assert new_face_1[3] == Point3D(-2, 4, 4)
+        assert new_face_1.area == face_1.area ** 2
+        assert new_face_1.perimeter == face_1.perimeter * 2
+        assert new_face_1.is_clockwise is face_1.is_clockwise
+        assert new_face_1.is_convex is face_1.is_convex
+        assert new_face_1.is_self_intersecting is face_1.is_self_intersecting
+        assert new_face_1.normal == face_1.normal
+
+        new_face_2 = face_2.scale(2, origin_2)
+        assert new_face_2[0] == Point3D(1, 1)
+        assert new_face_2[1] == Point3D(3, 1)
+        assert new_face_2[2] == Point3D(3, 3)
+        assert new_face_2[3] == Point3D(1, 3)
+        assert new_face_2.area == 4
+        assert new_face_2.perimeter == face_2.perimeter * 2
+        assert new_face_2.is_clockwise is face_2.is_clockwise
+        assert new_face_2.is_convex is face_2.is_convex
+        assert new_face_2.is_self_intersecting is face_2.is_self_intersecting
+        assert new_face_2.normal == face_2.normal
+
+    def test_scale_world_origin(self):
+        """Test the Face3D scale_world_origin method."""
+        pts = (Point3D(1, 1, 2), Point3D(2, 1, 2), Point3D(2, 2, 2), Point3D(1, 2, 2))
+        plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+        face = Face3D(pts, plane)
+
+        new_face = face.scale_world_origin(2)
+        assert new_face[0] == Point3D(2, 2, 4)
+        assert new_face[1] == Point3D(4, 2, 4)
+        assert new_face[2] == Point3D(4, 4, 4)
+        assert new_face[3] == Point3D(2, 4, 4)
+        assert new_face.area == 4
+        assert new_face.perimeter == face.perimeter * 2
+        assert new_face.is_clockwise is face.is_clockwise
+        assert new_face.is_convex is face.is_convex
+        assert new_face.is_self_intersecting is face.is_self_intersecting
+        assert new_face.normal == face.normal
+
+    def test_rotate(self):
+        """Test the Face3D rotate method."""
+        pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
+        plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+        face = Face3D(pts, plane)
+        origin = Point3D(0, 0, 0)
+        axis = Vector3D(1, 0, 0)
+
+        test_1 = face.rotate(axis, math.pi, origin)
+        assert test_1[0].x == pytest.approx(0, rel=1e-3)
+        assert test_1[0].y == pytest.approx(0, rel=1e-3)
+        assert test_1[0].z == pytest.approx(-2, rel=1e-3)
+        assert test_1[2].x == pytest.approx(2, rel=1e-3)
+        assert test_1[2].y == pytest.approx(-2, rel=1e-3)
+        assert test_1[2].z == pytest.approx(-2, rel=1e-3)
+        assert face.area == test_1.area
+        assert len(face.vertices) == len(test_1.vertices)
+
+        test_2 = face.rotate(axis, math.pi/2, origin)
+        assert test_2[0].x == pytest.approx(0, rel=1e-3)
+        assert test_2[0].y == pytest.approx(-2, rel=1e-3)
+        assert test_2[0].z == pytest.approx(0, rel=1e-3)
+        assert test_2[2].x == pytest.approx(2, rel=1e-3)
+        assert test_2[2].y == pytest.approx(-2, rel=1e-3)
+        assert test_2[2].z == pytest.approx(2, rel=1e-3)
+        assert face.area == test_2.area
+        assert len(face.vertices) == len(test_2.vertices)
+
+    def test_rotate_xy(self):
+        """Test the Face3D rotate_xy method."""
+        pts = (Point3D(1, 1, 2), Point3D(2, 1, 2), Point3D(2, 2, 2), Point3D(1, 2, 2))
+        plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+        face = Face3D(pts, plane)
+        origin_1 = Point3D(1, 1, 0)
+
+        test_1 = face.rotate_xy(math.pi, origin_1)
+        assert test_1[0].x == pytest.approx(1, rel=1e-3)
+        assert test_1[0].y == pytest.approx(1, rel=1e-3)
+        assert test_1[0].z == pytest.approx(2, rel=1e-3)
+        assert test_1[2].x == pytest.approx(0, rel=1e-3)
+        assert test_1[2].y == pytest.approx(0, rel=1e-3)
+        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+
+        test_2 = face.rotate_xy(math.pi/2, origin_1)
+        assert test_2[0].x == pytest.approx(1, rel=1e-3)
+        assert test_2[0].y == pytest.approx(1, rel=1e-3)
+        assert test_1[0].z == pytest.approx(2, rel=1e-3)
+        assert test_2[2].x == pytest.approx(0, rel=1e-3)
+        assert test_2[2].y == pytest.approx(2, rel=1e-3)
+        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+
+    def test_reflect(self):
+        """Test the Face3D reflect method."""
+        pts = (Point3D(1, 1, 2), Point3D(2, 1, 2), Point3D(2, 2, 2), Point3D(1, 2, 2))
+        plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+        face = Face3D(pts, plane)
+
+        origin_1 = Point3D(1, 0, 2)
+        normal_1 = Vector3D(1, 0, 0)
+        normal_2 = Vector3D(-1, -1, 0).normalized()
+
+        test_1 = face.reflect(normal_1, origin_1)
+        assert test_1[0].x == pytest.approx(1, rel=1e-3)
+        assert test_1[0].y == pytest.approx(1, rel=1e-3)
+        assert test_1[0].z == pytest.approx(2, rel=1e-3)
+        assert test_1[2].x == pytest.approx(0, rel=1e-3)
+        assert test_1[2].y == pytest.approx(2, rel=1e-3)
+        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+
+        test_1 = face.reflect(normal_2, Point3D(0, 0, 2))
+        assert test_1[0].x == pytest.approx(-1, rel=1e-3)
+        assert test_1[0].y == pytest.approx(-1, rel=1e-3)
+        assert test_1[0].z == pytest.approx(2, rel=1e-3)
+        assert test_1[2].x == pytest.approx(-2, rel=1e-3)
+        assert test_1[2].y == pytest.approx(-2, rel=1e-3)
+        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+
+        test_2 = face.reflect(normal_2, origin_1)
+        assert test_2[0].x == pytest.approx(0, rel=1e-3)
+        assert test_2[0].y == pytest.approx(0, rel=1e-3)
+        assert test_2[0].z == pytest.approx(2, rel=1e-3)
+        assert test_2[2].x == pytest.approx(-1, rel=1e-3)
+        assert test_2[2].y == pytest.approx(-1, rel=1e-3)
+        assert test_2[2].z == pytest.approx(2, rel=1e-3)
+
+    def test_intersect_line_ray(self):
+        """Test the Face3D intersect_line_ray method."""
+        pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 1, 2), Point3D(1, 1, 2),
+               Point3D(1, 2, 2), Point3D(0, 2, 2))
+        plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+        face = Face3D(pts, plane)
+        ray_1 = Ray3D(Point3D(0.5, 0.5, 0), Vector3D(0, 0, 1))
+        ray_2 = Ray3D(Point3D(0.5, 0.5, 0), Vector3D(0, 0, -1))
+        ray_3 = Ray3D(Point3D(1.5, 1.5, 0), Vector3D(0, 0, 1))
+        ray_4 = Ray3D(Point3D(-1, -1, 0), Vector3D(0, 0, 1))
+        line_1 = LineSegment3D(Point3D(0.5, 0.5, 0), Vector3D(0, 0, 3))
+        line_2 = LineSegment3D(Point3D(0.5, 0.5, 0), Vector3D(0, 0, 1))
+
+        assert face.intersect_line_ray(ray_1) == Point3D(0.5, 0.5, 2)
+        assert face.intersect_line_ray(ray_2) is None
+        assert face.intersect_line_ray(ray_3) is None
+        assert face.intersect_line_ray(ray_4) is None
+        assert face.intersect_line_ray(line_1) == Point3D(0.5, 0.5, 2)
+        assert face.intersect_line_ray(line_2) is None
+
+    def test_intersect_plane(self):
+        """Test the Face3D intersect_plane method."""
+        pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 1, 2), Point3D(1, 1, 2),
+               Point3D(1, 2, 2), Point3D(0, 2, 2))
+        plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+        face = Face3D(pts, plane)
+
+        plane_1 = Plane(Vector3D(0, 1, 0), Point3D(0.5, 0.5, 0))
+        plane_2 = Plane(Vector3D(1, 0, 0), Point3D(0.5, 0.5, 0))
+        plane_3 = Plane(Vector3D(0, 1, 0), Point3D(0.5, 1.5, 0))
+        plane_4 = Plane(Vector3D(0, 1, 0), Point3D(0, 3, 0))
+        plane_5 = Plane(Vector3D(1, 1, 0), Point3D(0, 2.5, 0))
+
+        assert len(face.intersect_plane(plane_1)) == 1
+        assert face.intersect_plane(plane_1)[0].p1 == Point3D(2, 0.5, 2)
+        assert face.intersect_plane(plane_1)[0].p2 == Point3D(0, 0.5, 2)
+        assert len(face.intersect_plane(plane_2)) == 1
+        assert face.intersect_plane(plane_2)[0].p1 == Point3D(0.5, 0, 2)
+        assert face.intersect_plane(plane_2)[0].p2 == Point3D(0.5, 2, 2)
+        assert len(face.intersect_plane(plane_3)) == 1
+        assert face.intersect_plane(plane_3)[0].p1 == Point3D(1, 1.5, 2)
+        assert face.intersect_plane(plane_3)[0].p2 == Point3D(0, 1.5, 2)
+        assert face.intersect_plane(plane_4) is None
+        assert len(face.intersect_plane(plane_5)) == 2
+
+    def test_project_point(self):
+        """Test the Face3D project_point method."""
+        pts = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 1), Point3D(1, 1),
+               Point3D(1, 2), Point3D(0, 2))
+        plane = Plane(Vector3D(0, 0, 1))
+        face = Face3D(pts, plane)
+
+        pt_1 = Point3D(0.5, 0.5, 2)
+        pt_2 = Point3D(0.5, 0.5, -2)
+        pt_3 = Point3D(1.5, 1.5, 2)
+        pt_4 = Point3D(-1, -1, 2)
+
+        assert face.project_point(pt_1) == Point3D(0.5, 0.5, 0)
+        assert face.project_point(pt_2) == Point3D(0.5, 0.5, 0)
+        assert face.project_point(pt_3) is None
+        assert face.project_point(pt_4) is None
+
+    def test_get_mesh_grid(self):
+        """Test the Face3D get_mesh_grid method."""
+        pts = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
+        plane = Plane(Vector3D(0, 0, 1))
+        face = Face3D(pts, plane)
+        mesh = face.get_mesh_grid(0.5)
+
+        assert len(mesh.vertices) == 25
+        assert len(mesh.faces) == 16
+        assert mesh.area == 4
+
+        assert mesh.min.x == pytest.approx(0.0000001, rel=1e-2)
+        assert mesh.min.y == pytest.approx(0.0000001, rel=1e-2)
+        assert mesh.min.z == pytest.approx(0, rel=1e-2)
+        assert mesh.max.x == pytest.approx(2., rel=1e-2)
+        assert mesh.max.y == pytest.approx(2., rel=1e-2)
+        assert mesh.max.z == pytest.approx(0, rel=1e-2)
+        assert mesh.center.x == pytest.approx(1, rel=1e-2)
+        assert mesh.center.y == pytest.approx(1, rel=1e-2)
+        assert len(mesh.face_areas) == 16
+        assert mesh.face_areas[0] == 0.25
+        assert len(mesh.face_centroids) == 16
+
+        mesh_2 = face.get_mesh_grid(0.5, 0.5, 1, False)
+        mesh_3 = face.get_mesh_grid(0.5, 0.5, 1, True)
+
+        assert mesh_2.min.z == pytest.approx(1, rel=1e-2)
+        assert mesh_2.max.z == pytest.approx(1, rel=1e-2)
+        assert mesh_3.min.z == pytest.approx(-1, rel=1e-2)
+        assert mesh_3.max.z == pytest.approx(-1, rel=1e-2)
 
 
 if __name__ == "__main__":

@@ -586,7 +586,8 @@ class Face3D(Base2DIn3D):
                 _int_pt3d = [self._plane.xy_to_xyz(pt) for pt in _int_pt2d]
                 _int_seg3d = []
                 for i in range(0, len(_int_pt3d) - 1, 2):
-                    _int_seg3d.append(LineSegment3D(_int_pt3d[i], _int_pt3d[i + 1]))
+                    _int_seg3d.append(LineSegment3D.from_end_points(
+                        _int_pt3d[i], _int_pt3d[i + 1]))
                 return _int_seg3d
         return None
 
