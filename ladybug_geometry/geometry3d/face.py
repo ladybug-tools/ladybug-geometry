@@ -8,6 +8,8 @@ from .plane import Plane
 from .mesh import Mesh3D
 from ._2d import Base2DIn3D
 
+from ..intersection3d import closest_point3d_on_line3d
+
 from ..geometry2d.pointvector import Vector2D
 from ..geometry2d.ray import Ray2D
 from ..geometry2d.polygon import Polygon2D
@@ -419,36 +421,6 @@ class Face3D(Base2DIn3D):
         """Boolean noting whther the face has holes within it."""
         return self._holes is not None
 
-    def validate_planarity(self, tolerance, raise_exception=True):
-        """Validate that all of the face's vertices lie within the face's plane.
-
-        This check is not done by default when creating the face since
-        it is assumed that there is likely a check for planarity before the face
-        is created (ie. in CAD software where the face likely originates from).
-        This method is intended for quality control checking when the origin of
-        face geometry is unkown or is known to come from a place where no
-        planarity check was performed.
-
-        Args:
-            tolerance: The minimum distance between a given vertex and a the
-                face's plane at which the vertex is said to lie in the plane.
-            raise_exception: Boolean to note whether an exception should be raised
-                if a vertex does not lie within the face's plane. If True, an
-                exception message will be given in such cases, which notes the non-planar
-                vertex and its distance from the plane. If False, this method will
-                simply return a False boolean if a vertex is found that is out
-                of plane. Default is True to raise an exception.
-        """
-        for _v in self.vertices:
-            if self._plane.distance_to_point(_v) > tolerance:
-                if raise_exception is True:
-                    raise AttributeError(
-                        'Vertex {} is out of plane with its parent face.\nDistance '
-                        'to plane is {}'.format(_v, self._plane.distance_to_point(_v)))
-                else:
-                    return False
-        return True
-
     def is_geometrically_equivalent(self, face, tolerance):
         """Check whether a given face is geometrically equivalent to this Face.
 
@@ -492,6 +464,62 @@ class Face3D(Base2DIn3D):
         else:
             return False
         return True
+
+    def validate_planarity(self, tolerance, raise_exception=True):
+        """Validate that all of the face's vertices lie within the face's plane.
+
+        This check is not done by default when creating the face since
+        it is assumed that there is likely a check for planarity before the face
+        is created (ie. in CAD software where the face likely originates from).
+        This method is intended for quality control checking when the origin of
+        face geometry is unkown or is known to come from a place where no
+        planarity check was performed.
+
+        Args:
+            tolerance: The minimum distance between a given vertex and a the
+                face's plane at which the vertex is said to lie in the plane.
+            raise_exception: Boolean to note whether an exception should be raised
+                if a vertex does not lie within the face's plane. If True, an
+                exception message will be given in such cases, which notes the non-planar
+                vertex and its distance from the plane. If False, this method will
+                simply return a False boolean if a vertex is found that is out
+                of plane. Default is True to raise an exception.
+
+        Return:
+            True if planar. False is not planar.
+        """
+        for _v in self.vertices:
+            if self._plane.distance_to_point(_v) > tolerance:
+                if raise_exception is True:
+                    raise AttributeError(
+                        'Vertex {} is out of plane with its parent face.\nDistance '
+                        'to plane is {}'.format(_v, self._plane.distance_to_point(_v)))
+                else:
+                    return False
+        return True
+
+    def remove_colinear_vertices(self, tolerance):
+        """Get a version of this face with colinear vertices removed.
+
+        Args:
+            tolerance: The minimum distance between a vertex and the boundary segments
+                at which point the vertex is considered colinear.
+        """
+        if len(self.vertices) == 3:
+            return self
+        new_vertices = []
+        _poly = self.polygon2d
+        for i, _v in enumerate(_poly.vertices):
+            _a = _poly[i - 2].determinant(_poly[i - 1]) + \
+                _poly[i - 1].determinant(_v) + _v.determinant(_poly[i - 2])
+            if abs(_a) > tolerance:
+                new_vertices.append(self[i - 1])
+        _new_face = Face3D(new_vertices, self.plane)
+        if not self.has_holes:
+            return _new_face
+        _new_face._boundary = self._remove_colinear(self._boundary, tolerance)
+        _new_face._holes = self._remove_colinear(self._holes, tolerance)
+        return _new_face
 
     def flip(self):
         """Get a face with a flipped direction from this one.
@@ -660,12 +688,115 @@ class Face3D(Base2DIn3D):
             return _plane_int
         return None
 
-    def sub_faces_by_ratio(self, ratio):
-        """Get a list of sub faces to this one using a ratio between 0 and 1.
+    def get_top_bottom_horizontal_edges(self, tolerance):
+        """Get top and bottom horizontal edges of this Face if they exist.
 
-        The combined area of the sub faces will be equal to the area of this
-        face multiplied by the ratio.  All sub faces will lie inside the
-        boundaries of this face.
+        Args:
+            tolerance: The maximum difference between the z values of the start and
+                end coordinates at which an edge is considered horizontal.
+
+        Returns:
+            (bottom_edge, top_edge) with each as LineSegment3D if they exist.
+            None if they do not exist.
+        """
+        # test if each of the edges are vertical.
+        horizontal_edges = []
+        for edge in self.boundary_segments:
+            if edge.is_edge_horizontal(tolerance):
+                horizontal_edges.append(edge)
+
+        if len(horizontal_edges) < 2:
+            return None
+        else:
+            sorted_edges = sorted(horizontal_edges, key=lambda edge: edge.p.z)
+            return sorted_edges[0], sorted_edges[1]
+
+    def get_left_right_vertical_edges(self, tolerance):
+        """Get left and right vertical edges of this Face if they exist.
+
+        Args:
+            tolerance: The maximum difference between the x any y values of the start
+                and end coordinates at which an edge is considered vertical.
+
+        Returns:
+            (left_edge, right_edge) with each as LineSegment3D if they exist. Left in
+            this case is defined as the edge with the lower X coordinates.
+            Result will be None if vertical edges do not exist.
+        """
+        # test if each of the edges are vertical.
+        vertical_edges = []
+        for edge in self.boundary_segments:
+            if edge.is_edge_vertical(tolerance):
+                vertical_edges.append(edge)
+
+        if len(vertical_edges) < 2:
+            return None
+        else:
+            if abs(self.normal.x) != 1:
+                sorted_edges = sorted(vertical_edges, key=lambda edge: edge.p.x)
+            else:
+                sorted_edges = sorted(vertical_edges, key=lambda edge: edge.p.y)
+            return sorted_edges[0], sorted_edges[-1]
+
+    def extract_rectangle(self, tolerance):
+        """Extract top and bottom line segments of a rectangle within this Face.
+
+        This method will only return geometry if:
+            1. There are no holes in the face.
+            2. The face is not within a horizontal plane.
+            3. There are two parallel edges to this face, which are either
+                oriented horizontally or vertically.
+            4. There must be enough horizontal or vertical overlap between
+                these edges for a rectangle to be drawn between them.
+        If this Face does not satisfy this criteria, None will be returned.
+
+        Args:
+            tolerance: The maximum difference between point values for them to be
+                considered a part of a rectangle.
+
+        Returns:
+            bottom_edge: A LineSegment3D representing the bottom of the rectangle.
+            top_edge: A LineSegment3D representing the top of the rectangle.
+            other_faces: A list of Face3D objects for the parts of this face not
+                included in the rectangle. The length of this list will be between
+                0 (if this face is already rectangular) and 2 (if there are non-
+                rectangular geometries on either side of the rectangle.)
+        """
+        # perform checks on the face to see if a rectangle is extractable
+        if self.has_holes:
+            return None
+        if abs(self.normal.x) < tolerance and abs(self.normal.y) < tolerance:
+            # face lies within a horizontal plane; we cannot distinguish top and bottom
+            return None
+        clean_face = self.remove_colinear_vertices(tolerance)
+
+        # try to extract a rectangle from horizontal curves
+        horiz_result = clean_face.get_top_bottom_horizontal_edges(tolerance)
+        if horiz_result is not None:
+            bottom_seg, top_seg = horiz_result
+            split_res = clean_face._split_with_rectangle(bottom_seg, top_seg, tolerance)
+            if split_res is not None:
+                return LineSegment3D.from_end_points(split_res[0][1], split_res[0][3]), \
+                    LineSegment3D.from_end_points(split_res[0][0], split_res[0][2]), \
+                    split_res[1]
+
+        # try to extract a rectangle from vertical curves
+        vert_result = clean_face.get_left_right_vertical_edges(tolerance)
+        if vert_result is not None:
+            left_seg, right_seg = vert_result
+            split_res = clean_face._split_with_rectangle(left_seg, right_seg, tolerance)
+            if split_res is not None:
+                seg_1 = LineSegment3D.from_end_points(split_res[0][0], split_res[0][1])
+                seg_2 = LineSegment3D.from_end_points(split_res[0][2], split_res[0][3])
+                sorted_edges = sorted([seg_1, seg_2], key=lambda edge: edge.p.z)
+                return sorted_edges[0], sorted_edges[1], split_res[1]
+
+        return None
+
+    def sub_faces_by_ratio(self, ratio):
+        """Get a list of faces with a combined area equal to the ratio times this face area.
+
+        All sub faces will lie inside the boundaries of this face.
 
         Args:
             ratio: A number between 0 and 1 for the ratio between the area of
@@ -685,6 +816,36 @@ class Face3D(Base2DIn3D):
                 _scaled_verts.append(
                     [pt.scale(scale_factor, _tri_mesh.face_centroids[i]) for pt in _tri])
             return [Face3D(_t, self.plane) for _t in _scaled_verts]
+
+    def sub_faces_by_ratio_rectangle(self, ratio, tolerance):
+        """Get a list of faces with a combined area equal to the ratio times this face area.
+
+        This function is virtually equivalent to the sub_faces_by_ratio method
+        but a check will be performed to see if any rectangles can be pulled out
+        of this face's geometry. This tends to make the result a bit cleaner,
+        especially for concave faces that have rectangles (like L-shaped faces).
+
+        Args:
+            ratio: A number between 0 and 1 for the ratio between the area of
+                the sub faces and the area of this face.
+            tolerance: The maximum difference between point values for them to be
+                considered a part of a rectangle.
+
+        Returns:
+            A list of Face3D objects for sub faces.
+        """
+        rect_res = self.extract_rectangle(tolerance)
+        if rect_res is None:
+            return self.sub_faces_by_ratio(ratio)
+        bottom_seg, top_seg, other_faces = rect_res
+        sub_faces = []
+        for face in other_faces:
+            sub_faces.extend(face.sub_faces_by_ratio(ratio))
+        rect_face = Face3D([bottom_seg.p1, bottom_seg.p2, top_seg.p1, top_seg.p2],
+                           self.plane)
+        scale_factor = ratio ** .5
+        sub_faces.append(rect_face.scale(scale_factor, rect_face.center))
+        return sub_faces
 
     def get_mesh_grid(self, x_dim, y_dim=None, offset=None, flip=False,
                       generate_centroids=True):
@@ -824,6 +985,92 @@ class Face3D(Base2DIn3D):
             new_face._perimeter = self._perimeter * factor
         if self._area is not None:
             new_face._area = self._area * factor
+
+    def _remove_colinear(self, vertices, tolerance):
+        """Remove colinear vertices from a list of Point3D."""
+        pts_2d = tuple(self.plane.xyz_to_xy(_v) for _v in vertices)
+        new_vertices = []
+        for i, _v in enumerate(pts_2d):
+            _a = pts_2d[i - 2].determinant(pts_2d[i - 1]) + \
+                pts_2d[i - 1].determinant(_v) + _v.determinant(pts_2d[i - 2])
+            if abs(_a) > tolerance:
+                new_vertices.append(vertices[i - 1])
+        return new_vertices
+
+    def _vertices_between_points(self, start_pt, end_pt):
+        """Get the vertices between a start and end point.
+
+        This method is used by the extract_rectangle method.
+        """
+        new_verts = [start_pt]
+        vert_ind = self.vertices.index(start_pt)
+        found_other = False
+        while found_other is False:
+            vert_ind -= 1
+            new_verts.append(self[vert_ind])
+            if self[vert_ind] == end_pt:
+                found_other = True
+        return new_verts
+
+    def _split_with_rectangle(self, edge_1, edge_2, tolerance):
+        """Split this shape using two parallel edges of the face.
+
+        Result will be None if no rectangle can be obtained.
+
+        Returns:
+            rectangle_points: A tuple of 4 points that make the rectangle.
+            other_faces: A list of faces for the other parts of this Face that
+                are not a part of the rectangle.
+        """
+        # compute the 4 points defining the rectangle
+        close_pt_1 = closest_point3d_on_line3d(edge_1.p1, edge_2)
+        close_pt_2 = closest_point3d_on_line3d(edge_2.p2, edge_1)
+        close_pt_3 = closest_point3d_on_line3d(edge_1.p2, edge_2)
+        close_pt_4 = closest_point3d_on_line3d(edge_2.p1, edge_1)
+
+        # check that there is overlap between the top and bottom curves
+        if close_pt_1.is_equivalent(edge_2.p1, tolerance) or \
+                close_pt_3.is_equivalent(edge_2.p2, tolerance):
+            return None
+
+        # check that the two sides of the rectangle are inside the polygon.
+        mid_pt_1 = self.plane.xyz_to_xy(
+            LineSegment3D.from_end_points(close_pt_1, close_pt_2).midpoint)
+        mid_pt_2 = self.plane.xyz_to_xy(
+            LineSegment3D.from_end_points(close_pt_3, close_pt_4).midpoint)
+        if self.polygon2d.point_relationship(mid_pt_1, tolerance) == -1 or \
+                self.polygon2d.point_relationship(mid_pt_2, tolerance) == -1:
+            return None
+
+        # get extra faces outside of the rectangle
+        other_faces = []
+        edge_pts_1 = self._vertices_between_points(edge_1.p1, edge_2.p2)
+        if close_pt_1.is_equivalent(edge_2.p2, tolerance) is False:
+            edge_pts_1.append(close_pt_1)
+            other_faces.append(Face3D(edge_pts_1, self.plane))
+        elif close_pt_2.is_equivalent(edge_1.p1, tolerance) is False:
+            edge_pts_1.append(close_pt_2)
+            other_faces.append(Face3D(edge_pts_1, self.plane))
+        elif len(edge_pts_1) > 2:
+            other_faces.append(Face3D(edge_pts_1, self.plane))
+
+        edge_pts_2 = self._vertices_between_points(edge_2.p1, edge_1.p2)
+        if close_pt_3.is_equivalent(edge_2.p1, tolerance) is False:
+            edge_pts_2.append(close_pt_3)
+            other_faces.append(Face3D(edge_pts_2, self.plane))
+        elif close_pt_4.is_equivalent(edge_1.p2, tolerance) is False:
+            edge_pts_2.append(close_pt_4)
+            other_faces.append(Face3D(edge_pts_2, self.plane))
+        elif len(edge_pts_2) > 2:
+            other_faces.append(Face3D(edge_pts_2, self.plane))
+
+        # check that any new faces are not self intersecting
+        for new_face in other_faces:
+            if new_face.is_self_intersecting:
+                return None
+
+        # return the rectangle edges and the extra faces
+        return (close_pt_1, close_pt_2, close_pt_3, close_pt_4), other_faces
 
     @staticmethod
     def _plane_from_vertices(vertices):

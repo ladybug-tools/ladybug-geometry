@@ -177,6 +177,17 @@ class Polygon2DTestCase(unittest.TestCase):
         assert polygon.max == Point2D(2, 2)
         assert polygon.center == Point2D(1, 1)
 
+    def test_remove_colinear_vertices(self):
+        """Test the remove_colinear_vertices method of Polygon2D."""
+        pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+        pts_2 = (Point2D(0, 0), Point2D(1, 0), Point2D(2, 0), Point2D(2, 2),
+                 Point2D(0, 2))
+        polygon_1 = Polygon2D(pts_1)
+        polygon_2 = Polygon2D(pts_2)
+
+        assert len(polygon_1.remove_colinear_vertices(0.0001).vertices) == 4
+        assert len(polygon_2.remove_colinear_vertices(0.0001).vertices) == 4
+
     def test_polygon2d_duplicate(self):
         """Test the duplicate method of Polygon2D."""
         pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))

@@ -219,11 +219,17 @@ class LineSegment2D(Base1DIn2D):
         """Get an immutable version of this object."""
         return LineSegment2DImmutable(self.p, self.v)
 
+    def _u_in(self, u):
+        return u >= 0.0 and u <= 1.0
+
     def __abs__(self):
         return abs(self.v)
 
-    def _u_in(self, u):
-        return u >= 0.0 and u <= 1.0
+    def __eq__(self, other):
+        if isinstance(other, LineSegment2D):
+            return self.p == other.p and self.v == other.v
+        else:
+            return False
 
     def __repr__(self):
         return 'LineSegment2D (<%.2f, %.2f> to <%.2f, %.2f>)' % \

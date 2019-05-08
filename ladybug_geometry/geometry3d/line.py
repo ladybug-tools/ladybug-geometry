@@ -70,6 +70,24 @@ class LineSegment3D(Base1DIn3D):
         """The length of the line segment."""
         return self.v.magnitude
 
+    def is_edge_horizontal(edge, tolerance):
+        """Test whether this line segment is horizontal within a certain tolerance.
+
+        Args:
+            tolerance: The maximum difference between the z values of the start and
+                end coordinates at which the line segment is considered horizontal.
+        """
+        return abs(edge.v.z) < tolerance
+
+    def is_edge_vertical(edge, tolerance):
+        """Test whether this line segment is vertical within a certain tolerance.
+
+        Args:
+            tolerance: The maximum difference between the x and y values of the start
+                and end coordinates at which the line segment is considered horizontal.
+        """
+        return abs(edge.v.x) < tolerance and abs(edge.v.y) < tolerance
+
     def flip(self):
         """Flip the direction of the line segment."""
         self.p = self.p2
@@ -202,11 +220,17 @@ class LineSegment3D(Base1DIn3D):
         """Get an immutable version of this object."""
         return LineSegment3DImmutable(self.p, self.v)
 
+    def _u_in(self, u):
+        return u >= 0.0 and u <= 1.0
+
     def __abs__(self):
         return abs(self.v)
 
-    def _u_in(self, u):
-        return u >= 0.0 and u <= 1.0
+    def __eq__(self, other):
+        if isinstance(other, LineSegment3D):
+            return self.p == other.p and self.v == other.v
+        else:
+            return False
 
     def __repr__(self):
         return 'LineSegment3D (<%.2f, %.2f, %.2f> to <%.2f, %.2f, %.2f>)' % \

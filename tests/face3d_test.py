@@ -348,6 +348,18 @@ class Face3DTestCase(unittest.TestCase):
         assert face.is_convex == new_face.is_convex
         assert face.is_self_intersecting == new_face.is_self_intersecting
 
+    def test_remove_colinear_vertices(self):
+        """Test the remove_colinear_vertices method of Face3D."""
+        pts_1 = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 2), Point3D(0, 2))
+        pts_2 = (Point3D(0, 0), Point3D(1, 0), Point3D(2, 0), Point3D(2, 2),
+                 Point3D(0, 2))
+        plane_1 = Plane(Vector3D(0, 0, 1))
+        face_1 = Face3D(pts_1, plane_1)
+        face_2 = Face3D(pts_2, plane_1)
+
+        assert len(face_1.remove_colinear_vertices(0.0001).vertices) == 4
+        assert len(face_2.remove_colinear_vertices(0.0001).vertices) == 4
+
     def test_triangulated_mesh_and_centroid(self):
         """Test the duplicate method of Face3D."""
         pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
@@ -632,6 +644,53 @@ class Face3DTestCase(unittest.TestCase):
         assert face.project_point(pt_2) == Point3D(0.5, 0.5, 0)
         assert face.project_point(pt_3) is None
         assert face.project_point(pt_4) is None
+
+    def test_extract_rectangle(self):
+        """Test the Face3D extract_rectangle method."""
+        pts_1 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 0, 0)]
+        pts_2 = [pt for pt in reversed(pts_1)]
+        pts_3 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(4, 0, 0)]
+        pts_4 = [Point3D(-2, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(4, 0, 0)]
+        pts_5 = [Point3D(0, 0, 0), Point3D(-2, 0, 2), Point3D(4, 0, 2), Point3D(2, 0, 0)]
+        pts_6 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(1, 0, 3), Point3D(2, 0, 2),
+                 Point3D(2, 0, 0)]
+        pts_7 = [Point3D(-2, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2),
+                 Point3D(-1, 0, 0)]
+        plane = Plane(Vector3D(0, 1, 0))
+        face_1 = Face3D(pts_1, plane)
+        face_2 = Face3D(pts_2, plane)
+        face_3 = Face3D(pts_3, plane)
+        face_4 = Face3D(pts_4, plane)
+        face_5 = Face3D(pts_5, plane)
+        face_6 = Face3D(pts_6, plane)
+        face_7 = Face3D(pts_7, plane)
+
+        f1_result = face_1.extract_rectangle(0.0001)
+        assert f1_result[0] == LineSegment3D.from_end_points(Point3D(2, 0, 0), Point3D(0, 0, 0))
+        assert f1_result[1] == LineSegment3D.from_end_points(Point3D(2, 0, 2), Point3D(0, 0, 2))
+        assert len(f1_result[2]) == 0
+        f2_result = face_2.extract_rectangle(0.0001)
+        assert f2_result[0] == LineSegment3D.from_end_points(Point3D(0, 0, 0), Point3D(2, 0, 0))
+        assert f2_result[1] == LineSegment3D.from_end_points(Point3D(0, 0, 2), Point3D(2, 0, 2))
+        assert len(f2_result[2]) == 0
+        f3_result = face_3.extract_rectangle(0.0001)
+        assert f3_result[0] == LineSegment3D.from_end_points(Point3D(2, 0, 0), Point3D(0, 0, 0))
+        assert f3_result[1] == LineSegment3D.from_end_points(Point3D(2, 0, 2), Point3D(0, 0, 2))
+        assert len(f3_result[2]) == 1
+        f4_result = face_4.extract_rectangle(0.0001)
+        assert f4_result[0] == LineSegment3D.from_end_points(Point3D(2, 0, 0), Point3D(0, 0, 0))
+        assert f4_result[1] == LineSegment3D.from_end_points(Point3D(2, 0, 2), Point3D(0, 0, 2))
+        assert len(f4_result[2]) == 2
+        f5_result = face_5.extract_rectangle(0.0001)
+        assert f5_result[0] == LineSegment3D.from_end_points(Point3D(2, 0, 0), Point3D(0, 0, 0))
+        assert f5_result[1] == LineSegment3D.from_end_points(Point3D(2, 0, 2), Point3D(0, 0, 2))
+        assert len(f5_result[2]) == 2
+        f6_result = face_6.extract_rectangle(0.0001)
+        assert f6_result[0] == LineSegment3D.from_end_points(Point3D(2, 0, 0), Point3D(0, 0, 0))
+        assert f6_result[1] == LineSegment3D.from_end_points(Point3D(2, 0, 2), Point3D(0, 0, 2))
+        assert len(f6_result[2]) == 1
+        f7_result = face_7.extract_rectangle(0.0001)
+        assert f7_result is None
 
     def test_sub_faces_by_ratio(self):
         """Test the sub_faces_by_ratio method."""

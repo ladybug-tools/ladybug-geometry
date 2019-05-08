@@ -291,9 +291,26 @@ class Polygon2D(Base2DIn2D):
                         break
         return self._is_complex
 
+    def remove_colinear_vertices(self, tolerance):
+        """Get a version of this polygon with colinear vertices removed.
+
+        Args:
+            tolerance: The minimum distance that a vertex can be from a line
+                before it is considered colinear.
+        """
+        if len(self.vertices) == 3:
+            return self
+        new_vertices = []
+        for i, _v in enumerate(self.vertices):
+            _a = self[i - 2].determinant(self[i - 1]) + self[i - 1].determinant(_v) + \
+                _v.determinant(self[i - 2])
+            if abs(_a) > tolerance:
+                new_vertices.append(self[i - 1])
+        return Polygon2D(new_vertices)
+
     def reverse(self):
         """Get a copy of this polygon where the vertices are reversed."""
-        return Polygon2D([pt for pt in reversed(self.vertices)])
+        return Polygon2D(tuple(pt for pt in reversed(self.vertices)))
 
     def move(self, moving_vec):
         """Get a polygon that has been moved along a vector.
@@ -301,7 +318,7 @@ class Polygon2D(Base2DIn2D):
         Args:
             moving_vec: A Vector2D with the direction and distance to move the polygon.
         """
-        return Polygon2D([pt.move(moving_vec) for pt in self.vertices])
+        return Polygon2D(tuple(pt.move(moving_vec) for pt in self.vertices))
 
     def rotate(self, angle, origin):
         """Get a polygon that is rotated counterclockwise by a certain angle.
@@ -310,7 +327,7 @@ class Polygon2D(Base2DIn2D):
             angle: An angle for rotation in radians.
             origin: A Point2D for the origin around which the point will be rotated.
         """
-        return Polygon2D([pt.rotate(angle, origin) for pt in self.vertices])
+        return Polygon2D(tuple(pt.rotate(angle, origin) for pt in self.vertices))
 
     def reflect(self, normal, origin):
         """Get a polygon reflected across a plane with the input normal vector and origin.
@@ -320,7 +337,7 @@ class Polygon2D(Base2DIn2D):
                 which the polygon will be reflected. THIS VECTOR MUST BE NORMALIZED.
             origin: A Point2D representing the origin from which to reflect.
         """
-        return Polygon2D([pt.reflect(normal, origin) for pt in self.vertices])
+        return Polygon2D(tuple(pt.reflect(normal, origin) for pt in self.vertices))
 
     def scale(self, factor, origin):
         """Scale a polygon by a factor from an origin point.
@@ -329,7 +346,7 @@ class Polygon2D(Base2DIn2D):
             factor: A number representing how much the polygon should be scaled.
             origin: A Point2D representing the origin from which to scale.
         """
-        return Polygon2D([pt.scale(factor, origin) for pt in self.vertices])
+        return Polygon2D(tuple(pt.scale(factor, origin) for pt in self.vertices))
 
     def scale_world_origin(self, factor):
         """Scale a polygon by a factor from the world origin. Faster than Polygon2D.scale.
@@ -337,7 +354,7 @@ class Polygon2D(Base2DIn2D):
         Args:
             factor: A number representing how much the polygon should be scaled.
         """
-        return Polygon2D([pt.scale_world_origin(factor) for pt in self.vertices])
+        return Polygon2D(tuple(pt.scale_world_origin(factor) for pt in self.vertices))
 
     def intersect_line_ray(self, line_ray):
         """Get the intersections between this polygon and a Ray2D or LineSegment2D.
