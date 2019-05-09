@@ -692,6 +692,15 @@ class Face3DTestCase(unittest.TestCase):
         f7_result = face_7.extract_rectangle(0.0001)
         assert f7_result is None
 
+    def test_extract_rectangle_complex(self):
+        """Test the Face3D extract_rectangle method with a more complex shape."""
+        pts_1 = (Point3D(-1, -1, 0), Point3D(-12, -1, 0), Point3D(-12, -1, 2),
+                 Point3D(-10, -1, 3), Point3D(-1, -1, 3))
+        plane = Plane(Vector3D(0, 1, 0))
+        face_1 = Face3D(pts_1, plane)
+        f1_result = face_1.extract_rectangle(0.0001)
+        print (f1_result)
+
     def test_sub_faces_by_ratio(self):
         """Test the sub_faces_by_ratio method."""
         pts_1 = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))

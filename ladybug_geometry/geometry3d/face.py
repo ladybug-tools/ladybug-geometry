@@ -998,7 +998,7 @@ class Face3D(Base2DIn3D):
                 new_vertices.append(vertices[i - 1])
         return new_vertices
 
-    def _vertices_between_points(self, start_pt, end_pt):
+    def _vertices_between_points(self, start_pt, end_pt, tolerance):
         """Get the vertices between a start and end point.
 
         This method is used by the extract_rectangle method.
@@ -1009,7 +1009,7 @@ class Face3D(Base2DIn3D):
         while found_other is False:
             vert_ind -= 1
             new_verts.append(self[vert_ind])
-            if self[vert_ind] == end_pt:
+            if self[vert_ind].is_equivalent(end_pt, tolerance):
                 found_other = True
         return new_verts
 
@@ -1045,7 +1045,7 @@ class Face3D(Base2DIn3D):
 
         # get extra faces outside of the rectangle
         other_faces = []
-        edge_pts_1 = self._vertices_between_points(edge_1.p1, edge_2.p2)
+        edge_pts_1 = self._vertices_between_points(edge_1.p1, edge_2.p2, tolerance)
         if close_pt_1.is_equivalent(edge_2.p2, tolerance) is False:
             edge_pts_1.append(close_pt_1)
             other_faces.append(Face3D(edge_pts_1, self.plane))
@@ -1055,7 +1055,7 @@ class Face3D(Base2DIn3D):
         elif len(edge_pts_1) > 2:
             other_faces.append(Face3D(edge_pts_1, self.plane))
 
-        edge_pts_2 = self._vertices_between_points(edge_2.p1, edge_1.p2)
+        edge_pts_2 = self._vertices_between_points(edge_2.p1, edge_1.p2, tolerance)
         if close_pt_3.is_equivalent(edge_2.p1, tolerance) is False:
             edge_pts_2.append(close_pt_3)
             other_faces.append(Face3D(edge_pts_2, self.plane))
