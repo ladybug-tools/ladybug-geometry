@@ -46,7 +46,9 @@ class Plane(object):
             if n.x == 0 and n.y == 0:
                 self._x = Vector3DImmutable(1, 0, 0)
             else:
-                self._x = Vector3DImmutable(n.y, -n.x, 0)
+                _x = Vector3D(n.y, -n.x, 0)
+                _x.normalize()
+                self._x = _x.to_immutable()
         else:
             assert isinstance(x, (Vector3D, Vector3DImmutable)), \
                 "Expected Vector3D for plane X-axis. Got {}.".format(type(x))

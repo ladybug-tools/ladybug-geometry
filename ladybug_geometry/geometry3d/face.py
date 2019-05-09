@@ -833,19 +833,19 @@ class Face3D(Base2DIn3D):
                 considered a part of a rectangle.
 
         Returns:
-            A list of Face3D objects for sub faces.
+            A list of Face3D objects for sub faces. If there is a rectangle in this
+            shape, the scaled rectangle will be the first item in this list.
         """
         rect_res = self.extract_rectangle(tolerance)
         if rect_res is None:
             return self.sub_faces_by_ratio(ratio)
         bottom_seg, top_seg, other_faces = rect_res
-        sub_faces = []
-        for face in other_faces:
-            sub_faces.extend(face.sub_faces_by_ratio(ratio))
-        rect_face = Face3D([bottom_seg.p1, bottom_seg.p2, top_seg.p1, top_seg.p2],
+        rect_face = Face3D([bottom_seg.p1, bottom_seg.p2, top_seg.p2, top_seg.p1],
                            self.plane)
         scale_factor = ratio ** .5
-        sub_faces.append(rect_face.scale(scale_factor, rect_face.center))
+        sub_faces = [rect_face.scale(scale_factor, rect_face.center)]
+        for face in other_faces:
+            sub_faces.extend(face.sub_faces_by_ratio(ratio))
         return sub_faces
 
     def get_mesh_grid(self, x_dim, y_dim=None, offset=None, flip=False,
