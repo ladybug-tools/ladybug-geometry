@@ -794,60 +794,6 @@ class Face3D(Base2DIn3D):
 
         return None
 
-    def sub_faces_by_ratio(self, ratio):
-        """Get a list of faces with a combined area equal to the ratio times this face area.
-
-        All sub faces will lie inside the boundaries of this face.
-
-        Args:
-            ratio: A number between 0 and 1 for the ratio between the area of
-                the sub faces and the area of this face.
-
-        Returns:
-            A list of Face3D objects for sub faces.
-        """
-        scale_factor = ratio ** .5
-        if self.is_convex:
-            return [self.scale(scale_factor, self.centroid)]
-        else:
-            _tri_mesh = self.triangulated_mesh3d
-            _tri_faces = [[_tri_mesh[i] for i in face] for face in _tri_mesh.faces]
-            _scaled_verts = []
-            for i, _tri in enumerate(_tri_faces):
-                _scaled_verts.append(
-                    [pt.scale(scale_factor, _tri_mesh.face_centroids[i]) for pt in _tri])
-            return [Face3D(_t, self.plane) for _t in _scaled_verts]
-
-    def sub_faces_by_ratio_rectangle(self, ratio, tolerance):
-        """Get a list of faces with a combined area equal to the ratio times this face area.
-
-        This function is virtually equivalent to the sub_faces_by_ratio method
-        but a check will be performed to see if any rectangles can be pulled out
-        of this face's geometry. This tends to make the result a bit cleaner,
-        especially for concave faces that have rectangles (like L-shaped faces).
-
-        Args:
-            ratio: A number between 0 and 1 for the ratio between the area of
-                the sub faces and the area of this face.
-            tolerance: The maximum difference between point values for them to be
-                considered a part of a rectangle.
-
-        Returns:
-            A list of Face3D objects for sub faces. If there is a rectangle in this
-            shape, the scaled rectangle will be the first item in this list.
-        """
-        rect_res = self.extract_rectangle(tolerance)
-        if rect_res is None:
-            return self.sub_faces_by_ratio(ratio)
-        bottom_seg, top_seg, other_faces = rect_res
-        rect_face = Face3D([bottom_seg.p1, bottom_seg.p2, top_seg.p2, top_seg.p1],
-                           self.plane)
-        scale_factor = ratio ** .5
-        sub_faces = [rect_face.scale(scale_factor, rect_face.center)]
-        for face in other_faces:
-            sub_faces.extend(face.sub_faces_by_ratio(ratio))
-        return sub_faces
-
     def get_mesh_grid(self, x_dim, y_dim=None, offset=None, flip=False,
                       generate_centroids=True):
         """Get a gridded Mesh3D from over this face.
@@ -915,6 +861,203 @@ class Face3D(Base2DIn3D):
                                                     for pt in grid_mesh2d.face_centroids)
 
         return grid_mesh3d
+
+    def sub_faces_by_ratio(self, ratio):
+        """Get a list of faces with a combined area equal to the ratio times this face area.
+
+        All sub faces will lie inside the boundaries of this face.
+
+        Args:
+            ratio: A number between 0 and 1 for the ratio between the area of
+                the sub faces and the area of this face.
+
+        Returns:
+            A list of Face3D objects for sub faces.
+        """
+        scale_factor = ratio ** .5
+        if self.is_convex:
+            return [self.scale(scale_factor, self.centroid)]
+        else:
+            _tri_mesh = self.triangulated_mesh3d
+            _tri_faces = [[_tri_mesh[i] for i in face] for face in _tri_mesh.faces]
+            _scaled_verts = []
+            for i, _tri in enumerate(_tri_faces):
+                _scaled_verts.append(
+                    [pt.scale(scale_factor, _tri_mesh.face_centroids[i]) for pt in _tri])
+            return [Face3D(_t, self.plane) for _t in _scaled_verts]
+
+    def sub_faces_by_ratio_rectangle(self, ratio, tolerance):
+        """Get a list of faces with a combined area equal to the ratio times this face area.
+
+        This function is virtually equivalent to the sub_faces_by_ratio method
+        but a check will be performed to see if any rectangles can be pulled out
+        of this face's geometry. This tends to make the result a bit cleaner,
+        especially for concave faces that have rectangles (like L-shaped faces).
+
+        Args:
+            ratio: A number between 0 and 1 for the ratio between the area of
+                the sub faces and the area of this face.
+            tolerance: The maximum difference between point values for them to be
+                considered a part of a rectangle.
+
+        Returns:
+            A list of Face3D objects for sub faces. If there is a rectangle in this
+            shape, the scaled rectangle will be the first item in this list.
+        """
+        rect_res = self.extract_rectangle(tolerance)
+        if rect_res is None:
+            return self.sub_faces_by_ratio(ratio)
+        bottom_seg, top_seg, other_faces = rect_res
+        rect_face = Face3D([bottom_seg.p1, bottom_seg.p2, top_seg.p2, top_seg.p1],
+                           self.plane)
+        scale_factor = ratio ** .5
+        sub_faces = [rect_face.scale(scale_factor, rect_face.center)]
+        for face in other_faces:
+            sub_faces.extend(face.sub_faces_by_ratio(ratio))
+        return sub_faces
+
+    def sub_faces_by_ratio_sub_rectangle(self, ratio, sub_rect_height, sill_height,
+                                         horizontal_separation, vertical_separation,
+                                         tolerance):
+        """Get a list of faces with a combined area equal to the ratio times this face area.
+
+        This function is virtually equivalent to the sub_faces_by_ratio method
+        but a check will be performed to see if any rectangles can be pulled out
+        of this face's geometry. This tends to make the result a bit cleaner,
+        especially for concave faces that have rectangles (like L-shaped faces).
+
+        Args:
+            ratio: A number between 0 and 1 for the ratio between the area of
+                the sub faces and the area of this face.
+            sub_rect_height: A number for the target height of the output sub-
+                rectangles. Note that, if the ratio is too large for the height,
+                the ratio will take precedence and the sub-rectangle height will
+                be larger than this value.
+            sill_height: A number for the target height above the bottom edge of
+                the rectangle to start the sub-rectangles. Note that, if the
+                ratio is too large for the height, the ratio will take precedence
+                and the sub-rectangle height will be smaller than this value.
+            horizontal_separation: A number for the target separation between
+                individual sub-rectangle centerlines.  If this number is larger than
+                the parent rectangle base, only one sub-rectangle will be produced.
+            vertical_separation: An optional number to create a single vertical
+                separation between top and bottom sub-rectangles. The default is
+                0 for no separation.
+            tolerance: The maximum difference between point values for them to be
+                considered a part of a rectangle.
+
+        Returns:
+            A list of Face3D objects for sub faces. If there is a rectangle in this
+            shape, the scaled rectangle will be the first item in this list.
+        """
+        rect_res = self.extract_rectangle(tolerance)
+        if rect_res is None:
+            return self.sub_faces_by_ratio(ratio)
+        bottom_seg, top_seg, other_faces = rect_res
+        height_seg = LineSegment3D.from_end_points(bottom_seg.p, top_seg.p)
+        base_plane = Plane(self.normal, bottom_seg.p, bottom_seg.v)
+        sub_faces = Face3D.sub_rectangles_from_rectangle(
+            bottom_seg.length, height_seg.length, ratio, sub_rect_height,
+            sill_height, horizontal_separation, vertical_separation, base_plane)
+        for face in other_faces:
+            sub_faces.extend(face.sub_faces_by_ratio(ratio))
+        return sub_faces
+
+    @staticmethod
+    def sub_rectangles_from_rectangle(parent_base, parent_height, ratio,
+                                      sub_rect_height, sill_height,
+                                      horizontal_separation, vertical_separation=0,
+                                      base_plane=None):
+        """Get a list of rectangular Face3D objects using parameters to define them.
+
+        All of the resulting Face3D objects lie within a parent rectangle defined
+        by the parent_base, parent_height, and base_plane. The combined area of the
+        resulting rectangles is equal to the area of the larger rectangle multiplied
+        by the input ratio. This method is particularly useful for generating
+        rectangular window surfaces.
+
+        Args:
+            parent_base: A number indicating the length of the base of the
+                parent rectangle.
+            parent_height: A number indicating the length of the height of the
+                parent rectangle.
+            ratio: A number between 0 and 1 for the ratio between the area of
+                the sub rectangle faces and the area of this face.
+            sub_rect_height: A number for the target height of the output sub-
+                rectangles. Note that, if the ratio is too large for the height,
+                the ratio will take precedence and the sub-rectangle height will
+                be larger than this value.
+            sill_height: A number for the target height above the bottom edge of
+                the rectangle to start the sub-rectangles. Note that, if the
+                ratio is too large for the height, the ratio will take precedence
+                and the sub-rectangle height will be smaller than this value.
+            horizontal_separation: A number for the target separation between
+                individual sub-rectangle centerlines.  If this number is larger than
+                the parent rectangle base, only one sub-rectangle will be produced.
+            vertical_separation: An optional number to create a single vertical
+                separation between top and bottom sub-rectangles. The default is
+                0 for no separation.
+            base_plane: A Plane object in which the rectangle exists.
+                The origin of this plane will be the lower left corner of the
+                rectangle and the X and Y axes will form the sides.
+                Default is the world XY plane.
+        """
+        # set the default base_plane
+        if base_plane is None:
+            base_plane = Plane()
+        else:
+            assert isinstance(base_plane, Plane), 'Expected Plane. Got {}'.format(
+                type(base_plane))
+
+        # calculate the target area to make the combined sub-rectangles
+        target_area = parent_base * parent_height * ratio
+        # find the maximum area for subdivision into smaller, taller sub-rectangles
+        max_area_subdiv = parent_base * 0.98 * sub_rect_height
+        # if sub_rect_height > parent_height, set it to just under parent_height
+        max_subh = 0.98 * parent_height
+        sub_rect_height = max_subh if sub_rect_height > max_subh else sub_rect_height
+        # if sill_height is close to 0, set it to just above 0.
+        min_sill = 0.01 * parent_height
+        sill_height = min_sill if sill_height < min_sill else sill_height
+        # properties used throughout the computation of sub-rectangles
+        bottom_seg = LineSegment3D.from_sdl(base_plane.o, base_plane.x, parent_base)
+
+        if target_area < max_area_subdiv:
+            # divide up the rectangle into points on the bottom.
+            if parent_base > (horizontal_separation / 2):
+                num_div = round(parent_base / horizontal_separation, 0)
+            else:
+                num_div = 1
+            btm_div_pts = bottom_seg.subdivide_evenly(num_div)
+            btm_div_segs = tuple(LineSegment3D.from_end_points(pt, btm_div_pts[i + 1])
+                                 for i, pt in enumerate(btm_div_pts[:-1]))
+            # move the segments to the sill height
+            max_sill_h = parent_height * 0.99 - sub_rect_height
+            sill_vec = base_plane.y * sill_height if sill_height < max_sill_h \
+                else base_plane.y * max_sill_h
+            div_segs = tuple(seg.move(sill_vec) for seg in btm_div_segs)
+            # scale the segments along their center points
+            seg_width = div_segs[0].length
+            subrect_width = (target_area / sub_rect_height) / num_div
+            scale_fac = subrect_width / seg_width
+            scaled_segs = tuple(seg.scale(scale_fac, seg.midpoint) for seg in div_segs)
+            # generate the vertices by 'extruding' along a window height vector.
+            h_vec = base_plane.y * sub_rect_height
+            final_faces = []
+            for seg in scaled_segs:
+                final_faces.append(Face3D(
+                    (seg.p1, seg.p2, seg.p2 + h_vec, seg.p1 + h_vec), base_plane))
+        else:
+            # make a single sub-rectangle at an apporporate sill height
+            max_sill_h = parent_height * 0.99 - (target_area / (parent_base * 0.98))
+            sill_vec = base_plane.y * sill_height if sill_height < max_sill_h \
+                else base_plane.y * max_sill_h
+            seg_init = bottom_seg.move(sill_vec)
+            seg = seg_init.scale(0.98, seg_init.midpoint)
+            h_vec = base_plane.y * (target_area / (parent_base * 0.98))
+            final_faces = [Face3D((seg.p1, seg.p2, seg.p2 + h_vec, seg.p1 + h_vec),
+                                  base_plane)]
+        return final_faces
 
     def _check_vertices_input(self, vertices):
         assert isinstance(vertices, (list, tuple)), \

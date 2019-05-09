@@ -58,18 +58,20 @@ to build tis core library.
 - [x] Scale Geometry from a Base Point (can be taken from Rhino3dm)
 - [x] Is Point Inside 2D Polygon (look pretty straightforward from [this example](https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/))
 - [x] Planar surface grid generation ([as done in this thesis](https://www.radiance-online.org/community/workshops/2015-philadelphia/presentations/day1/STADICUtilities-Radiance%20Workshop2015.pdf), which uses bounding box and is point inside)
-- [ ] Glazing Based on Ratio (currently implemented in legacy [glazing based on ratio component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_Glazing%20based%20on%20ratio.py))
+- [x] Glazing Based on Ratio (currently implemented in legacy [glazing based on ratio component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_Glazing%20based%20on%20ratio.py))
+- [x] Solve Adjacencies (possible with good geometric equivalency tests)
+- [ ] Generate louvers, fins and overhangs from a face. Should be easy by extruding intersected line segments generated from the Face3D.intersect_plane method that is already implemented.
+- [ ] Check if a 3D PolyFace is Closed ([should be possible by creating a 3D triangulated mesh](https://gamedev.stackexchange.com/questions/61878/how-check-if-an-arbitrary-given-mesh-is-a-single-closed-mesh/61886))
+- [ ] Ensure that all faces of a solid PolyFace are facing outward (possible with a 3D version of the current method that checks whether a point is inside a polygon. Essentially, shoot a ray from the center of a face using the face normal and make sure that the ray intersects 0 or an even number of other faces in the polyface)
+- [ ] Check if a Point is Inside a Closed 3D Geometry (useful for thermal comfort studies where points in a grid must be matched with zone results) (should be possible with a variation of the function that checks if a face is outward-facing except we use the point in question as the origin of the ray we shoot)
 - [ ] Straight Skeleton Methods (currently implemented in [legacy core/perimeter component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_SplitFloor2ThermalZones.py) but should be expanded to accept concave geometry)
 - [ ] Offset edge curve of a planar surface (can be done by translating vertices along the straight skeleton to make a "wavefront")
-- [ ] Check if a 3D Geometry is Closed ([should be possible by creating a 3D triangulated mesh](https://gamedev.stackexchange.com/questions/61878/how-check-if-an-arbitrary-given-mesh-is-a-single-closed-mesh/61886))
-- [ ] Solve Adjacencies (might be possible with surface-ray intersections)
-- [ ] Check if a Point is Inside a Closed 3D Geometry (helpful for thermal comfort when one needs to know if a point is in a zone)
 
 # Things That Should be a Part of this Library
-### (We Think We Can Do Them But They Require Expertise)
+### (We Think We Can Do Them But They Will Require Some Expertise)
 - [ ] Create Matching Zone Surfaces (intersection of surfaces with one another). OpenStudio has methods for this [as @saeranv shows here](https://github.com/mostaphaRoudsari/honeybee/issues/700)
+- [ ] Curve Boolean a set of 2D curves (useful for finding outer boundaries of set of THERM polygons, calculating building footprints from floor curves, and more).  Should be possible with [this method here]()
 
-# Things that We Will Rely on the Plugins For:
-- Conversion of Curved Surfaces to Planar Surfaces (curved geometry meshing)
-- Split Closed 3D Volume to Floors (intersection of a volume and a plane)
-- Calculate Building Footprints (boolean union floors)
+# Things that We Will Rely on the CAD Interface For:
+- Conversion of Curved Surfaces to Planar Surfaces (ideally with methods for treating single curvature differently than double curvature)
+- Solid Boolean Unions (we can probably get away with not needing this for anything in Ladybug Tools)

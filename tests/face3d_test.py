@@ -699,7 +699,33 @@ class Face3DTestCase(unittest.TestCase):
         plane = Plane(Vector3D(0, 1, 0))
         face_1 = Face3D(pts_1, plane)
         f1_result = face_1.extract_rectangle(0.0001)
-        print (f1_result)
+
+        assert f1_result[0] == LineSegment3D.from_end_points(Point3D(-1, -1, 0), Point3D(-10, -1, 0))
+        assert f1_result[1] == LineSegment3D.from_end_points(Point3D(-1, -1, 3), Point3D(-10, -1, 3))
+        assert len(f1_result[2]) == 1
+        assert len(f1_result[2][0].vertices) == 4
+
+    def test_sub_faces_by_ratio_sub_rectangle(self):
+        """Test the Face3D sub_faces_by_ratio_sub_rectangle method."""
+        pts_1 = (Point3D(0, 0, 0), Point3D(12, 0, 0), Point3D(12, 0, 2), Point3D(0, 0, 3))
+        plane = Plane(Vector3D(0, 1, 0))
+        face_1 = Face3D(pts_1, plane)
+        window_height = 2
+        sill_height = 1
+        horiz_separation = 3
+        vert_separation = 0
+
+        sub_faces = face_1.sub_faces_by_ratio_sub_rectangle(
+            0.4, window_height, sill_height, horiz_separation, vert_separation, 0.0001)
+        assert len(sub_faces) == 5
+        areas = [srf.area for srf in sub_faces]
+        assert sum(areas) == pytest.approx(face_1.area * 0.4, rel=1e-3)
+
+        sub_faces_2 = face_1.sub_faces_by_ratio_sub_rectangle(
+            0.99, window_height, sill_height, horiz_separation, vert_separation, 0.0001)
+        assert len(sub_faces_2) == 2
+        areas = [srf.area for srf in sub_faces_2]
+        assert sum(areas) == pytest.approx(face_1.area * 0.99, rel=1e-3)
 
     def test_sub_faces_by_ratio(self):
         """Test the sub_faces_by_ratio method."""
