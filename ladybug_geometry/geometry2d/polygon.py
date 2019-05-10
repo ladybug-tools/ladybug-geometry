@@ -30,7 +30,7 @@ class Polygon2D(Base2DIn2D):
     """
     __slots__ = ('_vertices', '_segments', '_triangulated_mesh',
                  '_min', '_max', '_center', '_perimeter', '_area',
-                 '_is_clockwise', '_is_convex', '_is_complex')
+                 '_is_clockwise', '_is_convex', '_is_self_intersecting')
 
     def __init__(self, vertices):
         """Initilize Polygon2D.
@@ -48,7 +48,7 @@ class Polygon2D(Base2DIn2D):
         self._area = None
         self._is_clockwise = None
         self._is_convex = None
-        self._is_complex = None
+        self._is_self_intersecting = None
 
     @classmethod
     def from_rectangle(cls, base_point, height_vector, base, height):
@@ -78,7 +78,7 @@ class Polygon2D(Base2DIn2D):
         polygon._area = base * height
         polygon._is_clockwise = True
         polygon._is_convex = True
-        polygon._is_complex = False
+        polygon._is_self_intersecting = False
         return polygon
 
     @classmethod
@@ -126,7 +126,7 @@ class Polygon2D(Base2DIn2D):
         _new_poly = cls(_vertices)
         _new_poly._is_clockwise = False
         _new_poly._is_convex = True
-        _new_poly._is_complex = False
+        _new_poly._is_self_intersecting = False
         return _new_poly
 
     @classmethod
@@ -163,7 +163,7 @@ class Polygon2D(Base2DIn2D):
         _new_poly = cls(boundary)
         _new_poly._is_clockwise = bound_direction
         _new_poly._is_convex = False
-        _new_poly._is_complex = False
+        _new_poly._is_self_intersecting = False
         return _new_poly
 
     @classmethod
@@ -204,7 +204,7 @@ class Polygon2D(Base2DIn2D):
         _new_poly = cls(boundary)
         _new_poly._is_clockwise = bound_direction
         _new_poly._is_convex = False
-        _new_poly._is_complex = False
+        _new_poly._is_self_intersecting = False
         return _new_poly
 
     @property
@@ -276,8 +276,8 @@ class Polygon2D(Base2DIn2D):
         So this property should only be used in quality control scripts where the
         origin of the geometry is unknown.
         """
-        if self._is_complex is None:
-            self._is_complex = False
+        if self._is_self_intersecting is None:
+            self._is_self_intersecting = False
             if self.is_convex is False:
                 _segs = self.segments
                 for i, _s in enumerate(_segs[1: len(_segs) - 1]):
@@ -285,11 +285,11 @@ class Polygon2D(Base2DIn2D):
                     _other_segs = [x for j, x in enumerate(_segs) if j not in _skip]
                     for _oth_s in _other_segs:
                         if _s.intersect_line_ray(_oth_s) is not None:  # intersection!
-                            self._is_complex = True
+                            self._is_self_intersecting = True
                             break
-                    if self._is_complex is True:
+                    if self._is_self_intersecting is True:
                         break
-        return self._is_complex
+        return self._is_self_intersecting
 
     def remove_colinear_vertices(self, tolerance):
         """Get a version of this polygon with colinear vertices removed.
@@ -561,8 +561,9 @@ class Polygon2D(Base2DIn2D):
             'vertices should be a list or tuple. Got {}'.format(type(vertices))
         assert len(vertices) >= 3, 'There must be at least 3 vertices for a Polygon2D.' \
             ' Got {}'.format(len(vertices))
-        assert isinstance(vertices[0], (Point2D, Point2DImmutable)), \
-            'Expected Point2D. Got {}.'.format(type(vertices[0]))
+        for vert in vertices:
+            assert isinstance(vert, (Point2D, Point2DImmutable)), \
+                'Expected Point2D for Polygon2D vertex. Got {}.'.format(type(vert))
         self._vertices = tuple(p.to_immutable() for p in vertices)
 
     @staticmethod

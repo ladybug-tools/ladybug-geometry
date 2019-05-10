@@ -70,7 +70,7 @@ to build tis core library.
 # Things That Should be a Part of this Library
 ### (We Think We Can Do Them But They Will Require Some Expertise)
 - [ ] Create Matching Zone Surfaces (intersection of surfaces with one another). OpenStudio has methods for this [as @saeranv shows here](https://github.com/mostaphaRoudsari/honeybee/issues/700)
-- [ ] Curve Boolean a set of 2D curves (useful for finding outer boundaries of set of THERM polygons, calculating building footprints from floor curves, and more).  Should be possible with [this method here]()
+- [ ] Curve Boolean a set of 2D curves (useful for finding outer boundaries of set of THERM polygons, calculating building footprints from floor curves, and more).  Should be possible with [this method here](https://stackoverflow.com/questions/2667748/how-do-i-combine-complex-polygons)
 
 # Things that We Will Rely on the CAD Interface For:
 - Conversion of Curved Surfaces to Planar Surfaces (ideally with methods for treating single curvature differently than double curvature)

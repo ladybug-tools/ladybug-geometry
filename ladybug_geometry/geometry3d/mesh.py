@@ -229,8 +229,9 @@ class Mesh3D(MeshBase, Base2DIn3D):
             'vertices should be a list or tuple. Got {}'.format(type(vertices))
         assert len(vertices) >= 3, 'Mesh3D should have at least 3 vertices. ' \
             'Got {}'.format(len(vertices))
-        assert isinstance(vertices[0], (Point3D, Point3DImmutable)), \
-            'Expected Point3D for Mesh3D vertex. Got {}.'.format(type(vertices[0]))
+        for vert in vertices:
+            assert isinstance(vert, (Point3D, Point3DImmutable)), \
+                'Expected Point3D for Mesh3D vertex. Got {}.'.format(type(vert))
         self._vertices = tuple(p.to_immutable() for p in vertices)
 
     def _calculate_face_areas_and_normals(self):

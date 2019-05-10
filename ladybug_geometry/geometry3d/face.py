@@ -51,7 +51,7 @@ class Face3D(Base2DIn3D):
                  '_triangulated_mesh3d', '_boundary', '_holes',
                  '_boundary_segments', '_hole_segments'
                  '_min', '_max', '_center', '_perimeter', '_area', '_centroid',
-                 '_is_clockwise', '_is_convex', '_is_complex')
+                 '_is_clockwise', '_is_convex', '_is_self_intersecting')
 
     def __init__(self, vertices, plane):
         """Initilize Face3D.
@@ -81,7 +81,7 @@ class Face3D(Base2DIn3D):
         self._centroid = None
         self._is_clockwise = None
         self._is_convex = None
-        self._is_complex = None
+        self._is_self_intersecting = None
 
     @classmethod
     def from_vertices(cls, vertices):
@@ -126,7 +126,7 @@ class Face3D(Base2DIn3D):
         face._centroid = _cent.to_immutable()
         face._is_clockwise = True
         face._is_convex = True
-        face._is_complex = False
+        face._is_self_intersecting = False
         return face
 
     @classmethod
@@ -162,7 +162,7 @@ class Face3D(Base2DIn3D):
         face._centroid = _cent.to_immutable()
         face._is_clockwise = True
         face._is_convex = True
-        face._is_complex = False
+        face._is_self_intersecting = False
         return face
 
     @classmethod
@@ -197,7 +197,7 @@ class Face3D(Base2DIn3D):
         _face._centroid = base_plane.o
         _face._is_clockwise = False
         _face._is_convex = True
-        _face._is_complex = False
+        _face._is_self_intersecting = False
         return _face
 
     @classmethod
@@ -413,9 +413,9 @@ class Face3D(Base2DIn3D):
         So this property should only be used in quality control scripts where the
         origin of the geometry is unknown.
         """
-        if self._is_complex is None:
-            self._is_complex = self.polygon2d.is_self_intersecting
-        return self._is_complex
+        if self._is_self_intersecting is None:
+            self._is_self_intersecting = self.polygon2d.is_self_intersecting
+        return self._is_self_intersecting
 
     @property
     def has_holes(self):
@@ -1040,13 +1040,30 @@ class Face3D(Base2DIn3D):
             seg_width = div_segs[0].length
             subrect_width = (target_area / sub_rect_height) / num_div
             scale_fac = subrect_width / seg_width
-            scaled_segs = tuple(seg.scale(scale_fac, seg.midpoint) for seg in div_segs)
+            scaled_segs = [seg.scale(scale_fac, seg.midpoint) for seg in div_segs]
+            # find the maximum acceptable area for splitting the glazing vertically.
+            if vertical_separation != 0:
+                max_split_vert = parent_height - sill_height - sub_rect_height \
+                    - (0.02 * parent_height)
+                if vertical_separation < 0 or max_split_vert < 0:
+                    vertical_separation = 0
+                elif vertical_separation > max_split_vert:
+                    vertical_separation = max_split_vert
             # generate the vertices by 'extruding' along a window height vector.
-            h_vec = base_plane.y * sub_rect_height
             final_faces = []
-            for seg in scaled_segs:
-                final_faces.append(Face3D(
-                    (seg.p1, seg.p2, seg.p2 + h_vec, seg.p1 + h_vec), base_plane))
+            if vertical_separation != 0:
+                sub_rect_height = sub_rect_height / 2
+                h_vec = base_plane.y * sub_rect_height
+                vert_move_vec = base_plane.y * (sub_rect_height + vertical_separation)
+                vert_segs = [seg.move(vert_move_vec) for seg in scaled_segs]
+                for seg in scaled_segs + vert_segs:
+                    final_faces.append(Face3D(
+                        (seg.p1, seg.p2, seg.p2 + h_vec, seg.p1 + h_vec), base_plane))
+            else:
+                h_vec = base_plane.y * sub_rect_height
+                for seg in scaled_segs:
+                    final_faces.append(Face3D(
+                        (seg.p1, seg.p2, seg.p2 + h_vec, seg.p1 + h_vec), base_plane))
         else:
             # make a single sub-rectangle at an apporporate sill height
             max_sill_h = parent_height * 0.99 - (target_area / (parent_base * 0.98))
@@ -1054,9 +1071,28 @@ class Face3D(Base2DIn3D):
                 else base_plane.y * max_sill_h
             seg_init = bottom_seg.move(sill_vec)
             seg = seg_init.scale(0.98, seg_init.midpoint)
-            h_vec = base_plane.y * (target_area / (parent_base * 0.98))
-            final_faces = [Face3D((seg.p1, seg.p2, seg.p2 + h_vec, seg.p1 + h_vec),
-                                  base_plane)]
+            # find the maximum acceptable area for splitting the glazing vertically.
+            if vertical_separation != 0:
+                max_split_vert = parent_height - sill_height - \
+                    (target_area / (parent_base * 0.98)) - (0.02 * parent_height)
+                if vertical_separation < 0 or max_split_vert < 0:
+                    vertical_separation = 0
+                elif vertical_separation > max_split_vert:
+                    vertical_separation = max_split_vert
+            # generate the vertices by 'extruding' along a window height vector.
+            if vertical_separation != 0:
+                sub_rect_height = (target_area / (parent_base * 0.98)) / 2
+                h_vec = base_plane.y * sub_rect_height
+                vert_move_vec = base_plane.y * (sub_rect_height + vertical_separation)
+                vert_seg = seg.move(vert_move_vec)
+                final_faces = []
+                for seg in [seg, vert_seg]:
+                    final_faces.append(Face3D(
+                        (seg.p1, seg.p2, seg.p2 + h_vec, seg.p1 + h_vec), base_plane))
+            else:
+                h_vec = base_plane.y * (target_area / (parent_base * 0.98))
+                final_faces = [Face3D((seg.p1, seg.p2, seg.p2 + h_vec, seg.p1 + h_vec),
+                                      base_plane)]
         return final_faces
 
     def _check_vertices_input(self, vertices):
@@ -1064,8 +1100,9 @@ class Face3D(Base2DIn3D):
             'vertices should be a list or tuple. Got {}'.format(type(vertices))
         assert len(vertices) >= 3, 'There must be at least 3 vertices for a Face3D.' \
             ' Got {}'.format(len(vertices))
-        assert isinstance(vertices[0], (Point3D, Point3DImmutable)), \
-            'Expected Point3D for Face3D vertex. Got {}.'.format(type(vertices[0]))
+        for vert in vertices:
+            assert isinstance(vert, (Point3D, Point3DImmutable)), \
+                'Expected Point3D for Face3D vertex. Got {}.'.format(type(vert))
         self._vertices = tuple(p.to_immutable() for p in vertices)
 
     def _check_number_mesh_grid(self, input, name):
@@ -1114,7 +1151,7 @@ class Face3D(Base2DIn3D):
         new_face._perimeter = self._perimeter
         new_face._area = self._area
         new_face._is_convex = self._is_convex
-        new_face._is_complex = self._is_complex
+        new_face._is_self_intersecting = self._is_self_intersecting
         new_face._is_clockwise = self._is_clockwise
 
     def _transfer_properties_scale(self, new_face, factor):
@@ -1123,7 +1160,7 @@ class Face3D(Base2DIn3D):
         This is used by the methods that scale the face.
         """
         new_face._is_convex = self._is_convex
-        new_face._is_complex = self._is_complex
+        new_face._is_self_intersecting = self._is_self_intersecting
         new_face._is_clockwise = self._is_clockwise
         if self._perimeter is not None:
             new_face._perimeter = self._perimeter * factor
