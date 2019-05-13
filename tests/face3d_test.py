@@ -1,9 +1,8 @@
 # coding=utf-8
 
-from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D, \
-    Point3DImmutable
+from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
 from ladybug_geometry.geometry3d.plane import Plane
-from ladybug_geometry.geometry3d.line import LineSegment3D, LineSegment3DImmutable
+from ladybug_geometry.geometry3d.line import LineSegment3D
 from ladybug_geometry.geometry3d.ray import Ray3D
 from ladybug_geometry.geometry3d.face import Face3D
 
@@ -32,12 +31,12 @@ class Face3DTestCase(unittest.TestCase):
         assert len(face.vertices) == 4
         assert len(face) == 4
         for point in face:
-            assert isinstance(point, Point3DImmutable)
+            assert isinstance(point, Point3D)
 
         assert isinstance(face.boundary_segments, tuple)
         assert len(face.boundary_segments) == 4
         for seg in face.boundary_segments:
-            assert isinstance(seg, LineSegment3DImmutable)
+            assert isinstance(seg, LineSegment3D)
             assert seg.length == 2
         assert face.has_holes is False
         assert face.hole_segments is None
@@ -63,12 +62,12 @@ class Face3DTestCase(unittest.TestCase):
         assert len(face.vertices) == 4
         assert len(face) == 4
         for point in face:
-            assert isinstance(point, Point3DImmutable)
+            assert isinstance(point, Point3D)
 
         assert isinstance(face.boundary_segments, tuple)
         assert len(face.boundary_segments) == 4
         for seg in face.boundary_segments:
-            assert isinstance(seg, LineSegment3DImmutable)
+            assert isinstance(seg, LineSegment3D)
             assert seg.length == 2
         assert face.has_holes is False
         assert face.hole_segments is None
@@ -95,12 +94,12 @@ class Face3DTestCase(unittest.TestCase):
         assert len(face.vertices) == 4
         assert len(face) == 4
         for point in face:
-            assert isinstance(point, Point3DImmutable)
+            assert isinstance(point, Point3D)
 
         assert isinstance(face.boundary_segments, tuple)
         assert len(face.boundary_segments) == 4
         for seg in face.boundary_segments:
-            assert isinstance(seg, LineSegment3DImmutable)
+            assert isinstance(seg, LineSegment3D)
             assert seg.length == 2
         assert face.has_holes is False
         assert face.hole_segments is None
@@ -124,12 +123,12 @@ class Face3DTestCase(unittest.TestCase):
         assert isinstance(face.vertices, tuple)
         assert len(face.vertices) == 4
         for point in face.vertices:
-            assert isinstance(point, Point3DImmutable)
+            assert isinstance(point, Point3D)
 
         assert isinstance(face.boundary_segments, tuple)
         assert len(face.boundary_segments) == 4
         for seg in face.boundary_segments:
-            assert isinstance(seg, LineSegment3DImmutable)
+            assert isinstance(seg, LineSegment3D)
             assert seg.length == 2
         assert face.has_holes is False
         assert face.hole_segments is None
@@ -153,11 +152,11 @@ class Face3DTestCase(unittest.TestCase):
         assert isinstance(face.vertices, tuple)
         assert len(face.vertices) == 8
         for point in face.vertices:
-            assert isinstance(point, Point3DImmutable)
+            assert isinstance(point, Point3D)
         assert isinstance(face.boundary_segments, tuple)
         assert len(face.boundary_segments) == 8
         for seg in face.boundary_segments:
-            assert isinstance(seg, LineSegment3DImmutable)
+            assert isinstance(seg, LineSegment3D)
             assert seg.length == pytest.approx(1.5307337, rel=1e-3)
         assert face.has_holes is False
         assert face.hole_segments is None
@@ -188,18 +187,18 @@ class Face3DTestCase(unittest.TestCase):
         assert isinstance(face.vertices, tuple)
         assert len(face.vertices) == 10
         for point in face.vertices:
-            assert isinstance(point, Point3DImmutable)
+            assert isinstance(point, Point3D)
 
         assert isinstance(face.boundary_segments, tuple)
         assert len(face.boundary_segments) == 4
         for seg in face.boundary_segments:
-            assert isinstance(seg, LineSegment3DImmutable)
+            assert isinstance(seg, LineSegment3D)
         assert face.has_holes is True
         assert isinstance(face.hole_segments, tuple)
         assert len(face.hole_segments) == 1
         assert len(face.hole_segments[0]) == 4
         for seg in face.hole_segments[0]:
-            assert isinstance(seg, LineSegment3DImmutable)
+            assert isinstance(seg, LineSegment3D)
 
         assert face.area == 12
         assert face.perimeter == pytest.approx(24, rel=1e-3)
@@ -221,12 +220,12 @@ class Face3DTestCase(unittest.TestCase):
         assert isinstance(face.vertices, tuple)
         assert len(face.vertices) == 16
         for point in face.vertices:
-            assert isinstance(point, Point3DImmutable)
+            assert isinstance(point, Point3D)
 
         assert isinstance(face.boundary_segments, tuple)
         assert len(face.boundary_segments) == 4
         for seg in face.boundary_segments:
-            assert isinstance(seg, LineSegment3DImmutable)
+            assert isinstance(seg, LineSegment3D)
         assert face.has_holes is True
         assert isinstance(face.hole_segments, tuple)
         assert len(face.hole_segments) == 2
@@ -417,7 +416,7 @@ class Face3DTestCase(unittest.TestCase):
         face_1 = Face3D(pts_1, plane_1)
         face_2 = face_1.flip()
 
-        assert face_1.normal == face_2.normal.reversed()
+        assert face_1.normal == face_2.normal.reverse()
         assert face_1.is_clockwise is False
         assert face_2.is_clockwise is True
         for i, pt in enumerate(face_1.vertices):
@@ -557,7 +556,7 @@ class Face3DTestCase(unittest.TestCase):
 
         origin_1 = Point3D(1, 0, 2)
         normal_1 = Vector3D(1, 0, 0)
-        normal_2 = Vector3D(-1, -1, 0).normalized()
+        normal_2 = Vector3D(-1, -1, 0).normalize()
 
         test_1 = face.reflect(normal_1, origin_1)
         assert test_1[0].x == pytest.approx(1, rel=1e-3)

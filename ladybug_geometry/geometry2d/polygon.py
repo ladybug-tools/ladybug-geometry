@@ -2,8 +2,8 @@
 """2D Polygon"""
 from __future__ import division
 
-from .pointvector import Point2D, Point2DImmutable, Vector2D, Vector2DImmutable
-from .line import LineSegment2DImmutable
+from .pointvector import Point2D, Vector2D
+from .line import LineSegment2D
 from .ray import Ray2D
 from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
     does_intersection_exist_line2d, closest_point2d_on_line2d
@@ -63,13 +63,13 @@ class Polygon2D(Base2DIn2D):
             base: A number indicating the length of the base of the rectangle.
             height: A number indicating the length of the height of the rectangle.
         """
-        assert isinstance(base_point, (Point2D, Point2DImmutable)), \
+        assert isinstance(base_point, Point2D), \
             'base_point must be Point2D. Got {}.'.format(type(base_point))
-        assert isinstance(height_vector, (Vector2D, Vector2DImmutable)), \
+        assert isinstance(height_vector, Vector2D), \
             'height_vector must be Vector2D. Got {}.'.format(type(height_vector))
         assert isinstance(base, (float, int)), 'base must be a number.'
         assert isinstance(height, (float, int)), 'height must be a number.'
-        _hv_norm = height_vector.normalized()
+        _hv_norm = height_vector.normalize()
         _bv = Vector2D(_hv_norm.y, -_hv_norm.x) * base
         _hv = _hv_norm * height
         _verts = (base_point, base_point + _hv, base_point + _hv + _bv, base_point + _bv)
@@ -98,7 +98,7 @@ class Polygon2D(Base2DIn2D):
             'integer. Got {}.'.format(type(number_of_sides))
         assert number_of_sides > 2, 'number_of_sides must be greater than 2. ' \
             'Got {}.'.format(number_of_sides)
-        assert isinstance(base_point, (Point2D, Point2DImmutable)), \
+        assert isinstance(base_point, Point2D), \
             'base_point must be Point2D. Got {}.'.format(type(base_point))
         assert isinstance(radius, (float, int)), 'height must be a number.'
 
@@ -110,9 +110,9 @@ class Polygon2D(Base2DIn2D):
         # pick a starting vertex that makes sense for the number of sides
         if number_of_sides % 2 == 0:
             start_vert = Point2D(base_point.x - radius, base_point.y)
-            start_vert = start_vert.rotate(angle / 2, base_point).to_immutable()
+            start_vert = start_vert.rotate(angle / 2, base_point)
         else:
-            start_vert = Point2DImmutable(base_point.x, base_point.y + radius)
+            start_vert = Point2D(base_point.x, base_point.y + radius)
         _vertices = [start_vert]
 
         # generate the vertices
@@ -120,7 +120,7 @@ class Polygon2D(Base2DIn2D):
             last_pt = _vertices[-1]
             qx = cos_a * (last_pt.x - base_point.x) - sin_a * (last_pt.y - base_point.y)
             qy = sin_a * (last_pt.x - base_point.x) + cos_a * (last_pt.y - base_point.y)
-            _vertices.append(Point2DImmutable(qx + base_point.x, qy + base_point.y))
+            _vertices.append(Point2D(qx + base_point.x, qy + base_point.y))
 
         # build the new polygon and set the properties that we know.
         _new_poly = cls(_vertices)
@@ -430,7 +430,7 @@ class Polygon2D(Base2DIn2D):
         """
         for _s in self.segments:
             close_pt = closest_point2d_on_line2d(point, _s)
-            if point.distance_to_point(close_pt) < tolerance:
+            if point.distance_to_point(close_pt) <= tolerance:
                 return True
         return False
 
@@ -556,21 +556,11 @@ class Polygon2D(Base2DIn2D):
             return False
         return self.is_point_inside(point, test_vector)
 
-    def _check_vertices_input(self, vertices):
-        assert isinstance(vertices, (list, tuple)), \
-            'vertices should be a list or tuple. Got {}'.format(type(vertices))
-        assert len(vertices) >= 3, 'There must be at least 3 vertices for a Polygon2D.' \
-            ' Got {}'.format(len(vertices))
-        for vert in vertices:
-            assert isinstance(vert, (Point2D, Point2DImmutable)), \
-                'Expected Point2D for Polygon2D vertex. Got {}.'.format(type(vert))
-        self._vertices = tuple(p.to_immutable() for p in vertices)
-
     @staticmethod
     def _segments_from_vertices(vertices):
         _segs = []
         for i, vert in enumerate(vertices):
-            _seg = LineSegment2DImmutable.from_end_points(vertices[i - 1], vert)
+            _seg = LineSegment2D.from_end_points(vertices[i - 1], vert)
             _segs.append(_seg)
         _segs.append(_segs.pop(0))  # segments will start from the first point
         return _segs

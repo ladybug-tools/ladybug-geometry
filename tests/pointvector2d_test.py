@@ -1,7 +1,6 @@
 # coding=utf-8
 
-from ladybug_geometry.geometry2d.pointvector import Vector2D, Point2D, \
-    Vector2DImmutable, Point2DImmutable
+from ladybug_geometry.geometry2d.pointvector import Vector2D, Point2D
 
 import unittest
 import pytest
@@ -27,13 +26,10 @@ class Point2DTestCase(unittest.TestCase):
         pt_tuple = tuple(i for i in vec)
         assert pt_tuple == (0, 2)
 
-        norm_vec = vec.normalized()
+        norm_vec = vec.normalize()
         assert norm_vec.x == 0
+        assert norm_vec.y == 1
         assert norm_vec.magnitude == 1
-
-        assert vec.magnitude == 2
-        vec.normalize()
-        assert vec.magnitude == 1
 
     def test_point2_init(self):
         """Test the initalization of Point2D objects and basic properties."""
@@ -59,75 +55,25 @@ class Point2DTestCase(unittest.TestCase):
         """Test the mutability and immutability of Vector2D objects."""
         vec = Vector2D(0, 2)
         assert isinstance(vec, Vector2D)
-        assert vec.is_mutable is True
-        vec.x = 1
-        assert vec.x == 1
         vec_copy = vec.duplicate()
         assert vec == vec_copy
-        vec_copy.x = 2
-        assert vec != vec_copy
 
-        vec_imm = vec.to_immutable()
-        assert isinstance(vec_imm, Vector2DImmutable)
-        assert vec_imm.is_mutable is False
         with pytest.raises(AttributeError):
-            vec_imm.x = 2
-        with pytest.raises(AttributeError):
-            vec_imm.normalize()
-        norm_vec = vec_imm.normalized()  # ensure operations tha yield new vectors are ok
+            vec.x = 2
+        norm_vec = vec.normalize()  # ensure operations tha yield new vectors are ok
         assert norm_vec.magnitude == pytest.approx(1., rel=1e-3)
-        assert vec_imm.x == 1
-
-        vec = Vector2DImmutable(0, 2)
-        assert isinstance(vec, Vector2DImmutable)
-        assert vec.is_mutable is False
-        with pytest.raises(AttributeError):
-            vec.x = 1
-        assert vec.x == 0
-        vec_copy = vec.duplicate()
-        assert vec == vec_copy
-
-        vec_mut = vec.to_mutable()
-        assert isinstance(vec_mut, Vector2D)
-        assert vec_mut.is_mutable is True
-        vec_mut.x = 1
-        assert vec_mut.x == 1
 
     def test_point2_mutability(self):
         """Test the mutability and immutability of Point2D objects."""
         pt = Point2D(0, 2)
         assert isinstance(pt, Point2D)
-        assert pt.is_mutable is True
-        pt.x = 1
-        assert pt.x == 1
         pt_copy = pt.duplicate()
         assert pt == pt_copy
-        pt_copy.x = 2
-        assert pt != pt_copy
 
-        pt_imm = pt.to_immutable()
-        assert isinstance(pt_imm, Point2DImmutable)
-        assert pt_imm.is_mutable is False
         with pytest.raises(AttributeError):
-            pt_imm.x = 2
-        norm_vec = pt_imm.normalized()  # ensure operations tha yield new vectors are ok
+            pt.x = 2
+        norm_vec = pt.normalize()  # ensure operations tha yield new vectors are ok
         assert norm_vec.magnitude == pytest.approx(1., rel=1e-3)
-        assert pt_imm.x == 1
-
-        pt = Point2DImmutable(0, 2)
-        assert isinstance(pt, Point2DImmutable)
-        assert pt.is_mutable is False
-        with pytest.raises(AttributeError):
-            pt.x = 1
-        assert pt.x == 0
-        pt_copy = pt.duplicate()
-        assert pt == pt_copy
-
-        pt_mut = pt.to_mutable()
-        assert isinstance(pt_mut, Point2D)
-        assert pt_mut.is_mutable is True
-        pt_mut.x = 1
-        assert pt_mut.x == 1
 
     def test_vector2_dot_cross_determinant_reverse(self):
         """Test the methods for dot, cross, and determinant."""
@@ -149,11 +95,8 @@ class Point2DTestCase(unittest.TestCase):
         assert vec_2.cross() == Vector2D(0, -2)
         assert vec_3.cross() == Vector2D(1, -1)
 
-        assert vec_1.reversed() == Vector2D(0, -2)
-        assert vec_2.reversed() == Vector2D(-2, 0)
-
-        vec_1.reverse()
-        assert vec_1 == Vector2D(0, -2)
+        assert vec_1.reverse() == Vector2D(0, -2)
+        assert vec_2.reverse() == Vector2D(-2, 0)
 
     def test_vector2_angle(self):
         """Test the methods that get the angle between Vector2D objects."""
@@ -274,7 +217,7 @@ class Point2DTestCase(unittest.TestCase):
         origin_1 = Point2D(0, 1)
         origin_2 = Point2D(1, 1)
         normal_1 = Vector2D(0, 1)
-        normal_2 = Vector2D(-1, 1).normalized()
+        normal_2 = Vector2D(-1, 1).normalize()
 
         assert pt_1.reflect(normal_1, origin_1) == Point2D(2, 0)
         assert pt_1.reflect(normal_1, origin_2) == Point2D(2, 0)

@@ -2,8 +2,7 @@
 """3D Line Segment"""
 from __future__ import division
 
-from .._immutable import immutable
-from .pointvector import Point3D
+from .pointvector import Point3D, Vector3D
 from ._1d import Base1DIn3D
 
 
@@ -26,8 +25,10 @@ class LineSegment3D(Base1DIn3D):
             p: A Point3D representing the first point of the line segment.
             v: A Vector3D representing the vector to the second point.
         """
-        self.p = p
-        self.v = v
+        assert isinstance(p, Point3D), "Expected Point3D. Got {}.".format(type(p))
+        assert isinstance(v, Vector3D), "Expected Vector3D. Got {}.".format(type(v))
+        self._p = p
+        self._v = v
 
     @classmethod
     def from_end_points(cls, p1, p2):
@@ -89,13 +90,8 @@ class LineSegment3D(Base1DIn3D):
         return abs(edge.v.x) < tolerance and abs(edge.v.y) < tolerance
 
     def flip(self):
-        """Flip the direction of the line segment."""
-        self.p = self.p2
-        self.v.reverse()
-
-    def flipped(self):
         """Get a copy of this line segment that is flipped."""
-        return LineSegment3D(self.p2, self.v.reversed())
+        return LineSegment3D(self.p2, self.v.reverse())
 
     def move(self, moving_vec):
         """Get a line segment that has been moved along a vector.
@@ -212,14 +208,6 @@ class LineSegment3D(Base1DIn3D):
         """
         return self.p + self.v * (length / self.length)
 
-    def to_mutable(self):
-        """Get a mutable version of this object."""
-        return self
-
-    def to_immutable(self):
-        """Get an immutable version of this object."""
-        return LineSegment3DImmutable(self.p, self.v)
-
     def _u_in(self, u):
         return u >= 0.0 and u <= 1.0
 
@@ -236,27 +224,3 @@ class LineSegment3D(Base1DIn3D):
         return 'LineSegment3D (<%.2f, %.2f, %.2f> to <%.2f, %.2f, %.2f>)' % \
             (self.p.x, self.p.y, self.p.z,
              self.p.x + self.v.x, self.p.y + self.v.y, self.p.z + self.v.z)
-
-
-@immutable
-class LineSegment3DImmutable(LineSegment3D):
-    """Immutable 3D Line Segment object."""
-    _mutable = False
-
-    def __init__(self, p, v):
-        """Initilize LineSegment2D.
-
-        Args:
-            p: A Point3D representing the base of the ray.
-            v: A Vector3D representing the direction of the ray.
-        """
-        self.p = p.to_immutable()
-        self.v = v.to_immutable()
-
-    def to_mutable(self):
-        """Get a mutable version of this object."""
-        return LineSegment3D(self.p.to_mutable(), self.v.to_mutable())
-
-    def to_immutable(self):
-        """Get an immutable version of this object."""
-        return self

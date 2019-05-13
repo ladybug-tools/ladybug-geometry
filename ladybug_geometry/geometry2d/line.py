@@ -2,8 +2,7 @@
 """2D Line Segment"""
 from __future__ import division
 
-from .._immutable import immutable
-from .pointvector import Point2D
+from .pointvector import Vector2D, Point2D
 from ._1d import Base1DIn2D
 from ..intersection2d import closest_point2d_between_line2d
 
@@ -27,8 +26,10 @@ class LineSegment2D(Base1DIn2D):
             p: A Point2D representing the first point of the line segment.
             v: A Vector2D representing the vector to the second point.
         """
-        self.p = p
-        self.v = v
+        assert isinstance(p, Point2D), "Expected Point2D. Got {}.".format(type(p))
+        assert isinstance(v, Vector2D), "Expected Vector2D. Got {}.".format(type(v))
+        self._p = p
+        self._v = v
 
     @classmethod
     def from_end_points(cls, p1, p2):
@@ -72,13 +73,8 @@ class LineSegment2D(Base1DIn2D):
         return self.v.magnitude
 
     def flip(self):
-        """Flip the direction of the line segment."""
-        self.p = self.p2
-        self.v.reverse()
-
-    def flipped(self):
         """Get a copy of this line segment that is flipped."""
-        return LineSegment2D(self.p2, self.v.reversed())
+        return LineSegment2D(self.p2, self.v.reverse())
 
     def move(self, moving_vec):
         """Get a line segment that has been moved along a vector.
@@ -211,14 +207,6 @@ class LineSegment2D(Base1DIn2D):
         dist, pts = closest_point2d_between_line2d(self, line)
         return dist
 
-    def to_mutable(self):
-        """Get a mutable version of this object."""
-        return self
-
-    def to_immutable(self):
-        """Get an immutable version of this object."""
-        return LineSegment2DImmutable(self.p, self.v)
-
     def _u_in(self, u):
         return u >= 0.0 and u <= 1.0
 
@@ -234,27 +222,3 @@ class LineSegment2D(Base1DIn2D):
     def __repr__(self):
         return 'LineSegment2D (<%.2f, %.2f> to <%.2f, %.2f>)' % \
             (self.p.x, self.p.y, self.p.x + self.v.x, self.p.y + self.v.y)
-
-
-@immutable
-class LineSegment2DImmutable(LineSegment2D):
-    """Immutable 2D Line Segment object."""
-    _mutable = False
-
-    def __init__(self, p, v):
-        """Initilize LineSegment2D.
-
-        Args:
-            p: A Point2D representing the base of the ray.
-            v: A Vector2D representing the direction of the ray.
-        """
-        self.p = p.to_immutable()
-        self.v = v.to_immutable()
-
-    def to_mutable(self):
-        """Get a mutable version of this object."""
-        return LineSegment2D(self.p.to_mutable(), self.v.to_mutable())
-
-    def to_immutable(self):
-        """Get an immutable version of this object."""
-        return self

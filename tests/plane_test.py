@@ -1,11 +1,10 @@
 # coding=utf-8
 
-from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D, \
-    Point3DImmutable, Vector3DImmutable
+from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
 from ladybug_geometry.geometry3d.plane import Plane
 from ladybug_geometry.geometry3d.ray import Ray3D
 from ladybug_geometry.geometry3d.line import LineSegment3D
-from ladybug_geometry.geometry2d.pointvector import Point2D, Point2DImmutable
+from ladybug_geometry.geometry2d.pointvector import Point2D
 
 import unittest
 import pytest
@@ -88,9 +87,9 @@ class PlaneTestCase(unittest.TestCase):
         with pytest.raises(AttributeError):
             plane.n.x = 3
         with pytest.raises(AttributeError):
-            plane.o = Point3DImmutable(0, 0, 0)
+            plane.o = Point3D(0, 0, 0)
         with pytest.raises(AttributeError):
-            plane.n = Vector3DImmutable(2, 2, 0)
+            plane.n = Vector3D(2, 2, 0)
         # ensure operations that yield new objects are ok
         plane_move = plane.move(Vector3D(-2, 0, 0))
         assert plane_move.o == Point3D(0, 0, 0)
@@ -228,7 +227,7 @@ class PlaneTestCase(unittest.TestCase):
         origin_1 = Point3D(0, 1, 2)
         origin_2 = Point3D(1, 1, 2)
         normal_1 = Vector3D(0, 1, 0)
-        normal_2 = Vector3D(-1, 1, 0).normalized()
+        normal_2 = Vector3D(-1, 1, 0).normalize()
 
         assert plane.reflect(normal_1, origin_1).o == Point3D(2, 0, 2)
         assert plane.reflect(normal_1, origin_1).n == Vector3D(0, -1, 0)
@@ -257,15 +256,9 @@ class PlaneTestCase(unittest.TestCase):
 
         test_pt = Point3D(4, 4, 2)
         assert plane.xyz_to_xy(test_pt) == Point2D(2, 2)
-        test_pt = Point3DImmutable(0, 0, 2)
+        test_pt = Point3D(0, 0, 2)
         assert plane.xyz_to_xy(test_pt) == Point2D(-2, -2)
         assert isinstance(plane.xyz_to_xy(test_pt), Point2D)
-
-        test_pt = Point3D(4, 4, 2)
-        assert plane.xyz_to_xy_immutable(test_pt) == Point2D(2, 2)
-        test_pt = Point3DImmutable(0, 0, 2)
-        assert plane.xyz_to_xy_immutable(test_pt) == Point2D(-2, -2)
-        assert isinstance(plane.xyz_to_xy_immutable(test_pt), Point2DImmutable)
 
     def test_xy_to_xyz(self):
         """Test the xy_to_xyz method."""
@@ -275,15 +268,9 @@ class PlaneTestCase(unittest.TestCase):
 
         test_pt = Point2D(2, 2)
         assert plane.xy_to_xyz(test_pt) == Point3D(4, 4, 2)
-        test_pt = Point2DImmutable(-1, -1)
+        test_pt = Point2D(-1, -1)
         assert plane.xy_to_xyz(test_pt) == Point3D(1, 1, 2)
         assert isinstance(plane.xy_to_xyz(test_pt), Point3D)
-
-        test_pt = Point2D(2, 2)
-        assert plane.xy_to_xyz_immutable(test_pt) == Point3D(4, 4, 2)
-        test_pt = Point2DImmutable(-1, -1)
-        assert plane.xy_to_xyz_immutable(test_pt) == Point3D(1, 1, 2)
-        assert isinstance(plane.xy_to_xyz_immutable(test_pt), Point3DImmutable)
 
     def test_closest_point(self):
         """Test the Plane closest_point method."""

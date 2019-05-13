@@ -4,7 +4,7 @@ from __future__ import division
 
 from .._mesh import MeshBase
 
-from .pointvector import Point2D, Point2DImmutable
+from .pointvector import Point2D
 from .line import LineSegment2D
 from .polygon import Polygon2D
 from ._2d import Base2DIn2D
@@ -209,8 +209,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
             for _c, _a in zip(self.face_centroids, self.face_areas):
                 _weight_x += _c.x * _a
                 _weight_y += _c.y * _a
-            self._centroid = Point2DImmutable(_weight_x / self.area,
-                                              _weight_y / self.area)
+            self._centroid = Point2D(_weight_x / self.area, _weight_y / self.area)
         return self._centroid
 
     def triangulated(self):
@@ -316,19 +315,8 @@ class Mesh2D(MeshBase, Base2DIn2D):
             angle: An angle for rotation in radians.
             origin: A Point2D for the origin around which the point will be rotated.
         """
-        _verts = tuple([pt.rotate(angle, origin).to_immutable() for pt in self.vertices])
+        _verts = tuple([pt.rotate(angle, origin) for pt in self.vertices])
         return self._mesh_transform(_verts)
-
-    def _check_vertices_input(self, vertices):
-        """Check input vertices for correct formatting and immutability."""
-        assert isinstance(vertices, (list, tuple)), \
-            'vertices should be a list or tuple. Got {}'.format(type(vertices))
-        assert len(vertices) >= 3, 'Mesh2D should have at least 3 vertices. ' \
-            'Got {}'.format(len(vertices))
-        for vert in vertices:
-            assert isinstance(vert, (Point2D, Point2DImmutable)), \
-                'Expected Point2D for Mesh2D vertex. Got {}.'.format(type(vert))
-        self._vertices = tuple(p.to_immutable() for p in vertices)
 
     def _face_area(self, face):
         """Return the area of a face."""
@@ -435,14 +423,14 @@ class Mesh2D(MeshBase, Base2DIn2D):
         _tot_a = sum(_tri_a)
         _cent_x = (_tri_c[0].x * _tri_a[0] + _tri_c[1].x * _tri_a[1]) / _tot_a
         _cent_y = (_tri_c[0].y * _tri_a[0] + _tri_c[1].y * _tri_a[1]) / _tot_a
-        return Point2DImmutable(_cent_x, _cent_y)
+        return Point2D(_cent_x, _cent_y)
 
     @staticmethod
     def _tri_centroid(verts):
         """Get the centroid of a list of 3 Point2D vertices."""
         _cent_x = sum([v.x for v in verts])
         _cent_y = sum([v.y for v in verts])
-        return Point2DImmutable(_cent_x / 3, _cent_y / 3)
+        return Point2D(_cent_x / 3, _cent_y / 3)
 
     @staticmethod
     def _get_area(verts):
@@ -468,7 +456,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
         for i in xrange(num_x + 1):
             _y = base_point.y
             for j in xrange(num_y + 1):
-                _verts.append(Point2DImmutable(_x, _y))
+                _verts.append(Point2D(_x, _y))
                 _y += y_dim
             _x += x_dim
         return _verts
@@ -495,7 +483,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
         for i in xrange(num_x):
             _y = base_point.y
             for j in xrange(num_y):
-                _centroids.append(Point2DImmutable(_x + _x_half, _y + _y_half))
+                _centroids.append(Point2D(_x + _x_half, _y + _y_half))
                 _y += y_dim
             _x += x_dim
         return tuple(_centroids)

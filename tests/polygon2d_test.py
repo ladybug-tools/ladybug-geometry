@@ -1,8 +1,8 @@
 # coding=utf-8
 
 from ladybug_geometry.geometry2d.polygon import Polygon2D
-from ladybug_geometry.geometry2d.pointvector import Point2D, Point2DImmutable, Vector2D
-from ladybug_geometry.geometry2d.line import LineSegment2D, LineSegment2DImmutable
+from ladybug_geometry.geometry2d.pointvector import Point2D, Vector2D
+from ladybug_geometry.geometry2d.line import LineSegment2D
 from ladybug_geometry.geometry2d.ray import Ray2D
 
 import unittest
@@ -24,12 +24,12 @@ class Polygon2DTestCase(unittest.TestCase):
         assert len(polygon.vertices) == 4
         assert len(polygon) == 4
         for point in polygon:
-            assert isinstance(point, Point2DImmutable)
+            assert isinstance(point, Point2D)
 
         assert isinstance(polygon.segments, tuple)
         assert len(polygon.segments) == 4
         for seg in polygon.segments:
-            assert isinstance(seg, LineSegment2DImmutable)
+            assert isinstance(seg, LineSegment2D)
             assert seg.length == 2
 
         assert polygon.area == 4
@@ -47,12 +47,12 @@ class Polygon2DTestCase(unittest.TestCase):
         assert isinstance(polygon.vertices, tuple)
         assert len(polygon.vertices) == 4
         for point in polygon.vertices:
-            assert isinstance(point, Point2DImmutable)
+            assert isinstance(point, Point2D)
 
         assert isinstance(polygon.segments, tuple)
         assert len(polygon.segments) == 4
         for seg in polygon.segments:
-            assert isinstance(seg, LineSegment2DImmutable)
+            assert isinstance(seg, LineSegment2D)
             assert seg.length == 2
 
         assert polygon.area == 4
@@ -68,11 +68,11 @@ class Polygon2DTestCase(unittest.TestCase):
         assert isinstance(polygon.vertices, tuple)
         assert len(polygon.vertices) == 8
         for point in polygon.vertices:
-            assert isinstance(point, Point2DImmutable)
+            assert isinstance(point, Point2D)
         assert isinstance(polygon.segments, tuple)
         assert len(polygon.segments) == 8
         for seg in polygon.segments:
-            assert isinstance(seg, LineSegment2DImmutable)
+            assert isinstance(seg, LineSegment2D)
             assert seg.length == pytest.approx(1.5307337, rel=1e-3)
 
         assert polygon.area == pytest.approx(11.3137084, rel=1e-3)
@@ -97,12 +97,12 @@ class Polygon2DTestCase(unittest.TestCase):
         assert isinstance(polygon.vertices, tuple)
         assert len(polygon.vertices) == 10
         for point in polygon.vertices:
-            assert isinstance(point, Point2DImmutable)
+            assert isinstance(point, Point2D)
 
         assert isinstance(polygon.segments, tuple)
         assert len(polygon.segments) == 10
         for seg in polygon.segments:
-            assert isinstance(seg, LineSegment2DImmutable)
+            assert isinstance(seg, LineSegment2D)
 
         assert polygon.area == 12
         assert polygon.perimeter == pytest.approx(26.828427, rel=1e-3)
@@ -120,12 +120,12 @@ class Polygon2DTestCase(unittest.TestCase):
         assert isinstance(polygon.vertices, tuple)
         assert len(polygon.vertices) == 16
         for point in polygon.vertices:
-            assert isinstance(point, Point2DImmutable)
+            assert isinstance(point, Point2D)
 
         assert isinstance(polygon.segments, tuple)
         assert len(polygon.segments) == 16
         for seg in polygon.segments:
-            assert isinstance(seg, LineSegment2DImmutable)
+            assert isinstance(seg, LineSegment2D)
 
         assert polygon.area == 16 - 1.25
         assert polygon.perimeter == pytest.approx(26.24264068, rel=1e-3)
@@ -300,7 +300,7 @@ class Polygon2DTestCase(unittest.TestCase):
 
         origin_1 = Point2D(1, 0)
         normal_1 = Vector2D(1, 0)
-        normal_2 = Vector2D(-1, -1).normalized()
+        normal_2 = Vector2D(-1, -1).normalize()
 
         test_1 = polygon.reflect(normal_1, origin_1)
         assert test_1[0].x == pytest.approx(1, rel=1e-3)

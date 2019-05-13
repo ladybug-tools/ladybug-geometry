@@ -322,7 +322,7 @@ class Mesh3DTestCase(unittest.TestCase):
         mesh = Mesh3D(pts, [(0, 1, 2, 3)])
         origin_1 = Point3D(1, 0, 2)
         normal_1 = Vector3D(1, 0, 0)
-        normal_2 = Vector3D(-1, -1, 0).normalized()
+        normal_2 = Vector3D(-1, -1, 0).normalize()
 
         test_1 = mesh.reflect(normal_1, origin_1)
         assert test_1[0].x == pytest.approx(1, rel=1e-3)

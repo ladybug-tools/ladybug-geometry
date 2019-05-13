@@ -2,7 +2,7 @@
 """Base class for all 1D geometries in 3D space (Ray3D and LineSegment3D)."""
 from __future__ import division
 
-from .pointvector import Point3D, Point3DImmutable, Vector3D, Vector3DImmutable
+from .pointvector import Point3D, Vector3D
 from ..intersection3d import closest_point3d_on_line3d
 
 
@@ -13,34 +13,16 @@ class Base1DIn3D(object):
         p: End Point3D of object
         v: Vector3D along object
     """
-    _mutable = True
-
-    @property
-    def is_mutable(self):
-        """Boolean to note whether the object is mutable."""
-        return self._mutable
 
     @property
     def p(self):
         """Base point."""
         return self._p
 
-    @p.setter
-    def p(self, p):
-        assert isinstance(p, (Point3D, Point3DImmutable)), \
-            "Expected Point3D. Got {}.".format(type(p))
-        self._p = p.duplicate()
-
     @property
     def v(self):
         """Direction vector."""
         return self._v
-
-    @v.setter
-    def v(self, v):
-        assert isinstance(v, (Vector3D, Vector3DImmutable)), \
-            "Expected Vector3D. Got {}.".format(type(v))
-        self._v = v.duplicate()
 
     def closest_point(self, point):
         """Get the closest Point3D on this object to another Point3D.

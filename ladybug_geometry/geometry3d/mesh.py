@@ -5,7 +5,7 @@ from __future__ import division
 from .._mesh import MeshBase
 from ..geometry2d.mesh import Mesh2D
 
-from .pointvector import Point3D, Point3DImmutable, Vector3D, Vector3DImmutable
+from .pointvector import Point3D, Vector3D
 from .plane import Plane
 from ._2d import Base2DIn3D
 
@@ -52,7 +52,6 @@ class Mesh3D(MeshBase, Base2DIn3D):
 
         self._is_color_by_face = False  # default if colors is None
         self.colors = colors
-
         self._min = None
         self._max = None
         self._center = None
@@ -88,11 +87,11 @@ class Mesh3D(MeshBase, Base2DIn3D):
         assert isinstance(mesh_2d, Mesh2D), 'Expected Mesh2D for from_mesh_2d. ' \
             'Got {}.'.format(type(mesh_2d))
         if plane is None:
-            return cls(tuple(Point3DImmutable(pt.x, pt.y, 0) for pt in mesh_2d.vertices),
+            return cls(tuple(Point3D(pt.x, pt.y, 0) for pt in mesh_2d.vertices),
                        mesh_2d.faces, mesh_2d.colors)
         else:
             assert isinstance(plane, Plane), 'Expected Plane. Got {}'.format(type(plane))
-            _verts3d = tuple(plane.xy_to_xyz_immutable(_v) for _v in mesh_2d.vertices)
+            _verts3d = tuple(plane.xy_to_xyz(_v) for _v in mesh_2d.vertices)
             return cls(_verts3d, mesh_2d.faces, mesh_2d.colors)
 
     @property
@@ -109,8 +108,7 @@ class Mesh3D(MeshBase, Base2DIn3D):
         """Tuple of Vector3D objects for all face normals."""
         if self._face_normals is None:
             self._calculate_face_areas_and_normals()
-        elif isinstance(self._face_normals, (Vector3D, Vector3DImmutable)):
-            # same normal for each face
+        elif isinstance(self._face_normals, Vector3D):  # same normal for each face
             self._face_normals = tuple(self._face_normals for face in self.faces)
         return self._face_normals
 
@@ -119,8 +117,7 @@ class Mesh3D(MeshBase, Base2DIn3D):
         """Tuple of Vector3D objects for all vertex normals."""
         if not self._vertex_normals:
             self._calculate_vertex_normals()
-        elif isinstance(self._vertex_normals, (Vector3D, Vector3DImmutable)):
-            # same normal for each vertex
+        elif isinstance(self._vertex_normals, Vector3D):  # same normal for each vertex
             self._vertex_normals = tuple(self._vertex_normals for face in self.vertices)
         return self._vertex_normals
 
@@ -208,8 +205,7 @@ class Mesh3D(MeshBase, Base2DIn3D):
             angle: An angle for rotation in radians.
             origin: A Point3D for the origin around which the point will be rotated.
         """
-        _verts = tuple([pt.rotate(axis, angle, origin).to_immutable()
-                        for pt in self.vertices])
+        _verts = tuple(pt.rotate(axis, angle, origin) for pt in self.vertices)
         return self._mesh_transform(_verts)
 
     def rotate_xy(self, angle, origin):
@@ -219,20 +215,8 @@ class Mesh3D(MeshBase, Base2DIn3D):
             angle: An angle for rotation in radians.
             origin: A Point3D for the origin around which the point will be rotated.
         """
-        _verts = tuple([pt.rotate_xy(angle, origin).to_immutable()
-                        for pt in self.vertices])
+        _verts = tuple(pt.rotate_xy(angle, origin) for pt in self.vertices)
         return self._mesh_transform(_verts)
-
-    def _check_vertices_input(self, vertices):
-        """Check input vertices for correct formatting and immutability."""
-        assert isinstance(vertices, (list, tuple)), \
-            'vertices should be a list or tuple. Got {}'.format(type(vertices))
-        assert len(vertices) >= 3, 'Mesh3D should have at least 3 vertices. ' \
-            'Got {}'.format(len(vertices))
-        for vert in vertices:
-            assert isinstance(vert, (Point3D, Point3DImmutable)), \
-                'Expected Point3D for Mesh3D vertex. Got {}.'.format(type(vert))
-        self._vertices = tuple(p.to_immutable() for p in vertices)
 
     def _calculate_face_areas_and_normals(self):
         """Calculate face areas and normals from vertices."""
@@ -274,8 +258,7 @@ class Mesh3D(MeshBase, Base2DIn3D):
                 y += n.y * a
                 z += n.z * a
             _v = Vector3D(x, y, z)
-            _v.normalize()
-            vn.append(_v.to_immutable())
+            vn.append(_v.normalize())
         self._vertex_normals = tuple(vn)
 
     def _tri_face_centroid(self, face):
@@ -318,11 +301,9 @@ class Mesh3D(MeshBase, Base2DIn3D):
         """
         v1 = pts[1] - pts[0]
         v2 = pts[2] - pts[0]
-        n1 = v1.cross(v2)
-        a = n1.magnitude / 2
-        n1.normalize()
-        n = n1.to_immutable()
-        return n, a
+        n = v1.cross(v2)
+        a = n.magnitude / 2
+        return n.normalize(), a
 
     @staticmethod
     def _calculate_normal_and_area_for_quad(pts):
@@ -349,10 +330,8 @@ class Mesh3D(MeshBase, Base2DIn3D):
         n2 = v3.cross(v4)
 
         a = (n1.magnitude + n2.magnitude) / 2
-        n3 = Vector3D((n1.x + n2.x) / 2, (n1.y + n2.y) / 2, (n1.z + n2.z) / 2)
-        n3.normalize()
-        n = n3.to_immutable()
-        return n, a
+        n = Vector3D((n1.x + n2.x) / 2, (n1.y + n2.y) / 2, (n1.z + n2.z) / 2)
+        return n.normalize(), a
 
     @staticmethod
     def _tri_centroid(verts):
@@ -360,7 +339,7 @@ class Mesh3D(MeshBase, Base2DIn3D):
         _cent_x = sum([v.x for v in verts])
         _cent_y = sum([v.y for v in verts])
         _cent_z = sum([v.z for v in verts])
-        return Point3DImmutable(_cent_x / 3, _cent_y / 3, _cent_z / 3)
+        return Point3D(_cent_x / 3, _cent_y / 3, _cent_z / 3)
 
     @staticmethod
     def _quad_centroid(verts):
@@ -377,7 +356,7 @@ class Mesh3D(MeshBase, Base2DIn3D):
         _cent_x = (_tri_c[0].x * _tri_a[0] + _tri_c[1].x * _tri_a[1]) / _tot_a
         _cent_y = (_tri_c[0].y * _tri_a[0] + _tri_c[1].y * _tri_a[1]) / _tot_a
         _cent_z = (_tri_c[0].z * _tri_a[0] + _tri_c[1].z * _tri_a[1]) / _tot_a
-        return Point3DImmutable(_cent_x, _cent_y, _cent_z)
+        return Point3D(_cent_x, _cent_y, _cent_z)
 
     @staticmethod
     def _get_tri_area(pts):

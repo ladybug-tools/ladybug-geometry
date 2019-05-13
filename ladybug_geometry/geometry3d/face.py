@@ -2,8 +2,8 @@
 """Planar Face in 3D Space"""
 from __future__ import division
 
-from .pointvector import Point3D, Point3DImmutable, Vector3D, Vector3DImmutable
-from .line import LineSegment3D, LineSegment3DImmutable
+from .pointvector import Point3D, Vector3D
+from .line import LineSegment3D
 from .plane import Plane
 from .mesh import Mesh3D
 from ._2d import Base2DIn3D
@@ -72,7 +72,6 @@ class Face3D(Base2DIn3D):
         self._holes = None
         self._boundary_segments = None
         self._hole_segments = None
-
         self._min = None
         self._max = None
         self._center = None
@@ -106,12 +105,10 @@ class Face3D(Base2DIn3D):
             extrusion_vector: A vector denoting the direction and distance to
                 extrude the line segment.
         """
-        assert isinstance(line_segment, (LineSegment3D, LineSegment3DImmutable)), \
-            'line_segment must be LineSegment3D. Got {}.'.format(
-                type(line_segment))
-        assert isinstance(extrusion_vector, (Vector3D, Vector3DImmutable)), \
-            'extrusion_vector must be Vector3D. Got {}.'.format(
-                type(extrusion_vector))
+        assert isinstance(line_segment, LineSegment3D), \
+            'line_segment must be LineSegment3D. Got {}.'.format(type(line_segment))
+        assert isinstance(extrusion_vector, Vector3D), \
+            'extrusion_vector must be Vector3D. Got {}.'.format(type(extrusion_vector))
         _p1 = line_segment.p1
         _p2 = line_segment.p2
         _verts = (_p1, _p1 + extrusion_vector, _p2 + extrusion_vector, _p2)
@@ -122,8 +119,7 @@ class Face3D(Base2DIn3D):
         _height = _dist * math.sin(extrusion_vector.angle(line_segment.v))
         face._perimeter = _base * 2 + _dist * 2
         face._area = _base * _height
-        _cent = _p1 + (line_segment.v * 0.5) + (extrusion_vector * 0.5)
-        face._centroid = _cent.to_immutable()
+        face._centroid = _p1 + (line_segment.v * 0.5) + (extrusion_vector * 0.5)
         face._is_clockwise = True
         face._is_convex = True
         face._is_self_intersecting = False
@@ -158,8 +154,7 @@ class Face3D(Base2DIn3D):
         face = cls(_verts, base_plane)
         face._perimeter = base * 2 + height * 2
         face._area = base * height
-        _cent = _o + (_b_vec * 0.5) + (_h_vec * 0.5)
-        face._centroid = _cent.to_immutable()
+        face._centroid = _o + (_b_vec * 0.5) + (_h_vec * 0.5)
         face._is_clockwise = True
         face._is_convex = True
         face._is_self_intersecting = False
@@ -188,7 +183,7 @@ class Face3D(Base2DIn3D):
 
         # create the regular polygon face
         _polygon2d = Polygon2D.from_regular_polygon(number_of_sides, radius)
-        _vert3d = tuple(base_plane.xy_to_xyz_immutable(_v) for _v in _polygon2d.vertices)
+        _vert3d = tuple(base_plane.xy_to_xyz(_v) for _v in _polygon2d.vertices)
         _face = cls(_vert3d, base_plane)
 
         # assign extra properties that we know to the face
@@ -235,18 +230,18 @@ class Face3D(Base2DIn3D):
             plane = cls._plane_from_vertices(boundary)
 
         # create a Polygon2D from the vertices
-        _boundary2d = [plane.xyz_to_xy_immutable(_v) for _v in boundary]
-        _holes2d = [[plane.xyz_to_xy_immutable(_v) for _v in hole] for hole in holes]
+        _boundary2d = [plane.xyz_to_xy(_v) for _v in boundary]
+        _holes2d = [[plane.xyz_to_xy(_v) for _v in hole] for hole in holes]
         _polygon2d = Polygon2D.from_shape_with_holes(_boundary2d, _holes2d)
 
         # convert Polygon2D vertices to 3D to become the vertices of the face.
-        _vert3d = tuple(plane.xy_to_xyz_immutable(_v) for _v in _polygon2d.vertices)
+        _vert3d = tuple(plane.xy_to_xyz(_v) for _v in _polygon2d.vertices)
         _face = cls(_vert3d, plane)
 
         # assign extra properties that we know to the face
         _face._polygon2d = _polygon2d
-        _face._boundary = tuple(pt.to_immutable() for pt in boundary)
-        _face._holes = tuple(tuple(pt.to_immutable() for pt in hole) for hole in holes)
+        _face._boundary = tuple(boundary)
+        _face._holes = tuple(tuple(hole) for hole in holes)
         return _face
 
     @property
@@ -273,7 +268,7 @@ class Face3D(Base2DIn3D):
         the outer boundary.
         """
         if self._polygon2d is None:
-            _vert2d = tuple(self._plane.xyz_to_xy_immutable(_v) for _v in self.vertices)
+            _vert2d = tuple(self._plane.xyz_to_xy(_v) for _v in self.vertices)
             self._polygon2d = Polygon2D(_vert2d)
             if self._is_clockwise is not None:
                 self._polygon2d._is_clockwise = self._is_clockwise
@@ -290,8 +285,8 @@ class Face3D(Base2DIn3D):
     def triangulated_mesh3d(self):
         """A triagulated Mesh3D of this face."""
         if self._mesh3d is None:
-            _vert3d = [self._plane.xy_to_xyz_immutable(_v) for _v in
-                       self.triangulated_mesh2d.vertices]
+            _vert3d = tuple(self._plane.xy_to_xyz(_v) for _v in
+                            self.triangulated_mesh2d.vertices)
             self._mesh3d = Mesh3D(_vert3d, self.triangulated_mesh2d.faces)
         return self._mesh3d
 
@@ -323,7 +318,7 @@ class Face3D(Base2DIn3D):
         if self._boundary_segments is None:
             _segs = []
             for i, vert in enumerate(self.boundary):
-                _seg = LineSegment3DImmutable.from_end_points(self.boundary[i - 1], vert)
+                _seg = LineSegment3D.from_end_points(self.boundary[i - 1], vert)
                 _segs.append(_seg)
             _segs.append(_segs.pop(0))  # segments will start from the first vertex
             self._boundary_segments = tuple(_segs)
@@ -340,7 +335,7 @@ class Face3D(Base2DIn3D):
             for hole in self.holes:
                 _segs = []
                 for i, vert in enumerate(hole):
-                    _seg = LineSegment3DImmutable.from_end_points(hole[i - 1], vert)
+                    _seg = LineSegment3D.from_end_points(hole[i - 1], vert)
                     _segs.append(_seg)
                 _segs.append(_segs.pop(0))  # segments will start from the first vertex
                 _all_segs.append(_segs)
@@ -380,7 +375,7 @@ class Face3D(Base2DIn3D):
         """
         if self._centroid is None:
             _cent2d = self.triangulated_mesh2d.centroid
-            self._centroid = self._plane.xy_to_xyz_immutable(_cent2d)
+            self._centroid = self._plane.xy_to_xyz(_cent2d)
         return self._centroid
 
     @property
@@ -833,32 +828,29 @@ class Face3D(Base2DIn3D):
         grid_mesh2d = Mesh2D.from_polygon_grid(
             self.polygon2d, x_dim, y_dim, generate_centroids)
         if offset is None or offset == 0:
-            vert_3d = tuple(self._plane.xy_to_xyz_immutable(pt)
+            vert_3d = tuple(self._plane.xy_to_xyz(pt)
                             for pt in grid_mesh2d.vertices)
         else:
             _off_num = -offset if flip is True else offset
             _off_plane = self.plane.move(self.plane.n * _off_num)
-            vert_3d = tuple(_off_plane.xy_to_xyz_immutable(pt)
+            vert_3d = tuple(_off_plane.xy_to_xyz(pt)
                             for pt in grid_mesh2d.vertices)
         grid_mesh3d = Mesh3D(vert_3d, grid_mesh2d.faces)
         grid_mesh3d._face_areas = grid_mesh2d._face_areas
 
         # assign the face plane normal to the mesh normals
         if flip is True:
-            grid_mesh3d._face_normals = self._plane.n.reversed().to_immutable()
-            grid_mesh3d._vertex_normals = self._plane.n.reversed().to_immutable()
+            grid_mesh3d._face_normals = self._plane.n.reverse()
+            grid_mesh3d._vertex_normals = self._plane.n.reverse()
         else:
             grid_mesh3d._face_normals = self._plane.n
             grid_mesh3d._vertex_normals = self._plane.n
 
         # transform the centroids to 3D space if they were generated
         if generate_centroids is True:
-            if offset is None or offset == 0:
-                grid_mesh3d._face_centroids = tuple(self._plane.xy_to_xyz_immutable(pt)
-                                                    for pt in grid_mesh2d.face_centroids)
-            else:
-                grid_mesh3d._face_centroids = tuple(_off_plane.xy_to_xyz_immutable(pt)
-                                                    for pt in grid_mesh2d.face_centroids)
+            _conv_plane = self._plane if offset is None or offset == 0 else _off_plane
+            grid_mesh3d._face_centroids = tuple(_conv_plane.xy_to_xyz(pt)
+                                                for pt in grid_mesh2d.face_centroids)
 
         return grid_mesh3d
 
@@ -1095,38 +1087,28 @@ class Face3D(Base2DIn3D):
                                       base_plane)]
         return final_faces
 
-    def _check_vertices_input(self, vertices):
-        assert isinstance(vertices, (list, tuple)), \
-            'vertices should be a list or tuple. Got {}'.format(type(vertices))
-        assert len(vertices) >= 3, 'There must be at least 3 vertices for a Face3D.' \
-            ' Got {}'.format(len(vertices))
-        for vert in vertices:
-            assert isinstance(vert, (Point3D, Point3DImmutable)), \
-                'Expected Point3D for Face3D vertex. Got {}.'.format(type(vert))
-        self._vertices = tuple(p.to_immutable() for p in vertices)
-
     def _check_number_mesh_grid(self, input, name):
         assert isinstance(input, (float, int)), '{} for Face3D.get_mesh_grid' \
             ' must be a number. Got {}.'.format(name, type(input))
 
     def _move(self, vertices, mov_vec):
-        return tuple(Point3DImmutable(
+        return tuple(Point3D(
             pt.x + mov_vec.x, pt.y + mov_vec.y, pt.z + mov_vec.z) for pt in vertices)
 
     def _rotate(self, vertices, axis, angle, origin):
-        return tuple([pt.rotate(axis, angle, origin).to_immutable() for pt in vertices])
+        return tuple(pt.rotate(axis, angle, origin) for pt in vertices)
 
     def _rotate_xy(self, vertices, angle, origin):
-        return tuple([pt.rotate_xy(angle, origin).to_immutable() for pt in vertices])
+        return tuple(pt.rotate_xy(angle, origin) for pt in vertices)
 
     def _reflect(self, vertices, normal, origin):
-        return tuple([pt.reflect(normal, origin).to_immutable() for pt in vertices])
+        return tuple(pt.reflect(normal, origin) for pt in vertices)
 
     def _scale(self, vertices, factor, origin):
-        return tuple([pt.scale(factor, origin).to_immutable() for pt in vertices])
+        return tuple(pt.scale(factor, origin) for pt in vertices)
 
     def _scale_world_origin(self, vertices, factor):
-        return tuple([pt.scale_world_origin(factor).to_immutable() for pt in vertices])
+        return tuple(pt.scale_world_origin(factor) for pt in vertices)
 
     def _face_transform(self, verts, plane):
         """Transform face in a way that transfers properties and avoids checks."""

@@ -2,7 +2,6 @@
 """3D Vector and 3D Point"""
 from __future__ import division
 
-from .._immutable import immutable
 from ..geometry2d.pointvector import Vector2D
 
 import math
@@ -19,20 +18,28 @@ class Vector3D(object):
         magnitude
         magnitude_squared
     """
-    __slots__ = ('x', 'y', 'z')
-    __hash__ = None
-    _mutable = True
+    __slots__ = ('_x', '_y', '_z')
 
     def __init__(self, x=0, y=0, z=0):
         """Initialize 3D Vector."""
-        self.x = x
-        self.y = y
-        self.z = z
+        self._x = x
+        self._y = y
+        self._z = z
 
     @property
-    def is_mutable(self):
-        """Boolean to note whether the object is mutable."""
-        return self._mutable
+    def x(self):
+        """Get the X coordinate."""
+        return self._x
+
+    @property
+    def y(self):
+        """Get the Y coordinate."""
+        return self._y
+
+    @property
+    def z(self):
+        """Get the Z coordinate."""
+        return self._z
 
     @property
     def magnitude(self):
@@ -45,14 +52,6 @@ class Vector3D(object):
         return self.x ** 2 + self.y ** 2 + self.z ** 2
 
     def normalize(self):
-        """Convert this vector to a unit vector (magnitude=1) with the same direction."""
-        d = self.magnitude
-        if d:
-            self.x /= d
-            self.y /= d
-            self.z /= d
-
-    def normalized(self):
         """Get a copy of the vector that is a unit vector (magnitude=1)."""
         d = self.magnitude
         if d:
@@ -60,12 +59,6 @@ class Vector3D(object):
         return self.duplicate()
 
     def reverse(self):
-        """Convert this vector into one with a reversed direction."""
-        self.x = -self.x
-        self.y = -self.y
-        self.z = -self.z
-
-    def reversed(self):
         """Get a copy of this vector that is reversed."""
         return self.__neg__()
 
@@ -114,14 +107,6 @@ class Vector3D(object):
         """
         return Vector3D._reflect(self, normal)
 
-    def to_mutable(self):
-        """Get a mutable version of this object."""
-        return self
-
-    def to_immutable(self):
-        """Get an immutable version of this vector."""
-        return Vector3DImmutable(self.x, self.y, self.z)
-
     def duplicate(self):
         """Get a copy of this vector."""
         return self.__copy__()
@@ -143,7 +128,7 @@ class Vector3D(object):
         u, v, w = axis.x, axis.y, axis.z
 
         # Extracted common factors for simplicity and efficiency
-        r2 = u**2 + v**2 + w**2
+        r2 = u ** 2 + v ** 2 + w ** 2
         r = math.sqrt(r2)
         ct = math.cos(angle)
         st = math.sin(angle) / r
@@ -156,7 +141,7 @@ class Vector3D(object):
         return self.__class__(self.x, self.y, self.z)
 
     def __eq__(self, other):
-        if isinstance(other, (Vector3D, Vector3DImmutable, Point3D, Point3DImmutable)):
+        if isinstance(other, (Vector3D, Point3D)):
             return self.x == other.x and self.y == other.y and self.z == other.z
         else:
             return False
@@ -179,102 +164,87 @@ class Vector3D(object):
     def __add__(self, other):
         # Vector + Point -> Point
         # Vector + Vector -> Vector
-        if isinstance(other, (Point3D, Point3DImmutable)):
+        if isinstance(other, Point3D):
             return Point3D(self.x + other.x, self.y + other.y, self.z + other.z)
-        elif isinstance(other, (Vector3D, Vector3DImmutable)):
+        elif isinstance(other, Vector3D):
             return Vector3D(self.x + other.x, self.y + other.y, self.z + other.z)
         else:
-            raise TypeError('Cannot add Vector3D and {}'.format(type(other)))
+            raise TypeError('Cannot add {} and {}'.format(
+                self.__class__.__name__, type(other)))
 
     __radd__ = __add__
-
-    def __iadd__(self, other):
-        if isinstance(other, (Vector3D, Vector3DImmutable, Point3D, Point3DImmutable)):
-            self.x += other.x
-            self.y += other.y
-            self.z += other.z
-        else:
-            self.x += other[0]
-            self.y += other[1]
-            self.z += other[2]
-        return self
 
     def __sub__(self, other):
         # Vector - Point -> Point
         # Vector - Vector -> Vector
-        if isinstance(other, (Point3D, Point3DImmutable)):
+        if isinstance(other, Point3D):
             return Point3D(self.x - other.x, self.y - other.y, self.z - other.z)
-        elif isinstance(other, (Vector3D, Vector3DImmutable)):
+        elif isinstance(other, Vector3D):
             return Vector3D(self.x - other.x, self.y - other.y, self.z - other.z)
         else:
-            raise TypeError('Cannot subtract Vector3D and {}'.format(type(other)))
+            raise TypeError('Cannot subtract {} and {}'.format(
+                self.__class__.__name__, type(other)))
 
     def __rsub__(self, other):
-        if isinstance(other, (Vector3D, Vector3DImmutable, Point3D, Point3DImmutable)):
+        if isinstance(other, (Vector3D, Point3D)):
             return Vector3D(other.x - self.x, other.y - self.y, other.z - self.z)
         else:
             assert hasattr(other, '__len__') and len(other) == 3, \
-                'Cannot subtract types {} and {}'.format(type(self), type(other))
+                'Cannot subtract types {} and {}'.format(
+                    self.__class__.__name__, type(other))
             return Vector3D(other.x - self[0], other.y - self[1], other.z - self[2])
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):
             return Vector3D(self.x * other, self.y * other, self.z * other)
-        elif isinstance(other, (Vector3D, Vector3DImmutable)):
+        elif isinstance(other, Vector3D):
             return Vector3D(self.x * other.x, self.y * other.y, self.z * other.z)
-        elif isinstance(other, (Point3D, Point3DImmutable)):
+        elif isinstance(other, Point3D):
             return Point3D(self.x * other.x, self.y * other.y, self.z * other.z)
         else:
-            raise TypeError('Cannot multiply {} and {}'.format(type(self), type(other)))
+            raise TypeError('Cannot multiply {} and {}'.format(
+                self.__class__.__name__, type(other)))
 
     __rmul__ = __mul__
 
-    def __imul__(self, other):
-        assert type(other) in (int, float), \
-            'Cannot multiply types {} and {}'.format(type(self), type(other))
-        self.x *= other
-        self.y *= other
-        self.z *= other
-        return self
-
     def __div__(self, other):
         assert type(other) in (int, float), \
-            'Cannot divide types {} and {}'.format(type(self), type(other))
+            'Cannot divide types {} and {}'.format(self.__class__.__name__, type(other))
         return Vector3D(operator.div(self.x, other),
                         operator.div(self.y, other),
                         operator.div(self.z, other))
 
     def __rdiv__(self, other):
         assert type(other) in (int, float), \
-            'Cannot divide types {} and {}'.format(type(self), type(other))
+            'Cannot divide types {} and {}'.format(self.__class__.__name__, type(other))
         return Vector3D(operator.div(other, self.x),
                         operator.div(other, self.y),
                         operator.div(other, self.z))
 
     def __floordiv__(self, other):
         assert type(other) in (int, float), \
-            'Cannot divide types {} and {}'.format(type(self), type(other))
+            'Cannot divide types {} and {}'.format(self.__class__.__name__, type(other))
         return Vector3D(operator.floordiv(self.x, other),
                         operator.floordiv(self.y, other),
                         operator.floordiv(self.z, other))
 
     def __rfloordiv__(self, other):
         assert type(other) in (int, float), \
-            'Cannot divide types {} and {}'.format(type(self), type(other))
+            'Cannot divide types {} and {}'.format(self.__class__.__name__, type(other))
         return Vector3D(operator.floordiv(other, self.x),
                         operator.floordiv(other, self.y),
                         operator.floordiv(other, self.z))
 
     def __truediv__(self, other):
         assert type(other) in (int, float), \
-            'Cannot divide types {} and {}'.format(type(self), type(other))
+            'Cannot divide types {} and {}'.format(self.__class__.__name__, type(other))
         return Vector3D(operator.truediv(self.x, other),
                         operator.truediv(self.y, other),
                         operator.truediv(self.z, other))
 
     def __rtruediv__(self, other):
         assert type(other) in (int, float), \
-            'Cannot divide types {} and {}'.format(type(self), type(other))
+            'Cannot divide types {} and {}'.format(self.__class__.__name__, type(other))
         return Vector3D(operator.truediv(other, self.x),
                         operator.truediv(other, self.y),
                         operator.truediv(other, self.z))
@@ -397,20 +367,16 @@ class Point3D(Vector3D):
         Returns:
             True if equivalent.  False if not equivalent.
         """
-        return abs(self.x - point.x) < tolerance and \
-            abs(self.y - point.y) < tolerance and \
-            abs(self.z - point.z) < tolerance
-
-    def to_immutable(self):
-        """Get an immutable version of this object."""
-        return Point3DImmutable(self.x, self.y, self.z)
+        return abs(self.x - point.x) <= tolerance and \
+            abs(self.y - point.y) <= tolerance and \
+            abs(self.z - point.z) <= tolerance
 
     def __add__(self, other):
         # Point + Vector -> Point
         # Point + Point -> Vector
-        if isinstance(other, (Vector3D, Vector3DImmutable)):
+        if isinstance(other, Vector3D):
             return Point3D(self.x + other.x, self.y + other.y, self.z + other.z)
-        elif isinstance(other, (Point3D, Point3DImmutable)):
+        elif isinstance(other, Point3D):
             return Vector3D(self.x + other.x, self.y + other.y, self.z + other.z)
         else:
             raise TypeError('Cannot add Point3D and {}'.format(type(other)))
@@ -418,9 +384,9 @@ class Point3D(Vector3D):
     def __sub__(self, other):
         # Point - Vector -> Point
         # Point - Point -> Vector
-        if isinstance(other, (Vector3D, Vector3DImmutable)):
+        if isinstance(other, Vector3D):
             return Point3D(self.x - other.x, self.y - other.y, self.z - other.z)
-        elif isinstance(other, (Point3D, Point3DImmutable)):
+        elif isinstance(other, Point3D):
             Vector3D(self.x - other.x, self.y - other.y, self.z - other.z)
         else:
             raise TypeError('Cannot subtract Point3D and {}'.format(type(other)))
@@ -428,31 +394,3 @@ class Point3D(Vector3D):
     def __repr__(self):
         """Point3D representation."""
         return 'Point3D (%.2f, %.2f, %.2f)' % (self.x, self.y, self.z)
-
-
-@immutable
-class Vector3DImmutable(Vector3D):
-    """Immutable 3D Vector object."""
-    _mutable = False
-
-    def to_mutable(self):
-        """Get a mutable version of this vector."""
-        return Vector3D(self.x, self.y, self.z)
-
-    def to_immutable(self):
-        """Get an immutable version of this object."""
-        return self
-
-
-@immutable
-class Point3DImmutable(Point3D):
-    """Immutable 3D Point object."""
-    _mutable = False
-
-    def to_mutable(self):
-        """Get a mutable version of this point."""
-        return Point3D(self.x, self.y, self.z)
-
-    def to_immutable(self):
-        """Get an immutable version of this object."""
-        return self

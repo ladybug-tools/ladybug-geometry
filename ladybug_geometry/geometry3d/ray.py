@@ -2,7 +2,7 @@
 """3D Ray"""
 from __future__ import division
 
-from .._immutable import immutable
+from .pointvector import Point3D, Vector3D
 from ._1d import Base1DIn3D
 
 
@@ -22,16 +22,14 @@ class Ray3D(Base1DIn3D):
             p: A Point3D representing the base of the ray.
             v: A Vector3D representing the direction of the ray.
         """
-        self.p = p
-        self.v = v
+        assert isinstance(p, Point3D), "Expected Point3D. Got {}.".format(type(p))
+        assert isinstance(v, Vector3D), "Expected Vector3D. Got {}.".format(type(v))
+        self._p = p
+        self._v = v
 
     def reverse(self):
-        """Reverse the direction of the ray."""
-        self.v.reverse()
-
-    def reversed(self):
         """Get a copy of this ray that is reversed."""
-        return Ray3D(self.p, self.v.reversed())
+        return Ray3D(self.p, self.v.reverse())
 
     def move(self, moving_vec):
         """Get a ray that has been moved along a vector.
@@ -91,14 +89,6 @@ class Ray3D(Base1DIn3D):
         """
         return Ray3D(self.p.scale_world_origin(factor), self.v * factor)
 
-    def to_mutable(self):
-        """Get a mutable version of this object."""
-        return self
-
-    def to_immutable(self):
-        """Get an immutable version of this object."""
-        return Ray3DImmutable(self.p, self.v)
-
     def _u_in(self, u):
         return u >= 0.0
 
@@ -114,27 +104,3 @@ class Ray3D(Base1DIn3D):
     def __repr__(self):
         return 'Ray3D (point <%.2f, %.2f, %.2f>) (vector <%.2f, %.2f, %.2f>)' % \
             (self.p.x, self.p.y, self.p.z, self.v.x, self.v.y, self.v.z)
-
-
-@immutable
-class Ray3DImmutable(Ray3D):
-    """Immutable 3D Ray object."""
-    _mutable = False
-
-    def __init__(self, p, v):
-        """Initilize Ray2D.
-
-        Args:
-            p: A Point2D representing the base of the ray.
-            v: A Vector2D representing the direction of the ray.
-        """
-        self.p = p.to_immutable()
-        self.v = v.to_immutable()
-
-    def to_mutable(self):
-        """Get a mutable version of this vector."""
-        return Ray3D(self.p.to_mutable(), self.v.to_mutable())
-
-    def to_immutable(self):
-        """Get an immutable version of this object."""
-        return self

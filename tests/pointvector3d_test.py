@@ -1,7 +1,6 @@
 # coding=utf-8
 
-from ladybug_geometry.geometry3d.pointvector import Vector3D, Point3D, \
-    Vector3DImmutable, Point3DImmutable
+from ladybug_geometry.geometry3d.pointvector import Vector3D, Point3D
 
 import unittest
 import pytest
@@ -29,14 +28,10 @@ class Point3DTestCase(unittest.TestCase):
         pt_tuple = tuple(i for i in vec)
         assert pt_tuple == (0, 2, 0)
 
-        norm_vec = vec.normalized()
+        norm_vec = vec.normalize()
         assert norm_vec.x == 0
         assert norm_vec.z == 0
         assert norm_vec.magnitude == 1
-
-        assert vec.magnitude == 2
-        vec.normalize()
-        assert vec.magnitude == 1
 
     def test_point3_init(self):
         """Test the initalization of Point3D objects and basic properties."""
@@ -60,78 +55,28 @@ class Point3DTestCase(unittest.TestCase):
         assert pt_1.is_equivalent(pt_3, 0.0001) is False
 
     def test_vector3_mutability(self):
-        """Test the mutability and immutability of Vector3D objects."""
+        """Test the immutability of Vector3D objects."""
         vec = Vector3D(0, 2, 0)
         assert isinstance(vec, Vector3D)
-        assert vec.is_mutable is True
-        vec.x = 1
-        assert vec.x == 1
         vec_copy = vec.duplicate()
         assert vec == vec_copy
-        vec_copy.x = 2
-        assert vec != vec_copy
 
-        vec_imm = vec.to_immutable()
-        assert isinstance(vec_imm, Vector3DImmutable)
-        assert vec_imm.is_mutable is False
         with pytest.raises(AttributeError):
-            vec_imm.x = 2
-        with pytest.raises(AttributeError):
-            vec_imm.normalize()
-        norm_vec = vec_imm.normalized()  # ensure operations tha yield new vectors are ok
+            vec.x = 2
+        norm_vec = vec.normalize()  # ensure operations tha yield new vectors are ok
         assert norm_vec.magnitude == pytest.approx(1., rel=1e-3)
-        assert vec_imm.x == 1
-
-        vec = Vector3DImmutable(0, 2, 0)
-        assert isinstance(vec, Vector3DImmutable)
-        assert vec.is_mutable is False
-        with pytest.raises(AttributeError):
-            vec.x = 1
-        assert vec.x == 0
-        vec_copy = vec.duplicate()
-        assert vec == vec_copy
-
-        vec_mut = vec.to_mutable()
-        assert isinstance(vec_mut, Vector3D)
-        assert vec_mut.is_mutable is True
-        vec_mut.x = 1
-        assert vec_mut.x == 1
 
     def test_point3_mutability(self):
-        """Test the mutability and immutability of Point3D objects."""
+        """Test the immutability of Point3D objects."""
         pt = Point3D(0, 2, 0)
         assert isinstance(pt, Point3D)
-        assert pt.is_mutable is True
-        pt.x = 1
-        assert pt.x == 1
         pt_copy = pt.duplicate()
         assert pt == pt_copy
-        pt_copy.x = 2
-        assert pt != pt_copy
 
-        pt_imm = pt.to_immutable()
-        assert isinstance(pt_imm, Point3DImmutable)
-        assert pt_imm.is_mutable is False
         with pytest.raises(AttributeError):
-            pt_imm.x = 2
-        norm_vec = pt_imm.normalized()  # ensure operations tha yield new vectors are ok
+            pt.x = 2
+        norm_vec = pt.normalize()  # ensure operations tha yield new vectors are ok
         assert norm_vec.magnitude == pytest.approx(1., rel=1e-3)
-        assert pt_imm.x == 1
-
-        pt = Point3DImmutable(0, 2, 0)
-        assert isinstance(pt, Point3DImmutable)
-        assert pt.is_mutable is False
-        with pytest.raises(AttributeError):
-            pt.x = 1
-        assert pt.x == 0
-        pt_copy = pt.duplicate()
-        assert pt == pt_copy
-
-        pt_mut = pt.to_mutable()
-        assert isinstance(pt_mut, Point3D)
-        assert pt_mut.is_mutable is True
-        pt_mut.x = 1
-        assert pt_mut.x == 1
 
     def test_vector3_dot_cross_reverse(self):
         """Test the methods for dot, cross, and reverse."""
@@ -149,11 +94,8 @@ class Point3DTestCase(unittest.TestCase):
         assert vec_1.cross(vec_3) == Vector3D(0, 0, -2)
         assert vec_3.cross(vec_1) == Vector3D(0, 0, 2)
 
-        assert vec_1.reversed() == Vector3D(0, -2, 0)
-        assert vec_2.reversed() == Vector3D(-2, 0, 0)
-
-        vec_1.reverse()
-        assert vec_1 == Vector3D(0, -2, 0)
+        assert vec_1.reverse() == Vector3D(0, -2, 0)
+        assert vec_2.reverse() == Vector3D(-2, 0, 0)
 
     def test_vector3_angle(self):
         """Test the methods that get the angle between Vector3D objects."""
@@ -300,7 +242,7 @@ class Point3DTestCase(unittest.TestCase):
         origin_1 = Point3D(0, 1, 0)
         origin_2 = Point3D(1, 1, 0)
         normal_1 = Vector3D(0, 1, 0)
-        normal_2 = Vector3D(-1, 1).normalized()
+        normal_2 = Vector3D(-1, 1).normalize()
 
         assert pt_1.reflect(normal_1, origin_1) == Point3D(2, 0, 2)
         assert pt_1.reflect(normal_1, origin_2) == Point3D(2, 0, 2)

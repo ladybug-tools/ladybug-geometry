@@ -2,7 +2,6 @@
 """Base class for all 1D geometries in 2D space (Ray2D and LineSegment2D)."""
 from __future__ import division
 
-from .pointvector import Point2D, Point2DImmutable, Vector2D, Vector2DImmutable
 from ..intersection2d import intersect_line2d, closest_point2d_on_line2d
 
 
@@ -13,34 +12,16 @@ class Base1DIn2D(object):
         p: End Point2D of object
         v: Vector2D along object
     """
-    _mutable = True
-
-    @property
-    def is_mutable(self):
-        """Boolean to note whether the object is mutable."""
-        return self._mutable
 
     @property
     def p(self):
         """Base point."""
         return self._p
 
-    @p.setter
-    def p(self, p):
-        assert isinstance(p, (Point2D, Point2DImmutable)), \
-            "Expected Point2D. Got {}.".format(type(p))
-        self._p = p.duplicate()
-
     @property
     def v(self):
         """Direction vector."""
         return self._v
-
-    @v.setter
-    def v(self, v):
-        assert isinstance(v, (Vector2D, Vector2DImmutable)), \
-            "Expected Vector2D. Got {}.".format(type(v))
-        self._v = v.duplicate()
 
     def closest_point(self, point):
         """Get the closest Point2D on this object to another Point2D.

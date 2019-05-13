@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
-from ladybug_geometry.geometry3d.ray import Ray3D, Ray3DImmutable
+from ladybug_geometry.geometry3d.ray import Ray3D
 
 import unittest
 import pytest
@@ -21,56 +21,29 @@ class Ray3DTestCase(unittest.TestCase):
         assert ray.p == Point3D(2, 0, 2)
         assert ray.v == Vector3D(0, 2, 0)
 
-        flip_ray = ray.reversed()
+        flip_ray = ray.reverse()
         assert flip_ray.p == Point3D(2, 0, 2)
         assert flip_ray.v == Vector3D(0, -2, 0)
 
-        ray.reverse()
-        assert ray.p == Point3D(2, 0, 2)
-        assert ray.v == Vector3D(0, -2, 0)
-
     def test_linerayment2_mutability(self):
-        """Test the mutability and immutability of Ray3D objects."""
+        """Test the immutability of Ray3D objects."""
         pt = Point3D(2, 0, 0)
         vec = Vector3D(0, 2, 0)
         ray = Ray3D(pt, vec)
 
         assert isinstance(ray, Ray3D)
-        assert ray.is_mutable is True
-        ray.p = Point3D(0, 0, 0)
-        assert ray.p == Point3D(0, 0, 0)
-        ray.p.x = 1
-        assert ray.p == Point3D(1, 0, 0)
+        with pytest.raises(AttributeError):
+            ray.p.x = 3
+        with pytest.raises(AttributeError):
+            ray.v.x = 3
+        with pytest.raises(AttributeError):
+            ray.p = Point3D(0, 0, 0)
+        with pytest.raises(AttributeError):
+            ray.v = Vector3D(2, 2, 0)
 
-        ray_imm = ray.to_immutable()
-        assert isinstance(ray_imm, Ray3DImmutable)
-        assert ray_imm.is_mutable is False
-        with pytest.raises(AttributeError):
-            ray_imm.p.x = 3
-        with pytest.raises(AttributeError):
-            ray_imm.v.x = 3
-        with pytest.raises(AttributeError):
-            ray_imm.p = Point3D(0, 0, 0)
-        with pytest.raises(AttributeError):
-            ray_imm.v = Vector3D(2, 2, 0)
-        ray_move = ray_imm.move(Vector3D(-1, 0, 0))  # ensure operations that yield new objects are ok
-        assert ray_move.p == Point3D(0, 0, 0)
-
-        ray = Ray3DImmutable(pt, vec)
-        assert isinstance(ray, Ray3DImmutable)
-        assert ray.is_mutable is False
-        with pytest.raises(AttributeError):
-            ray_imm.p.x = 3
-        assert ray.p == Point3D(2, 0, 0)
         ray_copy = ray.duplicate()
         assert ray.p == ray_copy.p
         assert ray.v == ray_copy.v
-
-        ray_mut = ray.to_mutable()
-        assert isinstance(ray_mut, Ray3D)
-        assert ray_mut.is_mutable is True
-        ray_mut.p.x = 1
-        assert ray_mut.p.x == 1
 
     def test_move(self):
         """Test the Ray3D move method."""
@@ -164,7 +137,7 @@ class Ray3DTestCase(unittest.TestCase):
         origin_1 = Point3D(0, 1, 2)
         origin_2 = Point3D(1, 1, 2)
         normal_1 = Vector3D(0, 1, 0)
-        normal_2 = Vector3D(-1, 1, 0).normalized()
+        normal_2 = Vector3D(-1, 1, 0).normalize()
 
         assert ray.reflect(normal_1, origin_1).p == Point3D(2, 0, 2)
         assert ray.reflect(normal_1, origin_1).v == Vector3D(0, -2, 0)

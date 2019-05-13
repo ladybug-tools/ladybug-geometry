@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
-from ladybug_geometry.geometry3d.line import LineSegment3D, LineSegment3DImmutable
+from ladybug_geometry.geometry3d.line import LineSegment3D
 
 import unittest
 import pytest
@@ -27,14 +27,9 @@ class LineSegment3DTestCase(unittest.TestCase):
         assert seg.point_at_length(1) == Point3D(2, 1, 2)
         assert seg.length == 2
 
-        flip_seg = seg.flipped()
+        flip_seg = seg.flip()
         assert flip_seg.p == Point3D(2, 2, 2)
         assert flip_seg.v == Vector3D(0, -2, 0)
-
-        assert seg.p == Point3D(2, 0, 2)
-        seg.flip()
-        assert seg.p == Point3D(2, 2, 2)
-        assert seg.v == Vector3D(0, -2, 0)
 
     def test_init_from_endpoints(self):
         """Test the initalization of LineSegment3D from end points."""
@@ -67,41 +62,18 @@ class LineSegment3DTestCase(unittest.TestCase):
         seg = LineSegment3D(pt, vec)
 
         assert isinstance(seg, LineSegment3D)
-        assert seg.is_mutable is True
-        seg.p = Point3D(0, 0, 0)
-        assert seg.p == Point3D(0, 0, 0)
-        seg.p.x = 1
-        assert seg.p == Point3D(1, 0, 0)
+        with pytest.raises(AttributeError):
+            seg.p.x = 3
+        with pytest.raises(AttributeError):
+            seg.v.x = 3
+        with pytest.raises(AttributeError):
+            seg.p = Point3D(0, 0, 0)
+        with pytest.raises(AttributeError):
+            seg.v = Vector3D(2, 2, 0)
 
-        seg_imm = seg.to_immutable()
-        assert isinstance(seg_imm, LineSegment3DImmutable)
-        assert seg_imm.is_mutable is False
-        with pytest.raises(AttributeError):
-            seg_imm.p.x = 3
-        with pytest.raises(AttributeError):
-            seg_imm.v.x = 3
-        with pytest.raises(AttributeError):
-            seg_imm.p = Point3D(0, 0, 0)
-        with pytest.raises(AttributeError):
-            seg_imm.v = Vector3D(2, 2, 0)
-        seg_move = seg_imm.move(Vector3D(-1, 0, 0))  # ensure operations that yield new objects are ok
-        assert seg_move.p == Point3D(0, 0, 0)
-
-        seg = LineSegment3DImmutable(pt, vec)
-        assert isinstance(seg, LineSegment3DImmutable)
-        assert seg.is_mutable is False
-        with pytest.raises(AttributeError):
-            seg_imm.p.x = 3
-        assert seg.p == Point3D(2, 0, 0)
         seg_copy = seg.duplicate()
         assert seg.p == seg_copy.p
         assert seg.v == seg_copy.v
-
-        seg_mut = seg.to_mutable()
-        assert isinstance(seg_mut, LineSegment3D)
-        assert seg_mut.is_mutable is True
-        seg_mut.p.x = 1
-        assert seg_mut.p.x == 1
 
     def test_move(self):
         """Test the LineSegment3D move method."""
@@ -196,7 +168,7 @@ class LineSegment3DTestCase(unittest.TestCase):
         origin_1 = Point3D(0, 1, 2)
         origin_2 = Point3D(1, 1, 2)
         normal_1 = Vector3D(0, 1, 0)
-        normal_2 = Vector3D(-1, 1, 0).normalized()
+        normal_2 = Vector3D(-1, 1, 0).normalize()
 
         assert seg.reflect(normal_1, origin_1).p == Point3D(2, 0, 2)
         assert seg.reflect(normal_1, origin_1).v == Vector3D(0, -2, 0)

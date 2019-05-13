@@ -2,7 +2,7 @@
 """Base class for 2D geometries in sD space (Surface3D and Mesh3D)."""
 from __future__ import division
 
-from .pointvector import Point3DImmutable
+from .pointvector import Point3D
 
 
 class Base2DIn3D(object):
@@ -37,7 +37,7 @@ class Base2DIn3D(object):
         """
         if self._center is None:
             min, max = self.min, self.max
-            self._center = Point3DImmutable(
+            self._center = Point3D(
                 (min.x + max.x) / 2, (min.y + max.y) / 2, (min.z + max.z) / 2)
         return self._center
 
@@ -47,25 +47,36 @@ class Base2DIn3D(object):
 
     def _calculate_min_max(self):
         """Calculate maximum and minimum Point3D for this polygon."""
-        min_pt = self.vertices[0].to_mutable()
-        max_pt = self.vertices[0].to_mutable()
+        min_pt = [self.vertices[0].x, self.vertices[0].y, self.vertices[0].z]
+        max_pt = [self.vertices[0].x, self.vertices[0].y, self.vertices[0].z]
 
         for v in self.vertices[1:]:
-            if v.x < min_pt.x:
-                min_pt.x = v.x
-            elif v.x > max_pt.x:
-                max_pt.x = v.x
-            if v.y < min_pt.y:
-                min_pt.y = v.y
-            elif v.y > max_pt.y:
-                max_pt.y = v.y
-            if v.z < min_pt.z:
-                min_pt.z = v.z
-            elif v.z > max_pt.z:
-                max_pt.z = v.z
+            if v.x < min_pt[0]:
+                min_pt[0] = v.x
+            elif v.x > max_pt[0]:
+                max_pt[0] = v.x
+            if v.y < min_pt[1]:
+                min_pt[1] = v.y
+            elif v.y > max_pt[1]:
+                max_pt[1] = v.y
+            if v.z < min_pt[2]:
+                min_pt[2] = v.z
+            elif v.z > max_pt[2]:
+                max_pt[2] = v.z
 
-        self._min = min_pt.to_immutable()
-        self._max = max_pt.to_immutable()
+        self._min = Point3D(min_pt[0], min_pt[1], min_pt[2])
+        self._max = Point3D(max_pt[0], max_pt[1], max_pt[2])
+
+    def _check_vertices_input(self, vertices):
+        if not isinstance(vertices, tuple):
+            vertices = tuple(vertices)
+        assert len(vertices) >= 3, 'There must be at least 3 vertices for a {}.' \
+            ' Got {}'.format(self.__class__.__name__, len(vertices))
+        for vert in vertices:
+            assert isinstance(vert, Point3D), \
+                'Expected Point3D for {} vertex. Got {}.'.format(
+                    self.__class__.__name__, type(vert))
+        self._vertices = vertices
 
     def __len__(self):
         return len(self.vertices)

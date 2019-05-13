@@ -97,7 +97,7 @@ class MeshBase(object):
         Args:
             moving_vec: A Vector with the direction and distance to move the mesh.
         """
-        _verts = tuple([pt.move(moving_vec).to_immutable() for pt in self.vertices])
+        _verts = tuple(pt.move(moving_vec) for pt in self.vertices)
         return self._mesh_transform(_verts)
 
     def reflect(self, normal, origin):
@@ -108,8 +108,7 @@ class MeshBase(object):
                 which the mesh will be reflected. THIS VECTOR MUST BE NORMALIZED.
             origin: A Point representing the origin from which to reflect.
         """
-        _verts = tuple([pt.reflect(normal, origin).to_immutable()
-                        for pt in self.vertices])
+        _verts = tuple(pt.reflect(normal, origin) for pt in self.vertices)
         return self._mesh_transform(_verts)
 
     def scale(self, factor, origin):
@@ -119,8 +118,7 @@ class MeshBase(object):
             factor: A number representing how much the mesh should be scaled.
             origin: A Point representing the origin from which to scale.
         """
-        _verts = tuple([pt.scale(factor, origin).to_immutable()
-                        for pt in self.vertices])
+        _verts = tuple(pt.scale(factor, origin) for pt in self.vertices)
         return self._mesh_scale(_verts, factor)
 
     def scale_world_origin(self, factor):
@@ -129,14 +127,13 @@ class MeshBase(object):
         Args:
             factor: A number representing how much the mesh should be scaled.
         """
-        _verts = tuple([pt.scale_world_origin(factor).to_immutable()
-                        for pt in self.vertices])
+        _verts = tuple(pt.scale_world_origin(factor) for pt in self.vertices)
         return self._mesh_scale(_verts, factor)
 
     def _check_faces_input(self, faces):
         """Check input faces for correct formatting."""
-        assert isinstance(faces, (list, tuple)), \
-            'faces should be a list or tuple. Got {}'.format(type(faces))
+        if not isinstance(faces, tuple):
+            faces = tuple(faces)
         assert len(faces) > 0, 'Mesh must have at least one face.'
         for f in faces:
             assert isinstance(f, tuple), \
@@ -154,8 +151,6 @@ class MeshBase(object):
                     raise TypeError(
                         'Mesh face must use integers to reference vertices. '
                         'Got {}.'.format(type(ind)))
-        if isinstance(faces, list):
-            faces = tuple(faces)
         self._faces = faces
 
     def _check_face_pattern(self, pattern):
@@ -303,7 +298,7 @@ class MeshBase(object):
 
     @staticmethod
     def _interpret_input_from_faces(faces, purge):
-        """Get faces anv vertices from a list of faces as points."""
+        """Get faces and vertices from a list of faces as points."""
         vertices = []  # collection of vertices as point objects
         face_collector = []  # collection of face indices
         if purge:

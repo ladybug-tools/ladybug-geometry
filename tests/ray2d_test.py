@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from ladybug_geometry.geometry2d.pointvector import Point2D, Vector2D
-from ladybug_geometry.geometry2d.ray import Ray2D, Ray2DImmutable
+from ladybug_geometry.geometry2d.ray import Ray2D
 
 import unittest
 import pytest
@@ -21,14 +21,9 @@ class Ray2DTestCase(unittest.TestCase):
         assert ray.p == Point2D(2, 0)
         assert ray.v == Vector2D(0, 2)
 
-        flip_ray = ray.reversed()
+        flip_ray = ray.reverse()
         assert flip_ray.p == Point2D(2, 0)
         assert flip_ray.v == Vector2D(0, -2)
-
-        assert ray.p == Point2D(2, 0)
-        ray.reverse()
-        assert ray.p == Point2D(2, 0)
-        assert ray.v == Vector2D(0, -2)
 
     def test_ray2d_mutability(self):
         """Test the mutability and immutability of Ray2D objects."""
@@ -37,41 +32,18 @@ class Ray2DTestCase(unittest.TestCase):
         ray = Ray2D(pt, vec)
 
         assert isinstance(ray, Ray2D)
-        assert ray.is_mutable is True
-        ray.p = Point2D(0, 0)
-        assert ray.p == Point2D(0, 0)
-        ray.p.x = 1
-        assert ray.p == Point2D(1, 0)
+        with pytest.raises(AttributeError):
+            ray.p.x = 3
+        with pytest.raises(AttributeError):
+            ray.v.x = 3
+        with pytest.raises(AttributeError):
+            ray.p = Point2D(0, 0)
+        with pytest.raises(AttributeError):
+            ray.v = Vector2D(2, 2)
 
-        ray_imm = ray.to_immutable()
-        assert isinstance(ray_imm, Ray2DImmutable)
-        assert ray_imm.is_mutable is False
-        with pytest.raises(AttributeError):
-            ray_imm.p.x = 3
-        with pytest.raises(AttributeError):
-            ray_imm.v.x = 3
-        with pytest.raises(AttributeError):
-            ray_imm.p = Point2D(0, 0)
-        with pytest.raises(AttributeError):
-            ray_imm.v = Vector2D(2, 2)
-        ray_move = ray_imm.move(Vector2D(-1, 0))  # ensure operations that yield new objects are ok
-        assert ray_move.p == Point2D(0, 0)
-
-        ray = Ray2DImmutable(pt, vec)
-        assert isinstance(ray, Ray2DImmutable)
-        assert ray.is_mutable is False
-        with pytest.raises(AttributeError):
-            ray_imm.p.x = 3
-        assert ray.p == Point2D(2, 0)
         ray_copy = ray.duplicate()
         assert ray.p == ray_copy.p
         assert ray.v == ray_copy.v
-
-        ray_mut = ray.to_mutable()
-        assert isinstance(ray_mut, Ray2D)
-        assert ray_mut.is_mutable is True
-        ray_mut.p.x = 1
-        assert ray_mut.p.x == 1
 
     def test_move(self):
         """Test the Ray2D move method."""
@@ -140,7 +112,7 @@ class Ray2DTestCase(unittest.TestCase):
         origin_1 = Point2D(0, 1)
         origin_2 = Point2D(1, 1)
         normal_1 = Vector2D(0, 1)
-        normal_2 = Vector2D(-1, 1).normalized()
+        normal_2 = Vector2D(-1, 1).normalize()
 
         assert ray.reflect(normal_1, origin_1).p == Point2D(2, 0)
         assert ray.reflect(normal_1, origin_1).v == Vector2D(0, -2)
@@ -200,6 +172,7 @@ class Ray2DTestCase(unittest.TestCase):
 
         assert ray_1.intersect_line_ray(ray_2) == Point2D(2, 3)
         assert ray_1.intersect_line_ray(ray_3) == Point2D(2, 2)
+
 
 if __name__ == "__main__":
     unittest.main()

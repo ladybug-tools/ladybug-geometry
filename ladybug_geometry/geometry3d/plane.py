@@ -2,11 +2,11 @@
 """Plane"""
 from __future__ import division
 
-from .pointvector import Point3D, Point3DImmutable, Vector3D, Vector3DImmutable
+from .pointvector import Point3D, Vector3D
 from .ray import Ray3D
 from ..intersection3d import intersect_line3d_plane, intersect_plane_plane, \
     closest_point3d_on_plane, closest_point3d_between_line3d_plane
-from ..geometry2d.pointvector import Point2D, Point2DImmutable
+from ..geometry2d.pointvector import Point2D
 
 import math
 
@@ -33,32 +33,28 @@ class Plane(object):
                 Note that this vector must be orthagonal to the input normal vector.
                 If None, the default will find an X-Axis in the world XY plane.
         """
-        assert isinstance(n, (Vector3D, Vector3DImmutable)), \
+        assert isinstance(n, Vector3D), \
             "Expected Vector3D for plane normal. Got {}.".format(type(n))
-        assert isinstance(o, (Point3D, Point3DImmutable)), \
+        assert isinstance(o, Point3D), \
             "Expected Point3D for plane origin. Got {}.".format(type(o))
-        n = n.normalized()
-        self._n = n.to_immutable()
-        self._o = o.to_immutable()
-        self._k = n.dot(o)
+        self._n = n.normalize()
+        self._o = o
+        self._k = self._n.dot(self._o)
 
         if x is None:
-            if n.x == 0 and n.y == 0:
-                self._x = Vector3DImmutable(1, 0, 0)
+            if self._n.x == 0 and self._n.y == 0:
+                self._x = Vector3D(1, 0, 0)
             else:
-                _x = Vector3D(n.y, -n.x, 0)
-                _x.normalize()
-                self._x = _x.to_immutable()
+                self._x = Vector3D(self._n.y, -self._n.x, 0)
         else:
-            assert isinstance(x, (Vector3D, Vector3DImmutable)), \
+            assert isinstance(x, Vector3D), \
                 "Expected Vector3D for plane X-axis. Got {}.".format(type(x))
-            x = x.normalized()
-            assert abs(n.x * x.x + n.y * x.y + n.z * x.z) < 1e-9, \
+            x = x.normalize()
+            assert abs(self._n.x * x.x + self._n.y * x.y + self._n.z * x.z) < 1e-9, \
                 'Plane X-axis and normal vector are not orthagonal. Got angle of {} ' \
-                'degrees between them.'.format(math.degrees(n.angle(x)))
-            self._x = x.to_immutable()
-        y = n.cross(self._x)
-        self._y = y.to_immutable()
+                'degrees between them.'.format(math.degrees(self._n.angle(x)))
+            self._x = x
+        self._y = self._n.cross(self._x)
 
     @classmethod
     def from_three_points(cls, o, p2, p3):
@@ -115,7 +111,7 @@ class Plane(object):
 
     def flip(self):
         """Get a flipped version of this plane (facing the opposite direction)."""
-        return Plane(self.n.reversed(), self.o, self.x.reversed())
+        return Plane(self.n.reverse(), self.o, self.x.reverse())
 
     def move(self, moving_vec):
         """Get a plane that has been moved along a vector.
@@ -198,20 +194,6 @@ class Plane(object):
         _u = (self.x.x * point.x, self.x.y * point.x, self.x.z * point.x)
         _v = (self.y.x * point.y, self.y.y * point.y, self.y.z * point.y)
         return Point3D(
-            self.o.x + _u[0] + _v[0], self.o.y + _u[1] + _v[1], self.o.z + _u[2] + _v[2])
-
-    def xyz_to_xy_immutable(self, point):
-        """Get a Point2DImmutable in the coordinate system of this plane from a Point3D.
-        """
-        _diff = Vector3D(point.x - self.o.x, point.y - self.o.y, point.z - self.o.z)
-        return Point2DImmutable(self.x.dot(_diff), self.y.dot(_diff))
-
-    def xy_to_xyz_immutable(self, point):
-        """Get a Point3DImmutable from a Point2D in the coordinate system of this plane.
-        """
-        _u = (self.x.x * point.x, self.x.y * point.x, self.x.z * point.x)
-        _v = (self.y.x * point.y, self.y.y * point.y, self.y.z * point.y)
-        return Point3DImmutable(
             self.o.x + _u[0] + _v[0], self.o.y + _u[1] + _v[1], self.o.z + _u[2] + _v[2])
 
     def closest_point(self, point):
@@ -305,7 +287,7 @@ class Plane(object):
         """
         if self.n == plane.n:
             return self.k == plane.k
-        elif self.n == plane.n.reversed():
+        elif self.n == plane.n.reverse():
             return self.k == -plane.k
         return False
 
@@ -324,7 +306,7 @@ class Plane(object):
             True if plane is coplanar. False if it is not coplanar.
         """
         if self.n.angle(plane.n) < angle_tolerance or \
-                self.n.angle(plane.n.reversed()) < angle_tolerance:
+                self.n.angle(plane.n.reverse()) < angle_tolerance:
             return self.distance_to_point(plane.o) < tolerance
         return False
 

@@ -446,7 +446,7 @@ class Mesh2DTestCase(unittest.TestCase):
 
         origin_1 = Point2D(1, 0)
         normal_1 = Vector2D(1, 0)
-        normal_2 = Vector2D(-1, -1).normalized()
+        normal_2 = Vector2D(-1, -1).normalize()
 
         test_1 = mesh.reflect(normal_1, origin_1)
         assert test_1[0].x == pytest.approx(1, rel=1e-3)

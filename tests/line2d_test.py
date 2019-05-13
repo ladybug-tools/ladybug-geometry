@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from ladybug_geometry.geometry2d.pointvector import Point2D, Vector2D
-from ladybug_geometry.geometry2d.line import LineSegment2D, LineSegment2DImmutable
+from ladybug_geometry.geometry2d.line import LineSegment2D
 
 import unittest
 import pytest
@@ -27,14 +27,9 @@ class LineSegment2DTestCase(unittest.TestCase):
         assert seg.point_at_length(1) == Point2D(2, 1)
         assert seg.length == 2
 
-        flip_seg = seg.flipped()
+        flip_seg = seg.flip()
         assert flip_seg.p == Point2D(2, 2)
         assert flip_seg.v == Vector2D(0, -2)
-
-        assert seg.p == Point2D(2, 0)
-        seg.flip()
-        assert seg.p == Point2D(2, 2)
-        assert seg.v == Vector2D(0, -2)
 
     def test_init_from_endpoints(self):
         """Test the initalization of LineSegement2D from end points."""
@@ -67,41 +62,18 @@ class LineSegment2DTestCase(unittest.TestCase):
         seg = LineSegment2D(pt, vec)
 
         assert isinstance(seg, LineSegment2D)
-        assert seg.is_mutable is True
-        seg.p = Point2D(0, 0)
-        assert seg.p == Point2D(0, 0)
-        seg.p.x = 1
-        assert seg.p == Point2D(1, 0)
+        with pytest.raises(AttributeError):
+            seg.p.x = 3
+        with pytest.raises(AttributeError):
+            seg.v.x = 3
+        with pytest.raises(AttributeError):
+            seg.p = Point2D(0, 0)
+        with pytest.raises(AttributeError):
+            seg.v = Vector2D(2, 2)
 
-        seg_imm = seg.to_immutable()
-        assert isinstance(seg_imm, LineSegment2DImmutable)
-        assert seg_imm.is_mutable is False
-        with pytest.raises(AttributeError):
-            seg_imm.p.x = 3
-        with pytest.raises(AttributeError):
-            seg_imm.v.x = 3
-        with pytest.raises(AttributeError):
-            seg_imm.p = Point2D(0, 0)
-        with pytest.raises(AttributeError):
-            seg_imm.v = Vector2D(2, 2)
-        seg_move = seg_imm.move(Vector2D(-1, 0))  # ensure operations that yield new objects are ok
-        assert seg_move.p == Point2D(0, 0)
-
-        seg = LineSegment2DImmutable(pt, vec)
-        assert isinstance(seg, LineSegment2DImmutable)
-        assert seg.is_mutable is False
-        with pytest.raises(AttributeError):
-            seg_imm.p.x = 3
-        assert seg.p == Point2D(2, 0)
         seg_copy = seg.duplicate()
         assert seg.p == seg_copy.p
         assert seg.v == seg_copy.v
-
-        seg_mut = seg.to_mutable()
-        assert isinstance(seg_mut, LineSegment2D)
-        assert seg_mut.is_mutable is True
-        seg_mut.p.x = 1
-        assert seg_mut.p.x == 1
 
     def test_move(self):
         """Test the LineSegement2D move method."""
@@ -172,7 +144,7 @@ class LineSegment2DTestCase(unittest.TestCase):
         origin_1 = Point2D(0, 1)
         origin_2 = Point2D(1, 1)
         normal_1 = Vector2D(0, 1)
-        normal_2 = Vector2D(-1, 1).normalized()
+        normal_2 = Vector2D(-1, 1).normalize()
 
         assert seg.reflect(normal_1, origin_1).p == Point2D(2, 0)
         assert seg.reflect(normal_1, origin_1).v == Vector2D(0, -2)
