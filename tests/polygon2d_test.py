@@ -415,6 +415,29 @@ class Polygon2DTestCase(unittest.TestCase):
         assert polygon.is_point_inside_bound_rect(Point2D(3, 3)) is False
         assert polygon.is_point_inside(Point2D(1, 1)) is True
 
+    def test_is_polygon_inside_outside(self):
+        """Test the is_polygon_inside and is_polygon_outside methods."""
+        bound_pts = [Point2D(0, 0), Point2D(4, 0), Point2D(4, 4), Point2D(0, 4)]
+        hole_pts_1 = [Point2D(1, 1), Point2D(1.5, 1), Point2D(1.5, 1.5), Point2D(1, 1.5)]
+        hole_pts_2 = [Point2D(2, 2), Point2D(3, 2), Point2D(3, 3), Point2D(2, 3)]
+        hole_pts_3 = [Point2D(2, 2), Point2D(6, 2), Point2D(6, 6), Point2D(2, 6)]
+        hole_pts_4 = [Point2D(5, 5), Point2D(6, 5), Point2D(6, 6), Point2D(5, 6)]
+        polygon = Polygon2D(bound_pts)
+        hole_1 = Polygon2D(hole_pts_1)
+        hole_2 = Polygon2D(hole_pts_2)
+        hole_3 = Polygon2D(hole_pts_3)
+        hole_4 = Polygon2D(hole_pts_4)
+
+        assert polygon.is_polygon_inside(hole_1) is True
+        assert polygon.is_polygon_inside(hole_2) is True
+        assert polygon.is_polygon_inside(hole_3) is False
+        assert polygon.is_polygon_inside(hole_4) is False
+
+        assert polygon.is_polygon_outside(hole_1) is False
+        assert polygon.is_polygon_outside(hole_2) is False
+        assert polygon.is_polygon_outside(hole_3) is False
+        assert polygon.is_polygon_outside(hole_4) is True
+
 
 if __name__ == "__main__":
     unittest.main()

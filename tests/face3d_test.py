@@ -263,6 +263,30 @@ class Face3DTestCase(unittest.TestCase):
         assert face_1.is_geometrically_equivalent(face_7, 0.0001) is False
         assert face_1.is_geometrically_equivalent(face_8, 0.0001) is True
 
+    def test_is_sub_face(self):
+        """Test the is_sub_face method."""
+        bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
+        sub_pts_1 = [Point3D(1, 1), Point3D(1.5, 1), Point3D(1.5, 1.5), Point3D(1, 1.5)]
+        sub_pts_2 = [Point3D(2, 2), Point3D(3, 2), Point3D(3, 3), Point3D(2, 3)]
+        sub_pts_3 = [Point3D(2, 2), Point3D(6, 2), Point3D(6, 6), Point3D(2, 6)]
+        sub_pts_4 = [Point3D(5, 5), Point3D(6, 5), Point3D(6, 6), Point3D(5, 6)]
+        sub_pts_5 = [Point3D(), Point3D(2), Point3D(2, 0, 2), Point3D(0, 0, 2)]
+        plane_1 = Plane(Vector3D(0, 0, 1))
+        plane_2 = Plane(Vector3D(0, 0, -1))
+        plane_3 = Plane(Vector3D(0, 1, 0))
+        face = Face3D(bound_pts, plane_1)
+        sub_face_1 = Face3D(sub_pts_1, plane_1)
+        sub_face_2 = Face3D(sub_pts_2, plane_2)
+        sub_face_3 = Face3D(sub_pts_3, plane_1)
+        sub_face_4 = Face3D(sub_pts_4, plane_1)
+        sub_face_5 = Face3D(sub_pts_5, plane_3)
+
+        assert face.is_sub_face(sub_face_1, 0.0001, 0.0001) is True
+        assert face.is_sub_face(sub_face_2, 0.0001, 0.0001) is True
+        assert face.is_sub_face(sub_face_3, 0.0001, 0.0001) is False
+        assert face.is_sub_face(sub_face_4, 0.0001, 0.0001) is False
+        assert face.is_sub_face(sub_face_5, 0.0001, 0.0001) is False
+
     def test_clockwise(self):
         """Test the clockwise property."""
         plane_1 = Plane(Vector3D(0, 0, 1))

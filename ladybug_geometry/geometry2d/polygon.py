@@ -545,7 +545,7 @@ class Polygon2D(Base2DIn2D):
             point: A Point2D for which the inside/ outside relationship will be tested.
             test_vector: Optional vector to set the direction in which intersections
                 with the polygon edges will be evaluated to determine if the
-                point is inside. Default is the x unit vector.
+                point is inside. Default is the X unit vector.
 
         Returns:
             A boolean denoting whether the point lies inside (True) or outside (False).
@@ -555,6 +555,44 @@ class Polygon2D(Base2DIn2D):
         if point.x < min.x or point.y < min.y or point.x > max.x or point.y > max.y:
             return False
         return self.is_point_inside(point, test_vector)
+
+    def is_polygon_inside(self, polygon):
+        """"Test whether another Polygon2D lies completely inside this polygon.
+
+        Args:
+            polygon: A Polygon2D to test whether it is completely inside this one.
+
+        Returns:
+            A boolean denoting whether the polygon lies inside (True) or not (False).
+        """
+        # if the first polygon vertex lies outside, we know it is not inside.
+        if not self.is_point_inside_bound_rect(polygon[0]):
+            return False
+        # if one of the edges intersects, we know it has crossed outside.
+        for seg in self.segments:
+            for _s in polygon.segments:
+                if does_intersection_exist_line2d(seg, _s):
+                    return False
+        return True
+
+    def is_polygon_outside(self, polygon):
+        """"Test whether another Polygon2D lies completely outside this polygon.
+
+        Args:
+            polygon: A Polygon2D to test whether it is completely outside this one.
+
+        Returns:
+            A boolean denoting whether the polygon lies outside (True) or not (False).
+        """
+        # if the first polygon vertex lies inside, we know it is not outside.
+        if self.is_point_inside_bound_rect(polygon[0]):
+            return False
+        # if one of the edges intersects, we know it has crossed inside.
+        for seg in self.segments:
+            for _s in polygon.segments:
+                if does_intersection_exist_line2d(seg, _s):
+                    return False
+        return True
 
     @staticmethod
     def _segments_from_vertices(vertices):

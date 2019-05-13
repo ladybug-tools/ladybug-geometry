@@ -49,7 +49,8 @@ class Face3D(Base2DIn3D):
     """
     __slots__ = ('_vertices', '_plane', '_polygon2d', '_triangulated_mesh2d',
                  '_triangulated_mesh3d', '_boundary', '_holes',
-                 '_boundary_segments', '_hole_segments'
+                 '_boundary_segments', '_hole_segments',
+                 '_boundary_polygon2d', '_hole_polygon2d',
                  '_min', '_max', '_center', '_perimeter', '_area', '_centroid',
                  '_is_clockwise', '_is_convex', '_is_self_intersecting')
 
@@ -72,6 +73,8 @@ class Face3D(Base2DIn3D):
         self._holes = None
         self._boundary_segments = None
         self._hole_segments = None
+        self._boundary_polygon2d = None
+        self._hole_polygon2d = None
         self._min = None
         self._max = None
         self._center = None
@@ -270,8 +273,6 @@ class Face3D(Base2DIn3D):
         if self._polygon2d is None:
             _vert2d = tuple(self._plane.xyz_to_xy(_v) for _v in self.vertices)
             self._polygon2d = Polygon2D(_vert2d)
-            if self._is_clockwise is not None:
-                self._polygon2d._is_clockwise = self._is_clockwise
         return self._polygon2d
 
     @property
@@ -341,6 +342,28 @@ class Face3D(Base2DIn3D):
                 _all_segs.append(_segs)
             self._hole_segments = tuple(tuple(_s) for _s in _all_segs)
         return self._hole_segments
+
+    @property
+    def boundary_polygon2d(self):
+        """A Polygon2D of the face boundary in the 2D space of the face's plane.
+
+        Note that this does not include any holes in the face. Just the outer boundary.
+        """
+        if self._boundary_polygon2d is None:
+            _vert2d = tuple(self._plane.xyz_to_xy(_v) for _v in self.boundary)
+            self._boundary_polygon2d = Polygon2D(_vert2d)
+        return self._boundary_polygon2d
+
+    @property
+    def hole_polygon2d(self):
+        """A list of Polygon2D for the face holes in the 2D space of the face's plane.
+        """
+        if self._hole_polygon2d is None:
+            self._hole_polygon2d = []
+            for hole in self.holes:
+                _vert2d = tuple(self._plane.xyz_to_xy(_v) for _v in hole)
+                self._hole_polygon2d.append(Polygon2D(_vert2d))
+        return self._hole_polygon2d
 
     @property
     def normal(self):
@@ -414,7 +437,7 @@ class Face3D(Base2DIn3D):
 
     @property
     def has_holes(self):
-        """Boolean noting whther the face has holes within it."""
+        """Boolean noting whether the face has holes within it."""
         return self._holes is not None
 
     def is_geometrically_equivalent(self, face, tolerance):
@@ -426,12 +449,14 @@ class Face3D(Base2DIn3D):
         direction of the face.  However, all other properties will be matching to
         within the input tolerance.
 
+        This is useful for identifying matching surfaces when solving for adjacency.
+
         Args:
             face: Another face for which geometric equivalency will be tested.
             tolerance: The minimum difference between the coordinate values of two
                 vertices at which they can be considered geometrically equivalent.
         Returns:
-            True if geometrically equivalent.  False if not geometrically equivalent.
+            True if geometrically equivalent. False if not geometrically equivalent.
         """
         # rule out surfaces if they don't fit key criteria
         if not self.center.is_equivalent(face.center, tolerance):
@@ -460,6 +485,42 @@ class Face3D(Base2DIn3D):
         else:
             return False
         return True
+
+    def is_sub_face(self, face, tolerance, angle_tolerance):
+        """Check whether a given face is a sub-face of this face.
+
+        Sub-faces will lie in the same plane as this one and have all of their
+        vertices completely within the boundary of this face.
+
+        This is useful for identifying whether a given sub-face (ie. a window or door)
+        can be assigned as a child to this face.
+
+        Args:
+            face: Another face for which sub-face equivalency will be tested.
+            tolerance: The minimum difference between the coordinate values of two
+                vertices at which they can be considered equivalent.
+            angle_tolerance: The max angle in radians that the plane normals can
+                differ from one another in order for them to be considered coplanar.
+        Returns:
+            True if it is a sub-face. False if it is not a sub-face.
+        """
+        # test whether the surface is coplanar
+        if not self.plane.is_coplanar_tolerance(face.plane, tolerance, angle_tolerance):
+            return False
+
+        # if it is, convert to a polygon in this face's plane
+        verts2d = tuple(self.plane.xyz_to_xy(_v) for _v in face.vertices)
+        sub_poly = Polygon2D(verts2d)
+
+        if not self.has_holes:
+            return self.polygon2d.is_polygon_inside(sub_poly)
+        else:
+            if not self.boundary_polygon2d.is_polygon_inside(sub_poly):
+                return False
+            for hole_poly in self.hole_polygon2d:
+                if not hole_poly.is_polygon_outside(sub_poly):
+                    return False
+            return True
 
     def validate_planarity(self, tolerance, raise_exception=True):
         """Validate that all of the face's vertices lie within the face's plane.
