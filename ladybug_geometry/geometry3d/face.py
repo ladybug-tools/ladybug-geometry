@@ -745,111 +745,6 @@ class Face3D(Base2DIn3D):
             return _plane_int
         return None
 
-    def get_top_bottom_horizontal_edges(self, tolerance):
-        """Get top and bottom horizontal edges of this Face if they exist.
-
-        Args:
-            tolerance: The maximum difference between the z values of the start and
-                end coordinates at which an edge is considered horizontal.
-
-        Returns:
-            (bottom_edge, top_edge) with each as LineSegment3D if they exist.
-            None if they do not exist.
-        """
-        # test if each of the edges are vertical.
-        horizontal_edges = []
-        for edge in self.boundary_segments:
-            if edge.is_edge_horizontal(tolerance):
-                horizontal_edges.append(edge)
-
-        if len(horizontal_edges) < 2:
-            return None
-        else:
-            sorted_edges = sorted(horizontal_edges, key=lambda edge: edge.p.z)
-            return sorted_edges[0], sorted_edges[1]
-
-    def get_left_right_vertical_edges(self, tolerance):
-        """Get left and right vertical edges of this Face if they exist.
-
-        Args:
-            tolerance: The maximum difference between the x any y values of the start
-                and end coordinates at which an edge is considered vertical.
-
-        Returns:
-            (left_edge, right_edge) with each as LineSegment3D if they exist. Left in
-            this case is defined as the edge with the lower X coordinates.
-            Result will be None if vertical edges do not exist.
-        """
-        # test if each of the edges are vertical.
-        vertical_edges = []
-        for edge in self.boundary_segments:
-            if edge.is_edge_vertical(tolerance):
-                vertical_edges.append(edge)
-
-        if len(vertical_edges) < 2:
-            return None
-        else:
-            if abs(self.normal.x) != 1:
-                sorted_edges = sorted(vertical_edges, key=lambda edge: edge.p.x)
-            else:
-                sorted_edges = sorted(vertical_edges, key=lambda edge: edge.p.y)
-            return sorted_edges[0], sorted_edges[-1]
-
-    def extract_rectangle(self, tolerance):
-        """Extract top and bottom line segments of a rectangle within this Face.
-
-        This method will only return geometry if:
-            1. There are no holes in the face.
-            2. The face is not within a horizontal plane.
-            3. There are two parallel edges to this face, which are either
-                oriented horizontally or vertically.
-            4. There must be enough horizontal or vertical overlap between
-                these edges for a rectangle to be drawn between them.
-        If this Face does not satisfy this criteria, None will be returned.
-
-        Args:
-            tolerance: The maximum difference between point values for them to be
-                considered a part of a rectangle.
-
-        Returns:
-            bottom_edge: A LineSegment3D representing the bottom of the rectangle.
-            top_edge: A LineSegment3D representing the top of the rectangle.
-            other_faces: A list of Face3D objects for the parts of this face not
-                included in the rectangle. The length of this list will be between
-                0 (if this face is already rectangular) and 2 (if there are non-
-                rectangular geometries on either side of the rectangle.)
-        """
-        # perform checks on the face to see if a rectangle is extractable
-        if self.has_holes:
-            return None
-        if abs(self.normal.x) < tolerance and abs(self.normal.y) < tolerance:
-            # face lies within a horizontal plane; we cannot distinguish top and bottom
-            return None
-        clean_face = self.remove_colinear_vertices(tolerance)
-
-        # try to extract a rectangle from horizontal curves
-        horiz_result = clean_face.get_top_bottom_horizontal_edges(tolerance)
-        if horiz_result is not None:
-            bottom_seg, top_seg = horiz_result
-            split_res = clean_face._split_with_rectangle(bottom_seg, top_seg, tolerance)
-            if split_res is not None:
-                return LineSegment3D.from_end_points(split_res[0][1], split_res[0][3]), \
-                    LineSegment3D.from_end_points(split_res[0][0], split_res[0][2]), \
-                    split_res[1]
-
-        # try to extract a rectangle from vertical curves
-        vert_result = clean_face.get_left_right_vertical_edges(tolerance)
-        if vert_result is not None:
-            left_seg, right_seg = vert_result
-            split_res = clean_face._split_with_rectangle(left_seg, right_seg, tolerance)
-            if split_res is not None:
-                seg_1 = LineSegment3D.from_end_points(split_res[0][0], split_res[0][1])
-                seg_2 = LineSegment3D.from_end_points(split_res[0][2], split_res[0][3])
-                sorted_edges = sorted([seg_1, seg_2], key=lambda edge: edge.p.z)
-                return sorted_edges[0], sorted_edges[1], split_res[1]
-
-        return None
-
     def get_mesh_grid(self, x_dim, y_dim=None, offset=None, flip=False,
                       generate_centroids=True):
         """Get a gridded Mesh3D from over this face.
@@ -914,6 +809,100 @@ class Face3D(Base2DIn3D):
                                                 for pt in grid_mesh2d.face_centroids)
 
         return grid_mesh3d
+
+    def countour_by_number(self, number_of_contours, direction_vector=Vector3D(0, 0, 1),
+                           flip_side=False):
+        """Generate a list of LineSegment3D objects contouring the face.
+
+        Args:
+            number_of_contours: A positive integer for the number of contours
+                to generate over the face.
+            direction_vector: A Vector3D for the direction along which contours
+                are generated. Default is Z-Axis, which generates horizontal contours.
+            flip_side: Boolean to note whether the side the contours start from
+                should be flipped. Default is False to have contours on top or right.
+                Setting to True will start contours on the bottom or left.
+        """
+        plane_normal = direction_vector.normalize()
+        tol_pt = Point3D(0.0000001, 0.0000001, 0.0000001)
+        diagonal = LineSegment3D.from_end_points(self.min + tol_pt, self.max - tol_pt)
+        diagonal = diagonal.flip() if flip_side is False else diagonal
+        contours = []
+        for pt in diagonal.subdivide_evenly(number_of_contours)[:-1]:
+            result = self.intersect_plane(Plane(plane_normal, pt))
+            if result is not None:
+                contours.extend(result)
+        return contours
+
+    def countour_by_distance_between(self, distance, direction_vector=Vector3D(0, 0, 1),
+                                     flip_side=False):
+        """Generate a list of LineSegment3D objects contouring the face.
+
+        Args:
+            distance: A number for the approximate distance between each contour.
+                The actual distance will be computed from
+            direction_vector: A Vector3D for the direction along which contours
+                are generated. Default is Z-Axis, which generates horizontal contours.
+            flip_side: Boolean to note whether the side the contours start from
+                should be flipped. Default is False to have contours on top or right.
+                Setting to True will start contours on the bottom or left.
+        """
+        plane_normal = direction_vector.normalize()
+        tol_pt = Point3D(0.0000001, 0.0000001, 0.0000001)
+        diagonal = LineSegment3D.from_end_points(self.min + tol_pt, self.max - tol_pt)
+        angle = direction_vector.angle(diagonal.v)
+        proj_dist = distance / math.cos(angle)
+        diagonal = diagonal.flip() if flip_side is False else diagonal
+        contours = []
+        for pt in diagonal.subdivide(proj_dist)[:-1]:
+            result = self.intersect_plane(Plane(plane_normal, pt))
+            if result is not None:
+                contours.extend(result)
+        return contours
+
+    def countour_fins_by_number(self, number_of_fins, depth, offset=0, angle=0,
+                                contour_vector=Vector3D(0, 0, 1), flip_side=False):
+        """Generate a list of Fac3D objects contouring the face.
+
+        Args:
+            number_of_fins: A positive integer for the number of fins to generate.
+            depth: A number for the depth to extrude the fins.
+            offset: A number for the distance to offset fins from this face.
+                Default is 0 for no offset.
+            angle: A number for the for an angle to rotate the fins in radians.
+                Default is 0 for no rotation.
+            contour_vector: A Vector3D for the direction along which contours
+                are generated. Default is Z-Axis, which generates horizontal fins.
+            flip_side: Boolean to note whether the side the fins start from
+                should be flipped. Default is False to have contours on top or right.
+                Setting to True will start contours on the bottom or left.
+        """
+        extru_vec = self._get_fin_extrusion_vector(depth, angle, contour_vector)
+        contours = self.countour_by_number(number_of_fins, contour_vector, flip_side)
+        return self._get_extrusion_fins(contours, extru_vec, offset)
+
+    def countour_fins_by_distance_between(self, distance, depth, offset=0, angle=0,
+                                          contour_vector=Vector3D(0, 0, 1),
+                                          flip_side=False):
+        """Generate a list of Fac3D objects contouring the face.
+
+        Args:
+            distance: A number for the approximate distance between each contour.
+                The actual distance will be computed from
+            depth: A number for the depth to extrude the fins.
+            offset: A number for the distance to offset fins from this face.
+                Default is 0 for no offset.
+            angle: A number for the for an angle to rotate the fins in radians.
+                Default is 0 for no rotation.
+            contour_vector: A Vector3D for the direction along which contours
+                are generated. Default is Z-Axis, which generates horizontal fins.
+            flip_side: Boolean to note whether the side the fins start from
+                should be flipped. Default is False to have contours on top or right.
+                Setting to True will start contours on the bottom or left.
+        """
+        extru_vec = self._get_fin_extrusion_vector(depth, angle, contour_vector)
+        contours = self.countour_by_distance_between(distance, contour_vector, flip_side)
+        return self._get_extrusion_fins(contours, extru_vec, offset)
 
     def sub_faces_by_ratio(self, ratio):
         """Get a list of faces with a combined area equal to the ratio times this face area.
@@ -1010,17 +999,120 @@ class Face3D(Base2DIn3D):
         height_seg = LineSegment3D.from_end_points(bottom_seg.p, top_seg.p)
         base_plane = Plane(self.normal, bottom_seg.p, bottom_seg.v)
         sub_faces = Face3D.sub_rectangles_from_rectangle(
-            bottom_seg.length, height_seg.length, ratio, sub_rect_height,
-            sill_height, horizontal_separation, vertical_separation, base_plane)
+            base_plane, bottom_seg.length, height_seg.length, ratio,
+            sub_rect_height, sill_height, horizontal_separation, vertical_separation)
         for face in other_faces:
             sub_faces.extend(face.sub_faces_by_ratio(ratio))
         return sub_faces
 
+    def get_top_bottom_horizontal_edges(self, tolerance):
+        """Get top and bottom horizontal edges of this Face if they exist.
+
+        Args:
+            tolerance: The maximum difference between the z values of the start and
+                end coordinates at which an edge is considered horizontal.
+
+        Returns:
+            (bottom_edge, top_edge) with each as LineSegment3D if they exist.
+            None if they do not exist.
+        """
+        # test if each of the edges are vertical.
+        horizontal_edges = []
+        for edge in self.boundary_segments:
+            if edge.is_edge_horizontal(tolerance):
+                horizontal_edges.append(edge)
+
+        if len(horizontal_edges) < 2:
+            return None
+        else:
+            sorted_edges = sorted(horizontal_edges, key=lambda edge: edge.p.z)
+            return sorted_edges[0], sorted_edges[1]
+
+    def get_left_right_vertical_edges(self, tolerance):
+        """Get left and right vertical edges of this Face if they exist.
+
+        Args:
+            tolerance: The maximum difference between the x any y values of the start
+                and end coordinates at which an edge is considered vertical.
+
+        Returns:
+            (left_edge, right_edge) with each as LineSegment3D if they exist. Left in
+            this case is defined as the edge with the lower X coordinates.
+            Result will be None if vertical edges do not exist.
+        """
+        # test if each of the edges are vertical.
+        vertical_edges = []
+        for edge in self.boundary_segments:
+            if edge.is_edge_vertical(tolerance):
+                vertical_edges.append(edge)
+
+        if len(vertical_edges) < 2:
+            return None
+        else:
+            if abs(self.normal.x) != 1:
+                sorted_edges = sorted(vertical_edges, key=lambda edge: edge.p.x)
+            else:
+                sorted_edges = sorted(vertical_edges, key=lambda edge: edge.p.y)
+            return sorted_edges[0], sorted_edges[-1]
+
+    def extract_rectangle(self, tolerance):
+        """Extract top and bottom line segments of a rectangle within this Face.
+
+        This method will only return geometry if:
+            1. There are no holes in the face.
+            2. The face is not parallel to the World XY plane.
+            3. There are two parallel edges to this face, which are either
+                oriented horizontally or vertically.
+            4. There must be enough overlap between these edges for a rectangle
+                to be drawn between them.
+        If this Face does not satisfy this criteria, None will be returned.
+
+        Args:
+            tolerance: The maximum difference between point values for them to be
+                considered a part of a rectangle.
+
+        Returns:
+            bottom_edge: A LineSegment3D representing the bottom of the rectangle.
+            top_edge: A LineSegment3D representing the top of the rectangle.
+            other_faces: A list of Face3D objects for the parts of this face not
+                included in the rectangle. The length of this list will be between
+                0 (if this face is already rectangular) and 2 (if there are non-
+                rectangular geometries on either side of the rectangle.)
+        """
+        # perform checks on the face to see if a rectangle is extractable
+        if self.has_holes:
+            return None
+        if abs(self.normal.x) < tolerance and abs(self.normal.y) < tolerance:
+            # face lies within a horizontal plane; we cannot distinguish top and bottom
+            return None
+        clean_face = self.remove_colinear_vertices(tolerance)
+
+        # try to extract a rectangle from horizontal curves
+        horiz_result = clean_face.get_top_bottom_horizontal_edges(tolerance)
+        if horiz_result is not None:
+            bottom_seg, top_seg = horiz_result
+            split_res = clean_face._split_with_rectangle(bottom_seg, top_seg, tolerance)
+            if split_res is not None:
+                return LineSegment3D.from_end_points(split_res[0][1], split_res[0][3]), \
+                    LineSegment3D.from_end_points(split_res[0][0], split_res[0][2]), \
+                    split_res[1]
+
+        # try to extract a rectangle from vertical curves
+        vert_result = clean_face.get_left_right_vertical_edges(tolerance)
+        if vert_result is not None:
+            left_seg, right_seg = vert_result
+            split_res = clean_face._split_with_rectangle(left_seg, right_seg, tolerance)
+            if split_res is not None:
+                seg_1 = LineSegment3D.from_end_points(split_res[0][0], split_res[0][1])
+                seg_2 = LineSegment3D.from_end_points(split_res[0][2], split_res[0][3])
+                sorted_edges = sorted([seg_1, seg_2], key=lambda edge: edge.p.z)
+                return sorted_edges[0], sorted_edges[1], split_res[1]
+        return None
+
     @staticmethod
-    def sub_rectangles_from_rectangle(parent_base, parent_height, ratio,
+    def sub_rectangles_from_rectangle(base_plane, parent_base, parent_height, ratio,
                                       sub_rect_height, sill_height,
-                                      horizontal_separation, vertical_separation=0,
-                                      base_plane=None):
+                                      horizontal_separation, vertical_separation=0):
         """Get a list of rectangular Face3D objects using parameters to define them.
 
         All of the resulting Face3D objects lie within a parent rectangle defined
@@ -1055,13 +1147,6 @@ class Face3D(Base2DIn3D):
                 rectangle and the X and Y axes will form the sides.
                 Default is the world XY plane.
         """
-        # set the default base_plane
-        if base_plane is None:
-            base_plane = Plane()
-        else:
-            assert isinstance(base_plane, Plane), 'Expected Plane. Got {}'.format(
-                type(base_plane))
-
         # calculate the target area to make the combined sub-rectangles
         target_area = parent_base * parent_height * ratio
         # find the maximum area for subdivision into smaller, taller sub-rectangles
@@ -1235,6 +1320,24 @@ class Face3D(Base2DIn3D):
             if self[vert_ind].is_equivalent(end_pt, tolerance):
                 found_other = True
         return new_verts
+
+    def _get_fin_extrusion_vector(self, depth, angle, contour_vector):
+        """Get the vector with which to extrude fins."""
+        extru_vec = self.plane.n * depth
+        if angle != 0:
+            if contour_vector.x == 0 and contour_vector.y == 0:
+                axis = Vector3D(1, 0, 0)
+            else:
+                axis = Vector3D(contour_vector.y, -contour_vector.x, 0)
+            extru_vec = extru_vec.rotate(axis, angle)
+        return extru_vec
+
+    def _get_extrusion_fins(self, contours, extru_vec, offset):
+        """Get fins from the contours and extrusion vector."""
+        if offset != 0:
+            off_vec = self.plane.n * offset
+            contours = tuple(seg.move(off_vec) for seg in contours)
+        return tuple(Face3D.from_extrusion(seg, extru_vec) for seg in contours)
 
     def _split_with_rectangle(self, edge_1, edge_2, tolerance):
         """Split this shape using two parallel edges of the face.

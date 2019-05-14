@@ -668,6 +668,127 @@ class Face3DTestCase(unittest.TestCase):
         assert face.project_point(pt_3) is None
         assert face.project_point(pt_4) is None
 
+    def test_get_mesh_grid(self):
+        """Test the Face3D get_mesh_grid method."""
+        pts = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
+        plane = Plane(Vector3D(0, 0, 1))
+        face = Face3D(pts, plane)
+        mesh = face.get_mesh_grid(0.5)
+
+        assert len(mesh.vertices) == 25
+        assert len(mesh.faces) == 16
+        assert mesh.area == 4
+
+        assert mesh.min.x == pytest.approx(0.0000001, rel=1e-2)
+        assert mesh.min.y == pytest.approx(0.0000001, rel=1e-2)
+        assert mesh.min.z == pytest.approx(0, rel=1e-2)
+        assert mesh.max.x == pytest.approx(2., rel=1e-2)
+        assert mesh.max.y == pytest.approx(2., rel=1e-2)
+        assert mesh.max.z == pytest.approx(0, rel=1e-2)
+        assert mesh.center.x == pytest.approx(1, rel=1e-2)
+        assert mesh.center.y == pytest.approx(1, rel=1e-2)
+        assert len(mesh.face_areas) == 16
+        assert mesh.face_areas[0] == 0.25
+        assert len(mesh.face_centroids) == 16
+
+        mesh_2 = face.get_mesh_grid(0.5, 0.5, 1, False)
+        mesh_3 = face.get_mesh_grid(0.5, 0.5, 1, True)
+
+        assert mesh_2.min.z == pytest.approx(1, rel=1e-2)
+        assert mesh_2.max.z == pytest.approx(1, rel=1e-2)
+        assert mesh_3.min.z == pytest.approx(-1, rel=1e-2)
+        assert mesh_3.max.z == pytest.approx(-1, rel=1e-2)
+
+    def test_countour_by_number(self):
+        """Test the countour_by_number method."""
+        pts_1 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 0, 0)]
+        pts_2 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(4, 0, 0)]
+        plane = Plane(Vector3D(0, 1, 0))
+        face_1 = Face3D(pts_1, plane)
+        face_2 = Face3D(pts_2, plane)
+
+        contours = face_1.countour_by_number(4)
+        assert len(contours) == 4
+        assert contours[0].p2.z == pytest.approx(2, rel=1e-3)
+        assert contours[-1].p2.z == pytest.approx(0.5, rel=1e-3)
+
+        contours = face_1.countour_by_number(4, Vector3D(1))
+        assert len(contours) == 4
+        assert contours[0].p2.x == pytest.approx(2, rel=1e-3)
+        assert contours[-1].p2.x == pytest.approx(0.5, rel=1e-3)
+
+        contours = face_1.countour_by_number(4, Vector3D(1), True)
+        assert len(contours) == 4
+        assert contours[-1].p2.x == pytest.approx(1.5, rel=1e-3)
+        assert round(contours[0].p2.x) == 0
+
+        contours = face_2.countour_by_number(4)
+        assert len(contours) == 4
+        contours = face_2.countour_by_number(8, Vector3D(1))
+        assert len(contours) == 8
+
+    def test_countour_by_distance_between(self):
+        """Test the countour_by_distance_between method."""
+        pts_1 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 0, 0)]
+        pts_2 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(4, 0, 0)]
+        plane = Plane(Vector3D(0, 1, 0))
+        face_1 = Face3D(pts_1, plane)
+        face_2 = Face3D(pts_2, plane)
+
+        contours = face_1.countour_by_distance_between(0.5)
+        assert len(contours) == 4
+        assert contours[0].p2.z == pytest.approx(2, rel=1e-3)
+        assert contours[-1].p2.z == pytest.approx(0.5, rel=1e-3)
+
+        contours = face_1.countour_by_distance_between(0.5, Vector3D(1))
+        assert len(contours) == 4
+        assert contours[0].p2.x == pytest.approx(2, rel=1e-3)
+        assert contours[-1].p2.x == pytest.approx(0.5, rel=1e-3)
+
+        contours = face_1.countour_by_distance_between(0.5, Vector3D(1), True)
+        assert len(contours) == 4
+        assert contours[-1].p2.x == pytest.approx(1.5, rel=1e-3)
+        assert round(contours[0].p2.x) == 0
+
+        contours = face_2.countour_by_distance_between(0.5)
+        assert len(contours) == 4
+        contours = face_2.countour_by_distance_between(0.5, Vector3D(1))
+        assert len(contours) == 8
+
+    def test_countour_fins_by_number(self):
+        """Test the countour_fins_by_number method."""
+        pts_1 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 0, 0)]
+        plane = Plane(Vector3D(0, 1, 0))
+        face_1 = Face3D(pts_1, plane)
+
+        fins = face_1.countour_fins_by_number(4, 0.5, 0.5)
+        assert len(fins) == 4
+
+        fins = face_1.countour_fins_by_number(4, 0.5, 0.5, contour_vector=Vector3D(1))
+        assert len(fins) == 4
+
+        fins = face_1.countour_fins_by_number(4, 0.5, 0.5, math.pi/4)
+        assert len(fins) == 4
+
+    def test_countour_fins_by_distance_between(self):
+        """Test the countour_fins_by_distance_between method."""
+        pts_1 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 0, 0)]
+        pts_2 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(4, 0, 0)]
+        plane = Plane(Vector3D(0, 1, 0))
+        face_1 = Face3D(pts_1, plane)
+        face_2 = Face3D(pts_2, plane)
+
+        fins = face_1.countour_fins_by_distance_between(0.5, 0.5, 0.5)
+        assert len(fins) == 4
+
+        fins = face_1.countour_fins_by_distance_between(0.25, 0.5, 0.5,
+                                                        contour_vector=Vector3D(1))
+        assert len(fins) == 8
+
+        fins = face_2.countour_fins_by_distance_between(0.5, 0.5, 0.5,
+                                                        contour_vector=Vector3D(1))
+        assert len(fins) == 8
+
     def test_extract_rectangle(self):
         """Test the Face3D extract_rectangle method."""
         pts_1 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 0, 0)]
@@ -767,37 +888,6 @@ class Face3DTestCase(unittest.TestCase):
         assert len(sub_faces_2) == 4
         areas = [srf.area for srf in sub_faces_2]
         assert sum(areas) == pytest.approx(face_2.area * 0.5, rel=1e-3)
-
-    def test_get_mesh_grid(self):
-        """Test the Face3D get_mesh_grid method."""
-        pts = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
-        plane = Plane(Vector3D(0, 0, 1))
-        face = Face3D(pts, plane)
-        mesh = face.get_mesh_grid(0.5)
-
-        assert len(mesh.vertices) == 25
-        assert len(mesh.faces) == 16
-        assert mesh.area == 4
-
-        assert mesh.min.x == pytest.approx(0.0000001, rel=1e-2)
-        assert mesh.min.y == pytest.approx(0.0000001, rel=1e-2)
-        assert mesh.min.z == pytest.approx(0, rel=1e-2)
-        assert mesh.max.x == pytest.approx(2., rel=1e-2)
-        assert mesh.max.y == pytest.approx(2., rel=1e-2)
-        assert mesh.max.z == pytest.approx(0, rel=1e-2)
-        assert mesh.center.x == pytest.approx(1, rel=1e-2)
-        assert mesh.center.y == pytest.approx(1, rel=1e-2)
-        assert len(mesh.face_areas) == 16
-        assert mesh.face_areas[0] == 0.25
-        assert len(mesh.face_centroids) == 16
-
-        mesh_2 = face.get_mesh_grid(0.5, 0.5, 1, False)
-        mesh_3 = face.get_mesh_grid(0.5, 0.5, 1, True)
-
-        assert mesh_2.min.z == pytest.approx(1, rel=1e-2)
-        assert mesh_2.max.z == pytest.approx(1, rel=1e-2)
-        assert mesh_3.min.z == pytest.approx(-1, rel=1e-2)
-        assert mesh_3.max.z == pytest.approx(-1, rel=1e-2)
 
 
 if __name__ == "__main__":
