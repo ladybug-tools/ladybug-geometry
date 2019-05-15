@@ -112,12 +112,12 @@ class Mesh2DTestCase(unittest.TestCase):
         assert mesh._is_color_by_face is False
         assert mesh.colors is None
 
-    def test_mesh2d_init_from_faces(self):
-        """Test the initalization of Mesh2D from_faces."""
+    def test_mesh2d_init_from_face_vertices(self):
+        """Test the initalization of Mesh2D from_face_vertices."""
         face_1 = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0))
         face_2 = (Point2D(2, 2), Point2D(2, 0), Point2D(4, 0))
-        mesh_1 = Mesh2D.from_faces([face_1, face_2])
-        mesh_2 = Mesh2D.from_faces([face_1, face_2], False)
+        mesh_1 = Mesh2D.from_face_vertices([face_1, face_2])
+        mesh_2 = Mesh2D.from_face_vertices([face_1, face_2], False)
 
         assert len(mesh_1.vertices) == 5
         assert len(mesh_2.vertices) == 7

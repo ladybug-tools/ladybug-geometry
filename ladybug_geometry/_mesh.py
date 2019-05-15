@@ -297,7 +297,7 @@ class MeshBase(object):
             new_mesh._area = tuple([a * factor for a in self._area])
 
     @staticmethod
-    def _interpret_input_from_faces(faces, purge):
+    def _interpret_input_from_face_vertices(faces, purge):
         """Get faces and vertices from a list of faces as points."""
         vertices = []  # collection of vertices as point objects
         face_collector = []  # collection of face indices
@@ -306,8 +306,7 @@ class MeshBase(object):
                 ind = []
                 for v in f:
                     try:  # this can get very slow for large number of vertices.
-                        index = vertices.index(v)
-                        ind.append(index)
+                        ind.append(vertices.index(v))
                     except ValueError:  # add new point
                         vertices.append(v)
                         ind.append(len(vertices) - 1)

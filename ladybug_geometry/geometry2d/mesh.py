@@ -59,7 +59,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
         self._face_centroids = None
 
     @classmethod
-    def from_faces(cls, faces, purge=True):
+    def from_face_vertices(cls, faces, purge=True):
         """Create a mesh from a list of faces with each face defined by a list of Point2Ds.
 
         Args:
@@ -69,7 +69,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
                 for large lists of faces but results in a higher-quality mesh with
                 a smaller size in memory. Default is True.
         """
-        vertices, face_collector = cls._interpret_input_from_faces(faces, purge)
+        vertices, face_collector = cls._interpret_input_from_face_vertices(faces, purge)
         return cls(tuple(vertices), tuple(face_collector))
 
     @classmethod
@@ -103,7 +103,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
         else:
             # slow ear-clipping method
             _faces = Mesh2D._ear_clipping_triangulation(polygon)
-            _new_mesh = cls.from_faces(_faces, purge)
+            _new_mesh = cls.from_face_vertices(_faces, purge)
 
         return _new_mesh
 

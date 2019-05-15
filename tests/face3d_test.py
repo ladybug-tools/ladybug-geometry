@@ -236,6 +236,39 @@ class Face3DTestCase(unittest.TestCase):
         assert face.is_convex is False
         assert face.is_self_intersecting is False
 
+    def test_face3d_init_from_punched_geometry(self):
+        """Test the initalization of Face3D from_shape_with_holes."""
+        bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
+        hole_pts_1 = [Point3D(1, 1), Point3D(1.5, 1), Point3D(1.5, 1.5), Point3D(1, 1.5)]
+        hole_pts_2 = [Point3D(2, 2), Point3D(3, 2), Point3D(3, 3), Point3D(2, 3)]
+        face_1 = Face3D.from_vertices(bound_pts)
+        face_2 = Face3D.from_shape_with_holes(bound_pts, [hole_pts_1])
+        sub_face = Face3D.from_vertices(hole_pts_2)
+
+        face = Face3D.from_punched_geometry(face_1, [sub_face])
+        assert isinstance(face.vertices, tuple)
+        assert len(face.vertices) == 10
+        assert face.has_holes is True
+        assert isinstance(face.hole_segments, tuple)
+        assert len(face.hole_segments) == 1
+        assert face.area == 15
+        assert face.perimeter == pytest.approx(20, rel=1e-3)
+        assert face.is_clockwise is False
+        assert face.is_convex is False
+        assert face.is_self_intersecting is False
+
+        face = Face3D.from_punched_geometry(face_2, [sub_face])
+        assert isinstance(face.vertices, tuple)
+        assert len(face.vertices) == 16
+        assert face.has_holes is True
+        assert isinstance(face.hole_segments, tuple)
+        assert len(face.hole_segments) == 2
+        assert face.area == 16 - 1.25
+        assert face.perimeter == pytest.approx(22, rel=1e-3)
+        assert face.is_clockwise is False
+        assert face.is_convex is False
+        assert face.is_self_intersecting is False
+
     def test_is_equivalent(self):
         """Test the is_equivalent method."""
         plane_1 = Plane(Vector3D(0, 0, 1))

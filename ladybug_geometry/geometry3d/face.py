@@ -58,7 +58,7 @@ class Face3D(Base2DIn3D):
         """Initilize Face3D.
 
         Args:
-            vertices: A list of Point3D objects representing the vertices of the sface.
+            vertices: A list of Point3D objects representing the vertices of the face.
             plane: A Plane object indicating the plane in which the face exists.
         """
         self._check_vertices_input(vertices)
@@ -202,12 +202,10 @@ class Face3D(Base2DIn3D):
     def from_shape_with_holes(cls, boundary, holes, plane=None):
         """Initialize a Face3D from a boundary vertex list with holes inside of it.
 
-        This method will separately store the list of Point2Ds representing the
+        This method will separately store the list of Point3Ds representing the
         boundary and holes on the `boundary` and `holes` properties of this object.
-        However, under the hood, the polygon_2d for the face will be a single
-        concave polygon made by drawing lines from the holes to the outer boundary.
-        This allows for ease of use with the other methods including intersections,
-        generating triangulated meshes, and generating grid meshes.
+        However, the vertices will trace out a single shape that turns inwards
+        from the boundary to cut out the holes.
 
         Args:
             boundary: A list of Point3D objects for the outer boundary of the face
@@ -215,7 +213,7 @@ class Face3D(Base2DIn3D):
             holes: A list of lists with one list for each hole in the face. Each hole
                 should be a list of at least 3 Point3D objects.
             plane: A Plane object indicating the plane in which the face exists.
-                If left as none, the Plane normal will automatically be calculated
+                If left as None, the Plane normal will automatically be calculated
                 by analyzing the first three vertices of the boundary and the origin
                 of the plane will be the first vertex of the boundary vertices.
         """
@@ -246,6 +244,30 @@ class Face3D(Base2DIn3D):
         _face._boundary = tuple(boundary)
         _face._holes = tuple(tuple(hole) for hole in holes)
         return _face
+
+    @classmethod
+    def from_punched_geometry(cls, base_face, sub_faces, plane=None):
+        """Create a face with holes punched in it from sub-faces.
+
+        Args:
+            base_face: A Face3D that acts as a parent to the sub_faces, completely
+                encircling them.
+            sub_faces: A list of Face3D objects that will be punched into the
+                base_face. These faces must lie completely within the base_face
+                for the result to be valid. The is_sub_face() method can be
+                used to verify that sub_faces are valid as input here.
+            plane: A Plane object indicating the plane in which the face exists.
+                If left as None, the Plane normal will automatically be calculated.
+        """
+        assert isinstance(base_face, Face3D), \
+            'base_face should be a Face3D. Got {}'.format(type(base_face))
+        for hole in sub_faces:
+            assert isinstance(hole, Face3D), \
+                'sub_face should be a list. Got {}'.format(type(hole))
+        hole_verts = [list(sf.vertices) for sf in sub_faces]
+        if base_face.has_holes:
+            hole_verts.extend([list(h) for h in base_face.holes])
+        return cls.from_shape_with_holes(list(base_face.boundary), hole_verts, plane)
 
     @property
     def vertices(self):
@@ -508,7 +530,7 @@ class Face3D(Base2DIn3D):
         if not self.plane.is_coplanar_tolerance(face.plane, tolerance, angle_tolerance):
             return False
 
-        # if it is, convert to a polygon in this face's plane
+        # if it is, convert sub-face to a polygon in this face's plane
         verts2d = tuple(self.plane.xyz_to_xy(_v) for _v in face.vertices)
         sub_poly = Polygon2D(verts2d)
 
@@ -862,7 +884,7 @@ class Face3D(Base2DIn3D):
 
     def countour_fins_by_number(self, number_of_fins, depth, offset=0, angle=0,
                                 contour_vector=Vector3D(0, 0, 1), flip_side=False):
-        """Generate a list of Fac3D objects contouring the face.
+        """Generate a list of Fac3D objects over this face (like louvers or fins).
 
         Args:
             number_of_fins: A positive integer for the number of fins to generate.
@@ -884,7 +906,7 @@ class Face3D(Base2DIn3D):
     def countour_fins_by_distance_between(self, distance, depth, offset=0, angle=0,
                                           contour_vector=Vector3D(0, 0, 1),
                                           flip_side=False):
-        """Generate a list of Fac3D objects contouring the face.
+        """Generate a list of Fac3D objects over this face (like louvers or fins).
 
         Args:
             distance: A number for the approximate distance between each contour.

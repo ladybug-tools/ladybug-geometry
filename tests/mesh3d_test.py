@@ -94,12 +94,12 @@ class Mesh3DTestCase(unittest.TestCase):
         assert mesh._is_color_by_face is False
         assert mesh.colors is None
 
-    def test_mesh3d_init_from_faces(self):
-        """Test the initalization of Mesh3D from_faces."""
+    def test_mesh3d_init_from_face_vertices(self):
+        """Test the initalization of Mesh3D from_face_vertices."""
         face_1 = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
         face_2 = (Point3D(2, 2, 2), Point3D(2, 0, 2), Point3D(4, 0, 2))
-        mesh_1 = Mesh3D.from_faces([face_1, face_2])
-        mesh_2 = Mesh3D.from_faces([face_1, face_2], False)
+        mesh_1 = Mesh3D.from_face_vertices([face_1, face_2])
+        mesh_2 = Mesh3D.from_face_vertices([face_1, face_2], False)
 
         assert len(mesh_1.vertices) == 5
         assert len(mesh_2.vertices) == 7
