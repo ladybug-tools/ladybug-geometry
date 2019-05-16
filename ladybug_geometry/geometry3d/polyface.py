@@ -82,11 +82,12 @@ class Polyface3D(Base2DIn3D):
         self._edge_indices = edge_i if isinstance(edge_i, tuple) else tuple(edge_i)
         self._edge_types = edge_t if isinstance(edge_t, tuple) else tuple(edge_t)
 
-        # determine solidity of the polyface using the euler characteristic
-        if len(self._vertices) - len(self._edge_indices) + len(self._face_indices) == 2:
-            self._is_solid = True
-        else:
-            self._is_solid = False
+        # determine solidity of the polyface by checking for internal edges
+        self._is_solid = True
+        for edge in self._edge_types:
+            if edge != 1:
+                self._is_solid = False
+                break
 
         # assign default properties
         self._faces = None
@@ -261,6 +262,12 @@ class Polyface3D(Base2DIn3D):
         return self._edge_types
 
     @property
+    def edge_information(self):
+        """Dictionary with keys: 'edge_indices', 'edge_types' and corresponding properties.
+        """
+        return {'edge_indices': self._edge_indices, 'edge_types': self._edge_types}
+
+    @property
     def area(self):
         """The total surface area of the polyface."""
         if self._area is None:
@@ -274,6 +281,93 @@ class Polyface3D(Base2DIn3D):
         Note that all solid polyface objects will have faces pointing outwards.
         """
         return self._is_solid
+
+    def move(self, moving_vec):
+        """Get a polyface that has been moved along a vector.
+
+        Args:
+            moving_vec: A Vector3D with the direction and distance to move the polyface.
+        """
+        _verts = tuple(pt.move(moving_vec) for pt in self.vertices)
+        _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
+        if self._faces is not None:
+            _new_pface._faces = tuple(face.move(moving_vec) for face in self._faces)
+        return _new_pface
+
+    def rotate(self, axis, angle, origin):
+        """Rotate a polyface by a certain angle around an axis and origin.
+
+        Right hand rule applies:
+        If axis has a positive orientation, rotation will be clockwise.
+        If axis has a negative orientation, rotation will be counterclockwise.
+
+        Args:
+            axis: A Vector3D axis representing the axis of rotation.
+            angle: An angle for rotation in radians.
+            origin: A Point3D for the origin around which the object will be rotated.
+        """
+        _verts = tuple(pt.rotate(axis, angle, origin) for pt in self.vertices)
+        _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
+        if self._faces is not None:
+            _new_pface._faces = tuple(face.rotate(axis, angle, origin)
+                                      for face in self._faces)
+        return _new_pface
+
+    def rotate_xy(self, angle, origin):
+        """Get a polyface rotated counterclockwise in the world XY plane by an angle.
+
+        Args:
+            angle: An angle in radians.
+            origin: A Point3D for the origin around which the object will be rotated.
+        """
+        _verts = tuple(pt.rotate_xy(angle, origin) for pt in self.vertices)
+        _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
+        if self._faces is not None:
+            _new_pface._faces = tuple(face.rotate_xy(angle, origin)
+                                      for face in self._faces)
+        return _new_pface
+
+    def reflect(self, normal, origin):
+        """Get a polyface reflected across a plane with the input normal vector and origin.
+
+        Args:
+            normal: A Vector3D representing the normal vector for the plane across
+                which the polyface will be reflected. THIS VECTOR MUST BE NORMALIZED.
+            origin: A Point3D representing the origin from which to reflect.
+        """
+        _verts = tuple(pt.reflect(normal, origin) for pt in self.vertices)
+        _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
+        if self._faces is not None:
+            _new_pface._faces = tuple(face.reflect(normal, origin)
+                                      for face in self._faces)
+        return _new_pface
+
+    def scale(self, factor, origin):
+        """Scale a polyface by a factor from an origin point.
+
+        Args:
+            factor: A number representing how much the polyface should be scaled.
+            origin: A Point3D representing the origin from which to scale.
+        """
+        _verts = tuple(pt.scale(factor, origin) for pt in self.vertices)
+        _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
+        if self._faces is not None:
+            _new_pface._faces = tuple(face.scale(factor, origin)
+                                      for face in self._faces)
+        return _new_pface
+
+    def scale_world_origin(self, factor):
+        """Scale a polyface by a factor from the world origin. Faster than Polyface3D.scale.
+
+        Args:
+            factor: A number representing how much the polyface should be scaled.
+        """
+        _verts = tuple(pt.scale_world_origin(factor) for pt in self.vertices)
+        _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
+        if self._faces is not None:
+            _new_pface._faces = tuple(face.scale_world_origin(factor)
+                                      for face in self._faces)
+        return _new_pface
 
     def is_point_inside(self, point, test_vector=Vector3D(1, 0, 0)):
         """Test whether a Point3D lies inside or outside the polyface.
@@ -299,6 +393,55 @@ class Polyface3D(Base2DIn3D):
         if n_int % 2 == 0:
             return False
         return True
+
+    def does_intersect_line_ray_exist(self, line_ray):
+        """Boolean denoting whether an intersection exists between the input Line3D or Ray3D.
+
+        Args:
+            line_ray: A Line3D or Ray3D object for which intersection will be evaluated.
+
+        Returns:
+            True if an intersection exists. False if it does not exist.
+        """
+        for face in self.faces:
+            _int = face.intersect_line_ray(line_ray)
+            if _int is not None:
+                return True
+        return False
+
+    def intersect_line_ray(self, line_ray):
+        """Get the intersections between this polyface and the input Line3D or Ray3D.
+
+        Args:
+            line_ray: A Line3D or Ray3D object for which intersection will be computed.
+
+        Returns:
+            A list of Point3D for the intersection. Will be an empty list if no
+            intersection exists.
+        """
+        _inters = []
+        for face in self.faces:
+            _int = face.intersect_line_ray(line_ray)
+            if _int is not None:
+                _inters.append(_int)
+        return _inters
+
+    def intersect_plane(self, plane):
+        """Get the intersection between this polyface and the input plane.
+
+        Args:
+            plane: A Plane object for which intersection will be computed.
+
+        Returns:
+            List of LineSegment3D objects for the intersection.
+            Will be an empty list if no intersection exists.
+        """
+        _inters = []
+        for face in self.faces:
+            _int = face.intersect_plane(plane)
+            if _int is not None:
+                _inters.extend(_int)
+        return _inters
 
     def _get_edge_type(self, edge_type):
         """Get all of the edges of a certain type in this polyface."""
@@ -333,3 +476,12 @@ class Polyface3D(Base2DIn3D):
             else:
                 final_faces.append(face.flip())
         return tuple(final_faces)
+
+    def __copy__(self):
+        _new_poly = Polyface3D(self.vertices, self.face_indices, self.edge_information)
+        _new_poly._faces = self._faces
+        return _new_poly
+
+    def __repr__(self):
+        return 'Polyface3D ({} faces) ({} vertices)'.format(
+            len(self.faces), len(self))

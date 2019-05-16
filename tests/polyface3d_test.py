@@ -6,7 +6,7 @@ from ladybug_geometry.geometry3d.line import LineSegment3D
 from ladybug_geometry.geometry3d.face import Face3D
 from ladybug_geometry.geometry3d.polyface import Polyface3D
 
-
+import math
 import unittest
 import pytest
 
@@ -132,10 +132,52 @@ class Polyface3DTestCase(unittest.TestCase):
     def test_polyface3d_init_from_box(self):
         """Test the initalization of Poyface3D from_box."""
         polyface = Polyface3D.from_box(2, 4, 2)
-        print(polyface.edge_indices)
-        print(polyface.edge_types)
-        for face in polyface.faces:
-            print(face.normal)
+
+        assert len(polyface.vertices) == 8
+        assert len(polyface.face_indices) == 6
+        assert len(polyface.faces) == 6
+        assert len(polyface.edge_indices) == 12
+        assert len(polyface.edges) == 12
+        assert len(polyface.naked_edges) == 0
+        assert len(polyface.non_manifold_edges) == 0
+        assert len(polyface.internal_edges) == 12
+        assert polyface.area == 40
+        assert polyface.is_solid
+
+    def test_is_solid_with_hole(self):
+        """Test the is_solid property for a polyface with a hole.
+
+        This ensures that the is_solid property still works where the Euler
+        characteristic fails.
+        """
+        pass
+
+    def test_min_max_center(self):
+        """Test the Face3D min, max and center."""
+        polyface_1 = Polyface3D.from_box(2, 4, 2)
+        polyface_2 = Polyface3D.from_box(math.sqrt(2), math.sqrt(2), 2, Plane(
+            Vector3D(0, 0, 1), Point3D(1, 0, 0), Vector3D(1, 1, 0)))
+
+        assert polyface_1.min == Point3D(0, 0, 0)
+        assert polyface_1.max == Point3D(2, 4, 2)
+        assert polyface_1.center == Point3D(1, 2, 1)
+
+        assert polyface_2.min == Point3D(0, 0, 0)
+        assert polyface_2.max == Point3D(2, 2, 2)
+        assert polyface_2.center == Point3D(1, 1, 1)
+
+    def test_duplicate(self):
+        """Test the duplicate method of Face3D."""
+        polyface = Polyface3D.from_box(2, 4, 2)
+        new_polyface = polyface.duplicate()
+
+        for i, pt in enumerate(polyface):
+            assert pt == new_polyface[i]
+        for i, fi in enumerate(polyface.face_indices):
+            assert fi == new_polyface.face_indices[i]
+
+        assert polyface.area == new_polyface.area
+        assert polyface.is_solid == new_polyface.is_solid
 
     def test_is_point_inside(self):
         """Test the is_point_inside method."""

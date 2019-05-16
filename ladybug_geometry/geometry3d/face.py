@@ -693,7 +693,7 @@ class Face3D(Base2DIn3D):
         """Scale a face by a factor from the world origin. Faster than Face3D.scale.
 
         Args:
-            factor: A number representing how much the line segment should be scaled.
+            factor: A number representing how much the face should be scaled.
         """
         _verts = self._scale_world_origin(self.vertices, factor)
         _new_face = self._face_transform_scale(
@@ -1260,8 +1260,7 @@ class Face3D(Base2DIn3D):
             ' must be a number. Got {}.'.format(name, type(input))
 
     def _move(self, vertices, mov_vec):
-        return tuple(Point3D(
-            pt.x + mov_vec.x, pt.y + mov_vec.y, pt.z + mov_vec.z) for pt in vertices)
+        return tuple(pt.move(mov_vec) for pt in vertices)
 
     def _rotate(self, vertices, axis, angle, origin):
         return tuple(pt.rotate(axis, angle, origin) for pt in vertices)
