@@ -31,6 +31,7 @@ class Polyface3DTestCase(unittest.TestCase):
         assert len(polyface.non_manifold_edges) == 0
         assert len(polyface.internal_edges) == 12
         assert polyface.area == 24
+        assert polyface.volume == 8
         assert polyface.is_solid
 
         for face in polyface.faces:
@@ -59,6 +60,7 @@ class Polyface3DTestCase(unittest.TestCase):
         assert len(polyface.non_manifold_edges) == 0
         assert len(polyface.internal_edges) == 8
         assert polyface.area == 20
+        assert polyface.volume == 0
         assert polyface.is_solid is False
 
         for face in polyface.faces:
@@ -90,6 +92,7 @@ class Polyface3DTestCase(unittest.TestCase):
         assert len(polyface.non_manifold_edges) == 0
         assert len(polyface.internal_edges) == 12
         assert polyface.area == 24
+        assert polyface.volume == 8
         assert polyface.is_solid
 
         for face in polyface.faces:
@@ -124,6 +127,7 @@ class Polyface3DTestCase(unittest.TestCase):
         assert len(polyface.non_manifold_edges) == 0
         assert len(polyface.internal_edges) == 8
         assert polyface.area == 20
+        assert polyface.volume == 0
         assert polyface.is_solid is False
 
         for face in polyface.faces:
@@ -142,6 +146,7 @@ class Polyface3DTestCase(unittest.TestCase):
         assert len(polyface.non_manifold_edges) == 0
         assert len(polyface.internal_edges) == 12
         assert polyface.area == 40
+        assert polyface.volume == 16
         assert polyface.is_solid
 
     def test_is_solid_with_hole(self):
@@ -161,10 +166,12 @@ class Polyface3DTestCase(unittest.TestCase):
         assert polyface_1.min == Point3D(0, 0, 0)
         assert polyface_1.max == Point3D(2, 4, 2)
         assert polyface_1.center == Point3D(1, 2, 1)
+        assert polyface_1.volume == pytest.approx(16, rel=1e-3)
 
         assert polyface_2.min == Point3D(0, 0, 0)
         assert polyface_2.max == Point3D(2, 2, 2)
         assert polyface_2.center == Point3D(1, 1, 1)
+        assert polyface_2.volume == pytest.approx(4, rel=1e-3)
 
     def test_duplicate(self):
         """Test the duplicate method of Face3D."""

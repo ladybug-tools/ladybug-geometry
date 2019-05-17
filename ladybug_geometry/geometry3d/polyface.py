@@ -27,6 +27,7 @@ class Polyface3D(Base2DIn3D):
         max
         center
         area
+        volume
         is_solid
     """
     __slots__ = ('_vertices', '_faces', '_edges',
@@ -99,6 +100,7 @@ class Polyface3D(Base2DIn3D):
         self._max = None
         self._center = None
         self._area = None
+        self._volume = None
 
     @classmethod
     def from_faces(cls, faces):
@@ -273,6 +275,23 @@ class Polyface3D(Base2DIn3D):
         if self._area is None:
             self._area = sum([face.area for face in self.faces])
         return self._area
+
+    @property
+    def volume(self):
+        """The volume enclosed by the polyface.
+
+        Note that, if this polyface is not solid, the volume will always be 0.
+        """
+        if self._volume is None:
+            if self._is_solid:
+                # formula taken from https://en.wikipedia.org/wiki/Polyhedron#Volume
+                _v = 0
+                for i, face in enumerate(self.faces):
+                    _v += face[0].dot(face.normal) * face.area
+                self._volume = _v / 3
+            else:
+                self._volume = 0
+        return self._volume
 
     @property
     def is_solid(self):
