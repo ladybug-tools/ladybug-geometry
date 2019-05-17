@@ -108,9 +108,9 @@ class Polyface3D(Base2DIn3D):
 
         Initializing a Polyface3D this way will preserve the properties of the
         underlying Face3D objects, including the order of Face3D objects on the faces
-        property and the presence of holes in the Face3D objects. As such,
-        it is the recommended way to create a polyface when Face3D objects are
-        available.
+        property of the polyface and the presence of holes in the Face3D objects.
+        As such, it is the recommended way to create a polyface when Face3D objects
+        are available.
 
         Args:
             faces: A list of Face3D objects representing the boundary of this Polyface.
@@ -124,6 +124,44 @@ class Polyface3D(Base2DIn3D):
                 try:  # this can get slow for large number of vertices.
                     ind.append(vertices.index(v))
                 except ValueError:  # add new point
+                    vertices.append(v)
+                    ind.append(len(vertices) - 1)
+            face_indices.append(tuple(ind))
+
+        # get the polyface object and assign correct faces to it
+        _polyface = cls(vertices, face_indices)
+        if _polyface._is_solid:
+            _polyface._faces = cls._correct_face_direction(faces)
+        else:
+            _polyface._faces = faces
+        return _polyface
+
+    @classmethod
+    def from_faces_tolerance(cls, faces, tolerance):
+        """Initilize Polyface3D from a list of Face3D objects with a tolerance.
+
+        This method is effectively equivalent to the from_faces method but faces
+        will be joined into the polyface if the vertices are within the tolerance
+        (rather than needing vertices to be perfectly equivalent).
+
+        Args:
+            faces: A list of Face3D objects representing the boundary of this Polyface.
+            tolerance: The maximum difference between x, y, and z values at which
+                point vertices are considered equivalent.
+        """
+        # extract unique vertices from the faces
+        vertices = []  # collection of vertices as point objects
+        face_indices = []  # collection of face indices
+        for f in faces:
+            ind = []
+            for v in f:
+                found = False
+                for i, vert in enumerate(vertices):  # slow for large number of vertices.
+                    if v.is_equivalent(vert, tolerance):
+                        found = True
+                        ind.append(i)
+                        break
+                if found is False:  # add new point
                     vertices.append(v)
                     ind.append(len(vertices) - 1)
             face_indices.append(tuple(ind))
@@ -173,6 +211,7 @@ class Polyface3D(Base2DIn3D):
                                                'edge_types': [1] * 12})
         verts = tuple(tuple(_verts[i] for i in face) for face in _face_indices)
         polyface._faces = tuple(Face3D.from_vertices(v) for v in verts)
+        polyface._volume = length * width * height
         return polyface
 
     @property
@@ -311,6 +350,7 @@ class Polyface3D(Base2DIn3D):
         _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
         if self._faces is not None:
             _new_pface._faces = tuple(face.move(moving_vec) for face in self._faces)
+        _new_pface._volume = self._volume
         return _new_pface
 
     def rotate(self, axis, angle, origin):
@@ -330,6 +370,7 @@ class Polyface3D(Base2DIn3D):
         if self._faces is not None:
             _new_pface._faces = tuple(face.rotate(axis, angle, origin)
                                       for face in self._faces)
+        _new_pface._volume = self._volume
         return _new_pface
 
     def rotate_xy(self, angle, origin):
@@ -344,6 +385,7 @@ class Polyface3D(Base2DIn3D):
         if self._faces is not None:
             _new_pface._faces = tuple(face.rotate_xy(angle, origin)
                                       for face in self._faces)
+        _new_pface._volume = self._volume
         return _new_pface
 
     def reflect(self, normal, origin):
@@ -359,6 +401,7 @@ class Polyface3D(Base2DIn3D):
         if self._faces is not None:
             _new_pface._faces = tuple(face.reflect(normal, origin)
                                       for face in self._faces)
+        _new_pface._volume = self._volume
         return _new_pface
 
     def scale(self, factor, origin):
@@ -373,6 +416,7 @@ class Polyface3D(Base2DIn3D):
         if self._faces is not None:
             _new_pface._faces = tuple(face.scale(factor, origin)
                                       for face in self._faces)
+        _new_pface._volume = self._volume * factor if self._volume is not None else None
         return _new_pface
 
     def scale_world_origin(self, factor):
@@ -386,6 +430,7 @@ class Polyface3D(Base2DIn3D):
         if self._faces is not None:
             _new_pface._faces = tuple(face.scale_world_origin(factor)
                                       for face in self._faces)
+        _new_pface._volume = self._volume * factor if self._volume is not None else None
         return _new_pface
 
     def is_point_inside(self, point, test_vector=Vector3D(1, 0, 0)):

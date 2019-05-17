@@ -480,7 +480,7 @@ class Face3DTestCase(unittest.TestCase):
             assert pt == face_2[i]
 
     def test_move(self):
-        """Test the Polygon2D move method."""
+        """Test the Face3D move method."""
         pts_1 = (Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 2, 0), Point3D(0, 2, 0))
         plane_1 = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 0))
         face_1 = Face3D(pts_1, plane_1)
