@@ -133,6 +133,30 @@ class Polyface3DTestCase(unittest.TestCase):
         for face in polyface.faces:
             assert face.area == 4
 
+    def test_polyface3d_init_from_faces_coplanar(self):
+        """Test the initalization of Poyface3D from_faces with two coplanar faces."""
+        # this is an important case that must be solved
+        # can be done by iterating through naked edges and finding colinear ones
+        pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
+        pts_2 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(0, 2, 0)]
+        pts_3 = [Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(0, 0, 2)]
+        pts_4 = [Point3D(2, 2, 0), Point3D(0, 2, 0), Point3D(0, 2, 2), Point3D(2, 2, 2)]
+        pts_5 = [Point3D(2, 2, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(2, 2, 2)]
+        pts_6 = [Point3D(0, 0, 2), Point3D(0, 1, 2), Point3D(2, 1, 2), Point3D(2, 0, 2)]
+        pts_7 = [Point3D(0, 1, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 1, 2)]
+        face_1 = Face3D.from_vertices(pts_1)
+        face_2 = Face3D.from_vertices(pts_2)
+        face_3 = Face3D.from_vertices(pts_3)
+        face_4 = Face3D.from_vertices(pts_4)
+        face_5 = Face3D.from_vertices(pts_5)
+        face_6 = Face3D.from_vertices(pts_6)
+        face_7 = Face3D.from_vertices(pts_7)
+        polyface = Polyface3D.from_faces(
+            [face_1, face_2, face_3, face_4, face_5, face_6, face_7])
+        print(polyface.is_solid)
+        for seg in polyface.naked_edges:
+            print (seg)
+
     def test_polyface3d_init_from_faces_tolerance(self):
         """Test the initalization of Poyface3D from_faces_tolerance."""
         pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
