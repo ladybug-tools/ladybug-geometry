@@ -9,6 +9,11 @@ from .plane import Plane
 from .face import Face3D
 from ._2d import Base2DIn3D
 
+try:
+    from itertools import izip as zip  # python 2
+except ImportError:
+    xrange = range  # python 3
+
 
 class Polyface3D(Base2DIn3D):
     """Object with Multiple Planar Faces in 3D Space. Includes solid objects and polyhedra.
@@ -214,6 +219,26 @@ class Polyface3D(Base2DIn3D):
         polyface._volume = length * width * height
         return polyface
 
+    @classmethod
+    def from_offset_face(cls, face, offset):
+        """Initilize Polyface3D from a Face3D that is offset along its normal by a height.
+
+        Args:
+            face: A Face3D to serve as a base for the polyface.
+            offset: A number for the distance to offset the face to make a solid.
+        """
+        assert isinstance(face, Face3D), \
+            'face must be a Face3D. Got {}.'.format(type(face))
+        assert isinstance(offset, (float, int)), \
+            'height must be a number. Got {}.'.format(type(offset))
+        extru_vec = face.normal * offset
+        verts = list(face._vertices) + [pt.move(extru_vec) for pt in face._vertices]
+        len_faces = len(face._vertices)
+        faces = [tuple(xrange(len_faces))]
+        for i in xrange(len_faces - 1):
+            faces.append((i, i + 1, i + len_faces, i + len_faces + 1))
+        return Polyface3D(verts, faces)
+
     @property
     def vertices(self):
         """Tuple of all vertices in this polyface.
@@ -339,6 +364,108 @@ class Polyface3D(Base2DIn3D):
         Note that all solid polyface objects will have faces pointing outwards.
         """
         return self._is_solid
+
+    def merge_overlapping_edges(self, tolerance, angle_tolerance):
+        """Get this object with overlapping naked edges merged into single internal edges.
+
+        This can be used to determine if a polyface is truly solid.
+        The default test of edge contiions that runs upon creation of a polyface does
+        not check for cases where overlapping colinear edges could be considered
+        a single internal edge such as the case below:
+                             |           1          |
+                            A|______________________|C
+                             |          B|          |
+                             |           |          |
+                             |     2     |     3    |
+        If Face 1 only has edge AC and not two separate edges for AB and BC, the
+        creation of the polyface will yield naked edges for AC, AB, and BC, meaning
+        the shape would not be considered solid when it might actually be so. This
+        merge_overlapping_edges method overcomes this by replacing the entire set
+        of 3 naked edges above a single internal edge running from A to C.
+
+        Args:
+            tolerance: The minimum distance between a vertex and the boundary segments
+                at which point the vertex is considered colinear.
+            angle_tolerance: The max angle in radians that the direction between
+                this object and another can vary for them to be considered
+                parallel.
+        """
+        # get naked edges
+        naked_edges = list(self.naked_edges)
+        if len(naked_edges) == 0:
+            return self
+
+        # establish lists that will be iteratively edited
+        remove_i = []
+        add_edges = []
+        naked_edge_i = []
+        naked_edge_ind = []
+        for i, x in enumerate(self.edge_types):
+            if x == 0:
+                naked_edge_i.append(i)
+                naked_edge_ind.append(self._edge_indices[i])
+
+        while len(naked_edge_i) > 1:
+            # get all of the edges that are colinear with the first edge
+            coll_edges = list(naked_edge_ind[0])
+            coll_i = [naked_edge_i[0]]
+            kept_i = []
+            for edge, ind, nei, i in zip(
+                    naked_edges[1:], naked_edge_ind[1:], naked_edge_i[1:],
+                    xrange(1, len(naked_edges))):
+                if edge.is_colinear(naked_edges[0], tolerance, angle_tolerance):
+                    coll_edges.extend(ind)
+                    coll_i.append(nei)
+                else:
+                    kept_i.append(i)
+
+            # determine if  colinear edges create a full double line along the edge
+            if len(coll_edges) == 1:
+                overlapping = False
+            else:
+                final_vi = []
+                coll_edges.sort()
+                overlapping = True
+                for i in range(0, len(coll_edges), 2):
+                    final_vi.append(coll_edges[i])
+                    if not coll_edges[i] == coll_edges[i + 1]:
+                        overlapping = False
+                        break
+
+            # if fully overlapping edges have been found, remake them into one
+            if overlapping is True:
+                remove_i.extend(coll_i)  # remove overlapping edges from the list
+                verts = [self.vertices[j] for j in final_vi]
+                dir_vec = verts[0] - verts[1]
+                if dir_vec.x != 0:
+                    vert_coor = [v.x for v in verts]
+                elif dir_vec.y != 0:
+                    vert_coor = [v.y for v in verts]
+                else:
+                    vert_coor = [v.z for v in verts]
+                vert_coor, final_vi = zip(*sorted(zip(vert_coor, final_vi)))
+                add_edges.append((final_vi[0], final_vi[-1]))
+
+            # delete the colinear vertices that have been accounted for
+            naked_edges = [naked_edges[i] for i in kept_i]
+            naked_edge_ind = [naked_edge_ind[i] for i in kept_i]
+            naked_edge_i = [naked_edge_i[i] for i in kept_i]
+
+        # create the new edge information and the new polyface
+        new_edge_indices = list(self.edge_indices)
+        new_edge_types = list(self.edge_types)
+        add_i = []
+        for i in range(len(new_edge_indices)):
+            if i not in remove_i:
+                add_i.append(i)
+        new_edge_indices = [new_edge_indices[i] for i in add_i]
+        new_edge_types = [new_edge_types[i] for i in add_i]
+        for new_edge in add_edges:
+            new_edge_indices.append(new_edge)
+            new_edge_types.append(1)
+        return Polyface3D(self._vertices, self._face_indices,
+                          {'edge_indices': new_edge_indices,
+                           'edge_types': new_edge_types})
 
     def move(self, moving_vec):
         """Get a polyface that has been moved along a vector.

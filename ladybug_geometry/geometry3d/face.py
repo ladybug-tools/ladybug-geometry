@@ -468,10 +468,13 @@ class Face3D(Base2DIn3D):
         Geometrical equivalence is definied as being coplananar with this face,
         having the same number of vertices, and having each vertex map-able between
         the faces. Clockwise relationships do not have to match nor does the normal
-        direction of the face.  However, all other properties will be matching to
+        direction of the face.  However, all other properties must be matching to
         within the input tolerance.
 
         This is useful for identifying matching surfaces when solving for adjacency.
+        Note that you may also want to use the remove_colinear_vertices() method
+        on input faces before using this method in order to count faces with the
+        same non-colinear vertices as geometrically equivalent.
 
         Args:
             face: Another face for which geometric equivalency will be tested.
@@ -586,18 +589,15 @@ class Face3D(Base2DIn3D):
         """
         if len(self.vertices) == 3:
             return self
-        new_vertices = []
-        _poly = self.polygon2d
-        for i, _v in enumerate(_poly.vertices):
-            _a = _poly[i - 2].determinant(_poly[i - 1]) + \
-                _poly[i - 1].determinant(_v) + _v.determinant(_poly[i - 2])
-            if abs(_a) > tolerance:
-                new_vertices.append(self[i - 1])
+        new_vertices = self._remove_colinear(
+            self._vertices, self.polygon2d, tolerance)
         _new_face = Face3D(new_vertices, self.plane)
         if not self.has_holes:
             return _new_face
-        _new_face._boundary = self._remove_colinear(self._boundary, tolerance)
-        _new_face._holes = self._remove_colinear(self._holes, tolerance)
+        _new_face._boundary = self._remove_colinear(
+            self._boundary, self.boundary_polygon2d, tolerance)
+        _new_face._holes = self._remove_colinear(
+            self._holes, self.hole_polygon2d, tolerance)
         return _new_face
 
     def flip(self):
@@ -1041,7 +1041,7 @@ class Face3D(Base2DIn3D):
         # test if each of the edges are vertical.
         horizontal_edges = []
         for edge in self.boundary_segments:
-            if edge.is_edge_horizontal(tolerance):
+            if edge.is_horizontal(tolerance):
                 horizontal_edges.append(edge)
 
         if len(horizontal_edges) < 2:
@@ -1065,7 +1065,7 @@ class Face3D(Base2DIn3D):
         # test if each of the edges are vertical.
         vertical_edges = []
         for edge in self.boundary_segments:
-            if edge.is_edge_vertical(tolerance):
+            if edge.is_vertical(tolerance):
                 vertical_edges.append(edge)
 
         if len(vertical_edges) < 2:
@@ -1316,15 +1316,18 @@ class Face3D(Base2DIn3D):
         if self._area is not None:
             new_face._area = self._area * factor
 
-    def _remove_colinear(self, vertices, tolerance):
-        """Remove colinear vertices from a list of Point3D."""
-        pts_2d = tuple(self.plane.xyz_to_xy(_v) for _v in vertices)
+    def _remove_colinear(self, pts_3d, pts_2d, tolerance):
+        """Remove colinear vertices from a list of Point2D.
+
+        This method determines colinearity by checking whether the area of the
+        triangle formed by 3 vertices is less than the tolerance.
+        """
         new_vertices = []
         for i, _v in enumerate(pts_2d):
             _a = pts_2d[i - 2].determinant(pts_2d[i - 1]) + \
                 pts_2d[i - 1].determinant(_v) + _v.determinant(pts_2d[i - 2])
             if abs(_a) > tolerance:
-                new_vertices.append(vertices[i - 1])
+                new_vertices.append(pts_3d[i - 1])
         return new_vertices
 
     def _vertices_between_points(self, start_pt, end_pt, tolerance):

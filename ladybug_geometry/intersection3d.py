@@ -71,6 +71,25 @@ def closest_point3d_on_line3d(P, L):
     return Point3D(L.p.x + u * L.v.x, L.p.y + u * L.v.y, L.p.z + u * L.v.z)
 
 
+def closest_point3d_on_line3d_infinite(P, L):
+    """Get the closest Point3D on an infinite extension of a LineSegment3D or Ray3D.
+
+    Args:
+        P: A Point3D object.
+        L: A LineSegment3D or Ray3D object along wich the closest point
+            will be determined.
+
+    Returns:
+        Point3D for the closest point on L to P.
+    """
+    d = L.v.magnitude_squared
+    assert d != 0, 'Length of LineSegment3D must be greater than 0.'
+    u = ((P.x - L.p.x) * L.v.x +
+         (P.y - L.p.y) * L.v.y +
+         (P.z - L.p.z) * L.v.z) / d
+    return Point3D(L.p.x + u * L.v.x, L.p.y + u * L.v.y, L.p.z + u * L.v.z)
+
+
 def closest_point3d_on_plane(P, PL):
     """Get the closest Point3D on a Plane to the input P.
 

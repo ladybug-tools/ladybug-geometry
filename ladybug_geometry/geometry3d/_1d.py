@@ -2,8 +2,8 @@
 """Base class for all 1D geometries in 3D space (Ray3D and LineSegment3D)."""
 from __future__ import division
 
-from .pointvector import Point3D, Vector3D
-from ..intersection3d import closest_point3d_on_line3d
+from ..intersection3d import closest_point3d_on_line3d, \
+    closest_point3d_on_line3d_infinite
 
 
 class Base1DIn3D(object):
@@ -23,6 +23,41 @@ class Base1DIn3D(object):
     def v(self):
         """Direction vector."""
         return self._v
+
+    def is_parallel(self, line_ray, angle_tolerance):
+        """Test whether this object is parallel to another LineSegment3D or Ray3D.
+
+        Args:
+            line_ray: Another LineSegment3D or Ray3D for which parallelization
+                with this objects will be tested.
+            angle_tolerance: The max angle in radians that the direction between
+                this object and another can vary for them to be considered
+                parallel.
+        """
+        if self.v.angle(line_ray.v) <= angle_tolerance:
+            return True
+        elif self.v.angle(line_ray.v.reverse()) <= angle_tolerance:
+            return True
+        return False
+
+    def is_colinear(self, line_ray, tolerance, angle_tolerance):
+        """Test whether this object is colinear to another LineSegment3D or Ray3D.
+
+        Args:
+            line_ray: Another LineSegment3D or Ray3D for which colinearity
+                with this object will be tested.
+            tolerance: The maximum distance between the line_ray and the infinite
+                extension of this object for them to be cinsidered colinear.
+            angle_tolerance: The max angle in radians that the direction between
+                this object and another can vary for them to be considered
+                parallel.
+        """
+        if not self.is_parallel(line_ray, angle_tolerance):
+            return False
+        _close_pt = closest_point3d_on_line3d_infinite(self.p, line_ray)
+        if self.p.distance_to_point(_close_pt) > tolerance:
+            return False
+        return True
 
     def closest_point(self, point):
         """Get the closest Point3D on this object to another Point3D.

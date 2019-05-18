@@ -71,7 +71,7 @@ class LineSegment3D(Base1DIn3D):
         """The length of the line segment."""
         return self.v.magnitude
 
-    def is_edge_horizontal(edge, tolerance):
+    def is_horizontal(edge, tolerance):
         """Test whether this line segment is horizontal within a certain tolerance.
 
         Args:
@@ -80,7 +80,7 @@ class LineSegment3D(Base1DIn3D):
         """
         return abs(edge.v.z) < tolerance
 
-    def is_edge_vertical(edge, tolerance):
+    def is_vertical(edge, tolerance):
         """Test whether this line segment is vertical within a certain tolerance.
 
         Args:

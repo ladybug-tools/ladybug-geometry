@@ -75,6 +75,29 @@ class LineSegment3DTestCase(unittest.TestCase):
         assert seg.p == seg_copy.p
         assert seg.v == seg_copy.v
 
+    def test_parallel_colinear(self):
+        """Test the is_parallel and is_colinear methods."""
+        pt_1 = Point3D(0, 0, 0)
+        pt_2 = Point3D(0, 4, 0)
+        pt_3 = Point3D(2, 0, 2)
+        vec_1 = Vector3D(0, 2, 0)
+        vec_2 = Vector3D(0, -2, 0)
+        vec_3 = Vector3D(3, 3, 0)
+        seg_1 = LineSegment3D(pt_1, vec_1)
+        seg_2 = LineSegment3D(pt_2, vec_1)
+        seg_3 = LineSegment3D(pt_1, vec_2)
+        seg_4 = LineSegment3D(pt_3, vec_1)
+        seg_5 = LineSegment3D(pt_3, vec_2)
+        seg_6 = LineSegment3D(pt_1, vec_3)
+
+        assert seg_1.is_colinear(seg_2, 0.0001, 0.0001)
+        assert seg_1.is_colinear(seg_3, 0.0001, 0.0001)
+        assert not seg_1.is_colinear(seg_4, 0.0001, 0.0001)
+
+        assert seg_1.is_parallel(seg_4, 0.0001)
+        assert seg_1.is_parallel(seg_5, 0.0001)
+        assert not seg_1.is_parallel(seg_6, 0.0001)
+
     def test_move(self):
         """Test the LineSegment3D move method."""
         pt = Point3D(2, 0, 2)
