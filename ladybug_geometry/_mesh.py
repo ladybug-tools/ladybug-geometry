@@ -62,15 +62,6 @@ class MeshBase(object):
         """
         return self._is_color_by_face
 
-    @is_color_by_face.setter
-    def is_color_by_face(self, by_face):
-        assert isinstance(by_face, bool), \
-            'is_color_by_face must be a boolean. Got {}'.format(type(by_face))
-        if self._colors is not None and self._is_color_by_face is not by_face:
-            raise AttributeError('is_color_by_face cannot be set when colors are'
-                                 ' already assinged to the mesh.')
-        self._is_color_by_face = by_face
-
     @property
     def area(self):
         """The area of the entire mesh."""
@@ -230,21 +221,15 @@ class MeshBase(object):
         """
         _new_f_cent = None
         if self._face_centroids is not None:
-            _f_cent = []
-            for i, _p in enumerate(face_pattern):
-                if _p is True:
-                    _f_cent.append(self._face_centroids[i])
-            _new_f_cent = tuple(_f_cent)
+            _new_f_cent = tuple(
+                self._face_centroids[i] for i, _p in enumerate(face_pattern) if _p)
         _new_f_area = None
         if self._face_areas is not None:
             if isinstance(self._face_areas, (float, int)):
                 _new_f_area = self._face_areas
             else:
-                _f_area = []
-                for i, _p in enumerate(face_pattern):
-                    if _p is True:
-                        _f_area.append(self._face_areas[i])
-                _new_f_area = tuple(_f_area)
+                _new_f_area = tuple(
+                    self._face_areas[i] for i, _p in enumerate(face_pattern) if _p)
         return _new_f_cent, _new_f_area
 
     def _vertex_pattern_from_remove_faces(self, pattern):
@@ -292,9 +277,9 @@ class MeshBase(object):
         new_mesh._colors = self._colors
         new_mesh._is_color_by_face = self._is_color_by_face
         if self._face_areas is not None:
-            new_mesh._face_areas = tuple([a * factor for a in self._face_areas])
+            new_mesh._face_areas = tuple(a * factor for a in self._face_areas)
         if self._area is not None:
-            new_mesh._area = tuple([a * factor for a in self._area])
+            new_mesh._area = tuple(a * factor for a in self._area)
 
     @staticmethod
     def _interpret_input_from_face_vertices(faces, purge):
