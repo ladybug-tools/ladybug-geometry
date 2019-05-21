@@ -563,9 +563,9 @@ class Polyface3DTestCase(unittest.TestCase):
 
         assert len(polyface.intersect_plane(plane_1)) == 4
         assert len(polyface.intersect_plane(plane_2)) == 4
-        #assert len(polyface.intersect_plane(plane_3)) == 4
-        #assert len(polyface.intersect_plane(plane_4)) == 0
-        #assert len(polyface.intersect_plane(plane_5)) == 8
+        assert len(polyface.intersect_plane(plane_3)) == 4
+        assert len(polyface.intersect_plane(plane_4)) == 0
+        assert len(polyface.intersect_plane(plane_5)) == 8
 
     def test_is_point_inside(self):
         """Test the is_point_inside method."""

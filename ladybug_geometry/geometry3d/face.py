@@ -752,9 +752,10 @@ class Face3D(Base2DIn3D):
         """
         _plane_int_ray = self._plane.intersect_plane(plane)
         if _plane_int_ray is not None:
-            _v2d = self._plane.xyz_to_xy(_plane_int_ray.v)
-            _int_ray2d = Ray2D(self._plane.xyz_to_xy(_plane_int_ray.p),
-                               Vector2D(_v2d.x, _v2d.y))
+            _p12d = self._plane.xyz_to_xy(_plane_int_ray.p)
+            _p22d = self._plane.xyz_to_xy(_plane_int_ray.p + _plane_int_ray.v)
+            _v2d = _p22d - _p12d
+            _int_ray2d = Ray2D(self._plane.xyz_to_xy(_plane_int_ray.p), _v2d)
             _int_pt2d = self.polygon2d.intersect_line_infinite(_int_ray2d)
             if len(_int_pt2d) != 0:
                 if len(_int_pt2d) > 2:  # sort the points along the intersection line
