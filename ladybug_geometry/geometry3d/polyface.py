@@ -221,7 +221,15 @@ class Polyface3D(Base2DIn3D):
 
     @classmethod
     def from_offset_face(cls, face, offset):
-        """Initilize Polyface3D from a Face3D that is offset along its normal by a height.
+        """Initilize a solid Polyface3D from a Face3D offset along its normal.
+
+        The resulting polyface will always be offset in the direction of
+        the face normal.
+
+        When a polyface is initialized this way, the first face of the
+        Polysurface3D.faces will always be the input face used to create the
+        object, the last face will be the offset version of the face, and all
+        other faces will form the extrusion connecting the two.
 
         Args:
             face: A Face3D to serve as a base for the polyface.
@@ -231,13 +239,53 @@ class Polyface3D(Base2DIn3D):
             'face must be a Face3D. Got {}.'.format(type(face))
         assert isinstance(offset, (float, int)), \
             'height must be a number. Got {}.'.format(type(offset))
+        # get the extrusion vector and starting vertices
         extru_vec = face.normal * offset
-        verts = list(face._vertices) + [pt.move(extru_vec) for pt in face._vertices]
-        len_faces = len(face._vertices)
-        faces = [tuple(xrange(len_faces))]
-        for i in xrange(len_faces - 1):
-            faces.append((i, i + 1, i + len_faces, i + len_faces + 1))
-        return Polyface3D(verts, faces)
+        cclock_verts = face._boundary if face.is_clockwise else \
+            list(reversed(face._boundary))
+        # compute vertices, face indices, and edges of the extrusion
+        verts, face_ind_extru, edge_indices = \
+            Polyface3D._verts_faces_edges_from_boundary(cclock_verts, extru_vec)
+        if face.has_holes:
+            for i, hole in enumerate(face.hole_polygon2d):
+                hole_verts = face._holes[i] if hole.is_clockwise else \
+                    list(reversed(face._holes[i]))
+                verts_2, face_ind_extru_2, edge_indices_2 = \
+                    Polyface3D._verts_faces_edges_from_boundary(hole_verts, extru_vec)
+                verts.extend(verts_2)
+                face_ind_extru.extend(face_ind_extru_2)
+                edge_indices.extend(edge_indices_2)
+        # compute the final faces (accounting for top and bottom)
+        if not face.has_holes:
+            len_faces = len(cclock_verts)
+            face_ind_bottom = tuple(xrange(len_faces))
+            face_ind_top = tuple(xrange(len_faces * 2 - 1, len_faces - 1, -1))
+        else:
+            face_verts_bottom = list(reversed(face._vertices)) if face.is_clockwise \
+                else face._vertices
+            face_verts_top = [pt.move(extru_vec)
+                              for pt in reversed(face_verts_bottom)]
+            face_ind_bottom = tuple(verts.index(pt) for pt in face_verts_bottom)
+            face_ind_top = tuple(verts.index(pt) for pt in face_verts_top)
+        faces_ind = [face_ind_bottom] + face_ind_extru + [face_ind_top]
+        # create the polysurface and assign known properties.
+        polyface = Polyface3D(verts, faces_ind,
+                              {'edge_indices': edge_indices,
+                               'edge_types': [1] * len(edge_indices)})
+        polyface._volume = face.area * offset
+        face_verts = tuple(tuple(verts[i] for i in f) for f in faces_ind)
+        if not face.has_holes:
+            polyface._faces = tuple(Face3D.from_vertices(v) for v in face_verts)
+        else:
+            mid_faces = [Face3D.from_vertices(v) for v in face_verts[1:-1]]
+            bottom_face = face.flip()
+            top_face = face.move(extru_vec)
+            if not face.is_clockwise:
+                bottom_face = bottom_face.reverse()
+            else:
+                top_face = top_face.reverse()
+            polyface._faces = tuple([bottom_face] + mid_faces + [top_face])
+        return polyface
 
     @property
     def vertices(self):
@@ -543,7 +591,8 @@ class Polyface3D(Base2DIn3D):
         if self._faces is not None:
             _new_pface._faces = tuple(face.scale(factor, origin)
                                       for face in self._faces)
-        _new_pface._volume = self._volume * factor if self._volume is not None else None
+        _new_pface._volume = self._volume * factor ** 3 \
+            if self._volume is not None else None
         return _new_pface
 
     def scale_world_origin(self, factor):
@@ -557,7 +606,8 @@ class Polyface3D(Base2DIn3D):
         if self._faces is not None:
             _new_pface._faces = tuple(face.scale_world_origin(factor)
                                       for face in self._faces)
-        _new_pface._volume = self._volume * factor if self._volume is not None else None
+        _new_pface._volume = self._volume * factor ** 3 \
+            if self._volume is not None else None
         return _new_pface
 
     def is_point_inside(self, point, test_vector=Vector3D(1, 0, 0)):
@@ -643,6 +693,23 @@ class Polyface3D(Base2DIn3D):
             if type == edge_type:
                 sel_edges.append(self._edges[i])
         return tuple(sel_edges)
+
+    @staticmethod
+    def _verts_faces_edges_from_boundary(cclock_verts, extru_vec, st_i=0):
+        verts = list(cclock_verts) + [pt.move(extru_vec) for pt in cclock_verts]
+        len_faces = len(cclock_verts)
+        faces_ind = []
+        for i in xrange(st_i, len_faces - 1):
+            faces_ind.append((i, i + 1, i + len_faces + 1, i + len_faces))
+        faces_ind.append((st_i + len_faces - 1, st_i,
+                          st_i + len_faces, st_i + len_faces * 2 - 1))
+        edge_i1 = [(st_i + i, st_i + i + 1) for i in xrange(len_faces - 1)]
+        edge_i2 = [(st_i + i, st_i + i + len_faces) for i in xrange(len_faces)]
+        edge_i3 = [(st_i + len_faces + i, st_i + len_faces + i + 1)
+                   for i in xrange(len_faces - 1)]
+        edge_indices = edge_i1 + [(st_i + len_faces - 1, st_i)] + edge_i2 + edge_i3 + \
+            [(st_i + len_faces * 2 - 1, st_i + len_faces)]
+        return verts, faces_ind, edge_indices
 
     @staticmethod
     def _correct_face_direction(faces):

@@ -2,6 +2,7 @@
 
 from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
 from ladybug_geometry.geometry3d.plane import Plane
+from ladybug_geometry.geometry3d.ray import Ray3D
 from ladybug_geometry.geometry3d.line import LineSegment3D
 from ladybug_geometry.geometry3d.face import Face3D
 from ladybug_geometry.geometry3d.polyface import Polyface3D
@@ -248,6 +249,77 @@ class Polyface3DTestCase(unittest.TestCase):
         assert polyface.volume == 16
         assert polyface.is_solid
 
+    def test_polyface3d_init_from_offset_face(self):
+        """Test the initalization of Poyface3D from_offset_face."""
+        face = Face3D.from_rectangle(2, 2)
+        polyface = Polyface3D.from_offset_face(face, 2)
+
+        assert len(polyface.vertices) == 8
+        assert len(polyface.face_indices) == 6
+        assert len(polyface.faces) == 6
+        assert len(polyface.edge_indices) == 12
+        assert len(polyface.edges) == 12
+        assert len(polyface.naked_edges) == 0
+        assert len(polyface.non_manifold_edges) == 0
+        assert len(polyface.internal_edges) == 12
+        assert polyface.area == 24
+        assert polyface.volume == 8
+        assert polyface.is_solid
+
+        for f in polyface.faces:
+            assert f.is_clockwise is False
+        for e in polyface.edges:
+            assert e.length == 2
+
+        assert polyface.faces[0].normal.z == pytest.approx(-1, rel=1e-3)
+        assert polyface.faces[-1].normal.z == pytest.approx(1, rel=1e-3)
+
+    def test_polyface3d_init_from_offset_face_hexagon(self):
+        """Test the initalization of Poyface3D from_offset_face."""
+        face = Face3D.from_regular_polygon(6, 2)
+        polyface = Polyface3D.from_offset_face(face, 2)
+
+        assert len(polyface.vertices) == 12
+        assert len(polyface.face_indices) == 8
+        assert len(polyface.faces) == 8
+        assert len(polyface.edge_indices) == 18
+        assert len(polyface.edges) == 18
+        assert len(polyface.naked_edges) == 0
+        assert len(polyface.non_manifold_edges) == 0
+        assert len(polyface.internal_edges) == 18
+        assert polyface.area == pytest.approx(44.784609, rel=1e-3)
+        assert polyface.volume == pytest.approx(20.78460, rel=1e-3)
+        assert polyface.is_solid
+
+        assert polyface.faces[0].normal.z == pytest.approx(-1, rel=1e-3)
+        assert polyface.faces[-1].normal.z == pytest.approx(1, rel=1e-3)
+
+    def test_polyface3d_init_from_offset_face_hole(self):
+        """Test the initalization of Poyface3D from_offset_face for a face witha hole."""
+        bound_pts = [Point3D(0, 0), Point3D(3, 0), Point3D(3, 3), Point3D(0, 3)]
+        hole_pts = [Point3D(1, 1), Point3D(2, 1), Point3D(2, 2), Point3D(1, 2)]
+        face = Face3D.from_shape_with_holes(bound_pts, [hole_pts])
+        polyface = Polyface3D.from_offset_face(face, 1)
+
+        assert len(polyface.vertices) == 16
+        assert len(polyface.face_indices) == 10
+        assert len(polyface.faces) == 10
+        assert len(polyface.edge_indices) == 24
+        assert len(polyface.edges) == 24
+        assert len(polyface.naked_edges) == 0
+        assert len(polyface.non_manifold_edges) == 0
+        assert len(polyface.internal_edges) == 24
+        assert polyface.area == pytest.approx(40, rel=1e-3)
+        assert polyface.volume == pytest.approx(8, rel=1e-3)
+        assert polyface.is_solid
+
+        assert polyface.faces[0].normal.z == pytest.approx(-1, rel=1e-3)
+        assert polyface.faces[-1].normal.z == pytest.approx(1, rel=1e-3)
+        assert polyface.faces[0].has_holes
+        assert polyface.faces[-1].has_holes
+        for face in polyface.faces:
+            assert not face.is_clockwise
+
     def test_is_solid_with_hole(self):
         """Test the is_solid property for a polyface with a hole.
 
@@ -328,6 +400,172 @@ class Polyface3DTestCase(unittest.TestCase):
 
         assert polyface.area == new_polyface.area
         assert polyface.volume == new_polyface.volume
+
+    def test_scale(self):
+        """Test the Polyface3D scale method."""
+        polyface_1 = Polyface3D.from_box(2, 2, 2, Plane(o=Point3D(0, 0, 2)))
+        polyface_2 = Polyface3D.from_box(1, 1, 1, Plane(o=Point3D(1, 1, 0)))
+        origin_1 = Point3D(2, 0)
+        origin_2 = Point3D(1, 1)
+
+        new_polyface_1 = polyface_1.scale(2, origin_1)
+        assert new_polyface_1[0] == Point3D(-2, 0, 4)
+        assert new_polyface_1[1] == Point3D(-2, 4, 4)
+        assert new_polyface_1[2] == Point3D(2, 4, 4)
+        assert new_polyface_1[3] == Point3D(2, 0, 4)
+        assert new_polyface_1.area == polyface_1.area * 2 ** 2
+        assert new_polyface_1.volume == polyface_1.volume * 2 ** 3
+
+        new_polyface_2 = polyface_2.scale(2, origin_2)
+        assert new_polyface_2[0] == Point3D(1, 1)
+        assert new_polyface_2[1] == Point3D(1, 3)
+        assert new_polyface_2[2] == Point3D(3, 3)
+        assert new_polyface_2[3] == Point3D(3, 1)
+        assert new_polyface_2.area == polyface_2.area * 2 ** 2
+        assert new_polyface_2.volume == polyface_2.volume * 2 ** 3
+
+    def test_scale_world_origin(self):
+        """Test the Polyface3D scale_world_origin method."""
+        polyface = Polyface3D.from_box(1, 1, 1, Plane(o=Point3D(1, 1, 2)))
+
+        new_polyface = polyface.scale_world_origin(2)
+        assert new_polyface[0] == Point3D(2, 2, 4)
+        assert new_polyface[1] == Point3D(2, 4, 4)
+        assert new_polyface[2] == Point3D(4, 4, 4)
+        assert new_polyface[3] == Point3D(4, 2, 4)
+        assert new_polyface.area == polyface.area * 2 ** 2
+        assert new_polyface.volume == polyface.volume * 2 ** 3
+
+    def test_rotate(self):
+        """Test the Polyface3D rotate method."""
+        polyface = Polyface3D.from_box(2, 2, 2, Plane(o=Point3D(0, 0, 2)))
+        origin = Point3D(0, 0, 0)
+        axis = Vector3D(1, 0, 0)
+
+        test_1 = polyface.rotate(axis, math.pi, origin)
+        assert test_1[0].x == pytest.approx(0, rel=1e-3)
+        assert test_1[0].y == pytest.approx(0, rel=1e-3)
+        assert test_1[0].z == pytest.approx(-2, rel=1e-3)
+        assert test_1[2].x == pytest.approx(2, rel=1e-3)
+        assert test_1[2].y == pytest.approx(-2, rel=1e-3)
+        assert test_1[2].z == pytest.approx(-2, rel=1e-3)
+        assert polyface.area == test_1.area
+        assert polyface.volume == test_1.volume
+        assert len(polyface.vertices) == len(test_1.vertices)
+
+        test_2 = polyface.rotate(axis, math.pi/2, origin)
+        assert test_2[0].x == pytest.approx(0, rel=1e-3)
+        assert test_2[0].y == pytest.approx(-2, rel=1e-3)
+        assert test_2[0].z == pytest.approx(0, rel=1e-3)
+        assert test_2[2].x == pytest.approx(2, rel=1e-3)
+        assert test_2[2].y == pytest.approx(-2, rel=1e-3)
+        assert test_2[2].z == pytest.approx(2, rel=1e-3)
+        assert polyface.area == test_2.area
+        assert polyface.volume == test_1.volume
+        assert len(polyface.vertices) == len(test_2.vertices)
+
+    def test_rotate_xy(self):
+        """Test the Polyface3D rotate_xy method."""
+        polyface = Polyface3D.from_box(1, 1, 1, Plane(o=Point3D(1, 1, 2)))
+        origin_1 = Point3D(1, 1, 0)
+
+        test_1 = polyface.rotate_xy(math.pi, origin_1)
+        assert test_1[0].x == pytest.approx(1, rel=1e-3)
+        assert test_1[0].y == pytest.approx(1, rel=1e-3)
+        assert test_1[0].z == pytest.approx(2, rel=1e-3)
+        assert test_1[2].x == pytest.approx(0, rel=1e-3)
+        assert test_1[2].y == pytest.approx(0, rel=1e-3)
+        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+
+        test_2 = polyface.rotate_xy(math.pi/2, origin_1)
+        assert test_2[0].x == pytest.approx(1, rel=1e-3)
+        assert test_2[0].y == pytest.approx(1, rel=1e-3)
+        assert test_1[0].z == pytest.approx(2, rel=1e-3)
+        assert test_2[2].x == pytest.approx(0, rel=1e-3)
+        assert test_2[2].y == pytest.approx(2, rel=1e-3)
+        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+
+    def test_reflect(self):
+        """Test the Polyface3D reflect method."""
+        polyface = Polyface3D.from_box(1, 1, 1, Plane(o=Point3D(1, 1, 2)))
+
+        origin_1 = Point3D(1, 0, 2)
+        normal_1 = Vector3D(1, 0, 0)
+        normal_2 = Vector3D(-1, -1, 0).normalize()
+
+        test_1 = polyface.reflect(normal_1, origin_1)
+        assert test_1[0].x == pytest.approx(1, rel=1e-3)
+        assert test_1[0].y == pytest.approx(1, rel=1e-3)
+        assert test_1[0].z == pytest.approx(2, rel=1e-3)
+        assert test_1[2].x == pytest.approx(0, rel=1e-3)
+        assert test_1[2].y == pytest.approx(2, rel=1e-3)
+        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+
+        test_1 = polyface.reflect(normal_2, Point3D(0, 0, 2))
+        assert test_1[0].x == pytest.approx(-1, rel=1e-3)
+        assert test_1[0].y == pytest.approx(-1, rel=1e-3)
+        assert test_1[0].z == pytest.approx(2, rel=1e-3)
+        assert test_1[2].x == pytest.approx(-2, rel=1e-3)
+        assert test_1[2].y == pytest.approx(-2, rel=1e-3)
+        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+
+        test_2 = polyface.reflect(normal_2, origin_1)
+        assert test_2[0].x == pytest.approx(0, rel=1e-3)
+        assert test_2[0].y == pytest.approx(0, rel=1e-3)
+        assert test_2[0].z == pytest.approx(2, rel=1e-3)
+        assert test_2[2].x == pytest.approx(-1, rel=1e-3)
+        assert test_2[2].y == pytest.approx(-1, rel=1e-3)
+        assert test_2[2].z == pytest.approx(2, rel=1e-3)
+
+    def test_intersect_line_ray(self):
+        """Test the Polyface3D intersect_line_ray method."""
+        pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 1, 2), Point3D(1, 1, 2),
+               Point3D(1, 2, 2), Point3D(0, 2, 2))
+        plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+        face = Face3D(pts, plane)
+        polyface = Polyface3D.from_offset_face(face, 1)
+        ray_1 = Ray3D(Point3D(0.5, 0.5, 0), Vector3D(0, 0, 1))
+        ray_2 = Ray3D(Point3D(0.5, 0.5, 0), Vector3D(0, 0, -1))
+        ray_3 = Ray3D(Point3D(1.5, 1.5, 0), Vector3D(0, 0, 1))
+        ray_4 = Ray3D(Point3D(-1, -1, 0), Vector3D(0, 0, 1))
+        line_1 = LineSegment3D(Point3D(0.5, 0.5, 0), Vector3D(0, 0, 3))
+        line_2 = LineSegment3D(Point3D(0.5, 0.5, 0), Vector3D(0, 0, 1))
+
+        assert polyface.does_intersect_line_ray_exist(ray_1) is True
+        assert polyface.does_intersect_line_ray_exist(ray_2) is False
+        assert polyface.does_intersect_line_ray_exist(ray_3) is False
+        assert polyface.does_intersect_line_ray_exist(ray_4) is False
+        assert polyface.does_intersect_line_ray_exist(line_1) is True
+        assert polyface.does_intersect_line_ray_exist(line_2) is False
+
+        assert polyface.intersect_line_ray(ray_1) == [Point3D(0.5, 0.5, 2),
+                                                      Point3D(0.5, 0.5, 3)]
+        assert polyface.intersect_line_ray(ray_2) == []
+        assert polyface.intersect_line_ray(ray_3) == []
+        assert polyface.intersect_line_ray(ray_4) == []
+        assert polyface.intersect_line_ray(line_1) == [Point3D(0.5, 0.5, 2),
+                                                       Point3D(0.5, 0.5, 3)]
+        assert polyface.intersect_line_ray(line_2) == []
+
+    def test_intersect_plane(self):
+        """Test the Polyface3D intersect_plane method."""
+        pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 1, 2), Point3D(1, 1, 2),
+               Point3D(1, 2, 2), Point3D(0, 2, 2))
+        plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+        face = Face3D(pts, plane)
+        polyface = Polyface3D.from_offset_face(face, 1)
+
+        plane_1 = Plane(Vector3D(0, 1, 0), Point3D(0.5, 0.5, 0))
+        plane_2 = Plane(Vector3D(1, 0, 0), Point3D(0.5, 0.5, 0))
+        plane_3 = Plane(Vector3D(0, 1, 0), Point3D(0.5, 1.5, 0))
+        plane_4 = Plane(Vector3D(0, 1, 0), Point3D(0, 3, 0))
+        plane_5 = Plane(Vector3D(1, 1, 0), Point3D(0, 2.5, 0))
+
+        assert len(polyface.intersect_plane(plane_1)) == 4
+        assert len(polyface.intersect_plane(plane_2)) == 4
+        #assert len(polyface.intersect_plane(plane_3)) == 4
+        #assert len(polyface.intersect_plane(plane_4)) == 0
+        #assert len(polyface.intersect_plane(plane_5)) == 8
 
     def test_is_point_inside(self):
         """Test the is_point_inside method."""

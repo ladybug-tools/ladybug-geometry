@@ -596,8 +596,9 @@ class Face3D(Base2DIn3D):
             return _new_face
         _new_face._boundary = self._remove_colinear(
             self._boundary, self.boundary_polygon2d, tolerance)
-        _new_face._holes = self._remove_colinear(
-            self._holes, self.hole_polygon2d, tolerance)
+        _new_face._holes = tuple(self._remove_colinear(
+            hole, self.hole_polygon2d[i], tolerance)
+                                 for i, hole in enumerate(self._holes))
         return _new_face
 
     def flip(self):
@@ -613,6 +614,20 @@ class Face3D(Base2DIn3D):
             _new_face._is_clockwise = not self._is_clockwise
         return _new_face
 
+    def reverse(self):
+        """Reverse the direction of vertices in the face.
+
+        Note that this does not chance the face normal. Only the is_clockwise property.
+        """
+        _new_face = Face3D(tuple(reversed(self.vertices)), self.plane)
+        self._transfer_properties(_new_face)
+        if self._holes is not None:
+            _new_face._boundary = reversed(self._boundary)
+            _new_face._holes = tuple(reversed(hole) for hole in self._holes)
+        if self._is_clockwise is not None:
+            _new_face._is_clockwise = not self._is_clockwise
+        return _new_face
+
     def move(self, moving_vec):
         """Get a face that has been moved along a vector.
 
@@ -623,7 +638,8 @@ class Face3D(Base2DIn3D):
         _new_face = self._face_transform(_verts, self.plane.move(moving_vec))
         if self._holes is not None:
             _new_face._boundary = self._move(self._boundary, moving_vec)
-            _new_face._holes = self._move(self._holes, moving_vec)
+            _new_face._holes = tuple(self._move(hole, moving_vec)
+                                     for hole in self._holes)
         return _new_face
 
     def rotate(self, axis, angle, origin):
@@ -642,7 +658,8 @@ class Face3D(Base2DIn3D):
         _new_face = self._face_transform(_verts, self.plane.rotate(axis, angle, origin))
         if self._holes is not None:
             _new_face._boundary = self._rotate(self._boundary, axis, angle, origin)
-            _new_face._holes = self._rotate(self._holes, axis, angle, origin)
+            _new_face._holes = tuple(self._rotate(hole, axis, angle, origin)
+                                     for hole in self._holes)
         return _new_face
 
     def rotate_xy(self, angle, origin):
@@ -656,7 +673,8 @@ class Face3D(Base2DIn3D):
         _new_face = self._face_transform(_verts, self.plane.rotate_xy(angle, origin))
         if self._holes is not None:
             _new_face._boundary = self._rotate_xy(self._boundary, angle, origin)
-            _new_face._holes = self._rotate_xy(self._holes, angle, origin)
+            _new_face._holes = tuple(self._rotate_xy(hole, angle, origin)
+                                     for hole in self._holes)
         return _new_face
 
     def reflect(self, normal, origin):
@@ -671,7 +689,8 @@ class Face3D(Base2DIn3D):
         _new_face = self._face_transform(_verts, self.plane.reflect(normal, origin))
         if self._holes is not None:
             _new_face._boundary = self._reflect(self._boundary, normal, origin)
-            _new_face._holes = self._reflect(self._holes, normal, origin)
+            _new_face._holes = tuple(self._reflect(hole, normal, origin)
+                                     for hole in self._holes)
         return _new_face
 
     def scale(self, factor, origin):
@@ -686,7 +705,8 @@ class Face3D(Base2DIn3D):
             _verts, self.plane.scale(factor, origin), factor)
         if self._holes is not None:
             _new_face._boundary = self._scale(self._boundary, factor, origin)
-            _new_face._holes = self._scale(self._holes, factor, origin)
+            _new_face._holes = tuple(self._scale(hole, factor, origin)
+                                     for hole in self._holes)
         return _new_face
 
     def scale_world_origin(self, factor):
@@ -700,7 +720,8 @@ class Face3D(Base2DIn3D):
             _verts, self.plane.scale_world_origin(factor), factor)
         if self._holes is not None:
             _new_face._boundary = self._scale_world_origin(self._boundary, factor)
-            _new_face._holes = self._scale_world_origin(self._holes, factor)
+            _new_face._holes = tuple(self._scale_world_origin(hole, factor)
+                                     for hole in self._holes)
         return _new_face
 
     def intersect_line_ray(self, line_ray):
@@ -1314,7 +1335,7 @@ class Face3D(Base2DIn3D):
         if self._perimeter is not None:
             new_face._perimeter = self._perimeter * factor
         if self._area is not None:
-            new_face._area = self._area * factor
+            new_face._area = self._area * factor ** 2
 
     def _remove_colinear(self, pts_3d, pts_2d, tolerance):
         """Remove colinear vertices from a list of Point2D.

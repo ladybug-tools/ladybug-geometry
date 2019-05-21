@@ -479,6 +479,19 @@ class Face3DTestCase(unittest.TestCase):
         for i, pt in enumerate(face_1.vertices):
             assert pt == face_2[i]
 
+    def test_reverse(self):
+        """Test the reverse method of Face3D."""
+        pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
+        plane_1 = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+        face_1 = Face3D(pts_1, plane_1)
+        face_2 = face_1.reverse()
+
+        assert face_1.normal == face_2.normal
+        assert face_1.is_clockwise is False
+        assert face_2.is_clockwise is True
+        for i, pt in enumerate(face_1.vertices):
+            assert pt == face_2[-i - 1]
+
     def test_move(self):
         """Test the Face3D move method."""
         pts_1 = (Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 2, 0), Point3D(0, 2, 0))
@@ -517,7 +530,7 @@ class Face3DTestCase(unittest.TestCase):
         assert new_face_1[1] == Point3D(2, 0, 4)
         assert new_face_1[2] == Point3D(2, 4, 4)
         assert new_face_1[3] == Point3D(-2, 4, 4)
-        assert new_face_1.area == face_1.area ** 2
+        assert new_face_1.area == face_1.area * 2 ** 2
         assert new_face_1.perimeter == face_1.perimeter * 2
         assert new_face_1.is_clockwise is face_1.is_clockwise
         assert new_face_1.is_convex is face_1.is_convex
@@ -529,7 +542,7 @@ class Face3DTestCase(unittest.TestCase):
         assert new_face_2[1] == Point3D(3, 1)
         assert new_face_2[2] == Point3D(3, 3)
         assert new_face_2[3] == Point3D(1, 3)
-        assert new_face_2.area == 4
+        assert new_face_2.area == face_2.area * 2 ** 2
         assert new_face_2.perimeter == face_2.perimeter * 2
         assert new_face_2.is_clockwise is face_2.is_clockwise
         assert new_face_2.is_convex is face_2.is_convex
@@ -547,7 +560,7 @@ class Face3DTestCase(unittest.TestCase):
         assert new_face[1] == Point3D(4, 2, 4)
         assert new_face[2] == Point3D(4, 4, 4)
         assert new_face[3] == Point3D(2, 4, 4)
-        assert new_face.area == 4
+        assert new_face.area == face.area * 2 ** 2
         assert new_face.perimeter == face.perimeter * 2
         assert new_face.is_clockwise is face.is_clockwise
         assert new_face.is_convex is face.is_convex
