@@ -130,22 +130,23 @@ class Mesh2D(MeshBase, Base2DIn2D):
         # figure out how many x and y cells to make
         _x_dim, _num_x = Mesh2D._domain_dimensions(polygon.max.x - polygon.min.x, x_dim)
         _y_dim, _num_y = Mesh2D._domain_dimensions(polygon.max.y - polygon.min.y, y_dim)
-
-        # for tolerance reasons, we shrink the x and y dimensions by a very small amount
-        # this avoids the fringe cases noted in the Polygon2d.is_point_inside description
-        _x_dim = _x_dim * 0.999999
-        _y_dim = _y_dim * 0.999999
-        _min_pt = Point2D(polygon.min.x + 0.0000001, polygon.min.y + 0.0000001)
+        _poly_min = polygon.min
 
         # generate the gid of points and faces
-        _verts = Mesh2D._grid_vertices(_min_pt, _num_x, _num_y, _x_dim, _y_dim)
+        _verts = Mesh2D._grid_vertices(_poly_min, _num_x, _num_y, _x_dim, _y_dim)
         _faces = Mesh2D._grid_faces(_num_x, _num_y)
         _centroids = None
         if generate_centroids is True:  # calculate centroids if requested
-            _centroids = Mesh2D._grid_centroids(_min_pt, _num_x, _num_y, _x_dim, _y_dim)
+            _centroids = Mesh2D._grid_centroids(
+                _poly_min, _num_x, _num_y, _x_dim, _y_dim)
 
         # figure out which vertices lie inside the polygon
-        _pattern = [polygon.is_point_inside(_v) for _v in _verts]
+        # for tolerance reasons, we scale the polygon by a very small amount
+        # this avoids the fringe cases noted in the Polygon2d.is_point_inside description
+        tol_pt = Point2D(0.0000001, 0.0000001)
+        scaled_poly = Polygon2D(
+            tuple(pt.scale(1.000001, _poly_min) - tol_pt for pt in polygon.vertices))
+        _pattern = [scaled_poly.is_point_inside(_v) for _v in _verts]
 
         # build the mesh
         _mesh_init = cls(_verts, _faces)

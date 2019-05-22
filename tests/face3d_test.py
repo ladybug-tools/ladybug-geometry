@@ -725,14 +725,14 @@ class Face3DTestCase(unittest.TestCase):
         assert len(mesh.faces) == 16
         assert mesh.area == 4
 
-        assert mesh.min.x == pytest.approx(0.0000001, rel=1e-2)
-        assert mesh.min.y == pytest.approx(0.0000001, rel=1e-2)
-        assert mesh.min.z == pytest.approx(0, rel=1e-2)
-        assert mesh.max.x == pytest.approx(2., rel=1e-2)
-        assert mesh.max.y == pytest.approx(2., rel=1e-2)
-        assert mesh.max.z == pytest.approx(0, rel=1e-2)
-        assert mesh.center.x == pytest.approx(1, rel=1e-2)
-        assert mesh.center.y == pytest.approx(1, rel=1e-2)
+        assert mesh.min.x == 0
+        assert mesh.min.y == 0
+        assert mesh.min.z == 0
+        assert mesh.max.x == 2
+        assert mesh.max.y == 2
+        assert mesh.max.z == 0
+        assert mesh.center.x == 1
+        assert mesh.center.y == 1
         assert len(mesh.face_areas) == 16
         assert mesh.face_areas[0] == 0.25
         assert len(mesh.face_centroids) == 16
