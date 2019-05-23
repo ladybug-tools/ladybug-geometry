@@ -33,10 +33,16 @@ class Point3DTestCase(unittest.TestCase):
         assert norm_vec.z == 0
         assert norm_vec.magnitude == 1
 
-    def test_point3_init(self):
-        """Test the initalization of Point3D objects and basic properties."""
+    def test_zero_magnitude_vector(self):
+        """Test properties with a zero magnitude vecotr."""
+        vec = Vector3D(0, 0, 0)
+
+        assert vec.magnitude == 0
+        assert vec.normalize() == vec
+
+    def test_test_distance_to_point(self):
+        """Test the test_distance_to_point method."""
         pt_1 = Point3D(0, 2, 0)
-        str(pt_1)  # test the string representation of the vector
         assert pt_1.x == 0
         assert pt_1.y == 2
         assert pt_1.z == 0

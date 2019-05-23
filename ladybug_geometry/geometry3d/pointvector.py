@@ -54,9 +54,10 @@ class Vector3D(object):
     def normalize(self):
         """Get a copy of the vector that is a unit vector (magnitude=1)."""
         d = self.magnitude
-        if d:
+        try:
             return Vector3D(self.x / d, self.y / d, self.z / d)
-        return self.duplicate()
+        except ZeroDivisionError:
+            return self.duplicate()
 
     def reverse(self):
         """Get a copy of this vector that is reversed."""

@@ -31,10 +31,16 @@ class Point2DTestCase(unittest.TestCase):
         assert norm_vec.y == 1
         assert norm_vec.magnitude == 1
 
-    def test_point2_init(self):
-        """Test the initalization of Point2D objects and basic properties."""
+    def test_zero_magnitude_vector(self):
+        """Test properties with a zero magnitude vecotr."""
+        vec = Vector2D(0, 0)
+
+        assert vec.magnitude == 0
+        assert vec.normalize() == vec
+
+    def test_distance_to_point(self):
+        """Test the test_distance_to_point method."""
         pt_1 = Point2D(0, 2)
-        str(pt_1)  # test the string representation of the vector
         assert pt_1.x == 0
         assert pt_1.y == 2
 
