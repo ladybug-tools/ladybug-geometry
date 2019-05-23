@@ -10,7 +10,7 @@ from ._2d import Base2DIn3D
 
 from ..intersection3d import closest_point3d_on_line3d
 
-from ..geometry2d.pointvector import Vector2D
+from ..geometry2d.pointvector import Point2D
 from ..geometry2d.ray import Ray2D
 from ..geometry2d.polygon import Polygon2D
 from ..geometry2d.mesh import Mesh2D
@@ -461,6 +461,40 @@ class Face3D(Base2DIn3D):
     def has_holes(self):
         """Boolean noting whether the face has holes within it."""
         return self._holes is not None
+
+    @property
+    def upper_left_counter_clockwise_vertices(self):
+        """Get this face's vertices startingfrom the upper left and moving counterclockwise.
+
+        This is useful for getting the vertices of several faces aligned with the
+        same global geometry rules for export to engines like EnergyPlus.
+        """
+        # get a 2d polygon in the face plane that has a positive Y axis.
+        if self._plane.y.z < 0:
+            ref_plane = self._plane.rotate(self._plane.n, math.pi, self._plane.o)
+            polygon = Polygon2D(
+                tuple(ref_plane.xyz_to_xy(v) for v in self._vertices))
+        else:
+            polygon = self.polygon2d
+        # get counterclockwise vertices
+        if self.is_clockwise:
+            verts3d = tuple(reversed(self.vertices))
+            verts2d = tuple(reversed(polygon.vertices))
+        else:
+            verts3d = self.vertices
+            verts2d = polygon.vertices
+        # sort points so that they start with the upper left point
+        corner_pt = Point2D(polygon.min.x, polygon.max.y)
+        first_pt_index = 0
+        min_dist = verts2d[0].distance_to_point(corner_pt)
+        for pt_index, pt in enumerate(verts2d[1:]):
+            new_dist = pt.distance_to_point(corner_pt)
+            if new_dist < min_dist:
+                first_pt_index = pt_index + 1
+                min_dist = new_dist
+        if first_pt_index != 0:
+            verts3d = verts3d[first_pt_index:] + verts3d[:first_pt_index]
+        return verts3d
 
     def is_geometrically_equivalent(self, face, tolerance):
         """Check whether a given face is geometrically equivalent to this Face.
@@ -1007,10 +1041,11 @@ class Face3D(Base2DIn3D):
                                          tolerance):
         """Get a list of faces with a combined area equal to the ratio times this face area.
 
-        This function is virtually equivalent to the sub_faces_by_ratio method
-        but a check will be performed to see if any rectangles can be pulled out
-        of this face's geometry. This tends to make the result a bit cleaner,
-        especially for concave faces that have rectangles (like L-shaped faces).
+        This function is virtually equivalent to the sub_faces_by_ratio_rectangle
+        method but any rectangles that are found will be broken down into sub-rectangles
+        using the other inputs (sub_rect_height, sill_height, horizontal_separation,
+        vertical_separation). This allows for the creation of a wide array of
+        rectangular sub-face geometries.
 
         Args:
             ratio: A number between 0 and 1 for the ratio between the area of

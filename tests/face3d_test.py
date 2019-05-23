@@ -388,6 +388,54 @@ class Face3DTestCase(unittest.TestCase):
         assert face_2.max == Point3D(2, 0, 2)
         assert face_2.center == Point3D(1, 0, 1)
 
+    def test_upper_left_counter_clockwise_vertices(self):
+        """Test the upper_left_counter_clockwise_vertices property."""
+        plane_1 = Plane(Vector3D(0, 1, 0))
+        plane_2 = Plane(Vector3D(0, -1, 0))
+        pts_1 = (Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(0, 0, 2))
+        pts_2 = (Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 0, 0))
+        face_1 = Face3D(pts_1, plane_1)
+        face_2 = Face3D(pts_2, plane_1)
+        face_3 = Face3D(pts_1, plane_2)
+        face_4 = Face3D(pts_2, plane_2)
+
+        up_cclock_1 = face_1.upper_left_counter_clockwise_vertices
+        assert up_cclock_1[0] == Point3D(2, 0, 2)
+        assert face_1.is_clockwise is True
+        assert Face3D.from_vertices(up_cclock_1).is_clockwise is False
+        up_cclock_2 = face_2.upper_left_counter_clockwise_vertices
+        assert up_cclock_2[0] == Point3D(2, 0, 2)
+        assert face_2.is_clockwise is False
+        assert not Face3D.from_vertices(up_cclock_2).is_clockwise
+        assert up_cclock_1 == up_cclock_2
+
+        up_cclock_3 = face_3.upper_left_counter_clockwise_vertices
+        assert up_cclock_3[0] == Point3D(0, 0, 2)
+        assert face_3.is_clockwise is False
+        assert Face3D.from_vertices(up_cclock_3).is_clockwise is False
+        up_cclock_4 = face_4.upper_left_counter_clockwise_vertices
+        assert up_cclock_4[0] == Point3D(0, 0, 2)
+        assert face_4.is_clockwise is True
+        assert Face3D.from_vertices(up_cclock_4).is_clockwise is False
+
+    def test_upper_left_counter_clockwise_vertices_triangle(self):
+        """Test the upper_left_counter_clockwise_vertices property with triangles."""
+        plane_1 = Plane(Vector3D(0, 1, 0))
+        pts_1 = (Point3D(0, 0, 0), Point3D(2, 0, -1), Point3D(0, 0, 2))
+        pts_2 = (Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, -1))
+        face_1 = Face3D(pts_1, plane_1)
+        face_2 = Face3D(pts_2, plane_1)
+
+        up_cclock_1 = face_1.upper_left_counter_clockwise_vertices
+        assert up_cclock_1[0] == Point3D(0, 0, 2)
+        assert face_1.is_clockwise is True
+        assert Face3D.from_vertices(up_cclock_1).is_clockwise is False
+        up_cclock_2 = face_2.upper_left_counter_clockwise_vertices
+        assert up_cclock_2[0] == Point3D(0, 0, 2)
+        assert face_2.is_clockwise is False
+        assert not Face3D.from_vertices(up_cclock_2).is_clockwise
+        assert up_cclock_1 == up_cclock_2
+
     def test_duplicate(self):
         """Test the duplicate method of Face3D."""
         pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
