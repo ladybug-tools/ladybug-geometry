@@ -15,6 +15,19 @@ class Base2DIn2D(object):
         center
     """
 
+    __slots__ = ('_vertices', '_min', '_max', '_center')
+
+    def __init__(self, vertices):
+        """Initilize Base2DIn2D.
+
+        Args:
+            vertices: A list of Point2D objects representing the vertices.
+        """
+        self._check_vertices_input(vertices)
+        self._min = None
+        self._max = None
+        self._center = None
+
     @property
     def min(self):
         """A Point2D for the minimum bounding rectangle vertex around this geometry."""
@@ -82,3 +95,7 @@ class Base2DIn2D(object):
     def ToString(self):
         """Overwrite .NET ToString."""
         return self.__repr__()
+
+    def __repr__(self):
+        """Base2Din2D representation."""
+        return 'Base 2D Object (2D Space)'

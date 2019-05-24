@@ -326,7 +326,7 @@ class Point3D(Vector3D):
         """
         return Point3D._reflect(self - origin, normal) + origin
 
-    def scale(self, factor, origin):
+    def scale(self, factor, origin=None):
         """Scale a point by a factor from an origin point.
 
         Args:

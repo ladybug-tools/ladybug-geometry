@@ -2,6 +2,7 @@
 """Base class for all 1D geometries in 3D space (Ray3D and LineSegment3D)."""
 from __future__ import division
 
+from .pointvector import Point3D, Vector3D
 from ..intersection3d import closest_point3d_on_line3d, \
     closest_point3d_on_line3d_infinite
 
@@ -13,6 +14,20 @@ class Base1DIn3D(object):
         p: End Point3D of object
         v: Vector3D along object
     """
+
+    __slots__ = ('_p', '_v')
+
+    def __init__(self, p, v):
+        """Initilize Base1DIn3D.
+
+        Args:
+            p: A Point2D representing the base.
+            v: A Vector2D representing the direction.
+        """
+        assert isinstance(p, Point3D), "Expected Point3D. Got {}.".format(type(p))
+        assert isinstance(v, Vector3D), "Expected Vector3D. Got {}.".format(type(v))
+        self._p = p
+        self._v = v
 
     @property
     def p(self):
@@ -93,3 +108,7 @@ class Base1DIn3D(object):
     def ToString(self):
         """Overwrite .NET ToString."""
         return self.__repr__()
+
+    def __repr__(self):
+        """Base1Din3D representation."""
+        return 'Base 1D Object (3D Space)'

@@ -2,6 +2,7 @@
 """Base class for all 1D geometries in 2D space (Ray2D and LineSegment2D)."""
 from __future__ import division
 
+from .pointvector import Vector2D, Point2D
 from ..intersection2d import intersect_line2d, closest_point2d_on_line2d
 
 
@@ -12,6 +13,19 @@ class Base1DIn2D(object):
         p: End Point2D of object
         v: Vector2D along object
     """
+    __slots__ = ('_p', '_v')
+
+    def __init__(self, p, v):
+        """Initilize Base1DIn2D.
+
+        Args:
+            p: A Point2D representing the base.
+            v: A Vector2D representing the direction.
+        """
+        assert isinstance(p, Point2D), "Expected Point2D. Got {}.".format(type(p))
+        assert isinstance(v, Vector2D), "Expected Vector2D. Got {}.".format(type(v))
+        self._p = p
+        self._v = v
 
     @property
     def p(self):
@@ -68,3 +82,7 @@ class Base1DIn2D(object):
     def ToString(self):
         """Overwrite .NET ToString."""
         return self.__repr__()
+
+    def __repr__(self):
+        """Base1Din2D representation."""
+        return 'Base 1D Object (2D Space)'
