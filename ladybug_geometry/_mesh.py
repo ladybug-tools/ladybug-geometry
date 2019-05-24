@@ -145,7 +145,7 @@ class MeshBase(object):
         self._faces = faces
 
     def _check_face_pattern(self, pattern):
-        """Check any input face pattern for compatability with this mesh."""
+        """Check input pattern for remove faces for compatibility with this mesh."""
         assert isinstance(pattern, (list, tuple)), 'pattern for remove_faces must' \
             ' be a list or tuple. Got {}.'.format(type(pattern))
         assert len(pattern) == len(self.faces), 'Length of pattern for remove_faces'\
