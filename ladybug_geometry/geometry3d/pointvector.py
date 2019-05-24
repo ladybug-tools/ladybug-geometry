@@ -75,7 +75,12 @@ class Vector3D(object):
 
     def angle(self, other):
         """Get the smallest angle between this vector and another."""
-        return math.acos(self.dot(other) / (self.magnitude * other.magnitude))
+        try:
+            return math.acos(self.dot(other) / (self.magnitude * other.magnitude))
+        except ValueError:  # python floating tolerance can cause math domain error
+            if self.dot(other) < 0:
+                return math.acos(-1)
+            return math.acos(1)
 
     def rotate(self, axis, angle):
         """Get a vector rotated around an axis through an angle.

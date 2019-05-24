@@ -46,6 +46,7 @@ class Face3D(Base2DIn3D):
         is_convex
         is_self_intersecting
         has_holes
+        upper_left_counter_clockwise_vertices
     """
     __slots__ = ('_vertices', '_plane', '_polygon2d', '_triangulated_mesh2d',
                  '_triangulated_mesh3d', '_boundary', '_holes',
