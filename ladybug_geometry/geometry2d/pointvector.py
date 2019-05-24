@@ -280,22 +280,18 @@ class Point2D(Vector2D):
         """
         return Point2D._reflect(self - origin, normal) + origin
 
-    def scale(self, factor, origin):
+    def scale(self, factor, origin=None):
         """Scale a point by a factor from an origin point.
 
         Args:
             factor: A number representing how much the point should be scaled.
             origin: A Point2D representing the origin from which to scale.
+                If None, it will be scaled from the World origin (0, 0).
         """
-        return (factor * (self - origin)) + origin
-
-    def scale_world_origin(self, factor):
-        """Scale a point by a factor from the world origin. Faster than Point2D.scale.
-
-        Args:
-            factor: A number representing how much the point should be scaled.
-        """
-        return Point2D(self.x * factor, self.y * factor)
+        if origin is None:
+            return Point2D(self.x * factor, self.y * factor)
+        else:
+            return (factor * (self - origin)) + origin
 
     def distance_to_point(self, point):
         """Get the distance from this point to another Point2D."""

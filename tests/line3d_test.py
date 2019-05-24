@@ -129,12 +129,12 @@ class LineSegment3DTestCase(unittest.TestCase):
         assert new_seg.v == Point3D(0, 4, 0)
 
     def test_scale_world_origin(self):
-        """Test the LineSegment3D scale_world_origin method."""
+        """Test the LineSegment3D scale method with None origin."""
         pt = Point3D(2, 2, 2)
         vec = Vector3D(0, 2, 0)
         seg = LineSegment3D(pt, vec)
 
-        new_seg = seg.scale_world_origin(2)
+        new_seg = seg.scale(2)
         assert new_seg.p == Point3D(4, 4, 4)
         assert new_seg.v == Point3D(0, 4)
         assert new_seg.length == 4

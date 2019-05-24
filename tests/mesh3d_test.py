@@ -249,12 +249,12 @@ class Mesh3DTestCase(unittest.TestCase):
         assert len(mesh.faces) == len(new_mesh_1.faces)
 
     def test_scale_world_origin(self):
-        """Test the Mesh2D scale_world_origin method."""
+        """Test the Mesh2D scale method with None origin."""
         pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2),
                Point3D(2, 0, 2), Point3D(4, 0, 2))
         mesh = Mesh3D(pts, [(0, 1, 2, 3), (2, 3, 4)])
 
-        new_mesh_1 = mesh.scale_world_origin(2)
+        new_mesh_1 = mesh.scale(2)
         assert new_mesh_1[0] == Point3D(0, 0, 4)
         assert new_mesh_1[1] == Point3D(0, 4, 4)
         assert new_mesh_1[2] == Point3D(4, 4, 4)

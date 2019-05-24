@@ -332,16 +332,12 @@ class Point3D(Vector3D):
         Args:
             factor: A number representing how much the point should be scaled.
             origin: A Point3D representing the origin from which to scale.
+                If None, it will be scaled from the World origin (0, 0, 0).
         """
-        return (factor * (self - origin)) + origin
-
-    def scale_world_origin(self, factor):
-        """Scale a point by a factor from the world origin. Faster than Point3D.scale.
-
-        Args:
-            factor: A number representing how much the point should be scaled.
-        """
-        return Point3D(self.x * factor, self.y * factor, self.z * factor)
+        if origin is None:
+            return Point3D(self.x * factor, self.y * factor, self.z * factor)
+        else:
+            return (factor * (self - origin)) + origin
 
     def project(self, normal, origin):
         """Get a point projected a point3d into a plane with a given normal and origin.

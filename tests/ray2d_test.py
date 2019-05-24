@@ -74,12 +74,12 @@ class Ray2DTestCase(unittest.TestCase):
         assert new_ray.v == Point2D(0, 4)
 
     def test_scale_world_origin(self):
-        """Test the Ray2D scale_world_origin method."""
+        """Test the Ray2D scale method with None origin."""
         pt = Point2D(2, 2)
         vec = Vector2D(0, 2)
         ray = Ray2D(pt, vec)
 
-        new_ray = ray.scale_world_origin(2)
+        new_ray = ray.scale(2)
         assert new_ray.p == Point2D(4, 4)
         assert new_ray.v == Point2D(0, 4)
         assert new_ray.v.magnitude == 4

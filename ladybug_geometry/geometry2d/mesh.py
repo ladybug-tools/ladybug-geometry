@@ -319,6 +319,21 @@ class Mesh2D(MeshBase, Base2DIn2D):
         _verts = tuple([pt.rotate(angle, origin) for pt in self.vertices])
         return self._mesh_transform(_verts)
 
+    def scale(self, factor, origin=None):
+        """Scale a mesh by a factor from an origin point.
+
+        Args:
+            factor: A number representing how much the mesh should be scaled.
+            origin: A Point representing the origin from which to scale.
+                If None, it will be scaled from the World origin (0, 0).
+        """
+        if origin is None:
+            _verts = tuple(
+                Point2D(pt.x * factor, pt.y * factor) for pt in self.vertices)
+        else:
+            _verts = tuple(pt.scale(factor, origin) for pt in self.vertices)
+        return self._mesh_scale(_verts, factor)
+
     def _face_area(self, face):
         """Return the area of a face."""
         return Mesh2D._get_area(tuple(self._vertices[i] for i in face))

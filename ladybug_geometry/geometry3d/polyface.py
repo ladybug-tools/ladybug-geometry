@@ -579,32 +579,22 @@ class Polyface3D(Base2DIn3D):
         _new_pface._volume = self._volume
         return _new_pface
 
-    def scale(self, factor, origin):
+    def scale(self, factor, origin=None):
         """Scale a polyface by a factor from an origin point.
 
         Args:
             factor: A number representing how much the polyface should be scaled.
             origin: A Point3D representing the origin from which to scale.
+                If None, it will be scaled from the World origin (0, 0, 0).
         """
-        _verts = tuple(pt.scale(factor, origin) for pt in self.vertices)
+        if origin is None:
+            _verts = tuple(Point3D(pt.x * factor, pt.y * factor, pt.z * factor)
+                           for pt in self._vertices)
+        else:
+            _verts = tuple(pt.scale(factor, origin) for pt in self.vertices)
         _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
         if self._faces is not None:
             _new_pface._faces = tuple(face.scale(factor, origin)
-                                      for face in self._faces)
-        _new_pface._volume = self._volume * factor ** 3 \
-            if self._volume is not None else None
-        return _new_pface
-
-    def scale_world_origin(self, factor):
-        """Scale a polyface by a factor from the world origin. Faster than Polyface3D.scale.
-
-        Args:
-            factor: A number representing how much the polyface should be scaled.
-        """
-        _verts = tuple(pt.scale_world_origin(factor) for pt in self.vertices)
-        _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
-        if self._faces is not None:
-            _new_pface._faces = tuple(face.scale_world_origin(factor)
                                       for face in self._faces)
         _new_pface._volume = self._volume * factor ** 3 \
             if self._volume is not None else None

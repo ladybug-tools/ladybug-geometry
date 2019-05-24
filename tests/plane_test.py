@@ -131,12 +131,12 @@ class PlaneTestCase(unittest.TestCase):
         assert new_plane.k == 3
 
     def test_scale_world_origin(self):
-        """Test the Plane scale_world_origin method."""
+        """Test the Plane scale method with None origin."""
         pt = Point3D(2, 2, 2)
         vec = Vector3D(0, 2, 0)
         plane = Plane(vec, pt)
 
-        new_plane = plane.scale_world_origin(2)
+        new_plane = plane.scale(2)
         assert new_plane.o == Point3D(4, 4, 4)
         assert new_plane.n == Point3D(0, 1, 0)
         assert new_plane.x == plane.x

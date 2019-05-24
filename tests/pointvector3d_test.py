@@ -179,14 +179,14 @@ class Point3DTestCase(unittest.TestCase):
         assert pt_1.scale(2, origin_2) == Point3D(3, 3, 3)
 
     def test_scale_world_origin(self):
-        """Test the Point3D scale_world_origin method."""
+        """Test the Point3D scale method with None origin."""
         pt_1 = Point3D(2, 2, 2)
         pt_2 = Point3D(-2, -2, -2)
-        assert pt_1.scale_world_origin(2) == Point3D(4, 4, 4)
-        assert pt_1.scale_world_origin(0.5) == Point3D(1, 1, 1)
-        assert pt_1.scale_world_origin(-2) == Point3D(-4, -4, -4)
-        assert pt_2.scale_world_origin(2) == Point3D(-4, -4, -4)
-        assert pt_2.scale_world_origin(-2) == Point3D(4, 4, 4)
+        assert pt_1.scale(2) == Point3D(4, 4, 4)
+        assert pt_1.scale(0.5) == Point3D(1, 1, 1)
+        assert pt_1.scale(-2) == Point3D(-4, -4, -4)
+        assert pt_2.scale(2) == Point3D(-4, -4, -4)
+        assert pt_2.scale(-2) == Point3D(4, 4, 4)
 
     def test_rotate(self):
         """Test the Point3D rotate method."""

@@ -106,12 +106,12 @@ class LineSegment2DTestCase(unittest.TestCase):
         assert new_seg.v == Point2D(0, 4)
 
     def test_scale_world_origin(self):
-        """Test the LineSegement2D scale_world_origin method."""
+        """Test the LineSegement2D scale method with None origin."""
         pt = Point2D(2, 2)
         vec = Vector2D(0, 2)
         seg = LineSegment2D(pt, vec)
 
-        new_seg = seg.scale_world_origin(2)
+        new_seg = seg.scale(2)
         assert new_seg.p == Point2D(4, 4)
         assert new_seg.v == Point2D(0, 4)
         assert new_seg.length == 4

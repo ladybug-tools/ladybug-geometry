@@ -72,12 +72,13 @@ class Ray3D(Base1DIn3D):
         """
         return Ray3D(self.p.reflect(normal, origin), self.v.reflect(normal))
 
-    def scale(self, factor, origin):
+    def scale(self, factor, origin=None):
         """Scale a ray by a factor from an origin point.
 
         Args:
             factor: A number representing how much the ray should be scaled.
             origin: A Point3D representing the origin from which to scale.
+                If None, it will be scaled from the World origin (0, 0, 0).
         """
         return Ray3D(self.p.scale(factor, origin), self.v * factor)
 

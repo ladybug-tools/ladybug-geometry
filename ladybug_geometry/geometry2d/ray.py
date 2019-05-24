@@ -58,22 +58,15 @@ class Ray2D(Base1DIn2D):
         """
         return Ray2D(self.p.reflect(normal, origin), self.v.reflect(normal))
 
-    def scale(self, factor, origin):
+    def scale(self, factor, origin=None):
         """Scale a ray by a factor from an origin point.
 
         Args:
             factor: A number representing how much the ray should be scaled.
             origin: A Point2D representing the origin from which to scale.
+                If None, it will be scaled from the World origin (0, 0).
         """
         return Ray2D(self.p.scale(factor, origin), self.v * factor)
-
-    def scale_world_origin(self, factor):
-        """Scale a ray by a factor from the world origin. Faster than Ray2D.scale.
-
-        Args:
-            factor: A number representing how much the ray should be scaled.
-        """
-        return Ray2D(self.p.scale_world_origin(factor), self.v * factor)
 
     def _u_in(self, u):
         return u >= 0.0

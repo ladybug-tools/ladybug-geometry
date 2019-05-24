@@ -102,25 +102,6 @@ class MeshBase(object):
         _verts = tuple(pt.reflect(normal, origin) for pt in self.vertices)
         return self._mesh_transform(_verts)
 
-    def scale(self, factor, origin):
-        """Scale a mesh by a factor from an origin point.
-
-        Args:
-            factor: A number representing how much the mesh should be scaled.
-            origin: A Point representing the origin from which to scale.
-        """
-        _verts = tuple(pt.scale(factor, origin) for pt in self.vertices)
-        return self._mesh_scale(_verts, factor)
-
-    def scale_world_origin(self, factor):
-        """Scale a mesh by a factor from the world origin. Faster than scale.
-
-        Args:
-            factor: A number representing how much the mesh should be scaled.
-        """
-        _verts = tuple(pt.scale_world_origin(factor) for pt in self.vertices)
-        return self._mesh_scale(_verts, factor)
-
     def _check_faces_input(self, faces):
         """Check input faces for correct formatting."""
         if not isinstance(faces, tuple):

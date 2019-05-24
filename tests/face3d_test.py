@@ -598,12 +598,12 @@ class Face3DTestCase(unittest.TestCase):
         assert new_face_2.normal == face_2.normal
 
     def test_scale_world_origin(self):
-        """Test the Face3D scale_world_origin method."""
+        """Test the Face3D scale method with None origin."""
         pts = (Point3D(1, 1, 2), Point3D(2, 1, 2), Point3D(2, 2, 2), Point3D(1, 2, 2))
         plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
         face = Face3D(pts, plane)
 
-        new_face = face.scale_world_origin(2)
+        new_face = face.scale(2)
         assert new_face[0] == Point3D(2, 2, 4)
         assert new_face[1] == Point3D(4, 2, 4)
         assert new_face[2] == Point3D(4, 4, 4)

@@ -75,12 +75,12 @@ class Ray3DTestCase(unittest.TestCase):
         assert new_ray.v == Point3D(0, 4, 0)
 
     def test_scale_world_origin(self):
-        """Test the Ray3D scale_world_origin method."""
+        """Test the Ray3D scale method with None origin."""
         pt = Point3D(2, 2, 2)
         vec = Vector3D(0, 2, 0)
         ray = Ray3D(pt, vec)
 
-        new_ray = ray.scale_world_origin(2)
+        new_ray = ray.scale(2)
         assert new_ray.p == Point3D(4, 4, 4)
         assert new_ray.v == Point3D(0, 4)
         assert new_ray.v.magnitude == 4

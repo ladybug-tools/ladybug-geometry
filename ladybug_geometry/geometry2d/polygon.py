@@ -339,22 +339,19 @@ class Polygon2D(Base2DIn2D):
         """
         return Polygon2D(tuple(pt.reflect(normal, origin) for pt in self.vertices))
 
-    def scale(self, factor, origin):
+    def scale(self, factor, origin=None):
         """Scale a polygon by a factor from an origin point.
 
         Args:
             factor: A number representing how much the polygon should be scaled.
             origin: A Point2D representing the origin from which to scale.
+                If None, it will be scaled from the World origin (0, 0).
         """
-        return Polygon2D(tuple(pt.scale(factor, origin) for pt in self.vertices))
-
-    def scale_world_origin(self, factor):
-        """Scale a polygon by a factor from the world origin. Faster than Polygon2D.scale.
-
-        Args:
-            factor: A number representing how much the polygon should be scaled.
-        """
-        return Polygon2D(tuple(pt.scale_world_origin(factor) for pt in self.vertices))
+        if origin is None:
+            return Polygon2D(tuple(
+                Point2D(pt.x * factor, pt.y * factor) for pt in self.vertices))
+        else:
+            return Polygon2D(tuple(pt.scale(factor, origin) for pt in self.vertices))
 
     def intersect_line_ray(self, line_ray):
         """Get the intersections between this polygon and a Ray2D or LineSegment2D.

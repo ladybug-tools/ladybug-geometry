@@ -136,22 +136,15 @@ class LineSegment3D(Base1DIn3D):
         """
         return LineSegment3D(self.p.reflect(normal, origin), self.v.reflect(normal))
 
-    def scale(self, factor, origin):
+    def scale(self, factor, origin=None):
         """Scale a line segment by a factor from an origin point.
 
         Args:
             factor: A number representing how much the line segment should be scaled.
             origin: A Point3D representing the origin from which to scale.
+                If None, it will be scaled from the World origin (0, 0, 0).
         """
         return LineSegment3D(self.p.scale(factor, origin), self.v * factor)
-
-    def scale_world_origin(self, factor):
-        """Scale a line segment by a factor from the world origin. Faster than scale.
-
-        Args:
-            factor: A number representing how much the line segment should be scaled.
-        """
-        return LineSegment3D(self.p.scale_world_origin(factor), self.v * factor)
 
     def subdivide(self, distances):
         """Get Point3D values along the line that subdivide it based on input distances.

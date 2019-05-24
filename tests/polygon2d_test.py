@@ -260,11 +260,11 @@ class Polygon2DTestCase(unittest.TestCase):
         assert new_polygon_2.is_self_intersecting is polygon_2.is_self_intersecting
 
     def test_scale_world_origin(self):
-        """Test the Polygon2D scale_world_origin method."""
+        """Test the Polygon2D scale method with None origin."""
         pts = (Point2D(1, 1), Point2D(2, 1), Point2D(2, 2), Point2D(1, 2))
         polygon = Polygon2D(pts)
 
-        new_polygon = polygon.scale_world_origin(2)
+        new_polygon = polygon.scale(2)
         assert new_polygon[0] == Point2D(2, 2)
         assert new_polygon[1] == Point2D(4, 2)
         assert new_polygon[2] == Point2D(4, 4)

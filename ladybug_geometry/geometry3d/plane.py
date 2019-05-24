@@ -160,22 +160,15 @@ class Plane(object):
                      self.o.reflect(normal, origin),
                      self.x.reflect(normal))
 
-    def scale(self, factor, origin):
+    def scale(self, factor, origin=None):
         """Scale a plane by a factor from an origin point.
 
         Args:
             factor: A number representing how much the plane should be scaled.
             origin: A Point3D representing the origin from which to scale.
+                If None, it will be scaled from the World origin (0, 0, 0).
         """
         return Plane(self.n, self.o.scale(factor, origin), self.x)
-
-    def scale_world_origin(self, factor):
-        """Scale a Plane by a factor from the world origin. Faster than Plane.scale.
-
-        Args:
-            factor: A number representing how much the line segment should be scaled.
-        """
-        return Plane(self.n, self.o.scale_world_origin(factor), self.x)
 
     def xyz_to_xy(self, point):
         """Get a Point2D in the coordinate system of this plane from a Point3D.

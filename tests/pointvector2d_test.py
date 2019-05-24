@@ -186,14 +186,14 @@ class Point2DTestCase(unittest.TestCase):
         assert pt_1.scale(2, origin_2) == Point2D(3, 3)
 
     def test_scale_world_origin(self):
-        """Test the Point2D scale_world_origin method."""
+        """Test the Point2D scale method with None origin."""
         pt_1 = Point2D(2, 2)
         pt_2 = Point2D(-2, -2)
-        assert pt_1.scale_world_origin(2) == Point2D(4, 4)
-        assert pt_1.scale_world_origin(0.5) == Point2D(1, 1)
-        assert pt_1.scale_world_origin(-2) == Point2D(-4, -4)
-        assert pt_2.scale_world_origin(2) == Point2D(-4, -4)
-        assert pt_2.scale_world_origin(-2) == Point2D(4, 4)
+        assert pt_1.scale(2) == Point2D(4, 4)
+        assert pt_1.scale(0.5) == Point2D(1, 1)
+        assert pt_1.scale(-2) == Point2D(-4, -4)
+        assert pt_2.scale(2) == Point2D(-4, -4)
+        assert pt_2.scale(-2) == Point2D(4, 4)
 
     def test_rotate(self):
         """Test the Point2D rotate method."""

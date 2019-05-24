@@ -728,12 +728,13 @@ class Face3D(Base2DIn3D):
                                      for hole in self._holes)
         return _new_face
 
-    def scale(self, factor, origin):
+    def scale(self, factor, origin=None):
         """Scale a face by a factor from an origin point.
 
         Args:
             factor: A number representing how much the face should be scaled.
             origin: A Point3D representing the origin from which to scale.
+                If None, it will be scaled from the World origin (0, 0, 0).
         """
         _verts = self._scale(self.vertices, factor, origin)
         _new_face = self._face_transform_scale(
@@ -741,21 +742,6 @@ class Face3D(Base2DIn3D):
         if self._holes is not None:
             _new_face._boundary = self._scale(self._boundary, factor, origin)
             _new_face._holes = tuple(self._scale(hole, factor, origin)
-                                     for hole in self._holes)
-        return _new_face
-
-    def scale_world_origin(self, factor):
-        """Scale a face by a factor from the world origin. Faster than Face3D.scale.
-
-        Args:
-            factor: A number representing how much the face should be scaled.
-        """
-        _verts = self._scale_world_origin(self.vertices, factor)
-        _new_face = self._face_transform_scale(
-            _verts, self.plane.scale_world_origin(factor), factor)
-        if self._holes is not None:
-            _new_face._boundary = self._scale_world_origin(self._boundary, factor)
-            _new_face._holes = tuple(self._scale_world_origin(hole, factor)
                                      for hole in self._holes)
         return _new_face
 
@@ -1330,10 +1316,12 @@ class Face3D(Base2DIn3D):
         return tuple(pt.reflect(normal, origin) for pt in vertices)
 
     def _scale(self, vertices, factor, origin):
-        return tuple(pt.scale(factor, origin) for pt in vertices)
-
-    def _scale_world_origin(self, vertices, factor):
-        return tuple(pt.scale_world_origin(factor) for pt in vertices)
+        if origin is None:
+            return tuple(
+                Point3D(pt.x * factor, pt.y * factor, pt.z * factor)
+                for pt in vertices)
+        else:
+            return tuple(pt.scale(factor, origin) for pt in vertices)
 
     def _face_transform(self, verts, plane):
         """Transform face in a way that transfers properties and avoids checks."""

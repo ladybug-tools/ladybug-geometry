@@ -218,6 +218,22 @@ class Mesh3D(MeshBase, Base2DIn3D):
         _verts = tuple(pt.rotate_xy(angle, origin) for pt in self.vertices)
         return self._mesh_transform(_verts)
 
+    def scale(self, factor, origin=None):
+        """Scale a mesh by a factor from an origin point.
+
+        Args:
+            factor: A number representing how much the mesh should be scaled.
+            origin: A Point representing the origin from which to scale.
+                If None, it will be scaled from the World origin (0, 0, 0).
+        """
+        if origin is None:
+            _verts = tuple(
+                Point3D(pt.x * factor, pt.y * factor, pt.z * factor)
+                for pt in self.vertices)
+        else:
+            _verts = tuple(pt.scale(factor, origin) for pt in self.vertices)
+        return self._mesh_scale(_verts, factor)
+
     def _calculate_face_areas_and_normals(self):
         """Calculate face areas and normals from vertices."""
         _f_norm = []

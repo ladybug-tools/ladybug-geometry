@@ -425,10 +425,10 @@ class Polyface3DTestCase(unittest.TestCase):
         assert new_polyface_2.volume == polyface_2.volume * 2 ** 3
 
     def test_scale_world_origin(self):
-        """Test the Polyface3D scale_world_origin method."""
+        """Test the Polyface3D scale method with None origin."""
         polyface = Polyface3D.from_box(1, 1, 1, Plane(o=Point3D(1, 1, 2)))
 
-        new_polyface = polyface.scale_world_origin(2)
+        new_polyface = polyface.scale(2)
         assert new_polyface[0] == Point3D(2, 2, 4)
         assert new_polyface[1] == Point3D(2, 4, 4)
         assert new_polyface[2] == Point3D(4, 4, 4)
