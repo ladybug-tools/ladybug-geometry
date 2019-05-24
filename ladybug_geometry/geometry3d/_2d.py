@@ -15,8 +15,6 @@ class Base2DIn3D(object):
         center
     """
 
-    __slots__ = ('_vertices', '_min', '_max', '_center')
-
     def __init__(self, vertices):
         """Initilize Base2DIn3D.
 

@@ -13,7 +13,6 @@ class Base1DIn2D(object):
         p: End Point2D of object
         v: Vector2D along object
     """
-    __slots__ = ('_p', '_v')
 
     def __init__(self, p, v):
         """Initilize Base1DIn2D.
