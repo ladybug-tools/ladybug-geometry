@@ -48,9 +48,8 @@ class Face3D(Base2DIn3D):
         has_holes
         upper_left_counter_clockwise_vertices
     """
-    __slots__ = ('_vertices', '_plane', '_polygon2d', '_triangulated_mesh2d',
-                 '_triangulated_mesh3d', '_boundary', '_holes',
-                 '_boundary_segments', '_hole_segments',
+    __slots__ = ('_vertices', '_plane', '_polygon2d', '_mesh2d', '_mesh3d',
+                 '_boundary', '_holes', '_boundary_segments', '_hole_segments',
                  '_boundary_polygon2d', '_hole_polygon2d',
                  '_min', '_max', '_center', '_perimeter', '_area', '_centroid',
                  '_is_clockwise', '_is_convex', '_is_self_intersecting')
