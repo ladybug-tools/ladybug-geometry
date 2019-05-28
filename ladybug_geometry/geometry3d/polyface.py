@@ -1,0 +1,735 @@
+# coding=utf-8
+"""Object with Multiple Planar Faces in 3D Space"""
+from __future__ import division
+
+from .pointvector import Vector3D, Point3D
+from .ray import Ray3D
+from .line import LineSegment3D
+from .plane import Plane
+from .face import Face3D
+from ._2d import Base2DIn3D
+
+try:
+    from itertools import izip as zip  # python 2
+except ImportError:
+    xrange = range  # python 3
+
+
+class Polyface3D(Base2DIn3D):
+    """Object with Multiple Planar Faces in 3D Space. Includes solid objects and polyhedra.
+
+    Properties:
+        vertices
+        faces
+        edges
+        naked_edges
+        internal_edges
+        non_manifold_edges
+        face_indices
+        edge_indices
+        edge_types
+        min
+        max
+        center
+        area
+        volume
+        is_solid
+    """
+    __slots__ = ('_vertices', '_faces', '_edges',
+                 '_naked_edges', '_internal_edges', '_non_manifold_edges',
+                 '_face_indices', '_edge_indices', '_edge_types'
+                 '_min', '_max', '_center', '_area', '_is_solid')
+
+    def __init__(self, vertices, face_indices, edge_information=None):
+        """Initilize Polyface3D.
+
+        Args:
+            vertices: A list of Point3D objects representing the vertices of
+                this PolyFace.
+            face_indices: A list of tuples that contain integers corresponding
+                to indices within the vertices list. Each tuple represents a
+                face of the polyface.
+            edge_information: Optional edge information, which will speed up the
+                creation of the Polyface object if it is available. If None, this
+                will be computed from the vertices and face_indices. Edge information
+                should be formatted as a dictionary with two keys as follows:
+                'edge_indices': A list of tuple objects that each contain two integers.
+                    These integers correspond to indices within the vertices list and
+                    each tuple represents a line sengment for an edge of the polyface.
+                'edge_types': A list of integers for each edge that parallels
+                    the edge_indices list. An integer of 0 denotes a naked edge, an
+                    integer of 1 denotes an internal edge. Anything higher is a
+                    non-manifold edge.
+        """
+        # assign input properties
+        self._check_vertices_input(vertices)
+        self._face_indices = face_indices if isinstance(face_indices, tuple) \
+            else tuple(face_indices)
+
+        # unpack or autocalculate edge information
+        if edge_information is not None:
+            edge_i = edge_information['edge_indices']
+            edge_t = edge_information['edge_types']
+        else:  # determine unique edges from the vertices and faces.
+            edge_i = []
+            edge_t = []
+            for fi in face_indices:
+                for i, vi in enumerate(fi):
+                    try:  # this can get slow for large number of vertices.
+                        ind = edge_i.index((fi[i - 1], vi))
+                        edge_t[ind] += 1
+                    except ValueError:  # make sure reversed edge isn't there
+                        try:
+                            ind = edge_i.index((vi, fi[i - 1]))
+                            edge_t[ind] += 1
+                        except ValueError:  # add a new edge
+                            edge_i.append((fi[i - 1], vi))
+                            edge_t.append(0)
+        self._edge_indices = edge_i if isinstance(edge_i, tuple) else tuple(edge_i)
+        self._edge_types = edge_t if isinstance(edge_t, tuple) else tuple(edge_t)
+
+        # determine solidity of the polyface by checking for internal edges
+        self._is_solid = True
+        for edge in self._edge_types:
+            if edge != 1:
+                self._is_solid = False
+                break
+
+        # assign default properties
+        self._faces = None
+        self._edges = None
+        self._naked_edges = None
+        self._internal_edges = None
+        self._non_manifold_edges = None
+        self._min = None
+        self._max = None
+        self._center = None
+        self._area = None
+        self._volume = None
+
+    @classmethod
+    def from_faces(cls, faces):
+        """Initilize Polyface3D from a list of Face3D objects.
+
+        Initializing a Polyface3D this way will preserve the properties of the
+        underlying Face3D objects, including the order of Face3D objects on the faces
+        property of the polyface and the presence of holes in the Face3D objects.
+        As such, it is the recommended way to create a polyface when Face3D objects
+        are available.
+
+        Args:
+            faces: A list of Face3D objects representing the boundary of this Polyface.
+        """
+        # extract unique vertices from the faces
+        vertices = []  # collection of vertices as point objects
+        face_indices = []  # collection of face indices
+        for f in faces:
+            ind = []
+            for v in f:
+                try:  # this can get slow for large number of vertices.
+                    ind.append(vertices.index(v))
+                except ValueError:  # add new point
+                    vertices.append(v)
+                    ind.append(len(vertices) - 1)
+            face_indices.append(tuple(ind))
+
+        # get the polyface object and assign correct faces to it
+        _polyface = cls(vertices, face_indices)
+        if _polyface._is_solid:
+            _polyface._faces = cls._correct_face_direction(faces)
+        else:
+            _polyface._faces = faces
+        return _polyface
+
+    @classmethod
+    def from_faces_tolerance(cls, faces, tolerance):
+        """Initilize Polyface3D from a list of Face3D objects with a tolerance.
+
+        This method is effectively equivalent to the from_faces method but faces
+        will be joined into the polyface if the vertices are within the tolerance
+        (rather than needing vertices to be perfectly equivalent).
+
+        Args:
+            faces: A list of Face3D objects representing the boundary of this Polyface.
+            tolerance: The maximum difference between x, y, and z values at which
+                point vertices are considered equivalent.
+        """
+        # extract unique vertices from the faces
+        vertices = []  # collection of vertices as point objects
+        face_indices = []  # collection of face indices
+        for f in faces:
+            ind = []
+            for v in f:
+                found = False
+                for i, vert in enumerate(vertices):  # slow for large number of vertices.
+                    if v.is_equivalent(vert, tolerance):
+                        found = True
+                        ind.append(i)
+                        break
+                if found is False:  # add new point
+                    vertices.append(v)
+                    ind.append(len(vertices) - 1)
+            face_indices.append(tuple(ind))
+
+        # get the polyface object and assign correct faces to it
+        _polyface = cls(vertices, face_indices)
+        if _polyface._is_solid:
+            _polyface._faces = cls._correct_face_direction(faces)
+        else:
+            _polyface._faces = faces
+        return _polyface
+
+    @classmethod
+    def from_box(cls, length, width, height, base_plane=None):
+        """Initilize Polyface3D from parameters describing a box.
+
+        Initializing a polyface this way has the added benefit of having its
+        faces property quickly calculated.
+
+        Args:
+            length: A number for the length of the box (in the X direction).
+            width: A number for the width of the box (in the Y direction).
+            height: A number for the height of the box (in the Z direction).
+            base_plane: A Plane object from which to generate the box.
+                If None, default is the WorldXY plane.
+        """
+        assert isinstance(length, (float, int)), 'Box length must be a number.'
+        assert isinstance(width, (float, int)), 'Box width must be a number.'
+        assert isinstance(height, (float, int)), 'Box height must be a number.'
+        if base_plane is not None:
+            assert isinstance(base_plane, Plane), \
+                'base_plane must be Plane. Got {}.'.format(type(base_plane))
+        else:
+            base_plane = Plane(Vector3D(0, 0, 1), Point3D())
+        _o = base_plane.o
+        _l_vec = base_plane.x * length
+        _w_vec = base_plane.y * width
+        _h_vec = base_plane.n * height
+        _verts = (_o, _o + _w_vec, _o + _w_vec + _l_vec, _o + _l_vec,
+                  _o + _h_vec, _o + _w_vec + _h_vec,
+                  _o + _w_vec + _l_vec + _h_vec, _o + _l_vec + _h_vec)
+        _face_indices = ((0, 1, 2, 3), (0, 4, 5, 1), (0, 3, 7, 4),
+                         (2, 1, 5, 6), (6, 7, 3, 2), (7, 6, 5, 4))
+        _edge_indices = ((3, 0), (0, 1), (1, 2), (2, 3), (0, 4), (4, 5),
+                         (5, 1), (3, 7), (7, 4), (6, 2), (5, 6), (6, 7))
+        polyface = cls(_verts, _face_indices, {'edge_indices': _edge_indices,
+                                               'edge_types': [1] * 12})
+        verts = tuple(tuple(_verts[i] for i in face) for face in _face_indices)
+        polyface._faces = tuple(Face3D.from_vertices(v) for v in verts)
+        polyface._volume = length * width * height
+        return polyface
+
+    @classmethod
+    def from_offset_face(cls, face, offset):
+        """Initilize a solid Polyface3D from a Face3D offset along its normal.
+
+        The resulting polyface will always be offset in the direction of
+        the face normal.
+
+        When a polyface is initialized this way, the first face of the
+        Polysurface3D.faces will always be the input face used to create the
+        object, the last face will be the offset version of the face, and all
+        other faces will form the extrusion connecting the two.
+
+        Args:
+            face: A Face3D to serve as a base for the polyface.
+            offset: A number for the distance to offset the face to make a solid.
+        """
+        assert isinstance(face, Face3D), \
+            'face must be a Face3D. Got {}.'.format(type(face))
+        assert isinstance(offset, (float, int)), \
+            'height must be a number. Got {}.'.format(type(offset))
+        # get the extrusion vector and starting vertices
+        extru_vec = face.normal * offset
+        cclock_verts = face._boundary if face.is_clockwise else \
+            list(reversed(face._boundary))
+        # compute vertices, face indices, and edges of the extrusion
+        verts, face_ind_extru, edge_indices = \
+            Polyface3D._verts_faces_edges_from_boundary(cclock_verts, extru_vec)
+        if face.has_holes:
+            for i, hole in enumerate(face.hole_polygon2d):
+                hole_verts = face._holes[i] if hole.is_clockwise else \
+                    list(reversed(face._holes[i]))
+                verts_2, face_ind_extru_2, edge_indices_2 = \
+                    Polyface3D._verts_faces_edges_from_boundary(hole_verts, extru_vec)
+                verts.extend(verts_2)
+                face_ind_extru.extend(face_ind_extru_2)
+                edge_indices.extend(edge_indices_2)
+        # compute the final faces (accounting for top and bottom)
+        if not face.has_holes:
+            len_faces = len(cclock_verts)
+            face_ind_bottom = tuple(xrange(len_faces))
+            face_ind_top = tuple(xrange(len_faces * 2 - 1, len_faces - 1, -1))
+        else:
+            face_verts_bottom = list(reversed(face._vertices)) if face.is_clockwise \
+                else face._vertices
+            face_verts_top = [pt.move(extru_vec)
+                              for pt in reversed(face_verts_bottom)]
+            face_ind_bottom = tuple(verts.index(pt) for pt in face_verts_bottom)
+            face_ind_top = tuple(verts.index(pt) for pt in face_verts_top)
+        faces_ind = [face_ind_bottom] + face_ind_extru + [face_ind_top]
+        # create the polysurface and assign known properties.
+        polyface = Polyface3D(verts, faces_ind,
+                              {'edge_indices': edge_indices,
+                               'edge_types': [1] * len(edge_indices)})
+        polyface._volume = face.area * offset
+        face_verts = tuple(tuple(verts[i] for i in f) for f in faces_ind)
+        if not face.has_holes:
+            polyface._faces = tuple(Face3D.from_vertices(v) for v in face_verts)
+        else:
+            mid_faces = [Face3D.from_vertices(v) for v in face_verts[1:-1]]
+            bottom_face = face.flip()
+            top_face = face.move(extru_vec)
+            if not face.is_clockwise:
+                bottom_face = bottom_face.reverse()
+            else:
+                top_face = top_face.reverse()
+            polyface._faces = tuple([bottom_face] + mid_faces + [top_face])
+        return polyface
+
+    @property
+    def vertices(self):
+        """Tuple of all vertices in this polyface.
+
+        Note that, in the case of a polyface with holes, some vertices will be repeated
+        since this property effectively traces out a single boundary around the
+        whole shape, winding inward to cut out the holes.
+        """
+        return self._vertices
+
+    @property
+    def faces(self):
+        """Tuple of all Face3D objects making up this polyface."""
+        if self._faces is None:
+            verts = tuple(tuple(self.vertices[i] for i in face)
+                          for face in self._face_indices)
+            faces = tuple(Face3D.from_vertices(v) for v in verts)
+            if self._is_solid:
+                faces = Polyface3D._correct_face_direction(faces)
+            self._faces = faces
+        return self._faces
+
+    @property
+    def edges(self):
+        """"Tuple of all edges in this polyface as LineSegment3D objects."""
+        if self._edges is None:
+            self._edges = tuple(LineSegment3D.from_end_points(
+                self.vertices[seg[0]], self.vertices[seg[1]])
+                                for seg in self._edge_indices)
+        return self._edges
+
+    @property
+    def naked_edges(self):
+        """"Tuple of all naked edges in this polyface as LineSegment3D objects.
+
+        Naked edges belong to only one face in the polyface (they are not
+        shared between faces).
+        """
+        if self._naked_edges is None:
+            self._naked_edges = self._get_edge_type(0)
+        return self._naked_edges
+
+    @property
+    def internal_edges(self):
+        """"Tuple of all internal edges in this polyface as LineSegment3D objects.
+
+        Internal edges are shared between two faces in the polyface.
+        """
+        if self._internal_edges is None:
+            self._internal_edges = self._get_edge_type(1)
+        return self._internal_edges
+
+    @property
+    def non_manifold_edges(self):
+        """"Tuple of all non-manifold edges in this polyface as LineSegment3D objects.
+
+        Non-manifold edges are shared between three or more faces and are therefore
+        not allowed in solid polyfaces.
+        """
+        if self._non_manifold_edges is None:
+            if self._edges is None:
+                self.edges
+            nm_edges = []
+            for i, type in enumerate(self._edge_types):
+                if type > 2:
+                    nm_edges.append(self._edges[i])
+            self._non_manifold_edges = tuple(nm_edges)
+        return self._non_manifold_edges
+
+    @property
+    def face_indices(self):
+        """Tuple of face tuples with integers corresponding to indices of vertices."""
+        return self._face_indices
+
+    @property
+    def edge_indices(self):
+        """Tuple of edge tuples with integers corresponding to indices of vertices."""
+        return self._edge_indices
+
+    @property
+    def edge_types(self):
+        """Tuple of integers for each edge that denotes the type of edge.
+
+        0 denotes a naked edge, 1 denotes an internal edge, and anything higher is a
+        non-manifold edge.
+        """
+        return self._edge_types
+
+    @property
+    def edge_information(self):
+        """Dictionary with keys: 'edge_indices', 'edge_types' and corresponding properties.
+        """
+        return {'edge_indices': self._edge_indices, 'edge_types': self._edge_types}
+
+    @property
+    def area(self):
+        """The total surface area of the polyface."""
+        if self._area is None:
+            self._area = sum([face.area for face in self.faces])
+        return self._area
+
+    @property
+    def volume(self):
+        """The volume enclosed by the polyface.
+
+        Note that, if this polyface is not solid, the volume will always be 0.
+        """
+        if self._volume is None:
+            if self._is_solid:
+                # formula taken from https://en.wikipedia.org/wiki/Polyhedron#Volume
+                _v = 0
+                for i, face in enumerate(self.faces):
+                    _v += face[0].dot(face.normal) * face.area
+                self._volume = _v / 3
+            else:
+                self._volume = 0
+        return self._volume
+
+    @property
+    def is_solid(self):
+        """A boolean to note whether the polyface is solid (True) or is open (False).
+
+        Note that all solid polyface objects will have faces pointing outwards.
+        """
+        return self._is_solid
+
+    def merge_overlapping_edges(self, tolerance, angle_tolerance):
+        """Get this object with overlapping naked edges merged into single internal edges.
+
+        This can be used to determine if a polyface is truly solid.
+        The default test of edge contiions that runs upon creation of a polyface does
+        not check for cases where overlapping colinear edges could be considered
+        a single internal edge such as the case below:
+                             |           1          |
+                            A|______________________|C
+                             |          B|          |
+                             |           |          |
+                             |     2     |     3    |
+        If Face 1 only has edge AC and not two separate edges for AB and BC, the
+        creation of the polyface will yield naked edges for AC, AB, and BC, meaning
+        the shape would not be considered solid when it might actually be so. This
+        merge_overlapping_edges method overcomes this by replacing the entire set
+        of 3 naked edges above a single internal edge running from A to C.
+
+        Args:
+            tolerance: The minimum distance between a vertex and the boundary segments
+                at which point the vertex is considered colinear.
+            angle_tolerance: The max angle in radians that the direction between
+                this object and another can vary for them to be considered
+                parallel.
+        """
+        # get naked edges
+        naked_edges = list(self.naked_edges)
+        if len(naked_edges) == 0:
+            return self
+
+        # establish lists that will be iteratively edited
+        remove_i = []
+        add_edges = []
+        naked_edge_i = []
+        naked_edge_ind = []
+        for i, x in enumerate(self.edge_types):
+            if x == 0:
+                naked_edge_i.append(i)
+                naked_edge_ind.append(self._edge_indices[i])
+
+        while len(naked_edge_i) > 1:
+            # get all of the edges that are colinear with the first edge
+            coll_edges = list(naked_edge_ind[0])
+            coll_i = [naked_edge_i[0]]
+            kept_i = []
+            for edge, ind, nei, i in zip(
+                    naked_edges[1:], naked_edge_ind[1:], naked_edge_i[1:],
+                    xrange(1, len(naked_edges))):
+                if edge.is_colinear(naked_edges[0], tolerance, angle_tolerance):
+                    coll_edges.extend(ind)
+                    coll_i.append(nei)
+                else:
+                    kept_i.append(i)
+
+            # determine if  colinear edges create a full double line along the edge
+            if len(coll_edges) == 1:
+                overlapping = False
+            else:
+                final_vi = []
+                coll_edges.sort()
+                overlapping = True
+                for i in range(0, len(coll_edges), 2):
+                    final_vi.append(coll_edges[i])
+                    if not coll_edges[i] == coll_edges[i + 1]:
+                        overlapping = False
+                        break
+
+            # if fully overlapping edges have been found, remake them into one
+            if overlapping is True:
+                remove_i.extend(coll_i)  # remove overlapping edges from the list
+                verts = [self.vertices[j] for j in final_vi]
+                dir_vec = verts[0] - verts[1]
+                if dir_vec.x != 0:
+                    vert_coor = [v.x for v in verts]
+                elif dir_vec.y != 0:
+                    vert_coor = [v.y for v in verts]
+                else:
+                    vert_coor = [v.z for v in verts]
+                vert_coor, final_vi = zip(*sorted(zip(vert_coor, final_vi)))
+                add_edges.append((final_vi[0], final_vi[-1]))
+
+            # delete the colinear vertices that have been accounted for
+            naked_edges = [naked_edges[i] for i in kept_i]
+            naked_edge_ind = [naked_edge_ind[i] for i in kept_i]
+            naked_edge_i = [naked_edge_i[i] for i in kept_i]
+
+        # create the new edge information and the new polyface
+        new_edge_indices = list(self.edge_indices)
+        new_edge_types = list(self.edge_types)
+        add_i = []
+        for i in range(len(new_edge_indices)):
+            if i not in remove_i:
+                add_i.append(i)
+        new_edge_indices = [new_edge_indices[i] for i in add_i]
+        new_edge_types = [new_edge_types[i] for i in add_i]
+        for new_edge in add_edges:
+            new_edge_indices.append(new_edge)
+            new_edge_types.append(1)
+        return Polyface3D(self._vertices, self._face_indices,
+                          {'edge_indices': new_edge_indices,
+                           'edge_types': new_edge_types})
+
+    def move(self, moving_vec):
+        """Get a polyface that has been moved along a vector.
+
+        Args:
+            moving_vec: A Vector3D with the direction and distance to move the polyface.
+        """
+        _verts = tuple(pt.move(moving_vec) for pt in self.vertices)
+        _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
+        if self._faces is not None:
+            _new_pface._faces = tuple(face.move(moving_vec) for face in self._faces)
+        _new_pface._volume = self._volume
+        return _new_pface
+
+    def rotate(self, axis, angle, origin):
+        """Rotate a polyface by a certain angle around an axis and origin.
+
+        Right hand rule applies:
+        If axis has a positive orientation, rotation will be clockwise.
+        If axis has a negative orientation, rotation will be counterclockwise.
+
+        Args:
+            axis: A Vector3D axis representing the axis of rotation.
+            angle: An angle for rotation in radians.
+            origin: A Point3D for the origin around which the object will be rotated.
+        """
+        _verts = tuple(pt.rotate(axis, angle, origin) for pt in self.vertices)
+        _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
+        if self._faces is not None:
+            _new_pface._faces = tuple(face.rotate(axis, angle, origin)
+                                      for face in self._faces)
+        _new_pface._volume = self._volume
+        return _new_pface
+
+    def rotate_xy(self, angle, origin):
+        """Get a polyface rotated counterclockwise in the world XY plane by an angle.
+
+        Args:
+            angle: An angle in radians.
+            origin: A Point3D for the origin around which the object will be rotated.
+        """
+        _verts = tuple(pt.rotate_xy(angle, origin) for pt in self.vertices)
+        _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
+        if self._faces is not None:
+            _new_pface._faces = tuple(face.rotate_xy(angle, origin)
+                                      for face in self._faces)
+        _new_pface._volume = self._volume
+        return _new_pface
+
+    def reflect(self, normal, origin):
+        """Get a polyface reflected across a plane with the input normal vector and origin.
+
+        Args:
+            normal: A Vector3D representing the normal vector for the plane across
+                which the polyface will be reflected. THIS VECTOR MUST BE NORMALIZED.
+            origin: A Point3D representing the origin from which to reflect.
+        """
+        _verts = tuple(pt.reflect(normal, origin) for pt in self.vertices)
+        _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
+        if self._faces is not None:
+            _new_pface._faces = tuple(face.reflect(normal, origin)
+                                      for face in self._faces)
+        _new_pface._volume = self._volume
+        return _new_pface
+
+    def scale(self, factor, origin=None):
+        """Scale a polyface by a factor from an origin point.
+
+        Args:
+            factor: A number representing how much the polyface should be scaled.
+            origin: A Point3D representing the origin from which to scale.
+                If None, it will be scaled from the World origin (0, 0, 0).
+        """
+        if origin is None:
+            _verts = tuple(Point3D(pt.x * factor, pt.y * factor, pt.z * factor)
+                           for pt in self._vertices)
+        else:
+            _verts = tuple(pt.scale(factor, origin) for pt in self.vertices)
+        _new_pface = Polyface3D(_verts, self.face_indices, self.edge_information)
+        if self._faces is not None:
+            _new_pface._faces = tuple(face.scale(factor, origin)
+                                      for face in self._faces)
+        _new_pface._volume = self._volume * factor ** 3 \
+            if self._volume is not None else None
+        return _new_pface
+
+    def is_point_inside(self, point, test_vector=Vector3D(1, 0, 0)):
+        """Test whether a Point3D lies inside or outside the polyface.
+
+        Note that, if this polyface is not solid, the result will always be False.
+
+        Args:
+            point: A Point3D for which the inside/outside relationship will be tested.
+            test_vector: Optional vector to set the direction in which intersections
+                with the polyface faces will be evaluated to determine if the
+                point is inside. Default is the X-unit vector.
+
+        Returns:
+            A boolean denoting whether the point lies inside (True) or outside (False).
+        """
+        if not self.is_solid:
+            return False
+        test_ray = Ray3D(point, test_vector)
+        n_int = 0
+        for _f in self.faces:
+            if _f.intersect_line_ray(test_ray):
+                n_int += 1
+        if n_int % 2 == 0:
+            return False
+        return True
+
+    def does_intersect_line_ray_exist(self, line_ray):
+        """Boolean denoting whether an intersection exists between the input Line3D or Ray3D.
+
+        Args:
+            line_ray: A Line3D or Ray3D object for which intersection will be evaluated.
+
+        Returns:
+            True if an intersection exists. False if it does not exist.
+        """
+        for face in self.faces:
+            _int = face.intersect_line_ray(line_ray)
+            if _int is not None:
+                return True
+        return False
+
+    def intersect_line_ray(self, line_ray):
+        """Get the intersections between this polyface and the input Line3D or Ray3D.
+
+        Args:
+            line_ray: A Line3D or Ray3D object for which intersection will be computed.
+
+        Returns:
+            A list of Point3D for the intersection. Will be an empty list if no
+            intersection exists.
+        """
+        _inters = []
+        for face in self.faces:
+            _int = face.intersect_line_ray(line_ray)
+            if _int is not None:
+                _inters.append(_int)
+        return _inters
+
+    def intersect_plane(self, plane):
+        """Get the intersection between this polyface and the input plane.
+
+        Args:
+            plane: A Plane object for which intersection will be computed.
+
+        Returns:
+            List of LineSegment3D objects for the intersection.
+            Will be an empty list if no intersection exists.
+        """
+        _inters = []
+        for face in self.faces:
+            _int = face.intersect_plane(plane)
+            if _int is not None:
+                _inters.extend(_int)
+        return _inters
+
+    def _get_edge_type(self, edge_type):
+        """Get all of the edges of a certain type in this polyface."""
+        if self._edges is None:
+            self.edges
+        sel_edges = []
+        for i, type in enumerate(self._edge_types):
+            if type == edge_type:
+                sel_edges.append(self._edges[i])
+        return tuple(sel_edges)
+
+    @staticmethod
+    def _verts_faces_edges_from_boundary(cclock_verts, extru_vec, st_i=0):
+        verts = list(cclock_verts) + [pt.move(extru_vec) for pt in cclock_verts]
+        len_faces = len(cclock_verts)
+        faces_ind = []
+        for i in xrange(st_i, len_faces - 1):
+            faces_ind.append((i, i + 1, i + len_faces + 1, i + len_faces))
+        faces_ind.append((st_i + len_faces - 1, st_i,
+                          st_i + len_faces, st_i + len_faces * 2 - 1))
+        edge_i1 = [(st_i + i, st_i + i + 1) for i in xrange(len_faces - 1)]
+        edge_i2 = [(st_i + i, st_i + i + len_faces) for i in xrange(len_faces)]
+        edge_i3 = [(st_i + len_faces + i, st_i + len_faces + i + 1)
+                   for i in xrange(len_faces - 1)]
+        edge_indices = edge_i1 + [(st_i + len_faces - 1, st_i)] + edge_i2 + edge_i3 + \
+            [(st_i + len_faces * 2 - 1, st_i + len_faces)]
+        return verts, faces_ind, edge_indices
+
+    @staticmethod
+    def _correct_face_direction(faces):
+        """Correct the direction that Face3D are pointing when the polyface is solid."""
+        final_faces = []
+        for i, face in enumerate(faces):
+            # construct a ray with the face normal and a point on the face
+            move_vec = (face.center - face[0]) * 0.000001
+            point_on_face = face[0] + move_vec
+            test_ray = Ray3D(point_on_face, face.normal)
+
+            # if the ray intersects with an even number of other faces, it is correct
+            n_int = 0
+            for _f in faces[i + 1:]:
+                if _f.intersect_line_ray(test_ray):
+                    n_int += 1
+            for _f in faces[:i]:
+                if _f.intersect_line_ray(test_ray):
+                    n_int += 1
+            if n_int % 2 == 0:
+                final_faces.append(face)
+            else:
+                final_faces.append(face.flip())
+        return tuple(final_faces)
+
+    def __copy__(self):
+        _new_poly = Polyface3D(self.vertices, self.face_indices, self.edge_information)
+        _new_poly._faces = self._faces
+        return _new_poly
+
+    def __repr__(self):
+        return 'Polyface3D ({} faces) ({} vertices)'.format(
+            len(self.faces), len(self))
