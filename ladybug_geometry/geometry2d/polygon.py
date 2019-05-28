@@ -27,6 +27,7 @@ class Polygon2D(Base2DIn2D):
         is_clockwise
         is_convex
         is_self_intersecting
+        is_valid
     """
     __slots__ = ('_vertices', '_segments', '_triangulated_mesh',
                  '_min', '_max', '_center', '_perimeter', '_area',
@@ -291,8 +292,19 @@ class Polygon2D(Base2DIn2D):
                         break
         return self._is_self_intersecting
 
+    @property
+    def is_valid(self):
+        """Boolean noting whether the polygon is valid (having a non-zero area).
+
+        Note that polygons are still considered valid if they have self-intersecting
+        edges, or duplicate/colinear vertices. The s_self_intersecting property
+        identifies self-intersecting edges, and the remove_colinear_vertices method
+        will remove duplicate/colinear vertices.
+        """
+        return not self.area == 0
+
     def remove_colinear_vertices(self, tolerance):
-        """Get a version of this polygon with colinear vertices removed.
+        """Get a version of this polygon without colinear or duplicate vertices.
 
         Args:
             tolerance: The minimum distance that a vertex can be from a line
