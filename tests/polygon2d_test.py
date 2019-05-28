@@ -168,6 +168,16 @@ class Polygon2DTestCase(unittest.TestCase):
         assert polygon_1.is_self_intersecting is False
         assert polygon_2.is_self_intersecting is True
 
+    def test_is_valid(self):
+        """Test the is_valid property."""
+        pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2))
+        pts_2 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 0))
+        polygon_1 = Polygon2D(pts_1)
+        polygon_2 = Polygon2D(pts_2)
+
+        assert polygon_1.is_valid is True
+        assert polygon_2.is_valid is False
+
     def test_min_max_center(self):
         """Test the Polygon2D min, max and center."""
         pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
