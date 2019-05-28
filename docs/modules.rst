@@ -4,4 +4,4 @@ ladybug-geometry
 .. toctree::
    :maxdepth: 4
 
-   ladybug-geometry
+   ladybug_geometry
