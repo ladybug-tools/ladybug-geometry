@@ -371,6 +371,17 @@ class Face3DTestCase(unittest.TestCase):
         assert face_3.is_self_intersecting is False
         assert face_4.is_self_intersecting is True
 
+    def test_is_valid(self):
+        """Test the is_valid property."""
+        plane_1 = Plane(Vector3D(0, 0, 1))
+        pts_1 = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 2))
+        pts_2 = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 0))
+        face_1 = Face3D(pts_1, plane_1)
+        face_2 = Face3D(pts_2, plane_1)
+
+        assert face_1.is_valid is True
+        assert face_2.is_valid is False
+
     def test_min_max_center(self):
         """Test the Face3D min, max and center."""
         pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))

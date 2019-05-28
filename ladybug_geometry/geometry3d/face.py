@@ -45,6 +45,7 @@ class Face3D(Base2DIn3D):
         is_clockwise
         is_convex
         is_self_intersecting
+        is_valid
         has_holes
         upper_left_counter_clockwise_vertices
     """
@@ -458,6 +459,17 @@ class Face3D(Base2DIn3D):
         return self._is_self_intersecting
 
     @property
+    def is_valid(self):
+        """Boolean noting whether the face is valid (having a non-zero area).
+
+        Note that faces are still considered valid if they have out-of-plane vertices,
+        self-intersecting edges, or duplicate/colinear vertices. The validate_planarity
+        method can be used to detect if there are out-of-plane vertices. The
+        is_self_intersecting property identifies self-intersecting edges, and the
+        remove_colinear_vertices method will remove duplicate/colinear vertices."""
+        return not self.area == 0
+
+    @property
     def has_holes(self):
         """Boolean noting whether the face has holes within it."""
         return self._holes is not None
@@ -615,7 +627,7 @@ class Face3D(Base2DIn3D):
         return True
 
     def remove_colinear_vertices(self, tolerance):
-        """Get a version of this face with colinear vertices removed.
+        """Get a version of this face without colinear or duplicate vertices.
 
         Args:
             tolerance: The minimum distance between a vertex and the boundary segments
