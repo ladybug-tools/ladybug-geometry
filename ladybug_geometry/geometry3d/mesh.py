@@ -259,7 +259,7 @@ class Mesh3D(MeshBase, Base2DIn3D):
         https://en.wikipedia.org/wiki/Vertex_normal
         """
         # find shared faces for each vertices
-        mapper = [[] for v in range(len(self.vertices))]
+        mapper = [[] for v in xrange(len(self.vertices))]
         for c, face in enumerate(self.faces):
             for i in face:
                 mapper[i].append(c)
