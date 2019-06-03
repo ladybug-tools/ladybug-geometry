@@ -19,8 +19,8 @@ class Polyface3DTestCase(unittest.TestCase):
         """Test the initalization of Poyface3D and basic properties of solid objects."""
         pts = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0),
                Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2)]
-        face_indices = [(0, 1, 2, 3), (0, 4, 5, 1), (0, 3, 7, 4),
-                        (2, 1, 5, 6), (2, 3, 7, 6), (4, 5, 6, 7)]
+        face_indices = [[(0, 1, 2, 3)], [(0, 4, 5, 1)], [(0, 3, 7, 4)],
+                        [(2, 1, 5, 6)], [(2, 3, 7, 6)], [(4, 5, 6, 7)]]
         polyface = Polyface3D(pts, face_indices)
 
         assert len(polyface.vertices) == 8
@@ -48,8 +48,8 @@ class Polyface3DTestCase(unittest.TestCase):
         """Test the initalization of Poyface3D and basic properties of open objects."""
         pts = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0),
                Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2)]
-        face_indices = [(0, 1, 2, 3), (0, 4, 5, 1), (0, 3, 7, 4),
-                        (2, 1, 5, 6), (2, 3, 7, 6)]
+        face_indices = [[(0, 1, 2, 3)], [(0, 4, 5, 1)], [(0, 3, 7, 4)],
+                        [(2, 1, 5, 6)], [(2, 3, 7, 6)]]
         polyface = Polyface3D(pts, face_indices)
 
         assert len(polyface.vertices) == 8
@@ -67,58 +67,6 @@ class Polyface3DTestCase(unittest.TestCase):
         for face in polyface.faces:
             assert face.area == 4
 
-    def test_polyface3d_to_from_dict(self):
-        """Test the to/from dict of Polyface3D objects."""
-        polyface = Polyface3D.from_box(2, 4, 2)
-
-        polyface_dict = polyface.to_dict()
-        new_polyface = Polyface3D.from_dict(polyface_dict)
-        assert isinstance(new_polyface, Polyface3D)
-        assert new_polyface.to_dict() == polyface_dict
-
-        assert len(new_polyface.vertices) == 8
-        assert len(new_polyface.face_indices) == 6
-        assert len(new_polyface.faces) == 6
-        assert len(new_polyface.edge_indices) == 12
-        assert len(new_polyface.edges) == 12
-        assert len(new_polyface.naked_edges) == 0
-        assert len(new_polyface.non_manifold_edges) == 0
-        assert len(new_polyface.internal_edges) == 12
-        assert new_polyface.area == 40
-        assert new_polyface.volume == 16
-        assert new_polyface.is_solid
-
-    def test_polyface3d_to_from_dict_with_overlap(self):
-        """Test the to/from dict of Polyface3D objects with overlapping edges."""
-        pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
-        pts_2 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(0, 2, 0)]
-        pts_3 = [Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(0, 0, 2)]
-        pts_4 = [Point3D(2, 2, 0), Point3D(0, 2, 0), Point3D(0, 2, 2), Point3D(2, 2, 2)]
-        pts_5 = [Point3D(2, 2, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(2, 2, 2)]
-        pts_6 = [Point3D(0, 0, 2), Point3D(0, 1, 2), Point3D(2, 1, 2), Point3D(2, 0, 2)]
-        pts_7 = [Point3D(0, 1, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 1, 2)]
-        face_1 = Face3D.from_vertices(pts_1)
-        face_2 = Face3D.from_vertices(pts_2)
-        face_3 = Face3D.from_vertices(pts_3)
-        face_4 = Face3D.from_vertices(pts_4)
-        face_5 = Face3D.from_vertices(pts_5)
-        face_6 = Face3D.from_vertices(pts_6)
-        face_7 = Face3D.from_vertices(pts_7)
-        polyface = Polyface3D.from_faces(
-            [face_1, face_2, face_3, face_4, face_5, face_6, face_7])
-        new_polyface = polyface.merge_overlapping_edges(0.0001, 0.0001)
-        assert new_polyface.is_solid
-        assert len(new_polyface.naked_edges) == 0
-        assert len(new_polyface.internal_edges) == 13
-
-        polyface_dict = new_polyface.to_dict()
-        dict_polyface = Polyface3D.from_dict(polyface_dict)
-        assert isinstance(dict_polyface, Polyface3D)
-        assert dict_polyface.to_dict() == polyface_dict
-        assert dict_polyface.is_solid
-        assert len(dict_polyface.naked_edges) == 0
-        assert len(dict_polyface.internal_edges) == 13
-
     def test_polyface3d_init_from_faces_solid(self):
         """Test the initalization of Poyface3D from_faces with a solid."""
         pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
@@ -127,12 +75,12 @@ class Polyface3DTestCase(unittest.TestCase):
         pts_4 = [Point3D(2, 2, 0), Point3D(0, 2, 0), Point3D(0, 2, 2), Point3D(2, 2, 2)]
         pts_5 = [Point3D(2, 2, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(2, 2, 2)]
         pts_6 = [Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2)]
-        face_1 = Face3D.from_vertices(pts_1)
-        face_2 = Face3D.from_vertices(pts_2)
-        face_3 = Face3D.from_vertices(pts_3)
-        face_4 = Face3D.from_vertices(pts_4)
-        face_5 = Face3D.from_vertices(pts_5)
-        face_6 = Face3D.from_vertices(pts_6)
+        face_1 = Face3D(pts_1)
+        face_2 = Face3D(pts_2)
+        face_3 = Face3D(pts_3)
+        face_4 = Face3D(pts_4)
+        face_5 = Face3D(pts_5)
+        face_6 = Face3D(pts_6)
         polyface = Polyface3D.from_faces(
             [face_1, face_2, face_3, face_4, face_5, face_6])
 
@@ -164,11 +112,11 @@ class Polyface3DTestCase(unittest.TestCase):
         pts_3 = [Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(0, 0, 2)]
         pts_4 = [Point3D(2, 2, 0), Point3D(0, 2, 0), Point3D(0, 2, 2), Point3D(2, 2, 2)]
         pts_5 = [Point3D(2, 2, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(2, 2, 2)]
-        face_1 = Face3D.from_vertices(pts_1)
-        face_2 = Face3D.from_vertices(pts_2)
-        face_3 = Face3D.from_vertices(pts_3)
-        face_4 = Face3D.from_vertices(pts_4)
-        face_5 = Face3D.from_vertices(pts_5)
+        face_1 = Face3D(pts_1)
+        face_2 = Face3D(pts_2)
+        face_3 = Face3D(pts_3)
+        face_4 = Face3D(pts_4)
+        face_5 = Face3D(pts_5)
         polyface = Polyface3D.from_faces([face_1, face_2, face_3, face_4, face_5])
 
         assert len(polyface.vertices) == 8
@@ -197,13 +145,13 @@ class Polyface3DTestCase(unittest.TestCase):
         pts_5 = [Point3D(2, 2, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(2, 2, 2)]
         pts_6 = [Point3D(0, 0, 2), Point3D(0, 1, 2), Point3D(2, 1, 2), Point3D(2, 0, 2)]
         pts_7 = [Point3D(0, 1, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 1, 2)]
-        face_1 = Face3D.from_vertices(pts_1)
-        face_2 = Face3D.from_vertices(pts_2)
-        face_3 = Face3D.from_vertices(pts_3)
-        face_4 = Face3D.from_vertices(pts_4)
-        face_5 = Face3D.from_vertices(pts_5)
-        face_6 = Face3D.from_vertices(pts_6)
-        face_7 = Face3D.from_vertices(pts_7)
+        face_1 = Face3D(pts_1)
+        face_2 = Face3D(pts_2)
+        face_3 = Face3D(pts_3)
+        face_4 = Face3D(pts_4)
+        face_5 = Face3D(pts_5)
+        face_6 = Face3D(pts_6)
+        face_7 = Face3D(pts_7)
         polyface = Polyface3D.from_faces(
             [face_1, face_2, face_3, face_4, face_5, face_6, face_7])
         polyface_2 = Polyface3D.from_faces(
@@ -233,14 +181,14 @@ class Polyface3DTestCase(unittest.TestCase):
         pts_6 = [Point3D(0, 0, 2), Point3D(0, 0.5, 2), Point3D(2, 0.5, 2), Point3D(2, 0, 2)]
         pts_7 = [Point3D(0, 0.5, 2), Point3D(0, 1, 2), Point3D(2, 1, 2), Point3D(2, 0.5, 2)]
         pts_8 = [Point3D(0, 1, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 1, 2)]
-        face_1 = Face3D.from_vertices(pts_1)
-        face_2 = Face3D.from_vertices(pts_2)
-        face_3 = Face3D.from_vertices(pts_3)
-        face_4 = Face3D.from_vertices(pts_4)
-        face_5 = Face3D.from_vertices(pts_5)
-        face_6 = Face3D.from_vertices(pts_6)
-        face_7 = Face3D.from_vertices(pts_7)
-        face_8 = Face3D.from_vertices(pts_8)
+        face_1 = Face3D(pts_1)
+        face_2 = Face3D(pts_2)
+        face_3 = Face3D(pts_3)
+        face_4 = Face3D(pts_4)
+        face_5 = Face3D(pts_5)
+        face_6 = Face3D(pts_6)
+        face_7 = Face3D(pts_7)
+        face_8 = Face3D(pts_8)
         polyface = Polyface3D.from_faces(
             [face_1, face_2, face_3, face_4, face_5, face_6, face_7, face_8])
         polyface_2 = Polyface3D.from_faces(
@@ -267,13 +215,13 @@ class Polyface3DTestCase(unittest.TestCase):
         pts_5 = [Point3D(2, 2, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(2, 2, 2)]
         pts_6 = [Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2)]
         pts_7 = [Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2.0001)]
-        face_1 = Face3D.from_vertices(pts_1)
-        face_2 = Face3D.from_vertices(pts_2)
-        face_3 = Face3D.from_vertices(pts_3)
-        face_4 = Face3D.from_vertices(pts_4)
-        face_5 = Face3D.from_vertices(pts_5)
-        face_6 = Face3D.from_vertices(pts_6)
-        face_7 = Face3D.from_vertices(pts_7)
+        face_1 = Face3D(pts_1)
+        face_2 = Face3D(pts_2)
+        face_3 = Face3D(pts_3)
+        face_4 = Face3D(pts_4)
+        face_5 = Face3D(pts_5)
+        face_6 = Face3D(pts_6)
+        face_7 = Face3D(pts_7)
         polyface_1 = Polyface3D.from_faces_tolerance(
             [face_1, face_2, face_3, face_4, face_5, face_6], 0.001)
         polyface_2 = Polyface3D.from_faces_tolerance(
@@ -325,6 +273,8 @@ class Polyface3DTestCase(unittest.TestCase):
 
         assert polyface.faces[0].normal.z == pytest.approx(-1, rel=1e-3)
         assert polyface.faces[-1].normal.z == pytest.approx(1, rel=1e-3)
+        for face in polyface.faces:
+            assert not face.is_clockwise
 
     def test_polyface3d_init_from_offset_face_hexagon(self):
         """Test the initalization of Poyface3D from_offset_face."""
@@ -345,15 +295,19 @@ class Polyface3DTestCase(unittest.TestCase):
 
         assert polyface.faces[0].normal.z == pytest.approx(-1, rel=1e-3)
         assert polyface.faces[-1].normal.z == pytest.approx(1, rel=1e-3)
+        for face in polyface.faces:
+            assert not face.is_clockwise
 
     def test_polyface3d_init_from_offset_face_hole(self):
         """Test the initalization of Poyface3D from_offset_face for a face witha hole."""
         bound_pts = [Point3D(0, 0), Point3D(3, 0), Point3D(3, 3), Point3D(0, 3)]
         hole_pts = [Point3D(1, 1), Point3D(2, 1), Point3D(2, 2), Point3D(1, 2)]
-        face = Face3D.from_shape_with_holes(bound_pts, [hole_pts])
+        face = Face3D(bound_pts, None, [hole_pts])
+
         polyface = Polyface3D.from_offset_face(face, 1)
 
         assert len(polyface.vertices) == 16
+
         assert len(polyface.face_indices) == 10
         assert len(polyface.faces) == 10
         assert len(polyface.edge_indices) == 24
@@ -361,7 +315,7 @@ class Polyface3DTestCase(unittest.TestCase):
         assert len(polyface.naked_edges) == 0
         assert len(polyface.non_manifold_edges) == 0
         assert len(polyface.internal_edges) == 24
-        assert polyface.area == pytest.approx(40, rel=1e-3)
+        assert polyface.area == pytest.approx(32, rel=1e-3)
         assert polyface.volume == pytest.approx(8, rel=1e-3)
         assert polyface.is_solid
 
@@ -371,6 +325,87 @@ class Polyface3DTestCase(unittest.TestCase):
         assert polyface.faces[-1].has_holes
         for face in polyface.faces:
             assert not face.is_clockwise
+
+    def test_polyface3d_to_from_dict(self):
+        """Test the to/from dict of Polyface3D objects."""
+        polyface = Polyface3D.from_box(2, 4, 2)
+
+        polyface_dict = polyface.to_dict()
+        new_polyface = Polyface3D.from_dict(polyface_dict)
+        assert isinstance(new_polyface, Polyface3D)
+        assert new_polyface.to_dict() == polyface_dict
+
+        assert len(new_polyface.vertices) == 8
+        assert len(new_polyface.face_indices) == 6
+        assert len(new_polyface.faces) == 6
+        assert len(new_polyface.edge_indices) == 12
+        assert len(new_polyface.edges) == 12
+        assert len(new_polyface.naked_edges) == 0
+        assert len(new_polyface.non_manifold_edges) == 0
+        assert len(new_polyface.internal_edges) == 12
+        assert new_polyface.area == 40
+        assert new_polyface.volume == 16
+        assert new_polyface.is_solid
+
+    def test_polyface3d_to_from_dict_hole(self):
+        """Test the to/from dict of Polyface3D objects with a hole."""
+        bound_pts = [Point3D(0, 0), Point3D(3, 0), Point3D(3, 3), Point3D(0, 3)]
+        hole_pts = [Point3D(1, 1), Point3D(2, 1), Point3D(2, 2), Point3D(1, 2)]
+        face = Face3D(bound_pts, None, [hole_pts])
+        polyface = Polyface3D.from_offset_face(face, 1)
+
+        polyface_dict = polyface.to_dict()
+        new_polyface = Polyface3D.from_dict(polyface_dict)
+
+        assert len(new_polyface.vertices) == 16
+        assert len(new_polyface.face_indices) == 10
+        assert len(new_polyface.faces) == 10
+        assert len(new_polyface.edge_indices) == 24
+        assert len(new_polyface.edges) == 24
+        assert len(new_polyface.naked_edges) == 0
+        assert len(new_polyface.non_manifold_edges) == 0
+        assert len(new_polyface.internal_edges) == 24
+        assert new_polyface.area == pytest.approx(32, rel=1e-3)
+        assert new_polyface.volume == pytest.approx(8, rel=1e-3)
+        assert new_polyface.is_solid
+
+        assert new_polyface.faces[0].normal.z == pytest.approx(-1, rel=1e-3)
+        assert new_polyface.faces[-1].normal.z == pytest.approx(1, rel=1e-3)
+        assert new_polyface.faces[0].has_holes
+        assert new_polyface.faces[-1].has_holes
+        for face in polyface.faces:
+            assert not face.is_clockwise
+
+    def test_polyface3d_to_from_dict_with_overlap(self):
+        """Test the to/from dict of Polyface3D objects with overlapping edges."""
+        pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
+        pts_2 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(0, 2, 0)]
+        pts_3 = [Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(0, 0, 2)]
+        pts_4 = [Point3D(2, 2, 0), Point3D(0, 2, 0), Point3D(0, 2, 2), Point3D(2, 2, 2)]
+        pts_5 = [Point3D(2, 2, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(2, 2, 2)]
+        pts_6 = [Point3D(0, 0, 2), Point3D(0, 1, 2), Point3D(2, 1, 2), Point3D(2, 0, 2)]
+        pts_7 = [Point3D(0, 1, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 1, 2)]
+        face_1 = Face3D(pts_1)
+        face_2 = Face3D(pts_2)
+        face_3 = Face3D(pts_3)
+        face_4 = Face3D(pts_4)
+        face_5 = Face3D(pts_5)
+        face_6 = Face3D(pts_6)
+        face_7 = Face3D(pts_7)
+        polyface = Polyface3D.from_faces(
+            [face_1, face_2, face_3, face_4, face_5, face_6, face_7])
+        new_polyface = polyface.merge_overlapping_edges(0.0001, 0.0001)
+        assert new_polyface.is_solid
+        assert len(new_polyface.naked_edges) == 0
+        assert len(new_polyface.internal_edges) == 13
+
+        polyface_dict = new_polyface.to_dict()
+        dict_polyface = Polyface3D.from_dict(polyface_dict)
+        assert isinstance(dict_polyface, Polyface3D)
+        assert dict_polyface.to_dict() == polyface_dict
+        assert dict_polyface.is_solid
+        assert len(dict_polyface.naked_edges) == 0
+        assert len(dict_polyface.internal_edges) == 13
 
     def test_is_solid_with_hole(self):
         """Test the is_solid property for a polyface with a hole.
@@ -391,18 +426,18 @@ class Polyface3DTestCase(unittest.TestCase):
         pts_11 = [Point3D(3, 3, 1), Point3D(3, 1, 1), Point3D(4, 0, 2), Point3D(4, 4, 2)]
         pts_12 = [Point3D(1, 3, 1), Point3D(3, 3, 1), Point3D(4, 4, 2), Point3D(0, 4, 2)]
 
-        face_1 = Face3D.from_vertices(pts_1)
-        face_2 = Face3D.from_vertices(pts_2)
-        face_3 = Face3D.from_vertices(pts_3)
-        face_4 = Face3D.from_vertices(pts_4)
-        face_5 = Face3D.from_vertices(pts_5)
-        face_6 = Face3D.from_vertices(pts_6)
-        face_7 = Face3D.from_vertices(pts_7)
-        face_8 = Face3D.from_vertices(pts_8)
-        face_9 = Face3D.from_vertices(pts_9)
-        face_10 = Face3D.from_vertices(pts_10)
-        face_11 = Face3D.from_vertices(pts_11)
-        face_12 = Face3D.from_vertices(pts_12)
+        face_1 = Face3D(pts_1)
+        face_2 = Face3D(pts_2)
+        face_3 = Face3D(pts_3)
+        face_4 = Face3D(pts_4)
+        face_5 = Face3D(pts_5)
+        face_6 = Face3D(pts_6)
+        face_7 = Face3D(pts_7)
+        face_8 = Face3D(pts_8)
+        face_9 = Face3D(pts_9)
+        face_10 = Face3D(pts_10)
+        face_11 = Face3D(pts_11)
+        face_12 = Face3D(pts_12)
         polyface = Polyface3D.from_faces([face_1, face_2, face_3, face_4, face_5,
                                           face_6, face_7, face_8, face_9, face_10,
                                           face_11, face_12])
@@ -624,8 +659,8 @@ class Polyface3DTestCase(unittest.TestCase):
         """Test the is_point_inside method."""
         pts = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0),
                Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2)]
-        face_indices = [(0, 1, 2, 3), (0, 4, 5, 1), (0, 3, 7, 4),
-                        (2, 1, 5, 6), (2, 3, 7, 6), (4, 5, 6, 7)]
+        face_indices = [[(0, 1, 2, 3)], [(0, 4, 5, 1)], [(0, 3, 7, 4)],
+                        [(2, 1, 5, 6)], [(2, 3, 7, 6)], [(4, 5, 6, 7)]]
         polyface = Polyface3D(pts, face_indices)
 
         assert polyface.is_point_inside(Point3D(1, 1, 1)) is True

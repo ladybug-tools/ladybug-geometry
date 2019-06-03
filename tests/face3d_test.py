@@ -60,7 +60,7 @@ class Face3DTestCase(unittest.TestCase):
 
         bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
         hole_pts = [Point3D(1, 1), Point3D(3, 1), Point3D(3, 3), Point3D(1, 3)]
-        face = Face3D.from_shape_with_holes(bound_pts, [hole_pts])
+        face = Face3D(bound_pts, None, [hole_pts])
         face_dict = face.to_dict()
         new_face = Face3D.from_dict(face_dict)
         assert isinstance(new_face, Face3D)
@@ -69,7 +69,7 @@ class Face3DTestCase(unittest.TestCase):
     def test_face3d_init_from_vertices(self):
         """Test the initalization of Face3D objects from_vertices."""
         pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
-        face = Face3D.from_vertices(pts)
+        face = Face3D(pts)
 
         assert isinstance(face.plane, Plane)
         assert face.plane.n == Vector3D(0, 0, -1)
@@ -196,7 +196,7 @@ class Face3DTestCase(unittest.TestCase):
         """Test the initalization of Face3D from_shape_with_holes with one hole."""
         bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
         hole_pts = [Point3D(1, 1), Point3D(3, 1), Point3D(3, 3), Point3D(1, 3)]
-        face = Face3D.from_shape_with_holes(bound_pts, [hole_pts])
+        face = Face3D(bound_pts, None, [hole_pts])
 
         assert face.plane.n == Vector3D(0, 0, 1)
         assert face.plane.n == face.normal
@@ -229,7 +229,7 @@ class Face3DTestCase(unittest.TestCase):
         bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
         hole_pts_1 = [Point3D(1, 1), Point3D(1.5, 1), Point3D(1.5, 1.5), Point3D(1, 1.5)]
         hole_pts_2 = [Point3D(2, 2), Point3D(3, 2), Point3D(3, 3), Point3D(2, 3)]
-        face = Face3D.from_shape_with_holes(bound_pts, [hole_pts_1, hole_pts_2])
+        face = Face3D(bound_pts, None, [hole_pts_1, hole_pts_2])
 
         assert face.plane.n == Vector3D(0, 0, 1)
         assert face.plane.n == face.normal
@@ -259,9 +259,9 @@ class Face3DTestCase(unittest.TestCase):
         bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
         hole_pts_1 = [Point3D(1, 1), Point3D(1.5, 1), Point3D(1.5, 1.5), Point3D(1, 1.5)]
         hole_pts_2 = [Point3D(2, 2), Point3D(3, 2), Point3D(3, 3), Point3D(2, 3)]
-        face_1 = Face3D.from_vertices(bound_pts)
-        face_2 = Face3D.from_shape_with_holes(bound_pts, [hole_pts_1])
-        sub_face = Face3D.from_vertices(hole_pts_2)
+        face_1 = Face3D(bound_pts)
+        face_2 = Face3D(bound_pts, None, [hole_pts_1])
+        sub_face = Face3D(hole_pts_2)
 
         face = Face3D.from_punched_geometry(face_1, [sub_face])
         assert isinstance(face.vertices, tuple)
@@ -431,21 +431,21 @@ class Face3DTestCase(unittest.TestCase):
         up_cclock_1 = face_1.upper_left_counter_clockwise_vertices
         assert up_cclock_1[0] == Point3D(2, 0, 2)
         assert face_1.is_clockwise is True
-        assert Face3D.from_vertices(up_cclock_1).is_clockwise is False
+        assert Face3D(up_cclock_1).is_clockwise is False
         up_cclock_2 = face_2.upper_left_counter_clockwise_vertices
         assert up_cclock_2[0] == Point3D(2, 0, 2)
         assert face_2.is_clockwise is False
-        assert not Face3D.from_vertices(up_cclock_2).is_clockwise
+        assert not Face3D(up_cclock_2).is_clockwise
         assert up_cclock_1 == up_cclock_2
 
         up_cclock_3 = face_3.upper_left_counter_clockwise_vertices
         assert up_cclock_3[0] == Point3D(0, 0, 2)
         assert face_3.is_clockwise is False
-        assert Face3D.from_vertices(up_cclock_3).is_clockwise is False
+        assert Face3D(up_cclock_3).is_clockwise is False
         up_cclock_4 = face_4.upper_left_counter_clockwise_vertices
         assert up_cclock_4[0] == Point3D(0, 0, 2)
         assert face_4.is_clockwise is True
-        assert Face3D.from_vertices(up_cclock_4).is_clockwise is False
+        assert Face3D(up_cclock_4).is_clockwise is False
 
     def test_upper_left_counter_clockwise_vertices_triangle(self):
         """Test the upper_left_counter_clockwise_vertices property with triangles."""
@@ -458,11 +458,11 @@ class Face3DTestCase(unittest.TestCase):
         up_cclock_1 = face_1.upper_left_counter_clockwise_vertices
         assert up_cclock_1[0] == Point3D(0, 0, 2)
         assert face_1.is_clockwise is True
-        assert Face3D.from_vertices(up_cclock_1).is_clockwise is False
+        assert Face3D(up_cclock_1).is_clockwise is False
         up_cclock_2 = face_2.upper_left_counter_clockwise_vertices
         assert up_cclock_2[0] == Point3D(0, 0, 2)
         assert face_2.is_clockwise is False
-        assert not Face3D.from_vertices(up_cclock_2).is_clockwise
+        assert not Face3D(up_cclock_2).is_clockwise
         assert up_cclock_1 == up_cclock_2
 
     def test_duplicate(self):

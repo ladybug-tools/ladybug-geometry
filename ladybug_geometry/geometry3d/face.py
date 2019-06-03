@@ -27,11 +27,13 @@ class Face3D(Base2DIn3D):
     Properties:
         vertices
         plane
-        polygon2d
-        triangulated_mesh2d
-        triangulated_mesh3d
         boundary
         holes
+        polygon2d
+        boundary_polygon2d
+        hole_polygon2d
+        triangulated_mesh2d
+        triangulated_mesh3d
         boundary_segments
         hole_segments
         normal
@@ -54,27 +56,58 @@ class Face3D(Base2DIn3D):
                  '_min', '_max', '_center', '_perimeter', '_area', '_centroid',
                  '_is_clockwise', '_is_convex', '_is_self_intersecting')
 
-    def __init__(self, vertices, plane):
+    def __init__(self, boundary, plane=None, holes=None):
         """Initilize Face3D.
 
         Args:
-            vertices: A list of Point3D objects representing the vertices of the face.
+            boundary: A list or tuple of Point3D objects representing the outer
+                boundary vertices of the face.
             plane: A Plane object indicating the plane in which the face exists.
+                If None, the Plane normal will automatically be calculated by
+                analyzing the first three boundary vertices and the origin of the
+                plane will be the first vertex of the input vertices.
+            holes: Optional list of lists with one list for each hole in the face.
+                Each hole should be a list of at least 3 Point3D objects.
+                If None, it will be assumed that there are no holes in the face.
+                The boundary and holes are stored as separate lists of Point3Ds on the
+                `boundary` and `holes` properties of this object. However, the
+                `vertices` property will always contain all vertices across the shape.
+                For a Face3D that has holes, it will trace out a single shape that
+                turns inwards from the boundary to cut out the holes.
         """
-        self._check_vertices_input(vertices)
-        assert isinstance(plane, Plane), 'Expected Plane for Face3D.' \
-            ' Got {}.'.format(type(plane))
+        # process the boundary and plane inputs
+        self._boundary = self._check_vertices_input(boundary)
+        if plane is not None:
+            assert isinstance(plane, Plane), 'Expected Plane for Face3D.' \
+                ' Got {}.'.format(type(plane))
+        else:
+            plane = self._plane_from_vertices(boundary)
         self._plane = plane
 
-        self._polygon2d = None
+        # process boundary and holes input
+        if holes is None:
+            self._holes = None
+            self._vertices = self._boundary
+            self._polygon2d = None
+        else:
+            assert isinstance(holes, (tuple, list)), \
+                'holes should be a tuple or list. Got {}'.format(type(holes))
+            self._holes = tuple(
+                self._check_vertices_input(hole, 'hole') for hole in holes)
+            # create a Polygon2D from the vertices
+            _boundary2d = [plane.xyz_to_xy(_v) for _v in boundary]
+            _holes2d = [[plane.xyz_to_xy(_v) for _v in hole] for hole in holes]
+            _polygon2d = Polygon2D.from_shape_with_holes(_boundary2d, _holes2d)
+            # convert Polygon2D vertices to 3D to become the vertices of the face.
+            self._vertices = tuple(plane.xy_to_xyz(_v) for _v in _polygon2d.vertices)
+            self._polygon2d = _polygon2d
+
         self._mesh2d = None
         self._mesh3d = None
-        self._boundary = self._vertices
-        self._holes = None
-        self._boundary_segments = None
-        self._hole_segments = None
         self._boundary_polygon2d = None
         self._hole_polygon2d = None
+        self._boundary_segments = None
+        self._hole_segments = None
         self._min = None
         self._max = None
         self._center = None
@@ -101,26 +134,10 @@ class Face3D(Base2DIn3D):
         """
         holes = None
         if 'holes' in data and data['holes'] is not None:
-            holes = data['holes']
-        if holes is None:
-            return cls(tuple(Point3D.from_dict(pt) for pt in data['boundary']),
-                       Plane.from_dict(data['plane']))
-        else:
-            return cls.from_shape_with_holes(
-                [Point3D.from_dict(pt) for pt in data['boundary']],
-                [[Point3D.from_dict(pt) for pt in hole] for hole in holes],
-                Plane.from_dict(data['plane']))
-
-    @classmethod
-    def from_vertices(cls, vertices):
-        """Initialize Face3D from only a list of vertices.
-
-        The Plane normal will automatically be calculated by analyzing the first
-        three vertices and the origin of the plane will be the first vertex of
-        the input vertices.
-        """
-        plane = cls._plane_from_vertices(vertices)
-        return cls(vertices, plane)
+            holes = tuple(
+                tuple(Point3D.from_dict(pt) for pt in hole) for hole in data['holes'])
+        return cls(tuple(Point3D.from_dict(pt) for pt in data['boundary']),
+                   Plane.from_dict(data['plane']), holes)
 
     @classmethod
     def from_extrusion(cls, line_segment, extrusion_vector):
@@ -175,7 +192,7 @@ class Face3D(Base2DIn3D):
             assert isinstance(base_plane, Plane), \
                 'base_plane must be Plane. Got {}.'.format(type(base_plane))
         else:
-            base_plane = Plane(Vector3D(0, 0, 1), Point3D())
+            base_plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 0))
         _o = base_plane.o
         _b_vec = base_plane.x * base
         _h_vec = base_plane.y * height
@@ -204,11 +221,11 @@ class Face3D(Base2DIn3D):
                 If None, the default will be the WorldXY plane.
         """
         # set the default base_plane
-        if base_plane is None:
-            base_plane = Plane()
-        else:
+        if base_plane is not None:
             assert isinstance(base_plane, Plane), 'Expected Plane. Got {}'.format(
                 type(base_plane))
+        else:
+            base_plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 0))
 
         # create the regular polygon face
         _polygon2d = Polygon2D.from_regular_polygon(number_of_sides, radius)
@@ -225,53 +242,6 @@ class Face3D(Base2DIn3D):
         return _face
 
     @classmethod
-    def from_shape_with_holes(cls, boundary, holes, plane=None):
-        """Initialize a Face3D from a boundary vertex list with holes inside of it.
-
-        This method will separately store the list of Point3Ds representing the
-        boundary and holes on the `boundary` and `holes` properties of this object.
-        However, the vertices will trace out a single shape that turns inwards
-        from the boundary to cut out the holes.
-
-        Args:
-            boundary: A list of Point3D objects for the outer boundary of the face
-                inside of which all of the holes are contained.
-            holes: A list of lists with one list for each hole in the face. Each hole
-                should be a list of at least 3 Point3D objects.
-            plane: A Plane object indicating the plane in which the face exists.
-                If left as None, the Plane normal will automatically be calculated
-                by analyzing the first three vertices of the boundary and the origin
-                of the plane will be the first vertex of the boundary vertices.
-        """
-        # check the inputs
-        assert isinstance(boundary, list), \
-            'boundary should be a list. Got {}'.format(type(boundary))
-        assert isinstance(holes, list), \
-            'holes should be a list. Got {}'.format(type(holes))
-        for hole in holes:
-            assert isinstance(hole, list), \
-                'hole should be a list. Got {}'.format(type(hole))
-            assert len(hole) >= 3, \
-                'hole should have at least 3 vertices. Got {}'.format(len(hole))
-        if plane is None:
-            plane = cls._plane_from_vertices(boundary)
-
-        # create a Polygon2D from the vertices
-        _boundary2d = [plane.xyz_to_xy(_v) for _v in boundary]
-        _holes2d = [[plane.xyz_to_xy(_v) for _v in hole] for hole in holes]
-        _polygon2d = Polygon2D.from_shape_with_holes(_boundary2d, _holes2d)
-
-        # convert Polygon2D vertices to 3D to become the vertices of the face.
-        _vert3d = tuple(plane.xy_to_xyz(_v) for _v in _polygon2d.vertices)
-        _face = cls(_vert3d, plane)
-
-        # assign extra properties that we know to the face
-        _face._polygon2d = _polygon2d
-        _face._boundary = tuple(boundary)
-        _face._holes = tuple(tuple(hole) for hole in holes)
-        return _face
-
-    @classmethod
     def from_punched_geometry(cls, base_face, sub_faces, plane=None):
         """Create a face with holes punched in it from sub-faces.
 
@@ -281,7 +251,7 @@ class Face3D(Base2DIn3D):
             sub_faces: A list of Face3D objects that will be punched into the
                 base_face. These faces must lie completely within the base_face
                 for the result to be valid. The is_sub_face() method can be
-                used to verify that sub_faces are valid as input here.
+                used to check sub_faces before they are input here.
             plane: A Plane object indicating the plane in which the face exists.
                 If left as None, the Plane normal will automatically be calculated.
         """
@@ -290,10 +260,11 @@ class Face3D(Base2DIn3D):
         for hole in sub_faces:
             assert isinstance(hole, Face3D), \
                 'sub_face should be a list. Got {}'.format(type(hole))
-        hole_verts = [list(sf.vertices) for sf in sub_faces]
+        plane = base_face.plane if plane is None else plane
+        hole_verts = [list(sf.boundary) for sf in sub_faces]
         if base_face.has_holes:
             hole_verts.extend([list(h) for h in base_face.holes])
-        return cls.from_shape_with_holes(list(base_face.boundary), hole_verts, plane)
+        return cls(base_face.boundary, plane, hole_verts)
 
     @property
     def vertices(self):
@@ -667,26 +638,35 @@ class Face3D(Base2DIn3D):
             return _new_face
         _new_face._boundary = self._remove_colinear(
             self._boundary, self.boundary_polygon2d, tolerance)
-        _new_face._holes = tuple(self._remove_colinear(
-            hole, self.hole_polygon2d[i], tolerance)
-                                 for i, hole in enumerate(self._holes))
+        _new_face._holes = \
+            tuple(self._remove_colinear(hole, self.hole_polygon2d[i], tolerance)
+                  for i, hole in enumerate(self._holes))
         return _new_face
 
-    def flip(self):
+    def flip(self, preserve_clockwise=False):
         """Get a face with a flipped direction from this one.
 
-        Note that this only flips the plane of the face and does not change the vertices.
+        Note that, by default, this only flips the plane of the face and does not
+        change the vertices (meaning clockwise property will be inverted). Set
+        preserve_clockwise to True to also reverse the vertices.
         """
-        _new_face = Face3D(self.vertices, self.plane.flip())
-        self._transfer_properties(_new_face)
-        _new_face._boundary = self._boundary
-        _new_face._holes = self._holes
-        if self._is_clockwise is not None:
-            _new_face._is_clockwise = not self._is_clockwise
+        if preserve_clockwise is False:
+            _new_face = Face3D(self.vertices, self.plane.flip())
+            self._transfer_properties(_new_face)
+            if self._is_clockwise is not None:
+                _new_face._is_clockwise = not self._is_clockwise
+            _new_face._boundary = self._boundary
+            _new_face._holes = self._holes
+        else:
+            _new_face = Face3D(reversed(self.vertices), self.plane.flip())
+            self._transfer_properties(_new_face)
+            _new_face._boundary = reversed(self._boundary)
+            _new_face._holes = tuple(reversed(hole) for hole in self._holes) \
+                if self._holes is not None else None
         return _new_face
 
     def reverse(self):
-        """Reverse the direction of vertices in the face.
+        """Reverse the direction of vertices in the face while keeping the same normal.
 
         Note that this does not chance the face normal. Only the is_clockwise property.
         """
@@ -1345,6 +1325,17 @@ class Face3D(Base2DIn3D):
                     'plane': self.plane.to_dict(),
                     'holes': [[pt.to_dict() for pt in hole] for hole in self.holes]}
 
+    def _check_vertices_input(self, vertices, loop_name='boundary'):
+        if not isinstance(vertices, tuple):
+            vertices = tuple(vertices)
+        assert len(vertices) >= 3, 'There must be at least 3 vertices for a Face3D {}.' \
+            ' Got {}'.format(loop_name, len(vertices))
+        for vert in vertices:
+            assert isinstance(vert, Point3D), \
+                'Expected Point3D for Face3D {} vertex. Got {}.'.format(
+                    loop_name, type(vert))
+        return vertices
+
     def _check_number_mesh_grid(self, input, name):
         assert isinstance(input, (float, int)), '{} for Face3D.get_mesh_grid' \
             ' must be a number. Got {}.'.format(name, type(input))
@@ -1407,6 +1398,28 @@ class Face3D(Base2DIn3D):
             new_face._perimeter = self._perimeter * factor
         if self._area is not None:
             new_face._area = self._area * factor ** 2
+
+    def _calculate_min_max(self):
+        """Calculate maximum and minimum Point3D for this object."""
+        min_pt = [self.boundary[0].x, self.boundary[0].y, self.boundary[0].z]
+        max_pt = [self.boundary[0].x, self.boundary[0].y, self.boundary[0].z]
+
+        for v in self.boundary[1:]:
+            if v.x < min_pt[0]:
+                min_pt[0] = v.x
+            elif v.x > max_pt[0]:
+                max_pt[0] = v.x
+            if v.y < min_pt[1]:
+                min_pt[1] = v.y
+            elif v.y > max_pt[1]:
+                max_pt[1] = v.y
+            if v.z < min_pt[2]:
+                min_pt[2] = v.z
+            elif v.z > max_pt[2]:
+                max_pt[2] = v.z
+
+        self._min = Point3D(min_pt[0], min_pt[1], min_pt[2])
+        self._max = Point3D(max_pt[0], max_pt[1], max_pt[2])
 
     def _remove_colinear(self, pts_3d, pts_2d, tolerance):
         """Remove colinear vertices from a list of Point2D.
@@ -1536,6 +1549,7 @@ class Face3D(Base2DIn3D):
         _new_face._holes = self._holes
         _new_face._polygon2d = self._polygon2d
         _new_face._mesh2d = self._mesh2d
+        _new_face._mesh3d = self._mesh3d
         return _new_face
 
     def __repr__(self):
