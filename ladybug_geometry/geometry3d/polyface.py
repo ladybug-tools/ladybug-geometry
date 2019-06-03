@@ -165,12 +165,7 @@ class Polyface3D(Base2DIn3D):
             face_indices.append(ind)
 
         # get the polyface object and assign correct faces to it
-        _polyface = cls(vertices, face_indices)
-        if _polyface._is_solid:
-            _polyface._faces = cls.get_outward_faces(_faces)
-        else:
-            _polyface._faces = faces
-        return _polyface
+        return cls(vertices, face_indices)
 
     @classmethod
     def from_faces_tolerance(cls, faces, tolerance):
@@ -209,12 +204,7 @@ class Polyface3D(Base2DIn3D):
             face_indices.append(tuple(ind))
 
         # get the polyface object and assign correct faces to it
-        _polyface = cls(vertices, face_indices)
-        if _polyface._is_solid:
-            _polyface._faces = cls.get_outward_faces(faces, tolerance)
-        else:
-            _polyface._faces = faces
-        return _polyface
+        return cls(vertices, face_indices)
 
     @classmethod
     def from_box(cls, length, width, height, base_plane=None):
@@ -300,7 +290,8 @@ class Polyface3D(Base2DIn3D):
         if not face.has_holes:
             len_faces = len(cclock_verts)
             face_ind_bottom = [tuple(reversed(xrange(len_faces)))]
-            face_ind_top = [tuple(reversed(xrange(len_faces * 2 - 1, len_faces - 1, -1)))]
+            face_ind_top = [tuple(
+                reversed(xrange(len_faces * 2 - 1, len_faces - 1, -1)))]
         else:
             if face.is_clockwise:
                 face_verts_bottom = [face.boundary] + list(face.holes)
@@ -356,8 +347,9 @@ class Polyface3D(Base2DIn3D):
                     holes = tuple(tuple(self.vertices[i] for i in f) for f in face[1:])
                     faces.append(Face3D(boundary=boundary, holes=holes))
             if self._is_solid:
-                faces = Polyface3D.get_outward_faces(faces)
-            self._faces = faces
+                self._faces = Polyface3D.get_outward_faces(faces)
+            else:
+                self._faces = tuple(faces)
         return self._faces
 
     @property
@@ -563,8 +555,6 @@ class Polyface3D(Base2DIn3D):
         _new_polyface = Polyface3D(self._vertices, self._face_indices,
                                    {'edge_indices': new_edge_indices,
                                     'edge_types': new_edge_types})
-        _new_polyface._tolerance = tolerance
-        _new_polyface._angle_tolerance = angle_tolerance
         return _new_polyface
 
     def move(self, moving_vec):
@@ -754,7 +744,7 @@ class Polyface3D(Base2DIn3D):
             v2 = face.boundary[1] - face.boundary[0]
             move_vec = Vector3D(
                 (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)).normalize()
-            move_vec = move_vec * (tolerance + 0.00000001)
+            move_vec = move_vec * (tolerance + 0.00001)
             point_on_face = face.boundary[0] + move_vec
             test_ray = Ray3D(point_on_face, face.normal)
 
@@ -770,7 +760,7 @@ class Polyface3D(Base2DIn3D):
                 outward_faces.append(face)
             else:
                 outward_faces.append(face.flip())
-        return tuple(outward_faces)
+        return outward_faces
 
     def to_dict(self):
         """Get Polyface3D as a dictionary."""
