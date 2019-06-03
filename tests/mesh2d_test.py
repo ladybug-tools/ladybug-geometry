@@ -39,6 +39,15 @@ class Mesh2DTestCase(unittest.TestCase):
         assert mesh._is_color_by_face is False
         assert mesh.colors is None
 
+    def test_mesh2d_to_from_dict(self):
+        """Test the to/from dict of Mesh2D objects."""
+        pts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0))
+        mesh = Mesh2D(pts, [(0, 1, 2, 3)])
+        mesh_dict = mesh.to_dict()
+        new_mesh = Mesh2D.from_dict(mesh_dict)
+        assert isinstance(new_mesh, Mesh2D)
+        assert new_mesh.to_dict() == mesh_dict
+
     def test_mesh2d_incorrect(self):
         """Test the initalization of Mesh2D objects with incorrect values."""
         pts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0), Point2D(4, 0))

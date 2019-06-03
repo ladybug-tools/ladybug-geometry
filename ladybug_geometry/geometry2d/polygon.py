@@ -52,6 +52,17 @@ class Polygon2D(Base2DIn2D):
         self._is_self_intersecting = None
 
     @classmethod
+    def from_dict(cls, data):
+        """Create a Polygon2D from a dictionary.
+
+        Args:
+            data: {
+            "vertices": [{"x": 0, "y": 0}, {"x": 10, "y": 0}, {"x": 0, "y": 10}]
+            }
+        """
+        return cls(tuple(Point2D.from_dict(pt) for pt in data['vertices']))
+
+    @classmethod
     def from_rectangle(cls, base_point, height_vector, base, height):
         """Initialize Polygon2D from rectangle parameters.
 
@@ -602,6 +613,10 @@ class Polygon2D(Base2DIn2D):
                 if does_intersection_exist_line2d(seg, _s):
                     return False
         return True
+
+    def to_dict(self):
+        """Get Polygon2D as a dictionary."""
+        return {'vertices': [pt.to_dict() for pt in self.vertices]}
 
     @staticmethod
     def _segments_from_vertices(vertices):

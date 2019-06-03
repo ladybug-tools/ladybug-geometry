@@ -31,6 +31,16 @@ class LineSegment3DTestCase(unittest.TestCase):
         assert flip_seg.p == Point3D(2, 2, 2)
         assert flip_seg.v == Vector3D(0, -2, 0)
 
+    def test_linesegment3_to_from_dict(self):
+        """Test the to/from dict of LineSegment3D objects."""
+        pt = Point3D(2, 0, 2)
+        vec = Vector3D(0, 2, 0)
+        seg = LineSegment3D(pt, vec)
+        seg_dict = seg.to_dict()
+        new_seg = LineSegment3D.from_dict(seg_dict)
+        assert isinstance(new_seg, LineSegment3D)
+        assert new_seg.to_dict() == seg_dict
+
     def test_init_from_endpoints(self):
         """Test the initalization of LineSegment3D from end points."""
         pt_1 = Point3D(2, 0, 2)

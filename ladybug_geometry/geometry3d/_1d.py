@@ -27,6 +27,17 @@ class Base1DIn3D(object):
         self._p = p
         self._v = v
 
+    @classmethod
+    def from_dict(cls, data):
+        """Create a LineSegment3D/Ray3D from a dictionary.
+
+        Args:
+            data: {
+            "p": {"x": 10, "y": 0, "z": 0},
+            "v": {"x": 10, "y": 10, "z": 0}}
+        """
+        return cls(Point3D.from_dict(data['p']), Vector3D.from_dict(data['v']))
+
     @property
     def p(self):
         """Base point."""
@@ -99,6 +110,11 @@ class Base1DIn3D(object):
     def duplicate(self):
         """Get a copy of this object."""
         return self.__copy__()
+
+    def to_dict(self):
+        """Get LineSegment3D/Ray3D as a dictionary."""
+        return {'p': self.p.to_dict(),
+                'v': self.v.to_dict()}
 
     def __copy__(self):
         return self.__class__(self.p, self.v)

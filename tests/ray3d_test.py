@@ -25,6 +25,16 @@ class Ray3DTestCase(unittest.TestCase):
         assert flip_ray.p == Point3D(2, 0, 2)
         assert flip_ray.v == Vector3D(0, -2, 0)
 
+    def test_ray3_to_from_dict(self):
+        """Test the to/from dict of Ray3D objects."""
+        pt = Point3D(2, 0, 2)
+        vec = Vector3D(0, 2, 0)
+        ray = Ray3D(pt, vec)
+        ray_dict = ray.to_dict()
+        new_ray = Ray3D.from_dict(ray_dict)
+        assert isinstance(new_ray, Ray3D)
+        assert new_ray.to_dict() == ray_dict
+
     def test_linerayment2_mutability(self):
         """Test the immutability of Ray3D objects."""
         pt = Point3D(2, 0, 0)

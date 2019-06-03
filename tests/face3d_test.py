@@ -48,6 +48,24 @@ class Face3DTestCase(unittest.TestCase):
         assert face.is_self_intersecting is False
         assert face.vertices[0] == face[0]
 
+    def test_face3d_to_from_dict(self):
+        """Test the to/from dict of Face3D objects."""
+        pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
+        plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+        face = Face3D(pts, plane)
+        face_dict = face.to_dict()
+        new_face = Face3D.from_dict(face_dict)
+        assert isinstance(new_face, Face3D)
+        assert new_face.to_dict() == face_dict
+
+        bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
+        hole_pts = [Point3D(1, 1), Point3D(3, 1), Point3D(3, 3), Point3D(1, 3)]
+        face = Face3D.from_shape_with_holes(bound_pts, [hole_pts])
+        face_dict = face.to_dict()
+        new_face = Face3D.from_dict(face_dict)
+        assert isinstance(new_face, Face3D)
+        assert new_face.to_dict() == face_dict
+
     def test_face3d_init_from_vertices(self):
         """Test the initalization of Face3D objects from_vertices."""
         pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
