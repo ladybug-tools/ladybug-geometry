@@ -26,6 +26,18 @@ class Vector3D(object):
         self._y = y
         self._z = z
 
+    @classmethod
+    def from_dict(cls, data):
+        """Create a Vector3D/Point3D from a dictionary.
+
+        Args:
+            data: {
+            "x": 10,
+            "y": 0,
+            "z": 0}
+        """
+        return cls(data['x'], data['y'], data['z'])
+
     @property
     def x(self):
         """Get the X coordinate."""
@@ -116,6 +128,12 @@ class Vector3D(object):
     def duplicate(self):
         """Get a copy of this vector."""
         return self.__copy__()
+
+    def to_dict(self):
+        """Get Vector3D/Point3D as a dictionary."""
+        return {'x': self.x,
+                'y': self.y,
+                'z': self.z}
 
     @staticmethod
     def _reflect(vec, normal):

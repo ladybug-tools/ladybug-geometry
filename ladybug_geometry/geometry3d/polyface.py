@@ -38,7 +38,8 @@ class Polyface3D(Base2DIn3D):
     __slots__ = ('_vertices', '_faces', '_edges',
                  '_naked_edges', '_internal_edges', '_non_manifold_edges',
                  '_face_indices', '_edge_indices', '_edge_types'
-                 '_min', '_max', '_center', '_area', '_is_solid')
+                 '_min', '_max', '_center', '_area', '_is_solid',
+                 '_tolerance', '_angle_tolerance')
 
     def __init__(self, vertices, face_indices, edge_information=None):
         """Initilize Polyface3D.
@@ -106,6 +107,46 @@ class Polyface3D(Base2DIn3D):
         self._center = None
         self._area = None
         self._volume = None
+        self._tolerance = None
+        self._angle_tolerance = None
+
+    @classmethod
+    def from_dict(cls, data):
+        """Create a Face3D from a dictionary.
+
+        Args:
+            data: {"faces": [
+                    {"boundary": [{"x": 0, "y": 0, "z": 0}, {"x": 10, "y": 0, "z": 0},
+                                 {"x": 0, "y": 10, "z": 0}],
+                    "plane": {"n": {"x": 0, "y": 0, "z": 1},
+                              "o": {"x": 0, "y": 0, "z": 0},
+                              "x": {"x": 1, "y": 0, "z": 0}}},
+                    {"boundary": [{"x": 10, "y": 0, "z": 0}, {"x": 10, "y": 10, "z": 0},
+                                 {"x": 0, "y": 10, "z": 0}],
+                    "plane": {"n": {"x": 0, "y": 0, "z": 1},
+                              "o": {"x": 0, "y": 0, "z": 0},
+                              "x": {"x": 1, "y": 0, "z": 0}}}
+                ],
+                "tolerance": None
+            }
+        """
+        tolerance = None
+        angle_tolerance = None
+        if 'tolerance' in data and data['tolerance'] is not None:
+            tolerance = data['tolerance']
+        if 'angle_tolerance' in data and data['angle_tolerance'] is not None:
+            angle_tolerance = data['angle_tolerance']
+
+        if tolerance is None:
+            polyface = cls.from_faces(
+                tuple(Face3D.from_dict(face) for face in data['faces']))
+        else:
+            polyface = cls.from_faces_tolerance(
+                tuple(Face3D.from_dict(face) for face in data['faces']),
+                data['tolerance'])
+        if angle_tolerance is not None:
+            polyface = polyface.merge_overlapping_edges(tolerance, angle_tolerance)
+        return polyface
 
     @classmethod
     def from_faces(cls, faces):
@@ -136,7 +177,7 @@ class Polyface3D(Base2DIn3D):
         # get the polyface object and assign correct faces to it
         _polyface = cls(vertices, face_indices)
         if _polyface._is_solid:
-            _polyface._faces = cls._correct_face_direction(faces)
+            _polyface._faces = cls.get_outward_faces(faces)
         else:
             _polyface._faces = faces
         return _polyface
@@ -174,9 +215,10 @@ class Polyface3D(Base2DIn3D):
         # get the polyface object and assign correct faces to it
         _polyface = cls(vertices, face_indices)
         if _polyface._is_solid:
-            _polyface._faces = cls._correct_face_direction(faces)
+            _polyface._faces = cls.get_outward_faces(faces, tolerance)
         else:
             _polyface._faces = faces
+        _polyface._tolerance = tolerance
         return _polyface
 
     @classmethod
@@ -305,7 +347,7 @@ class Polyface3D(Base2DIn3D):
                           for face in self._face_indices)
             faces = tuple(Face3D.from_vertices(v) for v in verts)
             if self._is_solid:
-                faces = Polyface3D._correct_face_direction(faces)
+                faces = Polyface3D.get_outward_faces(faces)
             self._faces = faces
         return self._faces
 
@@ -392,17 +434,15 @@ class Polyface3D(Base2DIn3D):
     def volume(self):
         """The volume enclosed by the polyface.
 
-        Note that, if this polyface is not solid, the volume will always be 0.
+        Note that, if this polyface is not solid (with all face normals pointing
+        outward), the value of this property will not be valid.
         """
         if self._volume is None:
-            if self._is_solid:
-                # formula taken from https://en.wikipedia.org/wiki/Polyhedron#Volume
-                _v = 0
-                for i, face in enumerate(self.faces):
-                    _v += face[0].dot(face.normal) * face.area
-                self._volume = _v / 3
-            else:
-                self._volume = 0
+            # formula taken from https://en.wikipedia.org/wiki/Polyhedron#Volume
+            _v = 0
+            for i, face in enumerate(self.faces):
+                _v += face[0].dot(face.normal) * face.area
+            self._volume = _v / 3
         return self._volume
 
     @property
@@ -511,9 +551,12 @@ class Polyface3D(Base2DIn3D):
         for new_edge in add_edges:
             new_edge_indices.append(new_edge)
             new_edge_types.append(1)
-        return Polyface3D(self._vertices, self._face_indices,
-                          {'edge_indices': new_edge_indices,
-                           'edge_types': new_edge_types})
+        _new_polyface = Polyface3D(self._vertices, self._face_indices,
+                                   {'edge_indices': new_edge_indices,
+                                    'edge_types': new_edge_types})
+        _new_polyface._tolerance = tolerance
+        _new_polyface._angle_tolerance = angle_tolerance
+        return _new_polyface
 
     def move(self, moving_vec):
         """Get a polyface that has been moved along a vector.
@@ -674,6 +717,57 @@ class Polyface3D(Base2DIn3D):
                 _inters.extend(_int)
         return _inters
 
+    @staticmethod
+    def get_outward_faces(faces, tolerance=0):
+        """Get faces that are all pointing outward from a list of faces together forming a solid.
+
+        Note that, if the input faces do not form a closed solid, thre may be some output
+        faces that are not pointing outward.  However, if the gaps in the combined solid
+        are within the input tolerance, this should not be an issue.
+
+        Also, note that this method runs automatically for any solid polyface
+        (meaning every solid polyface automatically has outward-facing faces). So there
+        is no need to rerun this method for faces from a solid polyface.
+
+        Args:
+            faces: A list of Face3D objects that together form a solid.
+            tolerance: Optional tolerance for the permissable size of gap between
+                faces at which point the faces are considered to have a single edge.
+
+        Returns:
+            outward_faces: A list of the input Face3D objects that all point outwards
+                (provided the input faces form a solid).
+        """
+        outward_faces = []
+        for i, face in enumerate(faces):
+            # construct a ray with the face normal and a point on the face
+            v1 = face.boundary[-1] - face.boundary[0]
+            v2 = face.boundary[1] - face.boundary[0]
+            move_vec = Vector3D(
+                (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)).normalize()
+            move_vec = move_vec * (tolerance + 0.00000001)
+            point_on_face = face.boundary[0] + move_vec
+            test_ray = Ray3D(point_on_face, face.normal)
+
+            # if the ray intersects with an even number of other faces, it is correct
+            n_int = 0
+            for _f in faces[i + 1:]:
+                if _f.intersect_line_ray(test_ray):
+                    n_int += 1
+            for _f in faces[:i]:
+                if _f.intersect_line_ray(test_ray):
+                    n_int += 1
+            if n_int % 2 == 0:
+                outward_faces.append(face)
+            else:
+                outward_faces.append(face.flip())
+        return tuple(outward_faces)
+
+    def to_dict(self):
+        """Get Polyface3D as a dictionary."""
+        return {'faces': [face.to_dict() for face in self.faces],
+                'tolerance': self._tolerance, 'angle_tolerance': self._angle_tolerance}
+
     def _get_edge_type(self, edge_type):
         """Get all of the edges of a certain type in this polyface."""
         if self._edges is None:
@@ -700,30 +794,6 @@ class Polyface3D(Base2DIn3D):
         edge_indices = edge_i1 + [(st_i + len_faces - 1, st_i)] + edge_i2 + edge_i3 + \
             [(st_i + len_faces * 2 - 1, st_i + len_faces)]
         return verts, faces_ind, edge_indices
-
-    @staticmethod
-    def _correct_face_direction(faces):
-        """Correct the direction that Face3D are pointing when the polyface is solid."""
-        final_faces = []
-        for i, face in enumerate(faces):
-            # construct a ray with the face normal and a point on the face
-            move_vec = (face.center - face[0]) * 0.000001
-            point_on_face = face[0] + move_vec
-            test_ray = Ray3D(point_on_face, face.normal)
-
-            # if the ray intersects with an even number of other faces, it is correct
-            n_int = 0
-            for _f in faces[i + 1:]:
-                if _f.intersect_line_ray(test_ray):
-                    n_int += 1
-            for _f in faces[:i]:
-                if _f.intersect_line_ray(test_ray):
-                    n_int += 1
-            if n_int % 2 == 0:
-                final_faces.append(face)
-            else:
-                final_faces.append(face.flip())
-        return tuple(final_faces)
 
     def __copy__(self):
         _new_poly = Polyface3D(self.vertices, self.face_indices, self.edge_information)

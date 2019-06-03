@@ -12,7 +12,7 @@ class LineSegment2DTestCase(unittest.TestCase):
     """Test for LineSegment2D"""
 
     def test_linesegment2_init(self):
-        """Test the initalization of LineSegement2D objects and basic properties."""
+        """Test the initalization of LineSegment2D objects and basic properties."""
         pt = Point2D(2, 0)
         vec = Vector2D(0, 2)
         seg = LineSegment2D(pt, vec)
@@ -30,6 +30,16 @@ class LineSegment2DTestCase(unittest.TestCase):
         flip_seg = seg.flip()
         assert flip_seg.p == Point2D(2, 2)
         assert flip_seg.v == Vector2D(0, -2)
+
+    def test_linesegment2_to_from_dict(self):
+        """Test the to/from dict of LineSegment2D objects."""
+        pt = Point2D(2, 0)
+        vec = Vector2D(0, 2)
+        seg = LineSegment2D(pt, vec)
+        seg_dict = seg.to_dict()
+        new_seg = LineSegment2D.from_dict(seg_dict)
+        assert isinstance(new_seg, LineSegment2D)
+        assert new_seg.to_dict() == seg_dict
 
     def test_init_from_endpoints(self):
         """Test the initalization of LineSegement2D from end points."""

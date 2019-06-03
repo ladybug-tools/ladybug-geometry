@@ -38,6 +38,20 @@ class Point2DTestCase(unittest.TestCase):
         assert vec.magnitude == 0
         assert vec.normalize() == vec
 
+    def test_vector2_to_from_dict(self):
+        """Test the initalization of Vector2D objects and basic properties."""
+        vec = Vector2D(0, 2)
+        vec_dict = vec.to_dict()
+        new_vec = Vector2D.from_dict(vec_dict)
+        assert isinstance(new_vec, Vector2D)
+        assert new_vec.to_dict() == vec_dict
+
+        pt = Point2D(0, 2)
+        pt_dict = pt.to_dict()
+        new_pt = Point2D.from_dict(pt_dict)
+        assert isinstance(new_pt, Point2D)
+        assert new_pt.to_dict() == pt_dict
+
     def test_distance_to_point(self):
         """Test the test_distance_to_point method."""
         pt_1 = Point2D(0, 2)

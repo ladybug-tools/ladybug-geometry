@@ -10,6 +10,13 @@ from .polygon import Polygon2D
 from ._2d import Base2DIn2D
 
 try:
+    from ladybug.color import Color
+except ImportError:
+    Color = None
+    print('Failed to import ladybug Color.\n'
+          'Importing mesh colors in from_dict methods will not be availabe.')
+
+try:
     from itertools import izip as zip  # python 2
 except ImportError:
     xrange = range  # python 3
@@ -57,6 +64,22 @@ class Mesh2D(MeshBase, Base2DIn2D):
         self._centroid = None
         self._face_areas = None
         self._face_centroids = None
+
+    @classmethod
+    def from_dict(cls, data):
+        """Create a Mesh2D from a dictionary.
+
+        Args:
+            data: {
+            "vertices": [{"x": 0, "y": 0}, {"x": 10, "y": 0}, {"x": 0, "y": 10}],
+            "faces": [(0, 1, 2)]
+            }
+        """
+        colors = None
+        if Color is not None and 'colors' in data and data['colors'] is not None:
+            colors = tuple(Color.from_dict(col) for col in data['colors'])
+        return cls(tuple(Point2D.from_dict(pt) for pt in data['vertices']),
+                   data['faces'], colors)
 
     @classmethod
     def from_face_vertices(cls, faces, purge=True):
@@ -333,6 +356,14 @@ class Mesh2D(MeshBase, Base2DIn2D):
         else:
             _verts = tuple(pt.scale(factor, origin) for pt in self.vertices)
         return self._mesh_scale(_verts, factor)
+
+    def to_dict(self):
+        """Get Mesh2D as a dictionary."""
+        colors = None
+        if self.colors is not None:
+            colors = [col.to_dict() for col in self.colors]
+        return {'vertices': [pt.to_dict() for pt in self.vertices],
+                'faces': self.faces, 'colors': colors}
 
     def _face_area(self, face):
         """Return the area of a face."""

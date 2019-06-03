@@ -86,6 +86,32 @@ class Face3D(Base2DIn3D):
         self._is_self_intersecting = None
 
     @classmethod
+    def from_dict(cls, data):
+        """Create a Face3D from a dictionary.
+
+        Args:
+            data: {
+            "boundary": [{"x": 0, "y": 0, "z": 0}, {"x": 10, "y": 0, "z": 0},
+                         {"x": 0, "y": 10, "z": 0}],
+            "plane": {"n": {"x": 0, "y": 0, "z": 1}, "o": {"x": 0, "y": 0, "z": 0},
+                      "x": {"x": 1, "y": 0, "z": 0}}
+            "holes": [[{"x": 2, "y": 2, "z": 0}, {"x": 5, "y": 2, "z": 0},
+                       {"x": 2, "y": 5, "z": 0}]],
+            }
+        """
+        holes = None
+        if 'holes' in data and data['holes'] is not None:
+            holes = data['holes']
+        if holes is None:
+            return cls(tuple(Point3D.from_dict(pt) for pt in data['boundary']),
+                       Plane.from_dict(data['plane']))
+        else:
+            return cls.from_shape_with_holes(
+                [Point3D.from_dict(pt) for pt in data['boundary']],
+                [[Point3D.from_dict(pt) for pt in hole] for hole in holes],
+                Plane.from_dict(data['plane']))
+
+    @classmethod
     def from_vertices(cls, vertices):
         """Initialize Face3D from only a list of vertices.
 
@@ -1309,6 +1335,16 @@ class Face3D(Base2DIn3D):
                                       base_plane)]
         return final_faces
 
+    def to_dict(self):
+        """Get Face3D as a dictionary."""
+        if not self.has_holes:
+            return {'boundary': [pt.to_dict() for pt in self.boundary],
+                    'plane': self.plane.to_dict()}
+        else:
+            return {'boundary': [pt.to_dict() for pt in self.boundary],
+                    'plane': self.plane.to_dict(),
+                    'holes': [[pt.to_dict() for pt in hole] for hole in self.holes]}
+
     def _check_number_mesh_grid(self, input, name):
         assert isinstance(input, (float, int)), '{} for Face3D.get_mesh_grid' \
             ' must be a number. Got {}.'.format(name, type(input))
@@ -1495,8 +1531,12 @@ class Face3D(Base2DIn3D):
         return Plane(n, pt1)
 
     def __copy__(self):
-        _new_poly = Face3D(self.vertices, self.plane)
-        return _new_poly
+        _new_face = Face3D(self.vertices, self.plane)
+        self._transfer_properties(_new_face)
+        _new_face._holes = self._holes
+        _new_face._polygon2d = self._polygon2d
+        _new_face._mesh2d = self._mesh2d
+        return _new_face
 
     def __repr__(self):
         return 'Face3D ({} vertices)'.format(len(self))

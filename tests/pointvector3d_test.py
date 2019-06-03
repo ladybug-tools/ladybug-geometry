@@ -33,6 +33,20 @@ class Point3DTestCase(unittest.TestCase):
         assert norm_vec.z == 0
         assert norm_vec.magnitude == 1
 
+    def test_vector3_to_from_dict(self):
+        """Test the initalization of Vector3D objects and basic properties."""
+        vec = Vector3D(0, 2, 0)
+        vec_dict = vec.to_dict()
+        new_vec = Vector3D.from_dict(vec_dict)
+        assert isinstance(new_vec, Vector3D)
+        assert new_vec.to_dict() == vec_dict
+
+        pt = Point3D(0, 2, 0)
+        pt_dict = pt.to_dict()
+        new_pt = Point3D.from_dict(pt_dict)
+        assert isinstance(new_pt, Point3D)
+        assert new_pt.to_dict() == pt_dict
+
     def test_zero_magnitude_vector(self):
         """Test properties with a zero magnitude vecotr."""
         vec = Vector3D(0, 0, 0)

@@ -40,6 +40,15 @@ class Polygon2DTestCase(unittest.TestCase):
 
         assert polygon.vertices[0] == polygon[0]
 
+    def test_polygon2d_to_from_dict(self):
+        """Test the to/from dict of Polygon2D objects."""
+        pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+        polygon = Polygon2D(pts)
+        polygon_dict = polygon.to_dict()
+        new_polygon = Polygon2D.from_dict(polygon_dict)
+        assert isinstance(new_polygon, Polygon2D)
+        assert new_polygon.to_dict() == polygon_dict
+
     def test_polygon2d_init_from_rectangle(self):
         """Test the initalization of Polygon2D from_rectangle."""
         polygon = Polygon2D.from_rectangle(Point2D(0, 0), Vector2D(0, 1), 2, 2)
