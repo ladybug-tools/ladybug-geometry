@@ -38,6 +38,9 @@ class Mesh3DTestCase(unittest.TestCase):
         assert mesh.face_centroids[0] == Point3D(1, 1, 2)
         assert mesh._is_color_by_face is False
         assert mesh.colors is None
+        assert len(mesh.vertex_connected_faces) == 4
+        for vf in mesh.vertex_connected_faces:
+            assert len(vf) == 1
 
     def test_mesh3d_to_from_dict(self):
         """Test the to/from dict of Mesh3D objects."""
@@ -356,6 +359,47 @@ class Mesh3DTestCase(unittest.TestCase):
         assert test_2[2].x == pytest.approx(-1, rel=1e-3)
         assert test_2[2].y == pytest.approx(-1, rel=1e-3)
         assert test_2[2].z == pytest.approx(2, rel=1e-3)
+
+    def test_offset_mesh(self):
+        """Test the offset_mesh method."""
+        pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
+        pts_rev = tuple(reversed(pts))
+        mesh = Mesh3D(pts, [(0, 1, 2, 3)])
+        mesh_rev = Mesh3D(pts_rev, [(0, 1, 2, 3)])
+
+        new_mesh = mesh.offset_mesh(2)
+        for v in new_mesh.vertices:
+            assert v.z == 0
+
+        new_mesh_rev = mesh_rev.offset_mesh(2)
+        for v in new_mesh_rev.vertices:
+            assert v.z == 4
+
+    def test_height_field_mesh(self):
+        """Test the height_field_mesh method."""
+        pts = (Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 2, 0), Point3D(0, 2, 0))
+        mesh = Mesh3D(pts, [(0, 1, 2, 3)])
+        values = [-1, 0, 1, 2]
+
+        new_mesh = mesh.height_field_mesh(values, (0, 3))
+        assert new_mesh[0].z == 0
+        assert new_mesh[1].z == 1
+        assert new_mesh[2].z == 2
+        assert new_mesh[3].z == 3
+
+    def test_height_field_mesh_faces(self):
+        """Test the height_field_mesh method with values for faces."""
+        pts = (Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 2, 0), Point3D(0, 2, 0),
+               Point3D(4, 0, 0))
+        mesh = Mesh3D(pts, [(0, 1, 2, 3), (2, 3, 4)])
+        values = [-1, 1]
+
+        new_mesh = mesh.height_field_mesh(values, (1, 2))
+        assert new_mesh[0].z == 1
+        assert new_mesh[1].z == 1
+        assert new_mesh[2].z == 1.5
+        assert new_mesh[3].z == 1.5
+        assert new_mesh[4].z == 2
 
 
 if __name__ == "__main__":

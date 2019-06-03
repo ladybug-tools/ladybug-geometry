@@ -10,13 +10,6 @@ from .polygon import Polygon2D
 from ._2d import Base2DIn2D
 
 try:
-    from ladybug.color import Color
-except ImportError:
-    Color = None
-    print('Failed to import ladybug Color.\n'
-          'Importing mesh colors in from_dict methods will not be availabe.')
-
-try:
     from itertools import izip as zip  # python 2
 except ImportError:
     xrange = range  # python 3
@@ -37,10 +30,11 @@ class Mesh2D(MeshBase, Base2DIn2D):
         centroid
         face_areas
         face_centroids
+        vertex_connected_faces
     """
     __slots__ = ('_vertices', '_faces', '_colors', '_is_color_by_face',
                  '_min', '_max', '_center', '_area', '_centroid',
-                 '_face_areas', '_face_centroids')
+                 '_face_areas', '_face_centroids', '_vertex_connected_faces')
 
     def __init__(self, vertices, faces, colors=None):
         """Initilize Mesh2D.
@@ -64,6 +58,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
         self._centroid = None
         self._face_areas = None
         self._face_centroids = None
+        self._vertex_connected_faces = None
 
     @classmethod
     def from_dict(cls, data):
@@ -72,11 +67,17 @@ class Mesh2D(MeshBase, Base2DIn2D):
         Args:
             data: {
             "vertices": [{"x": 0, "y": 0}, {"x": 10, "y": 0}, {"x": 0, "y": 10}],
-            "faces": [(0, 1, 2)]
+            "faces": [(0, 1, 2)],
+            "colors": [{"r": 255, "g": 0, "b": 0}]
             }
         """
         colors = None
-        if Color is not None and 'colors' in data and data['colors'] is not None:
+        if 'colors' in data and data['colors'] is not None:
+            try:
+                from ladybug.color import Color
+            except ImportError:
+                raise ImportError('Colors are specified in input Mesh2D dictionary '
+                                  'but failed to import ladybug.color')
             colors = tuple(Color.from_dict(col) for col in data['colors'])
         return cls(tuple(Point2D.from_dict(pt) for pt in data['vertices']),
                    data['faces'], colors)

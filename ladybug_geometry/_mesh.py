@@ -2,6 +2,10 @@
 """Base class for all Mesh objects."""
 from __future__ import division
 
+import sys
+if (sys.version_info > (3, 0)):  # python 3
+    xrange = range
+
 
 class MeshBase(object):
     """Base class for all Mesh objects.
@@ -14,7 +18,27 @@ class MeshBase(object):
         face_areas
         area
         face_centroids
+        vertex_connected_faces
     """
+
+    def __init__(self, vertices, faces, colors=None):
+        """Initilize MeshBase.
+
+        Args:
+            vertices: A list or tuple of Point objects for vertices.
+            faces: A list of tuples with each tuple having either 3 or 4 integers.
+                These integers correspond to indices within the list of vertices.
+            colors: An optional list of colors that correspond to either the faces
+                of the mesh or the vertices of the mesh. Default is None.
+        """
+        self._vertices = vertices
+        self._check_faces_input(faces)
+        self._is_color_by_face = False  # default if colors is None
+        self.colors = colors
+        self._area = None
+        self._face_areas = None
+        self._face_centroids = None
+        self._vertex_connected_faces = None
 
     @property
     def vertices(self):
@@ -71,7 +95,7 @@ class MeshBase(object):
 
     @property
     def face_centroids(self):
-        """A tuple of face centroids that parallels the Faces property."""
+        """Tuple of face centroids that parallels the Faces property."""
         if self._face_centroids is None:
             _f_cent = []
             for face in self.faces:
@@ -81,6 +105,18 @@ class MeshBase(object):
                     _f_cent.append(self._quad_face_centroid(face))
             self._face_centroids = tuple(_f_cent)
         return self._face_centroids
+
+    @property
+    def vertex_connected_faces(self):
+        """Tuple with a tuple for each vertex that lists the indexes of connected faces.
+        """
+        if self._vertex_connected_faces is None:
+            _vert_faces = [[] for i in xrange(len(self._vertices))]
+            for i, face in enumerate(self._faces):
+                for j in face:
+                    _vert_faces[j].append(i)
+            self._vertex_connected_faces = tuple(tuple(vert) for vert in _vert_faces)
+        return self._vertex_connected_faces
 
     def move(self, moving_vec):
         """Get a mesh that has been moved along a vector.

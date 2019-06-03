@@ -39,6 +39,10 @@ class Mesh2DTestCase(unittest.TestCase):
         assert mesh._is_color_by_face is False
         assert mesh.colors is None
 
+        assert len(mesh.vertex_connected_faces) == 4
+        for vf in mesh.vertex_connected_faces:
+            assert len(vf) == 1
+
     def test_mesh2d_to_from_dict(self):
         """Test the to/from dict of Mesh2D objects."""
         pts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0))
