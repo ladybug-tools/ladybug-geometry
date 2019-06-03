@@ -10,13 +10,6 @@ from .plane import Plane
 from ._2d import Base2DIn3D
 
 try:
-    from ladybug.color import Color
-except ImportError:
-    Color = None
-    print('Failed to import ladybug Color.\n'
-          'Importing mesh colors in from_dict methods will not be availabe.')
-
-try:
     from itertools import izip as zip  # python 2
 except ImportError:
     xrange = range  # python 3
@@ -38,11 +31,12 @@ class Mesh3D(MeshBase, Base2DIn3D):
         face_centroids
         face_normals
         vertex_normals
+        vertex_connected_faces
     """
     __slots__ = ('_vertices', '_faces', '_colors', '_is_color_by_face',
                  '_min', '_max', '_center', '_area',
                  '_face_areas', '_face_centroids', '_face_normals',
-                 '_vertex_normals')
+                 '_vertex_normals', '_vertex_connected_faces')
 
     def __init__(self, vertices, faces, colors=None):
         """Initilize Mesh3D.
@@ -67,6 +61,7 @@ class Mesh3D(MeshBase, Base2DIn3D):
         self._face_centroids = None
         self._face_normals = None
         self._vertex_normals = None
+        self._vertex_connected_faces = None
 
     @classmethod
     def from_dict(cls, data):
@@ -74,12 +69,19 @@ class Mesh3D(MeshBase, Base2DIn3D):
 
         Args:
             data: {
-            "vertices": [{"x": 0, "y": 0}, {"x": 10, "y": 0}, {"x": 0, "y": 10}],
-            "faces": [(0, 1, 2)]
+            "vertices": [{"x": 0, "y": 0, "z": 0}, {"x": 10, "y": 0, "z": 0},
+                         {"x": 0, "y": 10, "z": 0}],
+            "faces": [(0, 1, 2)],
+            "colors": [{"r": 255, "g": 0, "b": 0}]
             }
         """
         colors = None
-        if Color is not None and 'colors' in data and data['colors'] is not None:
+        if 'colors' in data and data['colors'] is not None:
+            try:
+                from ladybug.color import Color
+            except ImportError:
+                raise ImportError('Colors are specified in input Mesh2D dictionary '
+                                  'but failed to import ladybug.color')
             colors = tuple(Color.from_dict(col) for col in data['colors'])
         return cls(tuple(Point3D.from_dict(pt) for pt in data['vertices']),
                    data['faces'], colors)
@@ -257,6 +259,58 @@ class Mesh3D(MeshBase, Base2DIn3D):
             _verts = tuple(pt.scale(factor, origin) for pt in self.vertices)
         return self._mesh_scale(_verts, factor)
 
+    def offset_mesh(self, distance):
+        """Get a Mesh3D that has been offset from this one by a certain difference.
+
+        Effectively, this method moves each mesh vertex along the vertex normal
+        by the offset distance.
+
+        Args:
+            distance: A number for the distance to offset the mesh.
+        """
+        new_verts = tuple(pt.move(norm * distance) for pt, norm in
+                          zip(self.vertices, self.vertex_normals))
+        return Mesh3D(new_verts, self.faces, self._colors)
+
+    def height_field_mesh(self, values, domain):
+        """Get a Mesh3D that has faces or vertices offset according to a list of values.
+
+        Args:
+            values: A list of values that has a length matching the number of faces
+                or vertices in this mesh.
+            domain: A tuple or list of two numbers for the upper and lower distances
+                that the mesh vertices should be offset. (ie. (0, 3))
+        """
+        assert isinstance(domain, (tuple, list)), 'Expected tuple for domain. '\
+            'Got {}.'.format(type(domain))
+        assert len(domain) == 2, 'Expected domain to be in the format (min, max). ' \
+            'Got {}.'.format(domain)
+
+        if len(values) == len(self.faces):
+            remap_vals = Mesh3D._remap_values(values, domain[0], domain[-1])
+            vert_remap_vals = []
+            for vf in self.vertex_connected_faces:
+                v = 0
+                for j in vf:
+                    v += remap_vals[j]
+                try:
+                    v /= len(vf)  # average the vertex value over its connected faces
+                except ZeroDivisionError:
+                    pass  # lone vertex without any faces
+                vert_remap_vals.append(v)
+            new_verts = tuple(pt.move(norm * dist) for pt, norm, dist in
+                              zip(self.vertices, self.vertex_normals, vert_remap_vals))
+        elif len(values) == len(self.vertices):
+            remap_vals = Mesh3D._remap_values(values, domain[0], domain[-1])
+            new_verts = tuple(pt.move(norm * dist) for pt, norm, dist in
+                              zip(self.vertices, self.vertex_normals, remap_vals))
+        else:
+            raise ValueError(
+                'Input values for height_field_mesh ({}) does not match the number of'
+                ' mesh faces ({}) nor the number of vertices ({}).'
+                .format(len(values), len(self.faces), len(self.vertices)))
+        return Mesh3D(new_verts, self.faces, self._colors)
+
     def to_dict(self):
         """Get Mesh3D as a dictionary."""
         colors = None
@@ -412,6 +466,18 @@ class Mesh3D(MeshBase, Base2DIn3D):
         v2 = pts[2] - pts[0]
         n1 = v1.cross(v2)
         return n1.magnitude / 2
+
+    @staticmethod
+    def _remap_values(values, tmin, tmax):
+        """Remap a set of values to offset distances within a domain."""
+        omin = min(values)
+        omax = max(values)
+        odiff = omax - omin
+        tdiff = tmax - tmin
+        if odiff == 0:
+            return [tmin] * len(values)
+        else:
+            return [(v - omin) * tdiff / odiff + tmin for v in values]
 
     def __copy__(self):
         _new_mesh = Mesh3D(self.vertices, self.faces)

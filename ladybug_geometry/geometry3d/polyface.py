@@ -721,9 +721,9 @@ class Polyface3D(Base2DIn3D):
     def get_outward_faces(faces, tolerance=0):
         """Get faces that are all pointing outward from a list of faces together forming a solid.
 
-        Note that, if the input faces do not form a closed solid, thre may be some output
-        faces that are not pointing outward.  However, if the gaps in the combined solid
-        are within the input tolerance, this should not be an issue.
+        Note that, if the input faces do not form a closed solid, there may be some
+        output faces that are not pointing outward.  However, if the gaps in the
+        combined solid are within the input tolerance, this should not be an issue.
 
         Also, note that this method runs automatically for any solid polyface
         (meaning every solid polyface automatically has outward-facing faces). So there
