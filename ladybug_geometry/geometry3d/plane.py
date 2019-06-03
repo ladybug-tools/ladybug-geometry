@@ -333,6 +333,12 @@ class Plane(object):
     def __copy__(self):
         return self.__class__(self.n, self.o)
 
+    def __eq__(self, other):
+        if isinstance(other, Plane):
+            return self.n == other.n and self.o == other.o and self.x == other.x
+        else:
+            return False
+
     def ToString(self):
         """Overwrite .NET ToString."""
         return self.__repr__()
