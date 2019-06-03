@@ -57,7 +57,7 @@ class Base2DIn3D(object):
         return self.__copy__()
 
     def _calculate_min_max(self):
-        """Calculate maximum and minimum Point3D for this polygon."""
+        """Calculate maximum and minimum Point3D for this object."""
         min_pt = [self.vertices[0].x, self.vertices[0].y, self.vertices[0].z]
         max_pt = [self.vertices[0].x, self.vertices[0].y, self.vertices[0].z]
 
