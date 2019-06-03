@@ -38,8 +38,7 @@ class Polyface3D(Base2DIn3D):
     __slots__ = ('_vertices', '_faces', '_edges',
                  '_naked_edges', '_internal_edges', '_non_manifold_edges',
                  '_face_indices', '_edge_indices', '_edge_types'
-                 '_min', '_max', '_center', '_area', '_is_solid',
-                 '_tolerance', '_angle_tolerance')
+                 '_min', '_max', '_center', '_area', '_is_solid')
 
     def __init__(self, vertices, face_indices, edge_information=None):
         """Initilize Polyface3D.
@@ -47,12 +46,15 @@ class Polyface3D(Base2DIn3D):
         Args:
             vertices: A list of Point3D objects representing the vertices of
                 this PolyFace.
-            face_indices: A list of tuples that contain integers corresponding
-                to indices within the vertices list. Each tuple represents a
-                face of the polyface.
+            face_indices: A list of lists with one list for each face of the polyface.
+                Each face list must contain at least one tuple of integers corresponding
+                to indices within the vertices list. Additional tuples of integers may
+                follow this one such that the first tuple denotes the boundary of the
+                face while each subsequent tuple denotes a hole in the face.
             edge_information: Optional edge information, which will speed up the
-                creation of the Polyface object if it is available. If None, this
-                will be computed from the vertices and face_indices. Edge information
+                creation of the Polyface object if it is available but should be left
+                as None if it is unknown. If None, edge_information will be computed
+                from the vertices and face_indices inuputs. Edge information
                 should be formatted as a dictionary with two keys as follows:
                 'edge_indices': A list of tuple objects that each contain two integers.
                     These integers correspond to indices within the vertices list and
@@ -64,8 +66,8 @@ class Polyface3D(Base2DIn3D):
         """
         # assign input properties
         self._check_vertices_input(vertices)
-        self._face_indices = face_indices if isinstance(face_indices, tuple) \
-            else tuple(face_indices)
+        self._face_indices = tuple(tuple(tuple(loop) for loop in face)
+                                   for face in face_indices)
 
         # unpack or autocalculate edge information
         if edge_information is not None:
@@ -74,18 +76,19 @@ class Polyface3D(Base2DIn3D):
         else:  # determine unique edges from the vertices and faces.
             edge_i = []
             edge_t = []
-            for fi in face_indices:
-                for i, vi in enumerate(fi):
-                    try:  # this can get slow for large number of vertices.
-                        ind = edge_i.index((fi[i - 1], vi))
-                        edge_t[ind] += 1
-                    except ValueError:  # make sure reversed edge isn't there
-                        try:
-                            ind = edge_i.index((vi, fi[i - 1]))
+            for face in face_indices:
+                for fi in face:
+                    for i, vi in enumerate(fi):
+                        try:  # this can get slow for large number of vertices.
+                            ind = edge_i.index((fi[i - 1], vi))
                             edge_t[ind] += 1
-                        except ValueError:  # add a new edge
-                            edge_i.append((fi[i - 1], vi))
-                            edge_t.append(0)
+                        except ValueError:  # make sure reversed edge isn't there
+                            try:
+                                ind = edge_i.index((vi, fi[i - 1]))
+                                edge_t[ind] += 1
+                            except ValueError:  # add a new edge
+                                edge_i.append((fi[i - 1], vi))
+                                edge_t.append(0)
         self._edge_indices = edge_i if isinstance(edge_i, tuple) else tuple(edge_i)
         self._edge_types = edge_t if isinstance(edge_t, tuple) else tuple(edge_t)
 
@@ -107,77 +110,64 @@ class Polyface3D(Base2DIn3D):
         self._center = None
         self._area = None
         self._volume = None
-        self._tolerance = None
-        self._angle_tolerance = None
 
     @classmethod
     def from_dict(cls, data):
         """Create a Face3D from a dictionary.
 
         Args:
-            data: {"faces": [
-                    {"boundary": [{"x": 0, "y": 0, "z": 0}, {"x": 10, "y": 0, "z": 0},
-                                 {"x": 0, "y": 10, "z": 0}],
-                    "plane": {"n": {"x": 0, "y": 0, "z": 1},
-                              "o": {"x": 0, "y": 0, "z": 0},
-                              "x": {"x": 1, "y": 0, "z": 0}}},
-                    {"boundary": [{"x": 10, "y": 0, "z": 0}, {"x": 10, "y": 10, "z": 0},
-                                 {"x": 0, "y": 10, "z": 0}],
-                    "plane": {"n": {"x": 0, "y": 0, "z": 1},
-                              "o": {"x": 0, "y": 0, "z": 0},
-                              "x": {"x": 1, "y": 0, "z": 0}}}
-                ],
-                "tolerance": None
+            data:
+            {"vertices": [{"x": 0, "y": 0, "z": 0}, {"x": 10, "y": 0, "z": 0},
+                          {"x": 10, "y": 10, "z": 0}, {"x": 0, "y": 10, "z": 0}],
+            "face_indices": [[(0, 1, 2)], [(3, 0, 1)]],
+            "edge_information": {"edge_indices":[(0, 1), (1, 2), (2, 0), (2, 3), (3, 0)],
+                                 "edge_types":[0, 0, 1, 0, 0]}
             }
         """
-        tolerance = None
-        angle_tolerance = None
-        if 'tolerance' in data and data['tolerance'] is not None:
-            tolerance = data['tolerance']
-        if 'angle_tolerance' in data and data['angle_tolerance'] is not None:
-            angle_tolerance = data['angle_tolerance']
+        edge_information = None
+        if 'edge_information' in data and data['edge_information'] is not None:
+            edge_information = data['edge_information']
 
-        if tolerance is None:
-            polyface = cls.from_faces(
-                tuple(Face3D.from_dict(face) for face in data['faces']))
-        else:
-            polyface = cls.from_faces_tolerance(
-                tuple(Face3D.from_dict(face) for face in data['faces']),
-                data['tolerance'])
-        if angle_tolerance is not None:
-            polyface = polyface.merge_overlapping_edges(tolerance, angle_tolerance)
-        return polyface
+        return cls(tuple(Point3D.from_dict(pt) for pt in data['vertices']),
+                   data['face_indices'], edge_information)
 
     @classmethod
     def from_faces(cls, faces):
         """Initilize Polyface3D from a list of Face3D objects.
 
-        Initializing a Polyface3D this way will preserve the properties of the
-        underlying Face3D objects, including the order of Face3D objects on the faces
-        property of the polyface and the presence of holes in the Face3D objects.
-        As such, it is the recommended way to create a polyface when Face3D objects
-        are available.
+        Initializing a Polyface3D this way will ensure that the order of faces on
+        the Polyface3D.faces and Polyface3D.face_indices matche the order of faces
+        input here. Many properties of the faces will also be preserved except that
+        this method will ensure that all of the face_indices on the resulting polyface
+        are counterclockwise. This is done so that faces and their corresponding
+        plane normals can always be reconstructed from face_indices.
 
         Args:
             faces: A list of Face3D objects representing the boundary of this Polyface.
         """
+        # ensure that all faces are counter-clockwise
+        _faces = tuple(
+            face if not face.is_clockwise else face.reverse() for face in faces)
         # extract unique vertices from the faces
         vertices = []  # collection of vertices as point objects
         face_indices = []  # collection of face indices
-        for f in faces:
+        for f in _faces:
             ind = []
-            for v in f:
-                try:  # this can get slow for large number of vertices.
-                    ind.append(vertices.index(v))
-                except ValueError:  # add new point
-                    vertices.append(v)
-                    ind.append(len(vertices) - 1)
-            face_indices.append(tuple(ind))
+            loops = [f.boundary] if not f.has_holes else [f.boundary] + f.holes
+            for j, loop in enumerate(loops):
+                ind.append([])
+                for v in loop:
+                    try:  # this can get slow for large number of vertices.
+                        ind[j].append(vertices.index(v))
+                    except ValueError:  # add new point
+                        vertices.append(v)
+                        ind[j].append(len(vertices) - 1)
+            face_indices.append(ind)
 
         # get the polyface object and assign correct faces to it
         _polyface = cls(vertices, face_indices)
         if _polyface._is_solid:
-            _polyface._faces = cls.get_outward_faces(faces)
+            _polyface._faces = cls.get_outward_faces(_faces)
         else:
             _polyface._faces = faces
         return _polyface
@@ -195,21 +185,27 @@ class Polyface3D(Base2DIn3D):
             tolerance: The maximum difference between x, y, and z values at which
                 point vertices are considered equivalent.
         """
+        # ensure that all faces are counter-clockwise
+        _faces = tuple(
+            face if not face.is_clockwise else face.reverse() for face in faces)
         # extract unique vertices from the faces
         vertices = []  # collection of vertices as point objects
         face_indices = []  # collection of face indices
-        for f in faces:
+        for f in _faces:
             ind = []
-            for v in f:
-                found = False
-                for i, vert in enumerate(vertices):  # slow for large number of vertices.
-                    if v.is_equivalent(vert, tolerance):
-                        found = True
-                        ind.append(i)
-                        break
-                if found is False:  # add new point
-                    vertices.append(v)
-                    ind.append(len(vertices) - 1)
+            loops = [f.boundary] if not f.has_holes else [f.boundary] + f.holes
+            for j, loop in enumerate(loops):
+                ind.append([])
+                for v in loop:
+                    found = False
+                    for i, vert in enumerate(vertices):
+                        if v.is_equivalent(vert, tolerance):
+                            found = True
+                            ind[j].append(i)
+                            break
+                    if found is False:  # add new point
+                        vertices.append(v)
+                        ind[j].append(len(vertices) - 1)
             face_indices.append(tuple(ind))
 
         # get the polyface object and assign correct faces to it
@@ -218,7 +214,6 @@ class Polyface3D(Base2DIn3D):
             _polyface._faces = cls.get_outward_faces(faces, tolerance)
         else:
             _polyface._faces = faces
-        _polyface._tolerance = tolerance
         return _polyface
 
     @classmethod
@@ -250,14 +245,14 @@ class Polyface3D(Base2DIn3D):
         _verts = (_o, _o + _w_vec, _o + _w_vec + _l_vec, _o + _l_vec,
                   _o + _h_vec, _o + _w_vec + _h_vec,
                   _o + _w_vec + _l_vec + _h_vec, _o + _l_vec + _h_vec)
-        _face_indices = ((0, 1, 2, 3), (0, 4, 5, 1), (0, 3, 7, 4),
-                         (2, 1, 5, 6), (6, 7, 3, 2), (7, 6, 5, 4))
+        _face_indices = ([(0, 1, 2, 3)], [(0, 4, 5, 1)], [(0, 3, 7, 4)],
+                         [(2, 1, 5, 6)], [(6, 7, 3, 2)], [(7, 6, 5, 4)])
         _edge_indices = ((3, 0), (0, 1), (1, 2), (2, 3), (0, 4), (4, 5),
                          (5, 1), (3, 7), (7, 4), (6, 2), (5, 6), (6, 7))
         polyface = cls(_verts, _face_indices, {'edge_indices': _edge_indices,
                                                'edge_types': [1] * 12})
-        verts = tuple(tuple(_verts[i] for i in face) for face in _face_indices)
-        polyface._faces = tuple(Face3D.from_vertices(v) for v in verts)
+        verts = tuple(tuple(_verts[i] for i in face[0]) for face in _face_indices)
+        polyface._faces = tuple(Face3D(v) for v in verts)
         polyface._volume = length * width * height
         return polyface
 
@@ -283,43 +278,52 @@ class Polyface3D(Base2DIn3D):
             'height must be a number. Got {}.'.format(type(offset))
         # get the extrusion vector and starting vertices
         extru_vec = face.normal * offset
-        cclock_verts = face._boundary if face.is_clockwise else \
+        cclock_verts = face._boundary if not face.is_clockwise else \
             list(reversed(face._boundary))
         # compute vertices, face indices, and edges of the extrusion
         verts, face_ind_extru, edge_indices = \
             Polyface3D._verts_faces_edges_from_boundary(cclock_verts, extru_vec)
         if face.has_holes:
+            _st_i = len(verts)
             for i, hole in enumerate(face.hole_polygon2d):
                 hole_verts = face._holes[i] if hole.is_clockwise else \
                     list(reversed(face._holes[i]))
                 verts_2, face_ind_extru_2, edge_indices_2 = \
-                    Polyface3D._verts_faces_edges_from_boundary(hole_verts, extru_vec)
+                    Polyface3D._verts_faces_edges_from_boundary(
+                        hole_verts, extru_vec, _st_i)
                 verts.extend(verts_2)
                 face_ind_extru.extend(face_ind_extru_2)
                 edge_indices.extend(edge_indices_2)
+                _st_i += len(hole_verts)
+        face_ind_extru = [[fc] for fc in face_ind_extru]
         # compute the final faces (accounting for top and bottom)
         if not face.has_holes:
             len_faces = len(cclock_verts)
-            face_ind_bottom = tuple(xrange(len_faces))
-            face_ind_top = tuple(xrange(len_faces * 2 - 1, len_faces - 1, -1))
+            face_ind_bottom = [tuple(reversed(xrange(len_faces)))]
+            face_ind_top = [tuple(reversed(xrange(len_faces * 2 - 1, len_faces - 1, -1)))]
         else:
-            face_verts_bottom = list(reversed(face._vertices)) if face.is_clockwise \
-                else face._vertices
-            face_verts_top = [pt.move(extru_vec)
-                              for pt in reversed(face_verts_bottom)]
-            face_ind_bottom = tuple(verts.index(pt) for pt in face_verts_bottom)
-            face_ind_top = tuple(verts.index(pt) for pt in face_verts_top)
+            if face.is_clockwise:
+                face_verts_bottom = [face.boundary] + list(face.holes)
+            else:
+                face_verts_bottom = [list(reversed(face.boundary))] + list(face.holes)
+            face_verts_top = [[pt.move(extru_vec) for pt in reversed(loop)]
+                              for loop in face_verts_bottom]
+            face_ind_bottom = [tuple(verts.index(pt) for pt in loop)
+                               for loop in face_verts_bottom]
+            face_ind_top = [tuple(verts.index(pt) for pt in loop)
+                            for loop in face_verts_top]
         faces_ind = [face_ind_bottom] + face_ind_extru + [face_ind_top]
         # create the polysurface and assign known properties.
         polyface = Polyface3D(verts, faces_ind,
                               {'edge_indices': edge_indices,
                                'edge_types': [1] * len(edge_indices)})
         polyface._volume = face.area * offset
-        face_verts = tuple(tuple(verts[i] for i in f) for f in faces_ind)
+        face_verts = tuple(
+            tuple(tuple(verts[i] for i in loop) for loop in f) for f in faces_ind)
         if not face.has_holes:
-            polyface._faces = tuple(Face3D.from_vertices(v) for v in face_verts)
+            polyface._faces = tuple(Face3D(v[0]) for v in face_verts)
         else:
-            mid_faces = [Face3D.from_vertices(v) for v in face_verts[1:-1]]
+            mid_faces = [Face3D(v[0]) for v in face_verts[1:-1]]
             bottom_face = face.flip()
             top_face = face.move(extru_vec)
             if not face.is_clockwise:
@@ -343,9 +347,14 @@ class Polyface3D(Base2DIn3D):
     def faces(self):
         """Tuple of all Face3D objects making up this polyface."""
         if self._faces is None:
-            verts = tuple(tuple(self.vertices[i] for i in face)
-                          for face in self._face_indices)
-            faces = tuple(Face3D.from_vertices(v) for v in verts)
+            faces = []
+            for face in self._face_indices:
+                boundary = tuple(self.vertices[i] for i in face[0])
+                if len(face) == 1:
+                    faces.append(Face3D(boundary))
+                else:
+                    holes = tuple(tuple(self.vertices[i] for i in f) for f in face[1:])
+                    faces.append(Face3D(boundary=boundary, holes=holes))
             if self._is_solid:
                 faces = Polyface3D.get_outward_faces(faces)
             self._faces = faces
@@ -765,8 +774,9 @@ class Polyface3D(Base2DIn3D):
 
     def to_dict(self):
         """Get Polyface3D as a dictionary."""
-        return {'faces': [face.to_dict() for face in self.faces],
-                'tolerance': self._tolerance, 'angle_tolerance': self._angle_tolerance}
+        return {'vertices': [v.to_dict() for v in self.vertices],
+                'face_indices': self.face_indices,
+                'edge_information': self.edge_information}
 
     def _get_edge_type(self, edge_type):
         """Get all of the edges of a certain type in this polyface."""
@@ -783,7 +793,7 @@ class Polyface3D(Base2DIn3D):
         verts = list(cclock_verts) + [pt.move(extru_vec) for pt in cclock_verts]
         len_faces = len(cclock_verts)
         faces_ind = []
-        for i in xrange(st_i, len_faces - 1):
+        for i in xrange(st_i, st_i + len_faces - 1):
             faces_ind.append((i, i + 1, i + len_faces + 1, i + len_faces))
         faces_ind.append((st_i + len_faces - 1, st_i,
                           st_i + len_faces, st_i + len_faces * 2 - 1))
