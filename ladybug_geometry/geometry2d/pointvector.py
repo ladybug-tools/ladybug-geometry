@@ -22,6 +22,17 @@ class Vector2D(object):
         self._x = x
         self._y = y
 
+    @classmethod
+    def from_dict(cls, data):
+        """Create a Vector2D/Point2D from a dictionary.
+
+        Args:
+            data: {
+            "x": 10,
+            "y": 0}
+        """
+        return cls(data['x'], data['y'])
+
     @property
     def x(self):
         """Get the X coordinate."""
@@ -113,6 +124,11 @@ class Vector2D(object):
     def duplicate(self):
         """Get a copy of this vector."""
         return self.__copy__()
+
+    def to_dict(self):
+        """Get Vector2D/Point2D as a dictionary."""
+        return {'x': self.x,
+                'y': self.y}
 
     @staticmethod
     def _rotate(vec, angle):

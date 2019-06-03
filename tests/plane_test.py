@@ -41,6 +41,16 @@ class PlaneTestCase(unittest.TestCase):
         assert plane_flip.y == Vector3D(0, 0, -1)
         assert plane_flip.k == 0
 
+    def test_plane_to_from_dict(self):
+        """Test the initalization of Plane objects and basic properties."""
+        pt = Point3D(2, 0, 2)
+        vec = Vector3D(0, 2, 0)
+        plane = Plane(vec, pt)
+        plane_dict = plane.to_dict()
+        new_plane = Plane.from_dict(plane_dict)
+        assert isinstance(new_plane, Plane)
+        assert new_plane.to_dict() == plane_dict
+
     def test_init_from_three_points(self):
         """Test the initalization of Plane from end points."""
         plane = Plane.from_three_points(Point3D(0, 0, 2), Point3D(0, 2, 2),

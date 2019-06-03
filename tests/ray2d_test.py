@@ -25,6 +25,16 @@ class Ray2DTestCase(unittest.TestCase):
         assert flip_ray.p == Point2D(2, 0)
         assert flip_ray.v == Vector2D(0, -2)
 
+    def test_ray2_to_from_dict(self):
+        """Test the to/from dict of Ray2D objects."""
+        pt = Point2D(2, 0)
+        vec = Vector2D(0, 2)
+        ray = Ray2D(pt, vec)
+        ray_dict = ray.to_dict()
+        new_ray = Ray2D.from_dict(ray_dict)
+        assert isinstance(new_ray, Ray2D)
+        assert new_ray.to_dict() == ray_dict
+
     def test_ray2d_mutability(self):
         """Test the mutability and immutability of Ray2D objects."""
         pt = Point2D(2, 0)

@@ -45,7 +45,9 @@ class Plane(object):
             if self._n.x == 0 and self._n.y == 0:
                 self._x = Vector3D(1, 0, 0)
             else:
-                self._x = Vector3D(self._n.y, -self._n.x, 0)
+                x = Vector3D(self._n.y, -self._n.x, 0)
+                x = x.normalize()
+                self._x = x
         else:
             assert isinstance(x, Vector3D), \
                 "Expected Vector3D for plane X-axis. Got {}.".format(type(x))
@@ -55,6 +57,21 @@ class Plane(object):
                 'degrees between them.'.format(math.degrees(self._n.angle(x)))
             self._x = x
         self._y = self._n.cross(self._x)
+
+    @classmethod
+    def from_dict(cls, data):
+        """Create a Plane from a dictionary.
+
+        Args:
+            data: {
+            "n": {"x": 0, "y": 0, "z": 1},
+            "o": {"x": 0, "y": 10, "z": 0},
+            "x": {"x": 1, "y": 0, "z": 0}}
+        """
+        x = None
+        if 'x' in data and data['x'] is not None:
+            x = Vector3D.from_dict(data['x'])
+        return cls(Vector3D.from_dict(data['n']), Point3D.from_dict(data['o']), x)
 
     @classmethod
     def from_three_points(cls, o, p2, p3):
@@ -306,6 +323,12 @@ class Plane(object):
     def duplicate(self):
         """Get a copy of this object."""
         return self.__copy__()
+
+    def to_dict(self):
+        """Get Plane as a dictionary."""
+        return {'n': self.n.to_dict(),
+                'o': self.o.to_dict(),
+                'x': self.x.to_dict()}
 
     def __copy__(self):
         return self.__class__(self.n, self.o)

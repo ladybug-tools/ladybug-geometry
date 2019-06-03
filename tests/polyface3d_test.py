@@ -67,6 +67,58 @@ class Polyface3DTestCase(unittest.TestCase):
         for face in polyface.faces:
             assert face.area == 4
 
+    def test_polyface3d_to_from_dict(self):
+        """Test the to/from dict of Polyface3D objects."""
+        polyface = Polyface3D.from_box(2, 4, 2)
+
+        polyface_dict = polyface.to_dict()
+        new_polyface = Polyface3D.from_dict(polyface_dict)
+        assert isinstance(new_polyface, Polyface3D)
+        assert new_polyface.to_dict() == polyface_dict
+
+        assert len(new_polyface.vertices) == 8
+        assert len(new_polyface.face_indices) == 6
+        assert len(new_polyface.faces) == 6
+        assert len(new_polyface.edge_indices) == 12
+        assert len(new_polyface.edges) == 12
+        assert len(new_polyface.naked_edges) == 0
+        assert len(new_polyface.non_manifold_edges) == 0
+        assert len(new_polyface.internal_edges) == 12
+        assert new_polyface.area == 40
+        assert new_polyface.volume == 16
+        assert new_polyface.is_solid
+
+    def test_polyface3d_to_from_dict_with_overlap(self):
+        """Test the to/from dict of Polyface3D objects with overlapping edges."""
+        pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
+        pts_2 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(0, 2, 0)]
+        pts_3 = [Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(0, 0, 2)]
+        pts_4 = [Point3D(2, 2, 0), Point3D(0, 2, 0), Point3D(0, 2, 2), Point3D(2, 2, 2)]
+        pts_5 = [Point3D(2, 2, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(2, 2, 2)]
+        pts_6 = [Point3D(0, 0, 2), Point3D(0, 1, 2), Point3D(2, 1, 2), Point3D(2, 0, 2)]
+        pts_7 = [Point3D(0, 1, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 1, 2)]
+        face_1 = Face3D.from_vertices(pts_1)
+        face_2 = Face3D.from_vertices(pts_2)
+        face_3 = Face3D.from_vertices(pts_3)
+        face_4 = Face3D.from_vertices(pts_4)
+        face_5 = Face3D.from_vertices(pts_5)
+        face_6 = Face3D.from_vertices(pts_6)
+        face_7 = Face3D.from_vertices(pts_7)
+        polyface = Polyface3D.from_faces(
+            [face_1, face_2, face_3, face_4, face_5, face_6, face_7])
+        new_polyface = polyface.merge_overlapping_edges(0.0001, 0.0001)
+        assert new_polyface.is_solid
+        assert len(new_polyface.naked_edges) == 0
+        assert len(new_polyface.internal_edges) == 13
+
+        polyface_dict = new_polyface.to_dict()
+        dict_polyface = Polyface3D.from_dict(polyface_dict)
+        assert isinstance(dict_polyface, Polyface3D)
+        assert dict_polyface.to_dict() == polyface_dict
+        assert dict_polyface.is_solid
+        assert len(dict_polyface.naked_edges) == 0
+        assert len(dict_polyface.internal_edges) == 13
+
     def test_polyface3d_init_from_faces_solid(self):
         """Test the initalization of Poyface3D from_faces with a solid."""
         pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
@@ -326,18 +378,19 @@ class Polyface3DTestCase(unittest.TestCase):
         This ensures that the is_solid property still works where the Euler
         characteristic fails.
         """
-        pts_1 = [Point3D(0, 0, 0), Point3D(1, 1, 1), Point3D(1, 3, 1), Point3D(0, 4, 0)]
-        pts_2 = [Point3D(0, 0, 0), Point3D(1, 1, 1), Point3D(3, 1, 1), Point3D(4, 0, 0)]
-        pts_3 = [Point3D(4, 4, 0), Point3D(3, 3, 1), Point3D(1, 3, 1), Point3D(0, 4, 0)]
-        pts_4 = [Point3D(4, 4, 0), Point3D(3, 3, 1), Point3D(3, 1, 1), Point3D(4, 0, 0)]
-        pts_5 = [Point3D(0, 0, 2), Point3D(1, 1, 1), Point3D(1, 3, 1), Point3D(0, 4, 2)]
-        pts_6 = [Point3D(0, 0, 2), Point3D(1, 1, 1), Point3D(3, 1, 1), Point3D(4, 0, 2)]
-        pts_7 = [Point3D(4, 4, 2), Point3D(3, 3, 1), Point3D(1, 3, 1), Point3D(0, 4, 2)]
-        pts_8 = [Point3D(4, 4, 2), Point3D(3, 3, 1), Point3D(3, 1, 1), Point3D(4, 0, 2)]
-        pts_9 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(0, 4, 2), Point3D(0, 4, 0)]
-        pts_10 = [Point3D(0, 0, 0), Point3D(4, 0, 0), Point3D(4, 0, 2), Point3D(0, 0, 2)]
-        pts_11 = [Point3D(4, 4, 0), Point3D(0, 4, 0), Point3D(0, 4, 2), Point3D(4, 4, 2)]
-        pts_12 = [Point3D(4, 4, 0), Point3D(4, 0, 0), Point3D(4, 0, 2), Point3D(4, 4, 2)]
+        pts_1 = [Point3D(0, 0, 2), Point3D(0, 0, 0), Point3D(4, 0, 0), Point3D(4, 0, 2)]
+        pts_2 = [Point3D(4, 0, 2), Point3D(4, 0, 0), Point3D(4, 4, 0), Point3D(4, 4, 2)]
+        pts_3 = [Point3D(4, 4, 2), Point3D(4, 4, 0), Point3D(0, 4, 0), Point3D(0, 4, 2)]
+        pts_4 = [Point3D(0, 4, 2), Point3D(0, 4, 0), Point3D(0, 0, 0), Point3D(0, 0, 2)]
+        pts_5 = [Point3D(0, 0, 0), Point3D(0, 4, 0), Point3D(1, 3, 1), Point3D(1, 1, 1)]
+        pts_6 = [Point3D(4, 0, 0), Point3D(0, 0, 0), Point3D(1, 1, 1), Point3D(3, 1, 1)]
+        pts_7 = [Point3D(4, 4, 0), Point3D(4, 0, 0), Point3D(3, 1, 1), Point3D(3, 3, 1)]
+        pts_8 = [Point3D(0, 4, 0), Point3D(4, 4, 0), Point3D(3, 3, 1), Point3D(1, 3, 1)]
+        pts_9 = [Point3D(1, 1, 1), Point3D(1, 3, 1), Point3D(0, 4, 2), Point3D(0, 0, 2)]
+        pts_10 = [Point3D(3, 1, 1), Point3D(1, 1, 1), Point3D(0, 0, 2), Point3D(4, 0, 2)]
+        pts_11 = [Point3D(3, 3, 1), Point3D(3, 1, 1), Point3D(4, 0, 2), Point3D(4, 4, 2)]
+        pts_12 = [Point3D(1, 3, 1), Point3D(3, 3, 1), Point3D(4, 4, 2), Point3D(0, 4, 2)]
+
         face_1 = Face3D.from_vertices(pts_1)
         face_2 = Face3D.from_vertices(pts_2)
         face_3 = Face3D.from_vertices(pts_3)
@@ -354,8 +407,8 @@ class Polyface3DTestCase(unittest.TestCase):
                                           face_6, face_7, face_8, face_9, face_10,
                                           face_11, face_12])
         assert len(polyface.faces) + len(polyface.vertices) - len(polyface.edges) != 2
-        assert polyface.area == pytest.approx(57.4558, rel=1e-3)
-        assert polyface.volume == pytest.approx(15.333, rel=1e-3)
+        assert polyface.area == pytest.approx(65.941125, rel=1e-3)
+        assert polyface.volume == pytest.approx(13.333333, rel=1e-3)
         assert polyface.is_solid
 
     def test_min_max_center(self):

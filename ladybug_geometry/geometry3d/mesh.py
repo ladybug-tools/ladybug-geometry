@@ -10,6 +10,13 @@ from .plane import Plane
 from ._2d import Base2DIn3D
 
 try:
+    from ladybug.color import Color
+except ImportError:
+    Color = None
+    print('Failed to import ladybug Color.\n'
+          'Importing mesh colors in from_dict methods will not be availabe.')
+
+try:
     from itertools import izip as zip  # python 2
 except ImportError:
     xrange = range  # python 3
@@ -60,6 +67,22 @@ class Mesh3D(MeshBase, Base2DIn3D):
         self._face_centroids = None
         self._face_normals = None
         self._vertex_normals = None
+
+    @classmethod
+    def from_dict(cls, data):
+        """Create a Mesh3D from a dictionary.
+
+        Args:
+            data: {
+            "vertices": [{"x": 0, "y": 0}, {"x": 10, "y": 0}, {"x": 0, "y": 10}],
+            "faces": [(0, 1, 2)]
+            }
+        """
+        colors = None
+        if Color is not None and 'colors' in data and data['colors'] is not None:
+            colors = tuple(Color.from_dict(col) for col in data['colors'])
+        return cls(tuple(Point3D.from_dict(pt) for pt in data['vertices']),
+                   data['faces'], colors)
 
     @classmethod
     def from_face_vertices(cls, faces, purge=True):
@@ -233,6 +256,14 @@ class Mesh3D(MeshBase, Base2DIn3D):
         else:
             _verts = tuple(pt.scale(factor, origin) for pt in self.vertices)
         return self._mesh_scale(_verts, factor)
+
+    def to_dict(self):
+        """Get Mesh3D as a dictionary."""
+        colors = None
+        if self.colors is not None:
+            colors = [col.to_dict() for col in self.colors]
+        return {'vertices': [pt.to_dict() for pt in self.vertices],
+                'faces': self.faces, 'colors': colors}
 
     def _calculate_face_areas_and_normals(self):
         """Calculate face areas and normals from vertices."""

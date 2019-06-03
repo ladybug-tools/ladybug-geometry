@@ -39,6 +39,15 @@ class Mesh3DTestCase(unittest.TestCase):
         assert mesh._is_color_by_face is False
         assert mesh.colors is None
 
+    def test_mesh3d_to_from_dict(self):
+        """Test the to/from dict of Mesh3D objects."""
+        pts = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
+        mesh = Mesh3D(pts, [(0, 1, 2, 3)])
+        mesh_dict = mesh.to_dict()
+        new_mesh = Mesh3D.from_dict(mesh_dict)
+        assert isinstance(new_mesh, Mesh3D)
+        assert new_mesh.to_dict() == mesh_dict
+
     def test_face_normals(self):
         """Test the Mesh3D face_normals property."""
         pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
