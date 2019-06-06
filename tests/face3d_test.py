@@ -67,7 +67,7 @@ class Face3DTestCase(unittest.TestCase):
         assert new_face.to_dict() == face_dict
 
     def test_face3d_init_from_vertices(self):
-        """Test the initalization of Face3D objects from_vertices."""
+        """Test the initalization of Face3D objects without a plane."""
         pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
         face = Face3D(pts)
 
@@ -313,6 +313,30 @@ class Face3DTestCase(unittest.TestCase):
         assert face_1.is_geometrically_equivalent(face_6, 0.0001) is False
         assert face_1.is_geometrically_equivalent(face_7, 0.0001) is False
         assert face_1.is_geometrically_equivalent(face_8, 0.0001) is True
+
+    def test_is_centered_adjacent(self):
+        """Test the is_centered_adjacent method."""
+        plane_1 = Plane(Vector3D(0, 0, 1))
+        plane_2 = Plane(Vector3D(0, 0, -1))
+        pts_1 = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 2), Point3D(0, 2))
+        pts_2 = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
+        pts_3 = (Point3D(0, 0), Point3D(2, 0), Point3D(2.1, 2.1), Point3D(0, 2))
+        pts_4 = (Point3D(1, 0), Point3D(0, 1), Point3D(1, 2), Point3D(2, 1))
+        pts_5 = (Point3D(2, 0), Point3D(2, 2), Point3D(0, 2), Point3D(0, 0))
+        face_1 = Face3D(pts_1, plane_1)
+        face_2 = Face3D(pts_2, plane_1)
+        face_3 = Face3D(pts_1, plane_2)
+        face_4 = Face3D(pts_2, plane_2)
+        face_5 = Face3D(pts_3, plane_1)
+        face_6 = Face3D(pts_4, plane_1)
+        face_7 = Face3D(pts_5, plane_1)
+
+        assert face_1.is_centered_adjacent(face_2, 0.0001, 0.0001) is True
+        assert face_1.is_centered_adjacent(face_3, 0.0001, 0.0001) is True
+        assert face_1.is_centered_adjacent(face_4, 0.0001, 0.0001) is True
+        assert face_1.is_centered_adjacent(face_5, 0.0001, 0.0001) is False
+        assert face_1.is_centered_adjacent(face_6, 0.0001, 0.0001) is True
+        assert face_1.is_centered_adjacent(face_7, 0.0001, 0.0001) is True
 
     def test_is_sub_face(self):
         """Test the is_sub_face method."""
