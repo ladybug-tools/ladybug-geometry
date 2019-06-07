@@ -513,7 +513,8 @@ class Face3D(Base2DIn3D):
         direction of the face.  However, all other properties must be matching to
         within the input tolerance.
 
-        This is useful for identifying matching surfaces when solving for adjacency.
+        This is useful for identifying matching surfaces when solving for adjacency
+        and you need to ensure that two faces match perfectly in their area and vertices.
         Note that you may also want to use the remove_colinear_vertices() method
         on input faces before using this method in order to count faces with the
         same non-colinear vertices as geometrically equivalent.
@@ -550,6 +551,33 @@ class Face3D(Base2DIn3D):
                 if self[match_i - i].is_equivalent(face[i], tolerance) is False:
                     return False
         else:
+            return False
+        return True
+
+    def is_centered_adjacent(self, face, tolerance, angle_tolerance):
+        """Check whether a given face is centered adjacent with this Face.
+
+        Centered adjacency is definied as being coplananar with this face and sharing
+        the same center point to within the tolerance.
+
+        This is useful for identifying matching surfaces when you want to quickly
+        solve for adjacency and you are not concerned about false positives in cases
+        where one face does not perfectly match the other in terms of area or vertices.
+        This means it is good enough for cases where users know how to set up their
+        model correctly.
+
+        Args:
+            face: Another face for which centered adjacency will be tested.
+            tolerance: The minimum difference between the coordinate values of two
+                centers at which they can be considered centered adjacent.
+            angle_tolerance: The max angle in radians that the plane normals can
+                differ from one another in order for them to be considered coplanar.
+        Returns:
+            True if centered adjacent. False if not centered adjacent.
+        """
+        if not self.center.is_equivalent(face.center, tolerance):
+            return False
+        if not self.plane.is_coplanar_tolerance(face.plane, tolerance, angle_tolerance):
             return False
         return True
 
