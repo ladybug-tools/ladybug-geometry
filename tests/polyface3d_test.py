@@ -37,6 +37,7 @@ class Polyface3DTestCase(unittest.TestCase):
 
         for face in polyface.faces:
             assert face.area == 4
+            assert face.is_clockwise is False
         assert polyface.faces[0].normal == Vector3D(0, 0, -1)
         assert polyface.faces[1].normal == Vector3D(-1, 0, 0)
         assert polyface.faces[2].normal == Vector3D(0, -1, 0)
@@ -66,6 +67,7 @@ class Polyface3DTestCase(unittest.TestCase):
 
         for face in polyface.faces:
             assert face.area == 4
+            assert face.is_clockwise is False
 
     def test_polyface3d_init_from_faces_solid(self):
         """Test the initalization of Poyface3D from_faces with a solid."""
@@ -98,6 +100,7 @@ class Polyface3DTestCase(unittest.TestCase):
 
         for face in polyface.faces:
             assert face.area == 4
+            assert face.is_clockwise is False
         assert polyface.faces[0].normal == Vector3D(0, 0, -1)
         assert polyface.faces[1].normal == Vector3D(-1, 0, 0)
         assert polyface.faces[2].normal == Vector3D(0, -1, 0)
@@ -133,6 +136,7 @@ class Polyface3DTestCase(unittest.TestCase):
 
         for face in polyface.faces:
             assert face.area == 4
+            assert face.is_clockwise is False
 
     def test_polyface3d_init_from_faces_coplanar(self):
         """Test the initalization of Poyface3D from_faces with two coplanar faces."""
