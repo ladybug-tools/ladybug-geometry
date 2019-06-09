@@ -54,9 +54,9 @@ class Face3D(Base2DIn3D):
                  '_boundary', '_holes', '_boundary_segments', '_hole_segments',
                  '_boundary_polygon2d', '_hole_polygon2d',
                  '_min', '_max', '_center', '_perimeter', '_area', '_centroid',
-                 '_is_clockwise', '_is_convex', '_is_self_intersecting')
+                 '_is_convex', '_is_self_intersecting')
 
-    def __init__(self, boundary, plane=None, holes=None):
+    def __init__(self, boundary, plane=None, holes=None, enforce_right_hand=True):
         """Initilize Face3D.
 
         Args:
@@ -74,6 +74,14 @@ class Face3D(Base2DIn3D):
                 `vertices` property will always contain all vertices across the shape.
                 For a Face3D that has holes, it will trace out a single shape that
                 turns inwards from the boundary to cut out the holes.
+            enforce_right_hand: Boolean to note whether a check should be run to
+                ensure that input vertices are counterclockwise within the input plane,
+                thereby enforcing the right-hand rule. By default, this is True
+                and ensures that all Face3D objects adhere to the right-hand rule.
+                It is recommended that this only be set to False in cases where you
+                are certain that the input vertices are counter-clockwise
+                within the input plane and you would like to avoid the extra
+                unnecessary check.
         """
         # process the boundary and plane inputs
         self._boundary = self._check_vertices_input(boundary)
@@ -102,6 +110,15 @@ class Face3D(Base2DIn3D):
             self._vertices = tuple(plane.xy_to_xyz(_v) for _v in _polygon2d.vertices)
             self._polygon2d = _polygon2d
 
+        # perform a check of vertex orientation and enforce counter clockwise vertices
+        if enforce_right_hand is True:
+            if self.is_clockwise is True:
+                self._boundary = tuple(reversed(self._boundary))
+                self._vertices = tuple(reversed(self._vertices))
+                if self._polygon2d is not None:
+                    self._polygon2d = self._polygon2d.reverse()
+
+        # set other properties to None for now
         self._mesh2d = None
         self._mesh3d = None
         self._boundary_polygon2d = None
@@ -114,7 +131,6 @@ class Face3D(Base2DIn3D):
         self._perimeter = None
         self._area = None
         self._centroid = None
-        self._is_clockwise = None
         self._is_convex = None
         self._is_self_intersecting = None
 
@@ -157,16 +173,15 @@ class Face3D(Base2DIn3D):
             'extrusion_vector must be Vector3D. Got {}.'.format(type(extrusion_vector))
         _p1 = line_segment.p1
         _p2 = line_segment.p2
-        _verts = (_p1, _p1 + extrusion_vector, _p2 + extrusion_vector, _p2)
+        _verts = (_p1, _p2, _p2 + extrusion_vector, _p1 + extrusion_vector)
         _plane = Plane(line_segment.v.cross(extrusion_vector), _p1)
-        face = cls(_verts, _plane)
+        face = cls(_verts, _plane, enforce_right_hand=False)
         _base = line_segment.length
         _dist = extrusion_vector.magnitude
         _height = _dist * math.sin(extrusion_vector.angle(line_segment.v))
         face._perimeter = _base * 2 + _dist * 2
         face._area = _base * _height
         face._centroid = _p1 + (line_segment.v * 0.5) + (extrusion_vector * 0.5)
-        face._is_clockwise = True
         face._is_convex = True
         face._is_self_intersecting = False
         return face
@@ -196,12 +211,11 @@ class Face3D(Base2DIn3D):
         _o = base_plane.o
         _b_vec = base_plane.x * base
         _h_vec = base_plane.y * height
-        _verts = (_o, _o + _h_vec, _o + _h_vec + _b_vec, _o + _b_vec)
-        face = cls(_verts, base_plane)
+        _verts = (_o, _o + _b_vec, _o + _h_vec + _b_vec, _o + _h_vec)
+        face = cls(_verts, base_plane, enforce_right_hand=False)
         face._perimeter = base * 2 + height * 2
         face._area = base * height
         face._centroid = _o + (_b_vec * 0.5) + (_h_vec * 0.5)
-        face._is_clockwise = True
         face._is_convex = True
         face._is_self_intersecting = False
         return face
@@ -230,19 +244,18 @@ class Face3D(Base2DIn3D):
         # create the regular polygon face
         _polygon2d = Polygon2D.from_regular_polygon(number_of_sides, radius)
         _vert3d = tuple(base_plane.xy_to_xyz(_v) for _v in _polygon2d.vertices)
-        _face = cls(_vert3d, base_plane)
+        _face = cls(_vert3d, base_plane, enforce_right_hand=False)
 
         # assign extra properties that we know to the face
         _face._polygon2d = _polygon2d
         _face._center = base_plane.o
         _face._centroid = base_plane.o
-        _face._is_clockwise = False
         _face._is_convex = True
         _face._is_self_intersecting = False
         return _face
 
     @classmethod
-    def from_punched_geometry(cls, base_face, sub_faces, plane=None):
+    def from_punched_geometry(cls, base_face, sub_faces):
         """Create a face with holes punched in it from sub-faces.
 
         Args:
@@ -252,19 +265,17 @@ class Face3D(Base2DIn3D):
                 base_face. These faces must lie completely within the base_face
                 for the result to be valid. The is_sub_face() method can be
                 used to check sub_faces before they are input here.
-            plane: A Plane object indicating the plane in which the face exists.
-                If left as None, the Plane normal will automatically be calculated.
         """
         assert isinstance(base_face, Face3D), \
             'base_face should be a Face3D. Got {}'.format(type(base_face))
         for hole in sub_faces:
             assert isinstance(hole, Face3D), \
                 'sub_face should be a list. Got {}'.format(type(hole))
-        plane = base_face.plane if plane is None else plane
         hole_verts = [list(sf.boundary) for sf in sub_faces]
         if base_face.has_holes:
             hole_verts.extend([list(h) for h in base_face.holes])
-        return cls(base_face.boundary, plane, hole_verts)
+        return cls(base_face.boundary, base_face.plane, hole_verts,
+                   enforce_right_hand=False)
 
     @property
     def vertices(self):
@@ -424,11 +435,11 @@ class Face3D(Base2DIn3D):
     def is_clockwise(self):
         """Boolean for whether the face vertices and boundary are in clockwise order.
 
-        Note that this does not describe the orientation of any holes in the face.
+        Note that all Face3D objects should have counterclockwise vertices (meaning
+        that this property should always be False). This property exists largely
+        for testing / debugging purposes.
         """
-        if self._is_clockwise is None:
-            self._is_clockwise = self.polygon2d.is_clockwise
-        return self._is_clockwise
+        return self.polygon2d.is_clockwise
 
     @property
     def is_convex(self):
@@ -542,13 +553,13 @@ class Face3D(Base2DIn3D):
         # check equivalency of each vertex
         if match_i is None:
             return False
-        elif self[match_i + 1].is_equivalent(face[1], tolerance):
-            for i in xrange(0, -len(self.vertices), -1):
-                if self[match_i + i].is_equivalent(face[i], tolerance) is False:
-                    return False
         elif self[match_i - 1].is_equivalent(face[1], tolerance):
             for i in xrange(len(self.vertices)):
                 if self[match_i - i].is_equivalent(face[i], tolerance) is False:
+                    return False
+        elif self[match_i + 1].is_equivalent(face[1], tolerance):
+            for i in xrange(0, -len(self.vertices), -1):
+                if self[match_i + i].is_equivalent(face[i], tolerance) is False:
                     return False
         else:
             return False
@@ -597,7 +608,7 @@ class Face3D(Base2DIn3D):
             angle_tolerance: The max angle in radians that the plane normals can
                 differ from one another in order for them to be considered coplanar.
         Returns:
-            True if it is a sub-face. False if it is not a sub-face.
+            True if it is a possibe sub-face. False if it is not a valid sub-face.
         """
         # test whether the surface is coplanar
         if not self.plane.is_coplanar_tolerance(face.plane, tolerance, angle_tolerance):
@@ -638,7 +649,7 @@ class Face3D(Base2DIn3D):
                 of plane. Default is True to raise an exception.
 
         Return:
-            True if planar. False is not planar.
+            True if planar within the tolerance. False if not planar.
         """
         for _v in self.vertices:
             if self._plane.distance_to_point(_v) > tolerance:
@@ -661,7 +672,7 @@ class Face3D(Base2DIn3D):
             return self
         new_vertices = self._remove_colinear(
             self._vertices, self.polygon2d, tolerance)
-        _new_face = Face3D(new_vertices, self.plane)
+        _new_face = Face3D(new_vertices, self.plane, enforce_right_hand=False)
         if not self.has_holes:
             return _new_face
         _new_face._boundary = self._remove_colinear(
@@ -671,40 +682,14 @@ class Face3D(Base2DIn3D):
                   for i, hole in enumerate(self._holes))
         return _new_face
 
-    def flip(self, preserve_clockwise=False):
-        """Get a face with a flipped direction from this one.
-
-        Note that, by default, this only flips the plane of the face and does not
-        change the vertices (meaning clockwise property will be inverted). Set
-        preserve_clockwise to True to also reverse the vertices.
-        """
-        if preserve_clockwise is False:
-            _new_face = Face3D(self.vertices, self.plane.flip())
-            self._transfer_properties(_new_face)
-            if self._is_clockwise is not None:
-                _new_face._is_clockwise = not self._is_clockwise
-            _new_face._boundary = self._boundary
-            _new_face._holes = self._holes
-        else:
-            _new_face = Face3D(reversed(self.vertices), self.plane.flip())
-            self._transfer_properties(_new_face)
-            _new_face._boundary = reversed(self._boundary)
-            _new_face._holes = tuple(reversed(hole) for hole in self._holes) \
-                if self._holes is not None else None
-        return _new_face
-
-    def reverse(self):
-        """Reverse the direction of vertices in the face while keeping the same normal.
-
-        Note that this does not chance the face normal. Only the is_clockwise property.
-        """
-        _new_face = Face3D(tuple(reversed(self.vertices)), self.plane)
+    def flip(self):
+        """Get a face with a flipped direction from this one."""
+        _new_face = Face3D(reversed(self.vertices), self.plane.flip(),
+                           enforce_right_hand=False)
         self._transfer_properties(_new_face)
         if self._holes is not None:
-            _new_face._boundary = reversed(self._boundary)
-            _new_face._holes = tuple(reversed(hole) for hole in self._holes)
-        if self._is_clockwise is not None:
-            _new_face._is_clockwise = not self._is_clockwise
+            _new_face._boundary = tuple(reversed(self._boundary))
+            _new_face._holes = self._holes
         return _new_face
 
     def move(self, moving_vec):
@@ -765,7 +750,8 @@ class Face3D(Base2DIn3D):
             origin: A Point3D representing the origin from which to reflect.
         """
         _verts = self._reflect(self.vertices, normal, origin)
-        _new_face = self._face_transform(_verts, self.plane.reflect(normal, origin))
+        _new_face = self._face_transform_reflect(
+                _verts, self.plane.reflect(normal, origin))
         if self._holes is not None:
             _new_face._boundary = self._reflect(self._boundary, normal, origin)
             _new_face._holes = tuple(self._reflect(hole, normal, origin)
@@ -907,6 +893,8 @@ class Face3D(Base2DIn3D):
         if flip is True:
             grid_mesh3d._face_normals = self._plane.n.reverse()
             grid_mesh3d._vertex_normals = self._plane.n.reverse()
+            grid_mesh3d._faces = tuple(
+                tuple(reversed(face)) for face in grid_mesh3d._faces)  # right-hand rule
         else:
             grid_mesh3d._face_normals = self._plane.n
             grid_mesh3d._vertex_normals = self._plane.n
@@ -1059,7 +1047,7 @@ class Face3D(Base2DIn3D):
         if rect_res is None:
             return self.sub_faces_by_ratio(ratio)
         bottom_seg, top_seg, other_faces = rect_res
-        rect_face = Face3D([bottom_seg.p1, bottom_seg.p2, top_seg.p2, top_seg.p1],
+        rect_face = Face3D((bottom_seg.p1, bottom_seg.p2, top_seg.p2, top_seg.p1),
                            self.plane)
         scale_factor = ratio ** .5
         sub_faces = [rect_face.scale(scale_factor, rect_face.center)]
@@ -1378,7 +1366,7 @@ class Face3D(Base2DIn3D):
         return tuple(pt.rotate_xy(angle, origin) for pt in vertices)
 
     def _reflect(self, vertices, normal, origin):
-        return tuple(pt.reflect(normal, origin) for pt in vertices)
+        return tuple(pt.reflect(normal, origin) for pt in reversed(vertices))
 
     def _scale(self, vertices, factor, origin):
         if origin is None:
@@ -1390,15 +1378,21 @@ class Face3D(Base2DIn3D):
 
     def _face_transform(self, verts, plane):
         """Transform face in a way that transfers properties and avoids checks."""
-        _new_face = Face3D(verts, plane)
+        _new_face = Face3D(verts, plane, enforce_right_hand=False)
         self._transfer_properties(_new_face)
         _new_face._polygon2d = self._polygon2d
         _new_face._mesh2d = self._mesh2d
         return _new_face
 
+    def _face_transform_reflect(self, verts, plane):
+        """Reflect face in a way that transfers properties and avoids checks."""
+        _new_face = Face3D(verts, plane, enforce_right_hand=False)
+        self._transfer_properties(_new_face)
+        return _new_face
+
     def _face_transform_scale(self, verts, plane, factor):
         """Scale face in a way that transfers properties and avoids checks."""
-        _new_face = Face3D(verts, plane)
+        _new_face = Face3D(verts, plane, enforce_right_hand=False)
         self._transfer_properties_scale(_new_face, factor)
         return _new_face
 
@@ -1412,7 +1406,6 @@ class Face3D(Base2DIn3D):
         new_face._area = self._area
         new_face._is_convex = self._is_convex
         new_face._is_self_intersecting = self._is_self_intersecting
-        new_face._is_clockwise = self._is_clockwise
 
     def _transfer_properties_scale(self, new_face, factor):
         """Transfer properties from this face to a new face.
@@ -1421,7 +1414,6 @@ class Face3D(Base2DIn3D):
         """
         new_face._is_convex = self._is_convex
         new_face._is_self_intersecting = self._is_self_intersecting
-        new_face._is_clockwise = self._is_clockwise
         if self._perimeter is not None:
             new_face._perimeter = self._perimeter * factor
         if self._area is not None:

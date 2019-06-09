@@ -516,7 +516,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
         _c = 0
         for i in xrange(num_x):
             for j in xrange(num_y):
-                _faces.append((_c, _c + 1, _c + num_y + 2, _c + num_y + 1))
+                _faces.append((_c, _c + num_y + 1, _c + num_y + 2, _c + 1))
                 _c += 1
             _c += 1
         return _faces

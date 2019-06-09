@@ -80,11 +80,11 @@ class Polyface3D(Base2DIn3D):
                 for fi in face:
                     for i, vi in enumerate(fi):
                         try:  # this can get slow for large number of vertices.
-                            ind = edge_i.index((fi[i - 1], vi))
+                            ind = edge_i.index((vi, fi[i - 1]))
                             edge_t[ind] += 1
                         except ValueError:  # make sure reversed edge isn't there
                             try:
-                                ind = edge_i.index((vi, fi[i - 1]))
+                                ind = edge_i.index((fi[i - 1], vi))
                                 edge_t[ind] += 1
                             except ValueError:  # add a new edge
                                 edge_i.append((fi[i - 1], vi))
@@ -145,13 +145,10 @@ class Polyface3D(Base2DIn3D):
         Args:
             faces: A list of Face3D objects representing the boundary of this Polyface.
         """
-        # ensure that all faces are counter-clockwise
-        _faces = tuple(
-            face if not face.is_clockwise else face.reverse() for face in faces)
         # extract unique vertices from the faces
         vertices = []  # collection of vertices as point objects
         face_indices = []  # collection of face indices
-        for f in _faces:
+        for f in faces:
             ind = []
             loops = [f.boundary] if not f.has_holes else [f.boundary] + f.holes
             for j, loop in enumerate(loops):
@@ -180,13 +177,10 @@ class Polyface3D(Base2DIn3D):
             tolerance: The maximum difference between x, y, and z values at which
                 point vertices are considered equivalent.
         """
-        # ensure that all faces are counter-clockwise
-        _faces = tuple(
-            face if not face.is_clockwise else face.reverse() for face in faces)
         # extract unique vertices from the faces
         vertices = []  # collection of vertices as point objects
         face_indices = []  # collection of face indices
-        for f in _faces:
+        for f in faces:
             ind = []
             loops = [f.boundary] if not f.has_holes else [f.boundary] + f.holes
             for j, loop in enumerate(loops):
@@ -242,7 +236,7 @@ class Polyface3D(Base2DIn3D):
         polyface = cls(_verts, _face_indices, {'edge_indices': _edge_indices,
                                                'edge_types': [1] * 12})
         verts = tuple(tuple(_verts[i] for i in face[0]) for face in _face_indices)
-        polyface._faces = tuple(Face3D(v) for v in verts)
+        polyface._faces = tuple(Face3D(v, enforce_right_hand=False) for v in verts)
         polyface._volume = length * width * height
         return polyface
 
@@ -266,18 +260,15 @@ class Polyface3D(Base2DIn3D):
             'face must be a Face3D. Got {}.'.format(type(face))
         assert isinstance(offset, (float, int)), \
             'height must be a number. Got {}.'.format(type(offset))
-        # get the extrusion vector and starting vertices
-        extru_vec = face.normal * offset
-        cclock_verts = face._boundary if not face.is_clockwise else \
-            list(reversed(face._boundary))
         # compute vertices, face indices, and edges of the extrusion
+        extru_vec = face.normal * offset
         verts, face_ind_extru, edge_indices = \
-            Polyface3D._verts_faces_edges_from_boundary(cclock_verts, extru_vec)
+            Polyface3D._verts_faces_edges_from_boundary(face.boundary, extru_vec)
         if face.has_holes:
             _st_i = len(verts)
             for i, hole in enumerate(face.hole_polygon2d):
                 hole_verts = face._holes[i] if hole.is_clockwise else \
-                    list(reversed(face._holes[i]))
+                    tuple(reversed(face._holes[i]))
                 verts_2, face_ind_extru_2, edge_indices_2 = \
                     Polyface3D._verts_faces_edges_from_boundary(
                         hole_verts, extru_vec, _st_i)
@@ -288,15 +279,12 @@ class Polyface3D(Base2DIn3D):
         face_ind_extru = [[fc] for fc in face_ind_extru]
         # compute the final faces (accounting for top and bottom)
         if not face.has_holes:
-            len_faces = len(cclock_verts)
+            len_faces = len(face.boundary)
             face_ind_bottom = [tuple(reversed(xrange(len_faces)))]
             face_ind_top = [tuple(
                 reversed(xrange(len_faces * 2 - 1, len_faces - 1, -1)))]
         else:
-            if face.is_clockwise:
-                face_verts_bottom = [face.boundary] + list(face.holes)
-            else:
-                face_verts_bottom = [list(reversed(face.boundary))] + list(face.holes)
+            face_verts_bottom = [list(reversed(face.boundary))] + list(face.holes)
             face_verts_top = [[pt.move(extru_vec) for pt in reversed(loop)]
                               for loop in face_verts_bottom]
             face_ind_bottom = [tuple(verts.index(pt) for pt in loop)
@@ -312,15 +300,13 @@ class Polyface3D(Base2DIn3D):
         face_verts = tuple(
             tuple(tuple(verts[i] for i in loop) for loop in f) for f in faces_ind)
         if not face.has_holes:
-            polyface._faces = tuple(Face3D(v[0]) for v in face_verts)
+            polyface._faces = tuple(Face3D(v[0], enforce_right_hand=False)
+                                    for v in face_verts)
         else:
-            mid_faces = [Face3D(v[0]) for v in face_verts[1:-1]]
+            mid_faces = [Face3D(v[0], enforce_right_hand=False)
+                         for v in face_verts[1:-1]]
             bottom_face = face.flip()
             top_face = face.move(extru_vec)
-            if not face.is_clockwise:
-                bottom_face = bottom_face.reverse()
-            else:
-                top_face = top_face.reverse()
             polyface._faces = tuple([bottom_face] + mid_faces + [top_face])
         return polyface
 

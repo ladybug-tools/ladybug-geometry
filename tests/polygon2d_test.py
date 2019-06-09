@@ -66,7 +66,7 @@ class Polygon2DTestCase(unittest.TestCase):
 
         assert polygon.area == 4
         assert polygon.perimeter == 8
-        assert polygon.is_clockwise is True
+        assert polygon.is_clockwise is False
         assert polygon.is_convex is True
         assert polygon.is_self_intersecting is False
 
@@ -229,6 +229,18 @@ class Polygon2DTestCase(unittest.TestCase):
         assert new_polygon.is_convex == new_polygon_2.is_convex
         assert new_polygon.is_self_intersecting == new_polygon_2.is_self_intersecting
 
+    def test_reverse(self):
+        """Test the reverse property."""
+        pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+        polygon = Polygon2D(pts_1)
+        new_polygon = polygon.reverse()
+
+        assert polygon.area == new_polygon.area
+        assert polygon.perimeter == new_polygon.perimeter
+        assert polygon.is_clockwise is not new_polygon.is_clockwise
+        assert polygon.is_convex == new_polygon.is_convex
+        assert polygon.is_self_intersecting == new_polygon.is_self_intersecting
+
     def test_move(self):
         """Test the Polygon2D move method."""
         pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
@@ -305,6 +317,11 @@ class Polygon2DTestCase(unittest.TestCase):
         assert test_1[0].y == pytest.approx(1, rel=1e-3)
         assert test_1[2].x == pytest.approx(0, rel=1e-3)
         assert test_1[2].y == pytest.approx(0, rel=1e-3)
+        assert polygon.area == pytest.approx(test_1.area, rel=1e-3)
+        assert polygon.perimeter == pytest.approx(test_1.perimeter, rel=1e-3)
+        assert polygon.is_clockwise is test_1.is_clockwise
+        assert polygon.is_convex is test_1.is_convex
+        assert polygon.is_self_intersecting is test_1.is_self_intersecting
 
         test_2 = polygon.rotate(math.pi/2, origin_1)
         assert test_2[0].x == pytest.approx(1, rel=1e-3)
@@ -326,6 +343,11 @@ class Polygon2DTestCase(unittest.TestCase):
         assert test_1[0].y == pytest.approx(1, rel=1e-3)
         assert test_1[2].x == pytest.approx(0, rel=1e-3)
         assert test_1[2].y == pytest.approx(2, rel=1e-3)
+        assert polygon.area == pytest.approx(test_1.area, rel=1e-3)
+        assert polygon.perimeter == pytest.approx(test_1.perimeter, rel=1e-3)
+        assert polygon.is_clockwise is not test_1.is_clockwise
+        assert polygon.is_convex is test_1.is_convex
+        assert polygon.is_self_intersecting is test_1.is_self_intersecting
 
         test_1 = polygon.reflect(normal_2, Point2D(0, 0))
         assert test_1[0].x == pytest.approx(-1, rel=1e-3)
