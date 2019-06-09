@@ -84,11 +84,11 @@ class Polygon2D(Base2DIn2D):
         _hv_norm = height_vector.normalize()
         _bv = Vector2D(_hv_norm.y, -_hv_norm.x) * base
         _hv = _hv_norm * height
-        _verts = (base_point, base_point + _hv, base_point + _hv + _bv, base_point + _bv)
+        _verts = (base_point, base_point + _bv, base_point + _hv + _bv, base_point + _hv)
         polygon = cls(_verts)
         polygon._perimeter = base * 2 + height * 2
         polygon._area = base * height
-        polygon._is_clockwise = True
+        polygon._is_clockwise = False
         polygon._is_convex = True
         polygon._is_self_intersecting = False
         return polygon
@@ -333,7 +333,11 @@ class Polygon2D(Base2DIn2D):
 
     def reverse(self):
         """Get a copy of this polygon where the vertices are reversed."""
-        return Polygon2D(tuple(pt for pt in reversed(self.vertices)))
+        _new_poly = Polygon2D(tuple(pt for pt in reversed(self.vertices)))
+        self._transfer_properties(_new_poly)
+        if self._is_clockwise is not None:
+            _new_poly._is_clockwise = not self._is_clockwise
+        return _new_poly
 
     def move(self, moving_vec):
         """Get a polygon that has been moved along a vector.
@@ -341,7 +345,9 @@ class Polygon2D(Base2DIn2D):
         Args:
             moving_vec: A Vector2D with the direction and distance to move the polygon.
         """
-        return Polygon2D(tuple(pt.move(moving_vec) for pt in self.vertices))
+        _new_poly = Polygon2D(tuple(pt.move(moving_vec) for pt in self.vertices))
+        self._transfer_properties(_new_poly)
+        return _new_poly
 
     def rotate(self, angle, origin):
         """Get a polygon that is rotated counterclockwise by a certain angle.
@@ -350,7 +356,9 @@ class Polygon2D(Base2DIn2D):
             angle: An angle for rotation in radians.
             origin: A Point2D for the origin around which the point will be rotated.
         """
-        return Polygon2D(tuple(pt.rotate(angle, origin) for pt in self.vertices))
+        _new_poly = Polygon2D(tuple(pt.rotate(angle, origin) for pt in self.vertices))
+        self._transfer_properties(_new_poly)
+        return _new_poly
 
     def reflect(self, normal, origin):
         """Get a polygon reflected across a plane with the input normal vector and origin.
@@ -360,7 +368,11 @@ class Polygon2D(Base2DIn2D):
                 which the polygon will be reflected. THIS VECTOR MUST BE NORMALIZED.
             origin: A Point2D representing the origin from which to reflect.
         """
-        return Polygon2D(tuple(pt.reflect(normal, origin) for pt in self.vertices))
+        _new_poly = Polygon2D(tuple(pt.reflect(normal, origin) for pt in self.vertices))
+        self._transfer_properties(_new_poly)
+        if self._is_clockwise is not None:
+            _new_poly._is_clockwise = not self._is_clockwise
+        return _new_poly
 
     def scale(self, factor, origin=None):
         """Scale a polygon by a factor from an origin point.
@@ -617,6 +629,18 @@ class Polygon2D(Base2DIn2D):
     def to_dict(self):
         """Get Polygon2D as a dictionary."""
         return {'vertices': [pt.to_dict() for pt in self.vertices]}
+
+    def _transfer_properties(self, new_polygon):
+        """Transfer properties from this polygon to a new polygon.
+
+        This is used by the transform methods that don't alter the relationship of
+        face vertices to one another (move, rotate, reflect).
+        """
+        new_polygon._perimeter = self._perimeter
+        new_polygon._area = self._area
+        new_polygon._is_convex = self._is_convex
+        new_polygon._is_self_intersecting = self._is_self_intersecting
+        new_polygon._is_clockwise = self._is_clockwise
 
     @staticmethod
     def _segments_from_vertices(vertices):

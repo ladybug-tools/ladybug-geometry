@@ -43,7 +43,7 @@ class Face3DTestCase(unittest.TestCase):
 
         assert face.area == 4
         assert face.perimeter == 8
-        assert face.is_clockwise is True
+        assert face.is_clockwise is False
         assert face.is_convex is True
         assert face.is_self_intersecting is False
         assert face.vertices[0] == face[0]
@@ -124,7 +124,7 @@ class Face3DTestCase(unittest.TestCase):
 
         assert face.area == 4
         assert face.perimeter == 8
-        assert face.is_clockwise is True
+        assert face.is_clockwise is False
         assert face.is_convex is True
         assert face.is_self_intersecting is False
 
@@ -153,7 +153,7 @@ class Face3DTestCase(unittest.TestCase):
 
         assert face.area == 4
         assert face.perimeter == 8
-        assert face.is_clockwise is True
+        assert face.is_clockwise is False
         assert face.is_convex is True
         assert face.is_self_intersecting is False
 
@@ -368,10 +368,20 @@ class Face3DTestCase(unittest.TestCase):
         plane_2 = Plane(Vector3D(0, 0, -1))
         pts_1 = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 2), Point3D(0, 2))
         pts_2 = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
-        face_1 = Face3D(pts_1, plane_1)
-        face_2 = Face3D(pts_2, plane_1)
-        face_3 = Face3D(pts_1, plane_2)
-        face_4 = Face3D(pts_2, plane_2)
+        face_1 = Face3D(pts_1, plane_1, enforce_right_hand=True)
+        face_2 = Face3D(pts_2, plane_1, enforce_right_hand=True)
+        face_3 = Face3D(pts_1, plane_2, enforce_right_hand=True)
+        face_4 = Face3D(pts_2, plane_2, enforce_right_hand=True)
+
+        assert face_1.is_clockwise is face_1.polygon2d.is_clockwise is False
+        assert face_2.is_clockwise is face_2.polygon2d.is_clockwise is False
+        assert face_3.is_clockwise is face_3.polygon2d.is_clockwise is False
+        assert face_4.is_clockwise is face_4.polygon2d.is_clockwise is False
+
+        face_1 = Face3D(pts_1, plane_1, enforce_right_hand=False)
+        face_2 = Face3D(pts_2, plane_1, enforce_right_hand=False)
+        face_3 = Face3D(pts_1, plane_2, enforce_right_hand=False)
+        face_4 = Face3D(pts_2, plane_2, enforce_right_hand=False)
 
         assert face_1.is_clockwise is face_1.polygon2d.is_clockwise is False
         assert face_2.is_clockwise is face_2.polygon2d.is_clockwise is True
@@ -447,46 +457,46 @@ class Face3DTestCase(unittest.TestCase):
         plane_2 = Plane(Vector3D(0, -1, 0))
         pts_1 = (Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(0, 0, 2))
         pts_2 = (Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 0, 0))
-        face_1 = Face3D(pts_1, plane_1)
-        face_2 = Face3D(pts_2, plane_1)
-        face_3 = Face3D(pts_1, plane_2)
-        face_4 = Face3D(pts_2, plane_2)
+        face_1 = Face3D(pts_1, plane_1, enforce_right_hand=False)
+        face_2 = Face3D(pts_2, plane_1, enforce_right_hand=False)
+        face_3 = Face3D(pts_1, plane_2, enforce_right_hand=False)
+        face_4 = Face3D(pts_2, plane_2, enforce_right_hand=False)
 
         up_cclock_1 = face_1.upper_left_counter_clockwise_vertices
         assert up_cclock_1[0] == Point3D(2, 0, 2)
         assert face_1.is_clockwise is True
-        assert Face3D(up_cclock_1).is_clockwise is False
+        assert Face3D(up_cclock_1, enforce_right_hand=False).is_clockwise is False
         up_cclock_2 = face_2.upper_left_counter_clockwise_vertices
         assert up_cclock_2[0] == Point3D(2, 0, 2)
         assert face_2.is_clockwise is False
-        assert not Face3D(up_cclock_2).is_clockwise
+        assert not Face3D(up_cclock_2, enforce_right_hand=False).is_clockwise
         assert up_cclock_1 == up_cclock_2
 
         up_cclock_3 = face_3.upper_left_counter_clockwise_vertices
         assert up_cclock_3[0] == Point3D(0, 0, 2)
         assert face_3.is_clockwise is False
-        assert Face3D(up_cclock_3).is_clockwise is False
+        assert Face3D(up_cclock_3, enforce_right_hand=False).is_clockwise is False
         up_cclock_4 = face_4.upper_left_counter_clockwise_vertices
         assert up_cclock_4[0] == Point3D(0, 0, 2)
         assert face_4.is_clockwise is True
-        assert Face3D(up_cclock_4).is_clockwise is False
+        assert Face3D(up_cclock_4, enforce_right_hand=False).is_clockwise is False
 
     def test_upper_left_counter_clockwise_vertices_triangle(self):
         """Test the upper_left_counter_clockwise_vertices property with triangles."""
         plane_1 = Plane(Vector3D(0, 1, 0))
         pts_1 = (Point3D(0, 0, 0), Point3D(2, 0, -1), Point3D(0, 0, 2))
         pts_2 = (Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, -1))
-        face_1 = Face3D(pts_1, plane_1)
-        face_2 = Face3D(pts_2, plane_1)
+        face_1 = Face3D(pts_1, plane_1, enforce_right_hand=False)
+        face_2 = Face3D(pts_2, plane_1, enforce_right_hand=False)
 
         up_cclock_1 = face_1.upper_left_counter_clockwise_vertices
         assert up_cclock_1[0] == Point3D(0, 0, 2)
         assert face_1.is_clockwise is True
-        assert Face3D(up_cclock_1).is_clockwise is False
+        assert Face3D(up_cclock_1, enforce_right_hand=False).is_clockwise is False
         up_cclock_2 = face_2.upper_left_counter_clockwise_vertices
         assert up_cclock_2[0] == Point3D(0, 0, 2)
         assert face_2.is_clockwise is False
-        assert not Face3D(up_cclock_2).is_clockwise
+        assert not Face3D(up_cclock_2, enforce_right_hand=False).is_clockwise
         assert up_cclock_1 == up_cclock_2
 
     def test_duplicate(self):
@@ -576,22 +586,9 @@ class Face3DTestCase(unittest.TestCase):
 
         assert face_1.normal == face_2.normal.reverse()
         assert face_1.is_clockwise is False
-        assert face_2.is_clockwise is True
-        for i, pt in enumerate(face_1.vertices):
+        assert face_2.is_clockwise is False
+        for i, pt in enumerate(reversed(face_1.vertices)):
             assert pt == face_2[i]
-
-    def test_reverse(self):
-        """Test the reverse method of Face3D."""
-        pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
-        plane_1 = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
-        face_1 = Face3D(pts_1, plane_1)
-        face_2 = face_1.reverse()
-
-        assert face_1.normal == face_2.normal
-        assert face_1.is_clockwise is False
-        assert face_2.is_clockwise is True
-        for i, pt in enumerate(face_1.vertices):
-            assert pt == face_2[-i - 1]
 
     def test_move(self):
         """Test the Face3D move method."""
@@ -663,10 +660,16 @@ class Face3DTestCase(unittest.TestCase):
         assert new_face[3] == Point3D(2, 4, 4)
         assert new_face.area == face.area * 2 ** 2
         assert new_face.perimeter == face.perimeter * 2
-        assert new_face.is_clockwise is face.is_clockwise
+        assert new_face.is_clockwise is face.is_clockwise is False
         assert new_face.is_convex is face.is_convex
         assert new_face.is_self_intersecting is face.is_self_intersecting
         assert new_face.normal == face.normal
+
+        face = Face3D(pts, plane, enforce_right_hand=False)
+        new_face = face.scale(2)
+        assert new_face.is_clockwise is False
+        new_face = face.scale(-2)
+        assert new_face.is_clockwise is False
 
     def test_rotate(self):
         """Test the Face3D rotate method."""
@@ -696,6 +699,12 @@ class Face3DTestCase(unittest.TestCase):
         assert face.area == test_2.area
         assert len(face.vertices) == len(test_2.vertices)
 
+        face = Face3D(pts, plane, enforce_right_hand=False)
+        test_1 = face.rotate(axis, math.pi, origin)
+        assert test_1.is_clockwise is False
+        test_2 = face.rotate(axis, math.pi/2, origin)
+        assert test_2.is_clockwise is False
+
     def test_rotate_xy(self):
         """Test the Face3D rotate_xy method."""
         pts = (Point3D(1, 1, 2), Point3D(2, 1, 2), Point3D(2, 2, 2), Point3D(1, 2, 2))
@@ -719,6 +728,12 @@ class Face3DTestCase(unittest.TestCase):
         assert test_2[2].y == pytest.approx(2, rel=1e-3)
         assert test_1[2].z == pytest.approx(2, rel=1e-3)
 
+        face = Face3D(pts, plane, enforce_right_hand=False)
+        test_1 = face.rotate_xy(math.pi, origin_1)
+        assert test_1.is_clockwise is False
+        test_2 = face.rotate_xy(math.pi/2, origin_1)
+        assert test_2.is_clockwise is False
+
     def test_reflect(self):
         """Test the Face3D reflect method."""
         pts = (Point3D(1, 1, 2), Point3D(2, 1, 2), Point3D(2, 2, 2), Point3D(1, 2, 2))
@@ -730,28 +745,38 @@ class Face3DTestCase(unittest.TestCase):
         normal_2 = Vector3D(-1, -1, 0).normalize()
 
         test_1 = face.reflect(normal_1, origin_1)
-        assert test_1[0].x == pytest.approx(1, rel=1e-3)
-        assert test_1[0].y == pytest.approx(1, rel=1e-3)
-        assert test_1[0].z == pytest.approx(2, rel=1e-3)
-        assert test_1[2].x == pytest.approx(0, rel=1e-3)
-        assert test_1[2].y == pytest.approx(2, rel=1e-3)
-        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+        assert test_1[-1].x == pytest.approx(1, rel=1e-3)
+        assert test_1[-1].y == pytest.approx(1, rel=1e-3)
+        assert test_1[-1].z == pytest.approx(2, rel=1e-3)
+        assert test_1[1].x == pytest.approx(0, rel=1e-3)
+        assert test_1[1].y == pytest.approx(2, rel=1e-3)
+        assert test_1[1].z == pytest.approx(2, rel=1e-3)
 
         test_1 = face.reflect(normal_2, Point3D(0, 0, 2))
-        assert test_1[0].x == pytest.approx(-1, rel=1e-3)
-        assert test_1[0].y == pytest.approx(-1, rel=1e-3)
-        assert test_1[0].z == pytest.approx(2, rel=1e-3)
-        assert test_1[2].x == pytest.approx(-2, rel=1e-3)
-        assert test_1[2].y == pytest.approx(-2, rel=1e-3)
-        assert test_1[2].z == pytest.approx(2, rel=1e-3)
+        assert test_1.is_clockwise is False
+        assert test_1[-1].x == pytest.approx(-1, rel=1e-3)
+        assert test_1[-1].y == pytest.approx(-1, rel=1e-3)
+        assert test_1[-1].z == pytest.approx(2, rel=1e-3)
+        assert test_1[1].x == pytest.approx(-2, rel=1e-3)
+        assert test_1[1].y == pytest.approx(-2, rel=1e-3)
+        assert test_1[1].z == pytest.approx(2, rel=1e-3)
 
         test_2 = face.reflect(normal_2, origin_1)
-        assert test_2[0].x == pytest.approx(0, rel=1e-3)
-        assert test_2[0].y == pytest.approx(0, rel=1e-3)
-        assert test_2[0].z == pytest.approx(2, rel=1e-3)
-        assert test_2[2].x == pytest.approx(-1, rel=1e-3)
-        assert test_2[2].y == pytest.approx(-1, rel=1e-3)
-        assert test_2[2].z == pytest.approx(2, rel=1e-3)
+        assert test_2.is_clockwise is False
+        assert test_2[-1].x == pytest.approx(0, rel=1e-3)
+        assert test_2[-1].y == pytest.approx(0, rel=1e-3)
+        assert test_2[-1].z == pytest.approx(2, rel=1e-3)
+        assert test_2[1].x == pytest.approx(-1, rel=1e-3)
+        assert test_2[1].y == pytest.approx(-1, rel=1e-3)
+        assert test_2[1].z == pytest.approx(2, rel=1e-3)
+
+        face = Face3D(pts, plane, enforce_right_hand=False)
+        test_1 = face.reflect(normal_1, origin_1)
+        assert test_1.is_clockwise is False
+        test_1 = face.reflect(normal_2, Point3D(0, 0, 2))
+        assert test_1.is_clockwise is False
+        test_2 = face.reflect(normal_2, origin_1)
+        assert test_2.is_clockwise is False
 
     def test_intersect_line_ray(self):
         """Test the Face3D intersect_line_ray method."""
@@ -961,8 +986,8 @@ class Face3DTestCase(unittest.TestCase):
         assert f1_result[1] == LineSegment3D.from_end_points(Point3D(2, 0, 2), Point3D(0, 0, 2))
         assert len(f1_result[2]) == 0
         f2_result = face_2.extract_rectangle(0.0001)
-        assert f2_result[0] == LineSegment3D.from_end_points(Point3D(0, 0, 0), Point3D(2, 0, 0))
-        assert f2_result[1] == LineSegment3D.from_end_points(Point3D(0, 0, 2), Point3D(2, 0, 2))
+        assert f2_result[0] == LineSegment3D.from_end_points(Point3D(2, 0, 0), Point3D(0, 0, 0))
+        assert f2_result[1] == LineSegment3D.from_end_points(Point3D(2, 0, 2), Point3D(0, 0, 2))
         assert len(f2_result[2]) == 0
         f3_result = face_3.extract_rectangle(0.0001)
         assert f3_result[0] == LineSegment3D.from_end_points(Point3D(2, 0, 0), Point3D(0, 0, 0))
@@ -995,6 +1020,25 @@ class Face3DTestCase(unittest.TestCase):
         assert f1_result[1] == LineSegment3D.from_end_points(Point3D(-1, -1, 3), Point3D(-10, -1, 3))
         assert len(f1_result[2]) == 1
         assert len(f1_result[2][0].vertices) == 4
+
+    def test_sub_faces_by_ratio_rectangle(self):
+        """Test the Face3D sub_faces_by_ratio_rectangle method."""
+        pts_1 = (Point3D(0, 0, 0), Point3D(12, 0, 0), Point3D(12, 0, 2), Point3D(0, 0, 3))
+        plane_1 = Plane(Vector3D(0, 1, 0))
+        plane_2 = Plane(Vector3D(0, -1, 0))
+        face_1 = Face3D(pts_1, plane_1)
+        face_2 = Face3D(pts_1, plane_2)
+
+        sub_faces = face_1.sub_faces_by_ratio_rectangle(0.4, 0.0001)
+        assert len(sub_faces) == 2
+        areas = [srf.area for srf in sub_faces]
+        assert sum(areas) == pytest.approx(face_1.area * 0.4, rel=1e-3)
+        for face in sub_faces:
+            assert face.is_clockwise is False
+
+        sub_faces = face_2.sub_faces_by_ratio_rectangle(0.4, 0.0001)
+        for face in sub_faces:
+            assert face.is_clockwise is False
 
     def test_sub_faces_by_ratio_sub_rectangle(self):
         """Test the Face3D sub_faces_by_ratio_sub_rectangle method."""
