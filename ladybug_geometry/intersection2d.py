@@ -2,7 +2,9 @@
 """Utility functions for computing intersections between geometry in 2D space."""
 from __future__ import division
 
-from .geometry2d.pointvector import Point2D
+from .geometry2d.pointvector import Point2D, Vector2D
+
+import math
 
 
 def intersect_line2d(A, B):
@@ -77,6 +79,70 @@ def does_intersection_exist_line2d(A, B):
     return True
 
 
+def intersect_line2d_arc2d(L, C):
+    """Get the intersection between any Ray2D/LineSegment2D and an Arc2D.
+
+    Args:
+        L: A LineSegment2D or Ray2D object.
+        C: An Arc2D object along which the closest point will be determined.
+
+    Returns:
+        A list of 2 Point2D objects if a full intersection exists.
+        A list with a single Point2D object if the line is tangent or intersects
+        only once. None if no intersection exists.
+    """
+    a = L.v.magnitude_squared
+    b = 2 * (L.v.x * (L.p.x - C.c.x) + L.v.y * (L.p.y - C.c.y))
+    c = C.c.magnitude_squared + L.p.magnitude_squared - 2 * C.c.dot(L.p) - C.r ** 2
+    det = b ** 2 - 4 * a * c
+    if det < 0:
+        return None
+    sq = math.sqrt(det)
+    u1 = (-b + sq) / (2 * a)
+    u2 = (-b - sq) / (2 * a)
+    pt1 = Point2D(L.p.x + u1 * L.v.x, L.p.y + u1 * L.v.y) if L._u_in(u1) else None
+    pt2 = Point2D(L.p.x + u2 * L.v.x, L.p.y + u2 * L.v.y) if L._u_in(u2) else None
+
+    if u1 == u2:  # Tangent
+        pt = Point2D(L.p.x + u1 * L.v.x, L.p.y + u1 * L.v.y)
+        return pt if C._pt_in(pt) else None
+
+    pts = [p for p in (pt1, pt2) if p is not None and C._pt_in(p)]
+    return pts if len(pts) != 0 else None
+
+
+def intersect_line2d_infinite_arc2d(L, C):
+    """Get the intersection between an Arc2D and a Ray2D/LineSegment2D extended infinitely.
+
+    Args:
+        L: A LineSegment2D or Ray2D that will be extended infinitely for intersection.
+        C: An Arc2D object along which the closest point will be determined.
+
+    Returns:
+        A list of 2 Point2D objects if a full intersection exists.
+        A list with a single Point2D object if the line is tangent or intersects
+        only once. None if no intersection exists.
+    """
+    a = L.v.magnitude_squared
+    b = 2 * (L.v.x * (L.p.x - C.c.x) + L.v.y * (L.p.y - C.c.y))
+    c = C.c.magnitude_squared + L.p.magnitude_squared - 2 * C.c.dot(L.p) - C.r ** 2
+    det = b ** 2 - 4 * a * c
+    if det < 0:
+        return None
+    sq = math.sqrt(det)
+    u1 = (-b + sq) / (2 * a)
+    u2 = (-b - sq) / (2 * a)
+
+    if u1 == u2:  # Tangent
+        pt = Point2D(L.p.x + u1 * L.v.x, L.p.y + u1 * L.v.y)
+        return pt if C._pt_in(pt) else None
+
+    pt1 = Point2D(L.p.x + u1 * L.v.x, L.p.y + u1 * L.v.y)
+    pt2 = Point2D(L.p.x + u2 * L.v.x, L.p.y + u2 * L.v.y)
+    pts = [p for p in (pt1, pt2) if C._pt_in(p)]
+    return pts if len(pts) != 0 else None
+
+
 def closest_point2d_on_line2d(P, L):
     """Get the closest Point2D on a LineSegment2D or Ray2D to the input P.
 
@@ -129,3 +195,28 @@ def closest_point2d_between_line2d(A, B):
     pts = [(A.p, pt_1), (a_p2, pt_2), (pt_3, B.p), (pt_4, b_p2)]
     dists, i = zip(*sorted(zip(dists, range(len(pts)))))
     return dists[0], pts[i[0]]
+
+
+def closest_point2d_on_arc2d(P, C):
+    """Get the closest Point2D on a Arc2D to the input P.
+
+    Args:
+        P: A Point2D object.
+        C: An Arc2D object along which the closest point will be determined.
+
+    Returns:
+        Point2D for the closest point on C to P.
+    """
+    v = P - C.c
+    v = v.normalize() * C.r
+    if C.is_circle:
+        return Point2D(C.c.x + v.x, C.c.y + v.y)
+    else:
+        a = Vector2D(1, 0).angle_counterclockwise(v)
+        if (not C.is_inverted and C.a1 < a < C.a2) or \
+                (C.is_inverted and C.a1 > a > C.a2):
+            return Point2D(C.c.x + v.x, C.c.y + v.y)
+        else:
+            if C.p1.distance_to_point(P) <= C.p2.distance_to_point(P):
+                return C.p1
+    return C.p2

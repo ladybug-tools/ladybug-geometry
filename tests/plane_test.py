@@ -4,6 +4,8 @@ from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
 from ladybug_geometry.geometry3d.plane import Plane
 from ladybug_geometry.geometry3d.ray import Ray3D
 from ladybug_geometry.geometry3d.line import LineSegment3D
+from ladybug_geometry.geometry3d.arc import Arc3D
+
 from ladybug_geometry.geometry2d.pointvector import Point2D
 
 import unittest
@@ -357,6 +359,29 @@ class PlaneTestCase(unittest.TestCase):
 
         test_ray = Ray3D(Point3D(0, 4, 0), Vector3D(-1, -1, -1))
         assert plane.intersect_line_ray(test_ray) == Point3D(-2, 2, -2)
+
+    def test_intersect_arc(self):
+        """Test the Plane intersect_arc method."""
+        pt = Point3D(2, 0, 2)
+        arc = Arc3D(Plane(o=pt), 1, 0, math.pi)
+        circle = Arc3D(Plane(o=pt), 1)
+
+        plane_1 = Plane(Vector3D(0, 1, 0), Point3D(0, 0, 0))
+        int1 = plane_1.intersect_arc(circle)
+        assert len(int1) == 2
+        assert int1[0] == Point3D(3, 0, 2)
+
+        plane_2 = Plane(Vector3D(0, 1, 0), Point3D(0, 0.5, 0))
+        int2 = plane_2.intersect_arc(arc)
+        assert len(int2) == 2
+
+        plane_3 = Plane(Vector3D(1, 0, 0), Point3D(1.5, 0, 0))
+        int3 = plane_3.intersect_arc(arc)
+        assert len(int3) == 1
+
+        plane_4 = Plane(Vector3D(1, 0, 0), Point3D(0, 2, 0))
+        int4 = plane_4.intersect_arc(arc)
+        assert int4 is None
 
     def test_intersect_plane(self):
         """Test the Plane intersect_plane method."""
