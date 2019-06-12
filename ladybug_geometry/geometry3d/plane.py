@@ -7,6 +7,7 @@ from .ray import Ray3D
 from ..intersection3d import intersect_line3d_plane, intersect_plane_plane, \
     closest_point3d_on_plane, closest_point3d_between_line3d_plane
 from ..geometry2d.pointvector import Point2D
+from ..geometry2d.ray import Ray2D
 
 import math
 
@@ -271,6 +272,28 @@ class Plane(object):
             Point3D for the intersection. Will be None if no intersection exists.
         """
         return intersect_line3d_plane(line_ray, self)
+
+    def intersect_arc(self, arc):
+        """Get the intersection between this Plane and an Arc3D.
+
+        Args:
+            plane: A Plane object for which intersection will be computed.
+
+        Returns:
+            A list of 2 Point3D objects if a full intersection exists.
+            A list with a single Point3D object if the line is tangent or intersects
+            only once. None if no intersection exists.
+        """
+        _plane_int_ray = self.intersect_plane(arc.plane)
+        if _plane_int_ray is not None:
+            _p12d = arc.plane.xyz_to_xy(_plane_int_ray.p)
+            _p22d = arc.plane.xyz_to_xy(_plane_int_ray.p + _plane_int_ray.v)
+            _v2d = _p22d - _p12d
+            _int_ray2d = Ray2D(_p12d, _v2d)
+            _int_pt2d = arc.arc2d.intersect_line_infinite(_int_ray2d)
+            if _int_pt2d is not None:
+                return [arc.plane.xy_to_xyz(pt) for pt in _int_pt2d]
+        return None
 
     def intersect_plane(self, plane):
         """Get the intersection between this Plane and another Plane.
