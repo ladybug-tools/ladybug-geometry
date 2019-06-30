@@ -42,10 +42,7 @@ class Base2DIn3D(object):
 
     @property
     def center(self):
-        """A Point3D for the center of the bounding box around this geometry.
-
-        For a Surface3D, this point will always lie within the plane of the surface.
-        """
+        """A Point3D for the center of the bounding box around this geometry."""
         if self._center is None:
             min, max = self.min, self.max
             self._center = Point3D(

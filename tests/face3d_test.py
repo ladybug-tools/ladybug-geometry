@@ -287,8 +287,8 @@ class Face3DTestCase(unittest.TestCase):
         assert face.is_convex is False
         assert face.is_self_intersecting is False
 
-    def test_is_equivalent(self):
-        """Test the is_equivalent method."""
+    def test_is_geometrically_equivalent(self):
+        """Test the is_geometrically_equivalent method."""
         plane_1 = Plane(Vector3D(0, 0, 1))
         plane_2 = Plane(Vector3D(0, 0, -1))
         pts_1 = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 2), Point3D(0, 2))
