@@ -327,7 +327,7 @@ class Polygon2D(Base2DIn2D):
         for i, _v in enumerate(self.vertices):
             _a = self[i - 2].determinant(self[i - 1]) + self[i - 1].determinant(_v) + \
                 _v.determinant(self[i - 2])
-            if abs(_a) > tolerance:
+            if abs(_a) >= tolerance:
                 new_vertices.append(self[i - 1])
         return Polygon2D(new_vertices)
 

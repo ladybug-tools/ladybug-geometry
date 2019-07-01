@@ -221,11 +221,11 @@ class Face3D(Base2DIn3D):
         return face
 
     @classmethod
-    def from_regular_polygon(cls, number_of_sides, radius=1, base_plane=None):
+    def from_regular_polygon(cls, side_count, radius=1, base_plane=None):
         """Initialize Face3D from regular polygon parameters and a base_plane.
 
         Args:
-            number_of_sides: An integer for the number of sides on the regular
+            side_count: An integer for the number of sides on the regular
                 polgygon. This number must be greater than 2.
             radius: A number indicating the distance from the polygon's center
                 where the vertices of the polygon will lie.
@@ -242,7 +242,7 @@ class Face3D(Base2DIn3D):
             base_plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 0))
 
         # create the regular polygon face
-        _polygon2d = Polygon2D.from_regular_polygon(number_of_sides, radius)
+        _polygon2d = Polygon2D.from_regular_polygon(side_count, radius)
         _vert3d = tuple(base_plane.xy_to_xyz(_v) for _v in _polygon2d.vertices)
         _face = cls(_vert3d, base_plane, enforce_right_hand=False)
 
@@ -652,7 +652,7 @@ class Face3D(Base2DIn3D):
             True if planar within the tolerance. False if not planar.
         """
         for _v in self.vertices:
-            if self._plane.distance_to_point(_v) > tolerance:
+            if self._plane.distance_to_point(_v) >= tolerance:
                 if raise_exception is True:
                     raise AttributeError(
                         'Vertex {} is out of plane with its parent face.\nDistance '
@@ -842,7 +842,7 @@ class Face3D(Base2DIn3D):
 
     def get_mesh_grid(self, x_dim, y_dim=None, offset=None, flip=False,
                       generate_centroids=True):
-        """Get a gridded Mesh3D from over this face.
+        """Get a gridded Mesh3D over this face.
 
         This method generates a mesh grid over the domain of the face
         and then removes any vertices that do not lie within it.
@@ -907,12 +907,12 @@ class Face3D(Base2DIn3D):
 
         return grid_mesh3d
 
-    def countour_by_number(self, number_of_contours, direction_vector=Vector3D(0, 0, 1),
+    def countour_by_number(self, contour_count, direction_vector=Vector3D(0, 0, 1),
                            flip_side=False):
         """Generate a list of LineSegment3D objects contouring the face.
 
         Args:
-            number_of_contours: A positive integer for the number of contours
+            contour_count: A positive integer for the number of contours
                 to generate over the face.
             direction_vector: A Vector3D for the direction along which contours
                 are generated. Default is Z-Axis, which generates horizontal contours.
@@ -925,7 +925,7 @@ class Face3D(Base2DIn3D):
         diagonal = LineSegment3D.from_end_points(self.min + tol_pt, self.max - tol_pt)
         diagonal = diagonal.flip() if flip_side is False else diagonal
         contours = []
-        for pt in diagonal.subdivide_evenly(number_of_contours)[:-1]:
+        for pt in diagonal.subdivide_evenly(contour_count)[:-1]:
             result = self.intersect_plane(Plane(plane_normal, pt))
             if result is not None:
                 contours.extend(result)
@@ -957,12 +957,12 @@ class Face3D(Base2DIn3D):
                 contours.extend(result)
         return contours
 
-    def countour_fins_by_number(self, number_of_fins, depth, offset=0, angle=0,
+    def countour_fins_by_number(self, fin_count, depth, offset=0, angle=0,
                                 contour_vector=Vector3D(0, 0, 1), flip_side=False):
         """Generate a list of Fac3D objects over this face (like louvers or fins).
 
         Args:
-            number_of_fins: A positive integer for the number of fins to generate.
+            fin_count: A positive integer for the number of fins to generate.
             depth: A number for the depth to extrude the fins.
             offset: A number for the distance to offset fins from this face.
                 Default is 0 for no offset.
@@ -975,7 +975,7 @@ class Face3D(Base2DIn3D):
                 Setting to True will start contours on the bottom or left.
         """
         extru_vec = self._get_fin_extrusion_vector(depth, angle, contour_vector)
-        contours = self.countour_by_number(number_of_fins, contour_vector, flip_side)
+        contours = self.countour_by_number(fin_count, contour_vector, flip_side)
         return self._get_extrusion_fins(contours, extru_vec, offset)
 
     def countour_fins_by_distance_between(self, distance, depth, offset=0, angle=0,
@@ -985,7 +985,6 @@ class Face3D(Base2DIn3D):
 
         Args:
             distance: A number for the approximate distance between each contour.
-                The actual distance will be computed from
             depth: A number for the depth to extrude the fins.
             offset: A number for the distance to offset fins from this face.
                 Default is 0 for no offset.
@@ -1180,7 +1179,7 @@ class Face3D(Base2DIn3D):
         # perform checks on the face to see if a rectangle is extractable
         if self.has_holes:
             return None
-        if abs(self.normal.x) < tolerance and abs(self.normal.y) < tolerance:
+        if abs(self.normal.x) <= tolerance and abs(self.normal.y) <= tolerance:
             # face lies within a horizontal plane; we cannot distinguish top and bottom
             return None
         clean_face = self.remove_colinear_vertices(tolerance)
@@ -1451,7 +1450,7 @@ class Face3D(Base2DIn3D):
         for i, _v in enumerate(pts_2d):
             _a = pts_2d[i - 2].determinant(pts_2d[i - 1]) + \
                 pts_2d[i - 1].determinant(_v) + _v.determinant(pts_2d[i - 2])
-            if abs(_a) > tolerance:
+            if abs(_a) >= tolerance:
                 new_vertices.append(pts_3d[i - 1])
         return new_vertices
 

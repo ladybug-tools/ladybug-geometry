@@ -201,21 +201,21 @@ class Polyface3D(Base2DIn3D):
         return cls(vertices, face_indices)
 
     @classmethod
-    def from_box(cls, length, width, height, base_plane=None):
+    def from_box(cls, width, depth, height, base_plane=None):
         """Initilize Polyface3D from parameters describing a box.
 
         Initializing a polyface this way has the added benefit of having its
         faces property quickly calculated.
 
         Args:
-            length: A number for the length of the box (in the X direction).
-            width: A number for the width of the box (in the Y direction).
+            width: A number for the width of the box (in the X direction).
+            depth: A number for the depth of the box (in the Y direction).
             height: A number for the height of the box (in the Z direction).
             base_plane: A Plane object from which to generate the box.
                 If None, default is the WorldXY plane.
         """
-        assert isinstance(length, (float, int)), 'Box length must be a number.'
         assert isinstance(width, (float, int)), 'Box width must be a number.'
+        assert isinstance(depth, (float, int)), 'Box depth must be a number.'
         assert isinstance(height, (float, int)), 'Box height must be a number.'
         if base_plane is not None:
             assert isinstance(base_plane, Plane), \
@@ -223,21 +223,21 @@ class Polyface3D(Base2DIn3D):
         else:
             base_plane = Plane(Vector3D(0, 0, 1), Point3D())
         _o = base_plane.o
-        _l_vec = base_plane.x * length
-        _w_vec = base_plane.y * width
+        _w_vec = base_plane.x * width
+        _d_vec = base_plane.y * depth
         _h_vec = base_plane.n * height
-        _verts = (_o, _o + _w_vec, _o + _w_vec + _l_vec, _o + _l_vec,
-                  _o + _h_vec, _o + _w_vec + _h_vec,
-                  _o + _w_vec + _l_vec + _h_vec, _o + _l_vec + _h_vec)
-        _face_indices = ([(0, 1, 2, 3)], [(0, 4, 5, 1)], [(0, 3, 7, 4)],
-                         [(2, 1, 5, 6)], [(6, 7, 3, 2)], [(7, 6, 5, 4)])
+        _verts = (_o, _o + _d_vec, _o + _d_vec + _w_vec, _o + _w_vec,
+                  _o + _h_vec, _o + _d_vec + _h_vec,
+                  _o + _d_vec + _w_vec + _h_vec, _o + _w_vec + _h_vec)
+        _face_indices = ([(0, 1, 2, 3)], [(2, 1, 5, 6)], [(6, 7, 3, 2)],
+                         [(0, 3, 7, 4)], [(0, 4, 5, 1)], [(7, 6, 5, 4)])
         _edge_indices = ((3, 0), (0, 1), (1, 2), (2, 3), (0, 4), (4, 5),
                          (5, 1), (3, 7), (7, 4), (6, 2), (5, 6), (6, 7))
         polyface = cls(_verts, _face_indices, {'edge_indices': _edge_indices,
                                                'edge_types': [1] * 12})
         verts = tuple(tuple(_verts[i] for i in face[0]) for face in _face_indices)
         polyface._faces = tuple(Face3D(v, enforce_right_hand=False) for v in verts)
-        polyface._volume = length * width * height
+        polyface._volume = width * depth * height
         return polyface
 
     @classmethod
@@ -461,9 +461,8 @@ class Polyface3D(Base2DIn3D):
         Args:
             tolerance: The minimum distance between a vertex and the boundary segments
                 at which point the vertex is considered colinear.
-            angle_tolerance: The max angle in radians that the direction between
-                this object and another can vary for them to be considered
-                parallel.
+            angle_tolerance: The max angle in radians that vertices are allowed to
+                 differ from one another in order to consider them colinear.
         """
         # get naked edges
         naked_edges = list(self.naked_edges)
