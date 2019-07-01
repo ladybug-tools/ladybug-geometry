@@ -79,7 +79,7 @@ class Base1DIn3D(object):
         if not self.is_parallel(line_ray, angle_tolerance):
             return False
         _close_pt = closest_point3d_on_line3d_infinite(self.p, line_ray)
-        if self.p.distance_to_point(_close_pt) > tolerance:
+        if self.p.distance_to_point(_close_pt) >= tolerance:
             return False
         return True
 

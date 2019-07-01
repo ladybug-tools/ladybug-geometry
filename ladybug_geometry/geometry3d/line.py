@@ -78,7 +78,7 @@ class LineSegment3D(Base1DIn3D):
             tolerance: The maximum difference between the z values of the start and
                 end coordinates at which the line segment is considered horizontal.
         """
-        return abs(edge.v.z) < tolerance
+        return abs(edge.v.z) <= tolerance
 
     def is_vertical(edge, tolerance):
         """Test whether this line segment is vertical within a certain tolerance.
@@ -87,7 +87,7 @@ class LineSegment3D(Base1DIn3D):
             tolerance: The maximum difference between the x and y values of the start
                 and end coordinates at which the line segment is considered horizontal.
         """
-        return abs(edge.v.x) < tolerance and abs(edge.v.y) < tolerance
+        return abs(edge.v.x) <= tolerance and abs(edge.v.y) <= tolerance
 
     def flip(self):
         """Get a copy of this line segment that is flipped."""

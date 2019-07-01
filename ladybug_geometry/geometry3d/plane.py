@@ -338,9 +338,9 @@ class Plane(object):
         Returns:
             True if plane is coplanar. False if it is not coplanar.
         """
-        if self.n.angle(plane.n) < angle_tolerance or \
-                self.n.angle(plane.n.reverse()) < angle_tolerance:
-            return self.distance_to_point(plane.o) < tolerance
+        if self.n.angle(plane.n) <= angle_tolerance or \
+                self.n.angle(plane.n.reverse()) <= angle_tolerance:
+            return self.distance_to_point(plane.o) <= tolerance
         return False
 
     def duplicate(self):
