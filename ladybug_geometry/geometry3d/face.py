@@ -3,6 +3,7 @@
 from __future__ import division
 
 from .pointvector import Point3D, Vector3D
+from .ray import Ray3D
 from .line import LineSegment3D
 from .plane import Plane
 from .mesh import Mesh3D
@@ -565,15 +566,15 @@ class Face3D(Base2DIn3D):
             return False
         return True
 
-    def is_centered_adjacent(self, face, tolerance, angle_tolerance):
+    def is_centered_adjacent(self, face, tolerance):
         """Check whether a given face is centered adjacent with this Face.
 
-        Centered adjacency is definied as being coplananar with this face and sharing
-        the same center point to within the tolerance.
+        Centered adjacency is definied as sharing the same center point as this face,
+        sharing the same area, and being next to one another to within the tolerance.
 
         This is useful for identifying matching surfaces when you want to quickly
         solve for adjacency and you are not concerned about false positives in cases
-        where one face does not perfectly match the other in terms of area or vertices.
+        where one face does not perfectly match the other in terms of vertices.
         This means it is good enough for cases where users know how to set up their
         model correctly.
 
@@ -581,16 +582,25 @@ class Face3D(Base2DIn3D):
             face: Another face for which centered adjacency will be tested.
             tolerance: The minimum difference between the coordinate values of two
                 centers at which they can be considered centered adjacent.
-            angle_tolerance: The max angle in radians that the plane normals can
-                differ from one another in order for them to be considered coplanar.
         Returns:
             True if centered adjacent. False if not centered adjacent.
         """
-        if not self.center.is_equivalent(face.center, tolerance):
+        if not self.center.is_equivalent(face.center, tolerance):  # center check
             return False
-        if not self.plane.is_coplanar_tolerance(face.plane, tolerance, angle_tolerance):
+        if not abs(self.area - face.area) <= tolerance:  # area check
             return False
-        return True
+        # construct a ray using this face's normal and a point on this face
+        v1 = self.boundary[-1] - self.boundary[0]
+        v2 = self.boundary[1] - self.boundary[0]
+        move_vec = Vector3D(
+            (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)).normalize()
+        move_vec = move_vec * (tolerance + 0.00001)
+        point_on_face = self.boundary[0] + move_vec
+        test_ray = Ray3D(point_on_face, self.normal)
+        # shoot ray from this face to the other to verify adjacency
+        if face.intersect_line_ray(test_ray):
+            return True
+        return False
 
     def is_sub_face(self, face, tolerance, angle_tolerance):
         """Check whether a given face is a sub-face of this face.
@@ -654,7 +664,7 @@ class Face3D(Base2DIn3D):
         for _v in self.vertices:
             if self._plane.distance_to_point(_v) >= tolerance:
                 if raise_exception is True:
-                    raise AttributeError(
+                    raise ValueError(
                         'Vertex {} is out of plane with its parent face.\nDistance '
                         'to plane is {}'.format(_v, self._plane.distance_to_point(_v)))
                 else:
