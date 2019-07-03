@@ -331,12 +331,12 @@ class Face3DTestCase(unittest.TestCase):
         face_6 = Face3D(pts_4, plane_1)
         face_7 = Face3D(pts_5, plane_1)
 
-        assert face_1.is_centered_adjacent(face_2, 0.0001, 0.0001) is True
-        assert face_1.is_centered_adjacent(face_3, 0.0001, 0.0001) is True
-        assert face_1.is_centered_adjacent(face_4, 0.0001, 0.0001) is True
-        assert face_1.is_centered_adjacent(face_5, 0.0001, 0.0001) is False
-        assert face_1.is_centered_adjacent(face_6, 0.0001, 0.0001) is True
-        assert face_1.is_centered_adjacent(face_7, 0.0001, 0.0001) is True
+        assert face_1.is_centered_adjacent(face_2, 0.0001) is True
+        assert face_1.is_centered_adjacent(face_3, 0.0001) is True
+        assert face_1.is_centered_adjacent(face_4, 0.0001) is True
+        assert face_1.is_centered_adjacent(face_5, 0.0001) is False
+        assert face_1.is_centered_adjacent(face_6, 0.0001) is False
+        assert face_1.is_centered_adjacent(face_7, 0.0001) is True
 
     def test_is_sub_face(self):
         """Test the is_sub_face method."""
