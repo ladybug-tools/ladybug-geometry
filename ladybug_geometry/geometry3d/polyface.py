@@ -35,10 +35,10 @@ class Polyface3D(Base2DIn3D):
         volume
         is_solid
     """
-    __slots__ = ('_vertices', '_faces', '_edges',
+    __slots__ = ('_faces', '_edges',
                  '_naked_edges', '_internal_edges', '_non_manifold_edges',
-                 '_face_indices', '_edge_indices', '_edge_types'
-                 '_min', '_max', '_center', '_area', '_is_solid')
+                 '_face_indices', '_edge_indices', '_edge_types',
+                 '_area', '_volume', '_is_solid')
 
     def __init__(self, vertices, face_indices, edge_information=None):
         """Initilize Polyface3D.
@@ -65,7 +65,7 @@ class Polyface3D(Base2DIn3D):
                     non-manifold edge.
         """
         # assign input properties
-        self._check_vertices_input(vertices)
+        self._vertices = self._check_vertices_input(vertices)
         self._face_indices = tuple(tuple(tuple(loop) for loop in face)
                                    for face in face_indices)
 

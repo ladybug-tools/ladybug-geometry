@@ -7,7 +7,6 @@ from ..geometry2d.mesh import Mesh2D
 
 from .pointvector import Point3D, Vector3D
 from .plane import Plane
-from ._2d import Base2DIn3D
 
 try:
     from itertools import izip as zip  # python 2
@@ -15,7 +14,7 @@ except ImportError:
     xrange = range  # python 3
 
 
-class Mesh3D(MeshBase, Base2DIn3D):
+class Mesh3D(MeshBase):
     """3D Mesh object.
 
     Properties:
@@ -33,10 +32,7 @@ class Mesh3D(MeshBase, Base2DIn3D):
         vertex_normals
         vertex_connected_faces
     """
-    __slots__ = ('_vertices', '_faces', '_colors', '_is_color_by_face',
-                 '_min', '_max', '_center', '_area',
-                 '_face_areas', '_face_centroids', '_face_normals',
-                 '_vertex_normals', '_vertex_connected_faces')
+    __slots__ = ('_min', '_max', '_center', '_face_normals', '_vertex_normals')
 
     def __init__(self, vertices, faces, colors=None):
         """Initilize Mesh3D.
@@ -48,8 +44,8 @@ class Mesh3D(MeshBase, Base2DIn3D):
             colors: An optional list of colors that correspond to either the faces
                 of the mesh or the vertices of the mesh. Default is None.
         """
-        self._check_vertices_input(vertices)
-        self._check_faces_input(faces)
+        self._vertices = self._check_vertices_input(vertices)
+        self._faces = self._check_faces_input(faces)
 
         self._is_color_by_face = False  # default if colors is None
         self.colors = colors
@@ -118,6 +114,29 @@ class Mesh3D(MeshBase, Base2DIn3D):
             assert isinstance(plane, Plane), 'Expected Plane. Got {}'.format(type(plane))
             _verts3d = tuple(plane.xy_to_xyz(_v) for _v in mesh_2d.vertices)
             return cls(_verts3d, mesh_2d.faces, mesh_2d.colors)
+
+    @property
+    def min(self):
+        """A Point3D for the minimum bounding box vertex around this mesh."""
+        if self._min is None:
+            self._calculate_min_max()
+        return self._min
+
+    @property
+    def max(self):
+        """A Point3D for the maximum bounding box vertex around this mesh."""
+        if self._max is None:
+            self._calculate_min_max()
+        return self._max
+
+    @property
+    def center(self):
+        """A Point3D for the center of the bounding box around this mesh."""
+        if self._center is None:
+            min, max = self.min, self.max
+            self._center = Point3D(
+                (min.x + max.x) / 2, (min.y + max.y) / 2, (min.z + max.z) / 2)
+        return self._center
 
     @property
     def face_areas(self):
@@ -319,6 +338,28 @@ class Mesh3D(MeshBase, Base2DIn3D):
         return {'vertices': [pt.to_dict() for pt in self.vertices],
                 'faces': self.faces, 'colors': colors}
 
+    def _calculate_min_max(self):
+        """Calculate maximum and minimum Point3D for this object."""
+        min_pt = [self.vertices[0].x, self.vertices[0].y, self.vertices[0].z]
+        max_pt = [self.vertices[0].x, self.vertices[0].y, self.vertices[0].z]
+
+        for v in self.vertices[1:]:
+            if v.x < min_pt[0]:
+                min_pt[0] = v.x
+            elif v.x > max_pt[0]:
+                max_pt[0] = v.x
+            if v.y < min_pt[1]:
+                min_pt[1] = v.y
+            elif v.y > max_pt[1]:
+                max_pt[1] = v.y
+            if v.z < min_pt[2]:
+                min_pt[2] = v.z
+            elif v.z > max_pt[2]:
+                max_pt[2] = v.z
+
+        self._min = Point3D(min_pt[0], min_pt[1], min_pt[2])
+        self._max = Point3D(max_pt[0], max_pt[1], max_pt[2])
+
     def _calculate_face_areas_and_normals(self):
         """Calculate face areas and normals from vertices."""
         _f_norm = []
@@ -391,6 +432,16 @@ class Mesh3D(MeshBase, Base2DIn3D):
         _new_mesh._face_normals = self._face_normals
         _new_mesh._vertex_normals = self._vertex_normals
         return _new_mesh
+
+    def _check_vertices_input(self, vertices):
+        """Check the input vertices."""
+        if not isinstance(vertices, tuple):
+            vertices = tuple(vertices)
+        for vert in vertices:
+            assert isinstance(vert, Point3D), \
+                'Expected Point3D for {} vertex. Got {}.'.format(
+                    self.__class__.__name__, type(vert))
+        return vertices
 
     @staticmethod
     def _calculate_normal_and_area_for_triangle(pts):

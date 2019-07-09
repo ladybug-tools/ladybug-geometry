@@ -14,6 +14,7 @@ class Base1DIn3D(object):
         p: End Point3D of object
         v: Vector3D along object
     """
+    __slots__ = ('_p', '_v')
 
     def __init__(self, p, v):
         """Initilize Base1DIn3D.

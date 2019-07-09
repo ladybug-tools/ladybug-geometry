@@ -13,7 +13,7 @@ class Ray2D(Base1DIn2D):
         p: Base point
         v: Direction vector
     """
-    __slots__ = ('_p', '_v')
+    __slots__ = ()
 
     def __init__(self, p, v):
         """Initilize Ray2D.

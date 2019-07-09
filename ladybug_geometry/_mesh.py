@@ -20,6 +20,8 @@ class MeshBase(object):
         face_centroids
         vertex_connected_faces
     """
+    __slots__ = ('_vertices', '_faces', '_colors', '_is_color_by_face',
+                 '_area', '_face_areas', '_face_centroids', '_vertex_connected_faces')
 
     def __init__(self, vertices, faces, colors=None):
         """Initilize MeshBase.
@@ -32,7 +34,7 @@ class MeshBase(object):
                 of the mesh or the vertices of the mesh. Default is None.
         """
         self._vertices = vertices
-        self._check_faces_input(faces)
+        self._faces = self._check_faces_input(faces)
         self._is_color_by_face = False  # default if colors is None
         self.colors = colors
         self._area = None
@@ -138,6 +140,10 @@ class MeshBase(object):
         _verts = tuple(pt.reflect(normal, origin) for pt in self.vertices)
         return self._mesh_transform(_verts)
 
+    def duplicate(self):
+        """Get a copy of this object."""
+        return self.__copy__()
+
     def _check_faces_input(self, faces):
         """Check input faces for correct formatting."""
         if not isinstance(faces, tuple):
@@ -159,7 +165,7 @@ class MeshBase(object):
                     raise TypeError(
                         'Mesh face must use integers to reference vertices. '
                         'Got {}.'.format(type(ind)))
-        self._faces = faces
+        return faces
 
     def _check_face_pattern(self, pattern):
         """Check input pattern for remove faces for compatibility with this mesh."""
@@ -323,3 +329,20 @@ class MeshBase(object):
                     ver_counter += 1
                 face_collector.append(tuple(ind))
         return vertices, face_collector
+
+    def __len__(self):
+        return len(self.vertices)
+
+    def __getitem__(self, key):
+        return self.vertices[key]
+
+    def __iter__(self):
+        return iter(self.vertices)
+
+    def ToString(self):
+        """Overwrite .NET ToString."""
+        return self.__repr__()
+
+    def __repr__(self):
+        """Base MEsh representation."""
+        return 'Base Mesh Object'
