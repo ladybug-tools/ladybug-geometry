@@ -268,6 +268,7 @@ class Point2D(Vector2D):
         x
         y
     """
+    __slots__ = ()
 
     def move(self, moving_vec):
         """Get a point that has been moved along a vector.

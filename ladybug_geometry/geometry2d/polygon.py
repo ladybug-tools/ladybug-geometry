@@ -29,8 +29,7 @@ class Polygon2D(Base2DIn2D):
         is_self_intersecting
         is_valid
     """
-    __slots__ = ('_vertices', '_segments', '_triangulated_mesh',
-                 '_min', '_max', '_center', '_perimeter', '_area',
+    __slots__ = ('_segments', '_triangulated_mesh', '_perimeter', '_area',
                  '_is_clockwise', '_is_convex', '_is_self_intersecting')
 
     def __init__(self, vertices):
@@ -39,7 +38,7 @@ class Polygon2D(Base2DIn2D):
         Args:
             vertices: A list of Point2D objects representing the vertices of the polygon.
         """
-        self._check_vertices_input(vertices)
+        self._vertices = self._check_vertices_input(vertices)
         self._segments = None
         self._triangulated_mesh = None
         self._min = None

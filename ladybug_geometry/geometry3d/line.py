@@ -16,7 +16,7 @@ class LineSegment3D(Base1DIn3D):
         p2: Second point
         length: The length of the line segement
     """
-    __slots__ = ('_p', '_v')
+    __slots__ = ()
 
     def __init__(self, p, v):
         """Initilize LineSegment3D.
