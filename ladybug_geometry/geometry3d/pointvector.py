@@ -298,6 +298,7 @@ class Point3D(Vector3D):
         y
         z
     """
+    __slots__ = ()
 
     def move(self, moving_vec):
         """Get a point that has been moved along a vector.

@@ -14,6 +14,7 @@ class Base2DIn3D(object):
         max
         center
     """
+    __slots__ = ('_vertices', '_min', '_max', '_center')
 
     def __init__(self, vertices):
         """Initilize Base2DIn3D.
@@ -21,10 +22,15 @@ class Base2DIn3D(object):
         Args:
             vertices: A list of Point3D objects representing the vertices.
         """
-        self._check_vertices_input(vertices)
+        self._vertices = self._check_vertices_input(vertices)
         self._min = None
         self._max = None
         self._center = None
+
+    @property
+    def vertices(self):
+        """Tuple of all vertices in this object."""
+        return self._vertices
 
     @property
     def min(self):
@@ -84,7 +90,7 @@ class Base2DIn3D(object):
             assert isinstance(vert, Point3D), \
                 'Expected Point3D for {} vertex. Got {}.'.format(
                     self.__class__.__name__, type(vert))
-        self._vertices = vertices
+        return vertices
 
     def __len__(self):
         return len(self.vertices)

@@ -7,7 +7,6 @@ from .._mesh import MeshBase
 from .pointvector import Point2D
 from .line import LineSegment2D
 from .polygon import Polygon2D
-from ._2d import Base2DIn2D
 
 try:
     from itertools import izip as zip  # python 2
@@ -15,7 +14,7 @@ except ImportError:
     xrange = range  # python 3
 
 
-class Mesh2D(MeshBase, Base2DIn2D):
+class Mesh2D(MeshBase):
     """2D Mesh object.
 
     Properties:
@@ -32,9 +31,7 @@ class Mesh2D(MeshBase, Base2DIn2D):
         face_centroids
         vertex_connected_faces
     """
-    __slots__ = ('_vertices', '_faces', '_colors', '_is_color_by_face',
-                 '_min', '_max', '_center', '_area', '_centroid',
-                 '_face_areas', '_face_centroids', '_vertex_connected_faces')
+    __slots__ = ('_min', '_max', '_center', '_centroid')
 
     def __init__(self, vertices, faces, colors=None):
         """Initilize Mesh2D.
@@ -46,8 +43,8 @@ class Mesh2D(MeshBase, Base2DIn2D):
             colors: An optional list of colors that correspond to either the faces
                 of the mesh or the vertices of the mesh. Default is None.
         """
-        self._check_vertices_input(vertices)
-        self._check_faces_input(faces)
+        self._vertices = self._check_vertices_input(vertices)
+        self._faces = self._check_faces_input(faces)
         self._is_color_by_face = False  # default if colors is None
         self.colors = colors
 
@@ -211,6 +208,28 @@ class Mesh2D(MeshBase, Base2DIn2D):
         return _new_mesh
 
     @property
+    def min(self):
+        """A Point2D for the minimum bounding rectangle vertex around this geometry."""
+        if self._min is None:
+            self._calculate_min_max()
+        return self._min
+
+    @property
+    def max(self):
+        """A Point2D for the maximum bounding rectangle vertex around this geometry."""
+        if self._max is None:
+            self._calculate_min_max()
+        return self._max
+
+    @property
+    def center(self):
+        """A Point2D for the center of the bounding rectangle around this geometry."""
+        if self._center is None:
+            min, max = self.min, self.max
+            self._center = Point2D((min.x + max.x) / 2, (min.y + max.y) / 2)
+        return self._center
+
+    @property
     def face_areas(self):
         """A tuple of face areas that parallels the faces property."""
         if self._face_areas is None:
@@ -366,6 +385,24 @@ class Mesh2D(MeshBase, Base2DIn2D):
         return {'vertices': [pt.to_dict() for pt in self.vertices],
                 'faces': self.faces, 'colors': colors}
 
+    def _calculate_min_max(self):
+        """Calculate maximum and minimum Point2D for this object."""
+        min_pt = [self.vertices[0].x, self.vertices[0].y]
+        max_pt = [self.vertices[0].x, self.vertices[0].y]
+
+        for v in self.vertices[1:]:
+            if v.x < min_pt[0]:
+                min_pt[0] = v.x
+            elif v.x > max_pt[0]:
+                max_pt[0] = v.x
+            if v.y < min_pt[1]:
+                min_pt[1] = v.y
+            elif v.y > max_pt[1]:
+                max_pt[1] = v.y
+
+        self._min = Point2D(min_pt[0], min_pt[1])
+        self._max = Point2D(max_pt[0], max_pt[1])
+
     def _face_area(self, face):
         """Return the area of a face."""
         return Mesh2D._get_area(tuple(self._vertices[i] for i in face))
@@ -389,6 +426,15 @@ class Mesh2D(MeshBase, Base2DIn2D):
         _new_mesh = Mesh2D(verts, self.faces)
         self._transfer_properties_scale(_new_mesh, factor)
         return _new_mesh
+
+    def _check_vertices_input(self, vertices):
+        if not isinstance(vertices, tuple):
+            vertices = tuple(vertices)
+        for vert in vertices:
+            assert isinstance(vert, Point2D), \
+                'Expected Point2D for {} vertex. Got {}.'.format(
+                    self.__class__.__name__, type(vert))
+        return vertices
 
     @staticmethod
     def _ear_clipping_triangulation(polygon):
