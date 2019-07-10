@@ -19,8 +19,8 @@ class Vector2D(object):
 
     def __init__(self, x=0, y=0):
         """Initialize 2D Vector."""
-        self._x = x
-        self._y = y
+        self._x = self._cast_to_float(x)
+        self._y = self._cast_to_float(y)
 
     @classmethod
     def from_dict(cls, data):
@@ -129,6 +129,15 @@ class Vector2D(object):
         """Get Vector2D/Point2D as a dictionary."""
         return {'x': self.x,
                 'y': self.y}
+
+    def _cast_to_float(self, value):
+        """Ensure that an input coordinate value is a float."""
+        try:
+            number = float(value)
+        except (ValueError, TypeError):
+            raise TypeError(
+                'Coordinates must be numbers. Got {}: {}.'.format(type(value), value))
+        return number
 
     @staticmethod
     def _rotate(vec, angle):
