@@ -22,9 +22,9 @@ class Vector3D(object):
 
     def __init__(self, x=0, y=0, z=0):
         """Initialize 3D Vector."""
-        self._x = x
-        self._y = y
-        self._z = z
+        self._x = self._cast_to_float(x)
+        self._y = self._cast_to_float(y)
+        self._z = self._cast_to_float(z)
 
     @classmethod
     def from_dict(cls, data):
@@ -134,6 +134,15 @@ class Vector3D(object):
         return {'x': self.x,
                 'y': self.y,
                 'z': self.z}
+
+    def _cast_to_float(self, value):
+        """Ensure that an input coordinate value is a float."""
+        try:
+            number = float(value)
+        except (ValueError, TypeError):
+            raise TypeError(
+                'Coordinates must be numbers. Got {}: {}.'.format(type(value), value))
+        return number
 
     @staticmethod
     def _reflect(vec, normal):
