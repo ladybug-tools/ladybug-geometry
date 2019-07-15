@@ -444,7 +444,7 @@ class Polyface3D(Base2DIn3D):
         """Get this object with overlapping naked edges merged into single internal edges.
 
         This can be used to determine if a polyface is truly solid.
-        The default test of edge contiions that runs upon creation of a polyface does
+        The default test of edge conditions that runs upon creation of a polyface does
         not check for cases where overlapping colinear edges could be considered
         a single internal edge such as the case below:
                              |           1          |
