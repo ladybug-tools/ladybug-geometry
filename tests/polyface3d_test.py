@@ -213,7 +213,7 @@ def test_polyface3d_init_from_faces_coplanar_3face():
 
 
 def test_polyface3d_init_from_faces_tolerance():
-    """Test the initalization of Poyface3D from_faces_tolerance."""
+    """Test the initalization of Poyface3D from_faces with a tolerance."""
     pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
     pts_2 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(0, 2, 0)]
     pts_3 = [Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(0, 0, 2)]
@@ -228,11 +228,11 @@ def test_polyface3d_init_from_faces_tolerance():
     face_5 = Face3D(pts_5)
     face_6 = Face3D(pts_6)
     face_7 = Face3D(pts_7)
-    polyface_1 = Polyface3D.from_faces_tolerance(
+    polyface_1 = Polyface3D.from_faces(
         [face_1, face_2, face_3, face_4, face_5, face_6], 0.001)
-    polyface_2 = Polyface3D.from_faces_tolerance(
+    polyface_2 = Polyface3D.from_faces(
         [face_1, face_2, face_3, face_4, face_5, face_7],  0.001)
-    polyface_3 = Polyface3D.from_faces_tolerance(
+    polyface_3 = Polyface3D.from_faces(
         [face_1, face_2, face_3, face_4, face_5, face_7],  0.000001)
 
     assert polyface_1.is_solid
