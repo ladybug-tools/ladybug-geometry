@@ -69,17 +69,16 @@ class Polyface3D(Base2DIn3D):
         self._face_indices = tuple(tuple(tuple(loop) for loop in face)
                                    for face in face_indices)
 
-        # unpack or autocalculate edge information
-        if edge_information is not None:
+        if edge_information is not None:  # unpack the input edge information
             edge_i = edge_information['edge_indices']
             edge_t = edge_information['edge_types']
-        else:  # determine unique edges from the vertices and faces.
+        else:  # autocalculate the edge information from the vertices and faces
             edge_i = []
             edge_t = []
             for face in face_indices:
                 for fi in face:
                     for i, vi in enumerate(fi):
-                        try:  # this can get slow for large number of vertices.
+                        try:  # this can get slow for large number of vertices
                             ind = edge_i.index((vi, fi[i - 1]))
                             edge_t[ind] += 1
                         except ValueError:  # make sure reversed edge isn't there
@@ -124,58 +123,25 @@ class Polyface3D(Base2DIn3D):
                                  "edge_types":[0, 0, 1, 0, 0]}
             }
         """
-        edge_information = None
         if 'edge_information' in data and data['edge_information'] is not None:
             edge_information = data['edge_information']
+        else:
+            edge_information = None
 
         return cls(tuple(Point3D.from_dict(pt) for pt in data['vertices']),
                    data['face_indices'], edge_information)
 
     @classmethod
-    def from_faces(cls, faces):
+    def from_faces(cls, faces, tolerance=0):
         """Initilize Polyface3D from a list of Face3D objects.
 
-        Initializing a Polyface3D this way will ensure that the order of faces on
-        the Polyface3D.faces and Polyface3D.face_indices matche the order of faces
-        input here. Many properties of the faces will also be preserved except that
-        this method will ensure that all of the face_indices on the resulting polyface
-        are counterclockwise. This is done so that faces and their corresponding
-        plane normals can always be reconstructed from face_indices.
-
-        Args:
-            faces: A list of Face3D objects representing the boundary of this Polyface.
-        """
-        # extract unique vertices from the faces
-        vertices = []  # collection of vertices as point objects
-        face_indices = []  # collection of face indices
-        for f in faces:
-            ind = []
-            loops = [f.boundary] if not f.has_holes else [f.boundary] + f.holes
-            for j, loop in enumerate(loops):
-                ind.append([])
-                for v in loop:
-                    try:  # this can get slow for large number of vertices.
-                        ind[j].append(vertices.index(v))
-                    except ValueError:  # add new point
-                        vertices.append(v)
-                        ind[j].append(len(vertices) - 1)
-            face_indices.append(ind)
-
-        # get the polyface object and assign correct faces to it
-        return cls(vertices, face_indices)
-
-    @classmethod
-    def from_faces_tolerance(cls, faces, tolerance):
-        """Initilize Polyface3D from a list of Face3D objects with a tolerance.
-
-        This method is effectively equivalent to the from_faces method but faces
-        will be joined into the polyface if the vertices are within the tolerance
-        (rather than needing vertices to be perfectly equivalent).
+        Note that the Polyface3D.faces property of the resulting polyface will
+        have an order of faces that matches the order input to this classmethod.
 
         Args:
             faces: A list of Face3D objects representing the boundary of this Polyface.
             tolerance: The maximum difference between x, y, and z values at which
-                point vertices are considered equivalent.
+                the vertex of two adjacent faces is considered the same. Default: 0.
         """
         # extract unique vertices from the faces
         vertices = []  # collection of vertices as point objects
@@ -192,7 +158,7 @@ class Polyface3D(Base2DIn3D):
                             found = True
                             ind[j].append(i)
                             break
-                    if found is False:  # add new point
+                    if not found:  # add new point
                         vertices.append(v)
                         ind[j].append(len(vertices) - 1)
             face_indices.append(tuple(ind))
@@ -507,7 +473,7 @@ class Polyface3D(Base2DIn3D):
                         break
 
             # if fully overlapping edges have been found, remake them into one
-            if overlapping is True:
+            if overlapping:
                 remove_i.extend(coll_i)  # remove overlapping edges from the list
                 verts = [self.vertices[j] for j in final_vi]
                 dir_vec = verts[0] - verts[1]
