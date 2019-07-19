@@ -202,7 +202,11 @@ class Polyface3D(Base2DIn3D):
         polyface = cls(_verts, _face_indices, {'edge_indices': _edge_indices,
                                                'edge_types': [1] * 12})
         verts = tuple(tuple(_verts[i] for i in face[0]) for face in _face_indices)
-        polyface._faces = tuple(Face3D(v, enforce_right_hand=False) for v in verts)
+        top_plane = base_plane.move(_h_vec)
+        bottom = (Face3D(verts[0], plane=base_plane, enforce_right_hand=False),)
+        middle = tuple(Face3D(v, enforce_right_hand=False) for v in verts[1:5])
+        top = (Face3D(verts[5], plane=top_plane, enforce_right_hand=False),)
+        polyface._faces = bottom + middle + top
         polyface._volume = width * depth * height
         return polyface
 
