@@ -116,8 +116,8 @@ class Polyface3D(Base2DIn3D):
 
         Args:
             data:
-            {"vertices": [{"x": 0, "y": 0, "z": 0}, {"x": 10, "y": 0, "z": 0},
-                          {"x": 10, "y": 10, "z": 0}, {"x": 0, "y": 10, "z": 0}],
+            {"type": "Polyface3D",
+            "vertices": [[0, 0, 0], [10, 0, 0], [10, 10, 0], [0, 10, 0]],
             "face_indices": [[(0, 1, 2)], [(3, 0, 1)]],
             "edge_information": {"edge_indices":[(0, 1), (1, 2), (2, 0), (2, 3), (3, 0)],
                                  "edge_types":[0, 0, 1, 0, 0]}
@@ -128,7 +128,7 @@ class Polyface3D(Base2DIn3D):
         else:
             edge_information = None
 
-        return cls(tuple(Point3D.from_dict(pt) for pt in data['vertices']),
+        return cls(tuple(Point3D(pt[0], pt[1], pt[2]) for pt in data['vertices']),
                    data['face_indices'], edge_information)
 
     @classmethod
@@ -717,11 +717,20 @@ class Polyface3D(Base2DIn3D):
                 outward_faces.append(face.flip())
         return outward_faces
 
-    def to_dict(self):
-        """Get Polyface3D as a dictionary."""
-        return {'vertices': [v.to_dict() for v in self.vertices],
-                'face_indices': self.face_indices,
-                'edge_information': self.edge_information}
+    def to_dict(self, include_edge_information=True):
+        """Get Polyface3D as a dictionary.
+
+        Args:
+            include_edge_information: Set to True to include the edge_information
+                in the dictionary, which will allow for fast initialization when
+                it is de-serialized. Default True.
+        """
+        base = {'type': 'Polyface3D',
+                'vertices': [(v.x, v.y, v.z) for v in self.vertices],
+                'face_indices': self.face_indices}
+        if include_edge_information:
+                base['edge_information'] = self.edge_information
+        return base
 
     def _get_edge_type(self, edge_type):
         """Get all of the edges of a certain type in this polyface."""

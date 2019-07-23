@@ -200,6 +200,12 @@ class LineSegment2D(Base1DIn2D):
         dist, pts = closest_point2d_between_line2d(self, line)
         return dist
 
+    def to_dict(self):
+        """Get LineSegment2D as a dictionary."""
+        base = Base1DIn2D.to_dict(self)
+        base['type'] = 'LineSegment2D'
+        return base
+
     def _u_in(self, u):
         return u >= 0.0 and u <= 1.0
 

@@ -130,8 +130,9 @@ class Vector3D(object):
         return self.__copy__()
 
     def to_dict(self):
-        """Get Vector3D/Point3D as a dictionary."""
-        return {'x': self.x,
+        """Get Vector3D as a dictionary."""
+        return {'type': 'Vector3D',
+                'x': self.x,
                 'y': self.y,
                 'z': self.z}
 
@@ -400,6 +401,13 @@ class Point3D(Vector3D):
         return abs(self.x - point.x) <= tolerance and \
             abs(self.y - point.y) <= tolerance and \
             abs(self.z - point.z) <= tolerance
+
+    def to_dict(self):
+        """Get Point3D as a dictionary."""
+        return {'type': 'Point3D',
+                'x': self.x,
+                'y': self.y,
+                'z': self.z}
 
     def __add__(self, other):
         # Point + Vector -> Point

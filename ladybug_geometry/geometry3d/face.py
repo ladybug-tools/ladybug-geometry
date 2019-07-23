@@ -141,20 +141,21 @@ class Face3D(Base2DIn3D):
 
         Args:
             data: {
-            "boundary": [{"x": 0, "y": 0, "z": 0}, {"x": 10, "y": 0, "z": 0},
-                         {"x": 0, "y": 10, "z": 0}],
-            "plane": {"n": {"x": 0, "y": 0, "z": 1}, "o": {"x": 0, "y": 0, "z": 0},
-                      "x": {"x": 1, "y": 0, "z": 0}}
-            "holes": [[{"x": 2, "y": 2, "z": 0}, {"x": 5, "y": 2, "z": 0},
-                       {"x": 2, "y": 5, "z": 0}]],
+            "type": "Face3D",
+            "boundary": [[0, 0, 0], [10, 0, 0], [0, 10, 0]],
+            "plane": {"n": [0, 0, 1], "o": [0, 0, 0], "x": [1, 0, 0]},
+            "holes": [[[2, 2, 0], [5, 2, 0], [2, 5, 0]]]
             }
         """
         holes = None
         if 'holes' in data and data['holes'] is not None:
-            holes = tuple(
-                tuple(Point3D.from_dict(pt) for pt in hole) for hole in data['holes'])
-        return cls(tuple(Point3D.from_dict(pt) for pt in data['boundary']),
-                   Plane.from_dict(data['plane']), holes)
+            holes = tuple(tuple(
+                Point3D(pt[0], pt[1], pt[2]) for pt in hole) for hole in data['holes'])
+        plane = None
+        if 'plane' in data and data['plane'] is not None:
+            plane = Plane.from_dict(data['plane'])
+        return cls(tuple(Point3D(pt[0], pt[1], pt[2]) for pt in data['boundary']),
+                   plane, holes)
 
     @classmethod
     def from_extrusion(cls, line_segment, extrusion_vector):
@@ -1359,15 +1360,22 @@ class Face3D(Base2DIn3D):
                                       base_plane)]
         return final_faces
 
-    def to_dict(self):
-        """Get Face3D as a dictionary."""
-        if not self.has_holes:
-            return {'boundary': [pt.to_dict() for pt in self.boundary],
-                    'plane': self.plane.to_dict()}
-        else:
-            return {'boundary': [pt.to_dict() for pt in self.boundary],
-                    'plane': self.plane.to_dict(),
-                    'holes': [[pt.to_dict() for pt in hole] for hole in self.holes]}
+    def to_dict(self, include_plane=True):
+        """Get Face3D as a dictionary.
+
+        Args:
+            include_plane: Set to True to include the Face3D plane in the
+                dictionary, which will preserve the underlying orientation
+                of the face plane. Default True.
+        """
+        base = {'type': 'Face3D',
+                'boundary': [(pt.x, pt.y, pt.z) for pt in self.boundary]}
+        if include_plane:
+            base['plane'] = self.plane.to_dict()
+        if self.has_holes:
+            base['holes'] = [[(pt.x, pt.y, pt.z) for pt in hole]
+                             for hole in self.holes]
+        return base
 
     def _check_vertices_input(self, vertices, loop_name='boundary'):
         if not isinstance(vertices, tuple):
