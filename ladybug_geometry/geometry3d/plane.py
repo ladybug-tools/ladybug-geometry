@@ -65,14 +65,16 @@ class Plane(object):
 
         Args:
             data: {
-            "n": {"x": 0, "y": 0, "z": 1},
-            "o": {"x": 0, "y": 10, "z": 0},
-            "x": {"x": 1, "y": 0, "z": 0}}
+            "type": "Plane"
+            "n": [0, 0, 1],
+            "o": [0, 10, 0],
+            "x": [1, 0, 0]}
         """
         x = None
         if 'x' in data and data['x'] is not None:
-            x = Vector3D.from_dict(data['x'])
-        return cls(Vector3D.from_dict(data['n']), Point3D.from_dict(data['o']), x)
+            x = Vector3D(data['x'][0], data['x'][1], data['x'][2])
+        return cls(Vector3D(data['n'][0], data['n'][1], data['n'][2]),
+                   Point3D(data['o'][0], data['o'][1], data['o'][2]), x)
 
     @classmethod
     def from_three_points(cls, o, p2, p3):
@@ -349,9 +351,10 @@ class Plane(object):
 
     def to_dict(self):
         """Get Plane as a dictionary."""
-        return {'n': self.n.to_dict(),
-                'o': self.o.to_dict(),
-                'x': self.x.to_dict()}
+        return {'type': 'Plane',
+                'n': (self.n.x, self.n.y, self.n.z),
+                'o': (self.o.x, self.o.y, self.o.z),
+                'x': (self.x.x, self.x.y, self.x.z)}
 
     def __copy__(self):
         return self.__class__(self.n, self.o)

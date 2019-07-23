@@ -68,6 +68,12 @@ class Ray2D(Base1DIn2D):
         """
         return Ray2D(self.p.scale(factor, origin), self.v * factor)
 
+    def to_dict(self):
+        """Get Ray2D as a dictionary."""
+        base = Base1DIn2D.to_dict(self)
+        base['type'] = 'Ray2D'
+        return base
+
     def _u_in(self, u):
         return u >= 0.0
 

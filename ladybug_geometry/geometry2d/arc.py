@@ -56,12 +56,14 @@ class Arc2D(object):
 
         Args:
             data: {
-            "c": {"x": 10, "y": 0},
+            "type": "Arc2D"
+            "c": [10, 0],
             "r": 5,
             "a1": 0,
             "a2": 3.14159}
         """
-        return cls(Point2D.from_dict(data['c']), data['r'], data['a1'], data['a2'])
+        return cls(Point2D(data['c'][0], data['c'][1]),
+                   data['r'], data['a1'], data['a2'])
 
     @classmethod
     def from_start_mid_end(cls, p1, m, p2, circle=False):
@@ -367,7 +369,7 @@ class Arc2D(object):
 
     def to_dict(self):
         """Get Arc2D as a dictionary."""
-        return {'c': self.c.to_dict(),
+        return {'type': 'Arc2D', 'c': (self.c.x, self.c.y),
                 'r': self.r, 'a1': self.a1, 'a2': self.a2}
 
     def _pt_in(self, point):

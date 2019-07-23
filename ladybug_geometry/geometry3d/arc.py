@@ -51,8 +51,8 @@ class Arc3D(object):
 
         Args:
             data: {
-            "plane": {"n": {"x": 0, "y": 0, "z": 1}, "o": {"x": 0, "y": 10, "z": 0},
-                      "x": {"x": 1, "y": 0, "z": 0}},
+            "type": "Arc3D"
+            "plane": {"n": [0, 0, 1], "o": [0, 10, 0], "x": [1, 0, 0]},
             "radius": 5,
             "a1": 0,
             "a2": 3.14159}
@@ -305,7 +305,7 @@ class Arc3D(object):
 
     def to_dict(self):
         """Get Arc3D as a dictionary."""
-        return {'plane': self.plane.to_dict(),
+        return {'type': 'Arc3D', 'plane': self.plane.to_dict(),
                 'radius': self.radius, 'a1': self.a1, 'a2': self.a2}
 
     @staticmethod

@@ -90,6 +90,12 @@ class Ray3D(Base1DIn3D):
         """
         return Ray3D(self.p.scale_world_origin(factor), self.v * factor)
 
+    def to_dict(self):
+        """Get Ray3D as a dictionary."""
+        base = Base1DIn3D.to_dict(self)
+        base['type'] = 'Ray3D'
+        return base
+
     def _u_in(self, u):
         return u >= 0.0
 

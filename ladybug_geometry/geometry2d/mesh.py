@@ -63,7 +63,8 @@ class Mesh2D(MeshBase):
 
         Args:
             data: {
-            "vertices": [{"x": 0, "y": 0}, {"x": 10, "y": 0}, {"x": 0, "y": 10}],
+            "type": "Mesh2D",
+            "vertices": [[0, 0], [10, 0], [0, 10]],
             "faces": [(0, 1, 2)],
             "colors": [{"r": 255, "g": 0, "b": 0}]
             }
@@ -76,7 +77,7 @@ class Mesh2D(MeshBase):
                 raise ImportError('Colors are specified in input Mesh2D dictionary '
                                   'but failed to import ladybug.color')
             colors = tuple(Color.from_dict(col) for col in data['colors'])
-        return cls(tuple(Point2D.from_dict(pt) for pt in data['vertices']),
+        return cls(tuple(Point2D(pt[0], pt[1]) for pt in data['vertices']),
                    data['faces'], colors)
 
     @classmethod
@@ -382,7 +383,8 @@ class Mesh2D(MeshBase):
         colors = None
         if self.colors is not None:
             colors = [col.to_dict() for col in self.colors]
-        return {'vertices': [pt.to_dict() for pt in self.vertices],
+        return {'type': 'Mesh2D',
+                'vertices': [(pt.x, pt.y) for pt in self.vertices],
                 'faces': self.faces, 'colors': colors}
 
     def _calculate_min_max(self):
