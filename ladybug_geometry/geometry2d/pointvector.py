@@ -126,8 +126,9 @@ class Vector2D(object):
         return self.__copy__()
 
     def to_dict(self):
-        """Get Vector2D/Point2D as a dictionary."""
-        return {'x': self.x,
+        """Get Vector2D as a dictionary."""
+        return {'type': 'Vector2D',
+                'x': self.x,
                 'y': self.y}
 
     def _cast_to_float(self, value):
@@ -339,6 +340,12 @@ class Point2D(Vector2D):
         """
         return abs(self.x - point.x) <= tolerance and \
             abs(self.y - point.y) <= tolerance
+
+    def to_dict(self):
+        """Get Point2D as a dictionary."""
+        return {'type': 'Point2D',
+                'x': self.x,
+                'y': self.y}
 
     def __add__(self, other):
         # Point + Vector -> Point

@@ -56,10 +56,11 @@ class Polygon2D(Base2DIn2D):
 
         Args:
             data: {
-            "vertices": [{"x": 0, "y": 0}, {"x": 10, "y": 0}, {"x": 0, "y": 10}]
+            "type": "Polygon2D",
+            "vertices": [[0, 0], [10, 0], [0, 10]]
             }
         """
-        return cls(tuple(Point2D.from_dict(pt) for pt in data['vertices']))
+        return cls(tuple(Point2D(pt[0], pt[1]) for pt in data['vertices']))
 
     @classmethod
     def from_rectangle(cls, base_point, height_vector, base, height):
@@ -627,7 +628,8 @@ class Polygon2D(Base2DIn2D):
 
     def to_dict(self):
         """Get Polygon2D as a dictionary."""
-        return {'vertices': [pt.to_dict() for pt in self.vertices]}
+        return {'type': 'Polygon2D',
+                'vertices': [(pt.x, pt.y) for pt in self.vertices]}
 
     def _transfer_properties(self, new_polygon):
         """Transfer properties from this polygon to a new polygon.

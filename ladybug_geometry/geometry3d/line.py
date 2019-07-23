@@ -201,6 +201,12 @@ class LineSegment3D(Base1DIn3D):
         """
         return self.p + self.v * (length / self.length)
 
+    def to_dict(self):
+        """Get LineSegment3D as a dictionary."""
+        base = Base1DIn3D.to_dict(self)
+        base['type'] = 'LineSegment3D'
+        return base
+
     def _u_in(self, u):
         return u >= 0.0 and u <= 1.0
 
