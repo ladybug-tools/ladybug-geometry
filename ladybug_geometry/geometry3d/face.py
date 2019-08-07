@@ -485,7 +485,7 @@ class Face3D(Base2DIn3D):
 
     @property
     def upper_left_counter_clockwise_vertices(self):
-        """Get this face's vertices startingfrom the upper left and moving counterclockwise.
+        """Get this face's vertices starting from the upper left and moving counterclockwise.
 
         This is useful for getting the vertices of several faces aligned with the
         same global geometry rules for export to engines like EnergyPlus.
@@ -493,8 +493,7 @@ class Face3D(Base2DIn3D):
         # get a 2d polygon in the face plane that has a positive Y axis.
         if self._plane.y.z < 0:
             ref_plane = self._plane.rotate(self._plane.n, math.pi, self._plane.o)
-            polygon = Polygon2D(
-                tuple(ref_plane.xyz_to_xy(v) for v in self._vertices))
+            polygon = Polygon2D(tuple(ref_plane.xyz_to_xy(v) for v in self._vertices))
         else:
             polygon = self.polygon2d
         # get counterclockwise vertices
@@ -506,16 +505,28 @@ class Face3D(Base2DIn3D):
             verts2d = polygon.vertices
         # sort points so that they start with the upper left point
         corner_pt = Point2D(polygon.min.x, polygon.max.y)
-        first_pt_index = 0
-        min_dist = verts2d[0].distance_to_point(corner_pt)
-        for pt_index, pt in enumerate(verts2d[1:]):
-            new_dist = pt.distance_to_point(corner_pt)
-            if new_dist < min_dist:
-                first_pt_index = pt_index + 1
-                min_dist = new_dist
-        if first_pt_index != 0:
-            verts3d = verts3d[first_pt_index:] + verts3d[:first_pt_index]
-        return verts3d
+        return self._corner_pt_verts(corner_pt, verts3d, verts2d)
+
+    @property
+    def upper_left_counter_clockwise_boundary(self):
+        """Get this face's boundary starting from the upper left and moving counterclockwise.
+        """
+        # get a 2d polygon in the face plane that has a positive Y axis.
+        if self._plane.y.z < 0:
+            ref_plane = self._plane.rotate(self._plane.n, math.pi, self._plane.o)
+            polygon = Polygon2D(tuple(ref_plane.xyz_to_xy(v) for v in self._boundary))
+        else:
+            polygon = self.boundary_polygon2d
+        # get counterclockwise boundary
+        if self.is_clockwise:
+            verts3d = tuple(reversed(self.boundary))
+            verts2d = tuple(reversed(polygon.vertices))
+        else:
+            verts3d = self.boundary
+            verts2d = polygon.vertices
+        # sort points so that they start with the upper left point
+        corner_pt = Point2D(polygon.min.x, polygon.max.y)
+        return self._corner_pt_verts(corner_pt, verts3d, verts2d)
 
     def is_geometrically_equivalent(self, face, tolerance):
         """Check whether a given face is geometrically equivalent to this Face.
@@ -1360,16 +1371,24 @@ class Face3D(Base2DIn3D):
                                       base_plane)]
         return final_faces
 
-    def to_dict(self, include_plane=True):
+    def to_dict(self, include_plane=True, enforce_upper_left=False):
         """Get Face3D as a dictionary.
 
         Args:
             include_plane: Set to True to include the Face3D plane in the
                 dictionary, which will preserve the underlying orientation
                 of the face plane. Default True.
+            enforce_upper_left: Set to True to ensure that the boundary vertices all
+                start from the upper-left corner. This takes extra time to compute but
+                ensures that the vertices in the dictionary are directly usable in an
+                EnergyPlus simulations. Default: False.
         """
-        base = {'type': 'Face3D',
-                'boundary': [(pt.x, pt.y, pt.z) for pt in self.boundary]}
+        base = {'type': 'Face3D'}
+        if not enforce_upper_left:
+            base['boundary'] = [(pt.x, pt.y, pt.z) for pt in self.boundary]
+        else:
+            base['boundary'] = [(pt.x, pt.y, pt.z) for pt in
+                                self.upper_left_counter_clockwise_boundary]
         if include_plane:
             base['plane'] = self.plane.to_dict()
         if self.has_holes:
@@ -1598,6 +1617,20 @@ class Face3D(Base2DIn3D):
         except Exception as e:
             raise ValueError('Incorrect vertices input for Face3D:\n\t{}'.format(e))
         return Plane(n, pt1)
+
+    @staticmethod
+    def _corner_pt_verts(corner_pt, verts3d, verts2d):
+        """Get verts3d starting from the one closes to the corner_pt."""
+        first_pt_index = 0
+        min_dist = verts2d[0].distance_to_point(corner_pt)
+        for pt_index, pt in enumerate(verts2d[1:]):
+            new_dist = pt.distance_to_point(corner_pt)
+            if new_dist < min_dist:
+                first_pt_index = pt_index + 1
+                min_dist = new_dist
+        if first_pt_index != 0:
+            verts3d = verts3d[first_pt_index:] + verts3d[:first_pt_index]
+        return verts3d
 
     def __copy__(self):
         _new_face = Face3D(self.vertices, self.plane)
