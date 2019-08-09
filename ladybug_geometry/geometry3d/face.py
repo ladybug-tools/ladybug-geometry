@@ -490,6 +490,8 @@ class Face3D(Base2DIn3D):
         This is useful for getting the vertices of several faces aligned with the
         same global geometry rules for export to engines like EnergyPlus.
         """
+        if self._plane.n.z == 1or self._plane.n.z == -1:  # no vertex is above another
+            return self.vertices
         # get a 2d polygon in the face plane that has a positive Y axis.
         if self._plane.y.z < 0:
             ref_plane = self._plane.rotate(self._plane.n, math.pi, self._plane.o)
@@ -511,6 +513,8 @@ class Face3D(Base2DIn3D):
     def upper_left_counter_clockwise_boundary(self):
         """Get this face's boundary starting from the upper left and moving counterclockwise.
         """
+        if self._plane.n.z == 1 or self._plane.n.z == -1:  # no vertex is above another
+            return self.boundary
         # get a 2d polygon in the face plane that has a positive Y axis.
         if self._plane.y.z < 0:
             ref_plane = self._plane.rotate(self._plane.n, math.pi, self._plane.o)
