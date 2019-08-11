@@ -8,9 +8,11 @@
 [![Python 2.7](https://img.shields.io/badge/python-2.7-green.svg)](https://www.python.org/downloads/release/python-270/) [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/) [![IronPython](https://img.shields.io/badge/ironpython-2.7-red.svg)](https://github.com/IronLanguages/ironpython2/releases/tag/ipy-2.7.8/)
 
 # ladybug-geometry
-Ladybug geometry is a Python library that adds geometry objects and basic geometric computation to Ladybug.
+Ladybug geometry is a Python library that houses geometry objects used throughout the Ladybug Tools core libraries.
 
-# Reasons for this Library
+## [API Documentation](https://www.ladybug.tools/ladybug-geometry/docs/ladybug_geometry.html)
+
+## Reasons for this Library
 We initially debated whether geometry computation should be placed largely on the CAD plugins or
 whether it should be inincluded in the core.  As we developed the core libraries out, it became clear
 that there are large advantages to having it in the core (ie. cross compatability between
@@ -43,7 +45,7 @@ listed above (Rhino3dm and Blender), as well as other projects like
 [this PhD on Grid Generation for Radiance](https://www.radiance-online.org/community/workshops/2015-philadelphia/presentations/day1/STADICUtilities-Radiance%20Workshop2015.pdf)
 to build tis core library.
 
-# Things that Will be a Part of this Library
+## Things that Are or Will be a Part of this Library
 ### (We Can do Easily in Pure Python)
 - [x] Vectormath ([already exists in Ladybug core](https://github.com/ladybug-tools/ladybug/blob/master/ladybug/euclid.py))
 - [x] Calculate Bounding Box ([already exists in Butterfly core](https://github.com/ladybug-tools/butterfly/blob/master/butterfly/geometry.py))
@@ -67,11 +69,11 @@ to build tis core library.
 - [ ] Straight Skeleton Methods (currently implemented in [legacy core/perimeter component](https://github.com/mostaphaRoudsari/honeybee/blob/master/src/Honeybee_SplitFloor2ThermalZones.py) but should be expanded to accept concave geometry)
 - [ ] Offset edge curve of a planar surface (can be done by translating vertices along the straight skeleton to make a "wavefront")
 
-# Things That Should be a Part of this Library
+## Things That Should be a Part of this Library
 ### (We Think We Can Do Them But They Will Require Some Expertise)
 - [ ] Create Matching Zone Surfaces (intersection of surfaces with one another). OpenStudio has methods for this [as @saeranv shows here](https://github.com/mostaphaRoudsari/honeybee/issues/700)
 - [ ] Curve Boolean a set of 2D curves (useful for finding outer boundaries of set of THERM polygons, calculating building footprints from floor curves, and more).  Should be possible with [this method here](https://stackoverflow.com/questions/2667748/how-do-i-combine-complex-polygons)
 
-# Things that We Will Rely on the CAD Interface For:
+## Things that We Will Rely on the CAD Interface For:
 - Conversion of Curved Surfaces to Planar Surfaces (ideally with methods for treating single curvature differently than double curvature)
 - Solid Boolean Unions (we can probably get away with not needing this for anything in Ladybug Tools)
