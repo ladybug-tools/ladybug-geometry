@@ -472,7 +472,7 @@ class Face3D(Base2DIn3D):
         """Boolean noting whether the face is valid (having a non-zero area).
 
         Note that faces are still considered valid if they have out-of-plane vertices,
-        self-intersecting edges, or duplicate/colinear vertices. The validate_planarity
+        self-intersecting edges, or duplicate/colinear vertices. The check_planar
         method can be used to detect if there are out-of-plane vertices. The
         is_self_intersecting property identifies self-intersecting edges, and the
         remove_colinear_vertices method will remove duplicate/colinear vertices."""
@@ -654,8 +654,8 @@ class Face3D(Base2DIn3D):
                     return False
             return True
 
-    def validate_planarity(self, tolerance, raise_exception=True):
-        """Validate that all of the face's vertices lie within the face's plane.
+    def check_planar(self, tolerance, raise_exception=True):
+        """Check that all of the face's vertices lie within the face's plane.
 
         This check is not done by default when creating the face since
         it is assumed that there is likely a check for planarity before the face

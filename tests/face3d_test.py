@@ -575,8 +575,8 @@ def test_triangulated_mesh_and_centroid():
     assert face_2.centroid.z == 0
 
 
-def test_validate_planarity():
-    """Test the validate_planarity method of Face3D."""
+def test_check_planar():
+    """Test the check_planar method of Face3D."""
     pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
     pts_2 = (Point3D(0, 0, 0), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
     pts_3 = (Point3D(0, 0, 2.0001), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
@@ -585,14 +585,14 @@ def test_validate_planarity():
     face_2 = Face3D(pts_2, plane_1)
     face_3 = Face3D(pts_3, plane_1)
 
-    assert face_1.validate_planarity(0.001) is True
-    assert face_2.validate_planarity(0.001, False) is False
+    assert face_1.check_planar(0.001) is True
+    assert face_2.check_planar(0.001, False) is False
     with pytest.raises(Exception):
-        face_2.validate_planarity(0.0001)
-    assert face_3.validate_planarity(0.001) is True
-    assert face_3.validate_planarity(0.000001, False) is False
+        face_2.check_planar(0.0001)
+    assert face_3.check_planar(0.001) is True
+    assert face_3.check_planar(0.000001, False) is False
     with pytest.raises(Exception):
-        face_3.validate_planarity(0.000001)
+        face_3.check_planar(0.000001)
 
 
 def test_flip():
