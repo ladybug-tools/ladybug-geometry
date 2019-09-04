@@ -17,17 +17,17 @@ class Polygon2D(Base2DIn2D):
     """2D polygon object.
 
     Properties:
-        vertices
-        segments
-        min
-        max
-        center
-        perimeter
-        area
-        is_clockwise
-        is_convex
-        is_self_intersecting
-        is_valid
+        * vertices: A list of Point2D objects representing the vertices of the polygon.
+        * segments
+        * min
+        * max
+        * center
+        * perimeter
+        * area
+        * is_clockwise
+        * is_convex
+        * is_self_intersecting
+        * is_valid
     """
     __slots__ = ('_segments', '_triangulated_mesh', '_perimeter', '_area',
                  '_is_clockwise', '_is_convex', '_is_self_intersecting')
@@ -35,8 +35,6 @@ class Polygon2D(Base2DIn2D):
     def __init__(self, vertices):
         """Initilize Polygon2D.
 
-        Args:
-            vertices: A list of Point2D objects representing the vertices of the polygon.
         """
         self._vertices = self._check_vertices_input(vertices)
         self._segments = None
@@ -54,7 +52,8 @@ class Polygon2D(Base2DIn2D):
     def from_dict(cls, data):
         """Create a Polygon2D from a dictionary.
 
-        Args:
+        **Parameters:**
+        ::
             data: {
             "type": "Polygon2D",
             "vertices": [[0, 0], [10, 0], [0, 10]]
@@ -438,9 +437,9 @@ class Polygon2D(Base2DIn2D):
         Returns:
             An integer denoting the relationship of the point. This will be one
                 of the following:
-                    -1 = Outside polygon
-                     0 = On the edge of the polygon
-                    +1 = Inside polygon
+                    * -1 = Outside polygon
+                    * 0 = On the edge of the polygon
+                    * +1 = Inside polygon
         """
         if self.is_point_on_edge(point, tolerance):
             return 0
@@ -476,10 +475,11 @@ class Polygon2D(Base2DIn2D):
         one concave turn (provided that they do not have colinear vertices).
         This is suitable for nearly all practical purposes and the only cases
         that could yield an incorrect result are when a point is co-linear with
-        two or more polygon edges along the X vector like so:
-                          _____     _____     _____
-                         |  .  |___|     |___|     |
-                         |_________________________|
+        two or more polygon edges along the X vector like so::
+             _____     _____     _____
+            |  .  |___|     |___|     |
+            |_________________________|
+
         While this method covers most fringe cases, it will not test for whether
         a point lies perfectly on the edge of the polygon so it assesses whether
         a point lies inside the polygon up to Python floating point tolerance
@@ -532,18 +532,19 @@ class Polygon2D(Base2DIn2D):
         the given point lies inside the boundary rectangle of the polygon.
         However, while this method gives the correct result in 99.9% of cases,
         there are a few fringe cases where it will not give the correct result.
-        Specifically these are:
-        1 - When the test_ray intersects perfectly with a polygon vertex.
-            For example, this case with an X-unit test_vector:
-                                _____________
-                               |      .      |
-                               |            /
-                               |___________/
-        2 - When there are two polygon vertices that are colinear with the point
-            along the test_ray. For example, this case with an X-unit test_vector:
-                                  _____
-                                 |  .  |____
-                                 |__________|
+        Specifically these are::
+            1 - When the test_ray intersects perfectly with a polygon vertex.
+                For example, this case with an X-unit test_vector:
+                                    _____________
+                                   |      .      |
+                                   |            /
+                                   |___________/
+            2 - When there are two polygon vertices that are colinear with the point
+                along the test_ray. For example, this case with an X-unit test_vector:
+                                      _____
+                                     |  .  |____
+                                     |__________|
+
         Use the `is_point_inside_check` method if a result that covers these fringe
         cases is needed.
 
