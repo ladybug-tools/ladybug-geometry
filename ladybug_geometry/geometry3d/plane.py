@@ -15,24 +15,24 @@ import math
 class Plane(object):
     """Plane object.
 
+    Args:
+        n: A Vector3D representing the normal of the plane.
+        o: A Point3D representing the origin point of the plane.
+        x: An optional Vector3D for the X-Axis of the Plane.
+            Note that this vector must be orthagonal to the input normal vector.
+            If None, the default will find an X-Axis in the world XY plane.
+
     Properties:
-        n: Normal vector
-        o: Origin point
-        k: Scalar constant relating origin point to normal vector
-        x: Plane X-Axis
-        y: Plane Y-Axis
+        * n: Normal vector
+        * o: Origin point
+        * k: Scalar constant relating origin point to normal vector
+        * x: Plane X-Axis
+        * y: Plane Y-Axis
     """
     __slots__ = ('_n', '_o', '_k', '_x', '_y')
 
     def __init__(self, n=Vector3D(0, 0, 1), o=Point3D(0, 0, 0), x=None):
         """Initilize Plane.
-
-        Args:
-            n: A Vector3D representing the normal of the plane.
-            o: A Point3D representing the origin point of the plane.
-            x: An optional Vector3D for the X-Axis of the Plane.
-                Note that this vector must be orthagonal to the input normal vector.
-                If None, the default will find an X-Axis in the world XY plane.
         """
         assert isinstance(n, Vector3D), \
             "Expected Vector3D for plane normal. Got {}.".format(type(n))
@@ -63,12 +63,14 @@ class Plane(object):
     def from_dict(cls, data):
         """Create a Plane from a dictionary.
 
-        Args:
-            data: {
+        .. code-block:: json
+
+            {
             "type": "Plane"
             "n": [0, 0, 1],
             "o": [0, 10, 0],
-            "x": [1, 0, 0]}
+            "x": [1, 0, 0]
+            }
         """
         x = None
         if 'x' in data and data['x'] is not None:
@@ -241,9 +243,11 @@ class Plane(object):
                 will be computed.
 
         Returns:
-            Two Point3D objects representing:
-                1) The closest point on the input line_ray to this plane.
-                2) The closest point on this plane to the input line_ray.
+            Two Point3D objects representing
+
+            1) The closest point on the input line_ray to this plane.
+            2) The closest point on this plane to the input line_ray.
+
             Will be None if the line_ray intersects this plant
         """
         return closest_point3d_between_line3d_plane(line_ray, self)

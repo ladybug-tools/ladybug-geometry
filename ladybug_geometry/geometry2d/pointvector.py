@@ -26,11 +26,15 @@ class Vector2D(object):
     def from_dict(cls, data):
         """Create a Vector2D/Point2D from a dictionary.
 
-            **Parameters:**
-            ::
-                data: {
-                "x": 10,
-                "y": 0}
+        Args:
+            data: A python dictionary in the following format
+
+        .. code-block:: json
+
+            {
+            "x": 10,
+            "y": 0
+            }
         """
         return cls(data['x'], data['y'])
 

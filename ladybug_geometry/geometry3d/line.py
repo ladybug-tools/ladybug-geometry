@@ -9,21 +9,21 @@ from ._1d import Base1DIn3D
 class LineSegment3D(Base1DIn3D):
     """3D line segment object.
 
+    Args:
+        p: A Point3D representing the first point of the line segment.
+        v: A Vector3D representing the vector to the second point.
+
     Properties:
-        p: Base point
-        v: Direction vector
-        p1: First point (same as p)
-        p2: Second point
-        length: The length of the line segement
+        * p: Base point
+        * v: Direction vector
+        * p1: First point (same as p)
+        * p2: Second point
+        * length: The length of the line segement
     """
     __slots__ = ()
 
     def __init__(self, p, v):
         """Initilize LineSegment3D.
-
-        Args:
-            p: A Point3D representing the first point of the line segment.
-            v: A Vector3D representing the vector to the second point.
         """
         assert isinstance(p, Point3D), "Expected Point3D. Got {}.".format(type(p))
         assert isinstance(v, Vector3D), "Expected Vector3D. Got {}.".format(type(v))

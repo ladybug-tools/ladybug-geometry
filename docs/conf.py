@@ -99,11 +99,11 @@ html_theme_options = {
     # Fix navigation bar to top of page?
     # Values: "true" (default) or "false"
     'navbar_fixed_top': "true",
-	'navbar_pagenav': True,
+    'navbar_pagenav': True,
     'source_link_position': "nav",
-	'bootswatch_theme': "united",
+    'bootswatch_theme': "united",
     'bootstrap_version': "3",
-	}
+}
 
 # on_rtd is whether we are on readthedocs.org
 # on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -212,3 +212,48 @@ epub_exclude_files = ['search.html']
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+# -- Options for autodoc extension --------------------------------------------
+autodoc_default_options = {
+    'inherited-members': True,
+}
+
+autodoc_member_order = 'groupwise'
+
+
+def autodoc_process_docstring(app, what, name, obj, options, lines):
+    # Make bolded items in class properties when descriopns are included
+    prev_line = ""
+    if what == 'class':
+        for i, line in enumerate(lines):
+            if line.strip(" ").startswith("* ") and ":" in line:  # typical bulleted line
+                right = line.find(":")
+                left = line.find("* ")
+                lines[i] = line[:left] + "* **" + line[left+2:right] + "** -- " +\
+                    line[right+1:]
+            elif prev_line.strip(" ") == "*" and ":" in line:  # Special multi-line cases
+                right = line.find(":")
+                left = len(line) - len(line.lstrip(" "))
+                lines[i] = line[:left] + "**" + line[left:right] + "** -- " +\
+                    line[right+1:]
+            prev_line = line
+    return lines
+
+
+def setup(app):
+    app.connect('autodoc-process-docstring', autodoc_process_docstring)
+
+
+"""
+# -- Docstring preprocessing example
+
+def autodoc_skip_member(app, what, name, obj, skip, options):
+    exclusions = (
+                  )
+    exclude = name in exclusions
+    return skip or exclusions
+
+def setup(app):
+    app.connect('autodoc-skip-member', autodoc_skip_member)
+
+"""

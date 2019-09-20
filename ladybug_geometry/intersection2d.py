@@ -180,16 +180,18 @@ def closest_point2d_between_line2d(line_ray_a, line_ray_b):
     Note that the line segments should not intersect for the result to be valid.
 
     Args:
-        Args:
-            line_ray_a: A LineSegment2D object.
-            line_ray_b: Another LineSegment2D to which closest points will
-                be determined.
+        line_ray_a: A LineSegment2D object.
+        line_ray_b: Another LineSegment2D to which closest points will
+            be determined.
 
     Returns:
-        dists[0]: The distance between the two LineSegment2D objects.
-        pts[0]: A tuple of two Point2D objects representing:
-            1) The point on line_ray_a that is closest to line_ray_b
-            2) The point on line_ray_b that is closest to line_ray_a
+        A list with two elements.
+
+        - dists[0]: The distance between the two LineSegment2D objects.
+        - pts[0]: A tuple of two Point2D objects representing:
+
+        1) The point on line_ray_a that is closest to line_ray_b
+        2) The point on line_ray_b that is closest to line_ray_a
     """
     # one of the 4 endpoints must be a closest point
     pt_1 = closest_point2d_on_line2d(line_ray_a.p, line_ray_b)

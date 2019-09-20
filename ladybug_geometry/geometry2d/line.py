@@ -10,21 +10,21 @@ from ..intersection2d import closest_point2d_between_line2d
 class LineSegment2D(Base1DIn2D):
     """2D line segment object.
 
+    Args:
+        p: A Point2D representing the first point of the line segment.
+        v: A Vector2D representing the vector to the second point.
+
     Properties:
-        p: Base point
-        v: Direction vector
-        p1: First point (same as p)
-        p2: Second point
-        length: The length of the line segement
+        * p: Base point
+        * v: Direction vector
+        * p1: First point (same as p)
+        * p2: Second point
+        * length: The length of the line segement
     """
     __slots__ = ()
 
     def __init__(self, p, v):
         """Initilize LineSegment2D.
-
-        Args:
-            p: A Point2D representing the first point of the line segment.
-            v: A Vector2D representing the vector to the second point.
         """
         assert isinstance(p, Point2D), "Expected Point2D. Got {}.".format(type(p))
         assert isinstance(v, Vector2D), "Expected Vector2D. Got {}.".format(type(v))
@@ -179,9 +179,10 @@ class LineSegment2D(Base1DIn2D):
                 will be computed.
 
         Returns:
-            Two Point2D objects representing:
-                1) The closest point on this object to the input line.
-                2) The closest point on the input line to this object.
+            Two Point2D objects representing
+
+            1) The closest point on this object to the input line.
+            2) The closest point on the input line to this object.
         """
         dist, pts = closest_point2d_between_line2d(self, line)
         return pts

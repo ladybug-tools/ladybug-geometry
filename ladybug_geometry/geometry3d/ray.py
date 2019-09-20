@@ -9,18 +9,18 @@ from ._1d import Base1DIn3D
 class Ray3D(Base1DIn3D):
     """3D Ray object.
 
+    Args:
+        p: A Point3D representing the base of the ray.
+        v: A Vector3D representing the direction of the ray.
+
     Properties:
-        p: Base point
-        v: Direction vector
+        * p: Base point
+        * v: Direction vector
     """
     __slots__ = ()
 
     def __init__(self, p, v):
         """Initilize Ray3D.
-
-        Args:
-            p: A Point3D representing the base of the ray.
-            v: A Vector3D representing the direction of the ray.
         """
         assert isinstance(p, Point3D), "Expected Point3D. Got {}.".format(type(p))
         assert isinstance(v, Vector3D), "Expected Vector3D. Got {}.".format(type(v))

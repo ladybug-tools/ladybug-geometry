@@ -17,31 +17,31 @@ except ImportError:
 class Mesh2D(MeshBase):
     """2D Mesh object.
 
+    Args:
+        vertices: A list or tuple of Point2D objects for vertices.
+        faces: A list of tuples with each tuple having either 3 or 4 integers.
+            These integers correspond to indices within the list of vertices.
+        colors: An optional list of colors that correspond to either the faces
+            of the mesh or the vertices of the mesh. Default is None.
+
     Properties:
-        vertices
-        faces
-        colors
-        is_color_by_face
-        min
-        max
-        center
-        area
-        centroid
-        face_areas
-        face_centroids
-        vertex_connected_faces
+        * vertices
+        * faces
+        * colors
+        * is_color_by_face
+        * min
+        * max
+        * center
+        * area
+        * centroid
+        * face_areas
+        * face_centroids
+        * vertex_connected_faces
     """
     __slots__ = ('_min', '_max', '_center', '_centroid')
 
     def __init__(self, vertices, faces, colors=None):
         """Initilize Mesh2D.
-
-        Args:
-            vertices: A list or tuple of Point2D objects for vertices.
-            faces: A list of tuples with each tuple having either 3 or 4 integers.
-                These integers correspond to indices within the list of vertices.
-            colors: An optional list of colors that correspond to either the faces
-                of the mesh or the vertices of the mesh. Default is None.
         """
         self._vertices = self._check_vertices_input(vertices)
         self._faces = self._check_faces_input(faces)
@@ -62,7 +62,11 @@ class Mesh2D(MeshBase):
         """Create a Mesh2D from a dictionary.
 
         Args:
-            data: {
+            data: A python dictionary in the following format
+
+        .. code-block:: json
+
+            {
             "type": "Mesh2D",
             "vertices": [[0, 0], [10, 0], [0, 10]],
             "faces": [(0, 1, 2)],
@@ -290,11 +294,14 @@ class Mesh2D(MeshBase):
                 The length of this list must match the number of this mesh's vertices.
 
         Returns:
-            new_mesh: A mesh where the vertices have been removed according
-                to the input pattern.
-            face_pattern: A list of boolean values that corresponds to the
-                original mesh faces noting whether the face is in the new mesh
-                (True) or has been removed from the new mesh (False).
+            A list with two elements.
+
+            - new_mesh: A mesh where the vertices have been removed according
+            to the input pattern.
+            
+            - face_pattern: A list of boolean values that corresponds to the
+            original mesh faces noting whether the face is in the new mesh (True)
+            or has been removed from the new mesh (False).
         """
         _new_verts, _new_faces, _new_colors, _new_f_cent, _new_f_area, face_pattern = \
             self._remove_vertices(pattern)
@@ -313,11 +320,14 @@ class Mesh2D(MeshBase):
                 The length of this list must match the number of this mesh's faces.
 
         Returns:
-            new_mesh: A mesh where the faces have been removed according
-                to the input pattern.
-            vertex_pattern: A list of boolean values that corresponds to the
-                original mesh vertices noting whether the vertex is in the new mesh
-                (True) or has been removed from the new mesh (False).
+            A list with two elements.
+
+            - new_mesh: A mesh where the faces have been removed according
+            to the input pattern.
+
+            - vertex_pattern: A list of boolean values that corresponds to the
+            original mesh vertices noting whether the vertex is in the new mesh
+            (True) or has been removed from the new mesh (False).
         """
         vertex_pattern = self._vertex_pattern_from_remove_faces(pattern)
         _new_verts, _new_faces, _new_colors, _new_f_cent, _new_f_area, face_pattern = \
@@ -342,8 +352,8 @@ class Mesh2D(MeshBase):
                 The length of this list must match the number of this mesh's faces.
 
         Returns:
-            new_mesh: A mesh where the faces have been removed according
-                to the input pattern.
+            new_mesh -- A mesh where the faces have been removed according
+            to the input pattern.
         """
         _new_faces, _new_colors, _new_f_cent, _new_f_area = \
             self._remove_faces_only(pattern)
