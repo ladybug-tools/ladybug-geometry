@@ -221,12 +221,14 @@ autodoc_default_options = {
 autodoc_member_order = 'groupwise'
 
 
+# -- Docstring preprocessing
 def autodoc_process_docstring(app, what, name, obj, options, lines):
-    # Make bolded items in class properties when descriopns are included
+
+    # Make bolded items in class properties when descriptions are included
     prev_line = ""
     if what == 'class':
         for i, line in enumerate(lines):
-            if line.strip(" ").startswith("* ") and ":" in line:  # typical bulleted line
+            if line.strip(" ").startswith("* ") and ":" in line:  # Typical bulleted line
                 right = line.find(":")
                 left = line.find("* ")
                 lines[i] = line[:left] + "* **" + line[left+2:right] + "** -- " +\
@@ -237,23 +239,9 @@ def autodoc_process_docstring(app, what, name, obj, options, lines):
                 lines[i] = line[:left] + "**" + line[left:right] + "** -- " +\
                     line[right+1:]
             prev_line = line
+
     return lines
 
 
 def setup(app):
     app.connect('autodoc-process-docstring', autodoc_process_docstring)
-
-
-"""
-# -- Docstring preprocessing example
-
-def autodoc_skip_member(app, what, name, obj, skip, options):
-    exclusions = (
-                  )
-    exclude = name in exclusions
-    return skip or exclusions
-
-def setup(app):
-    app.connect('autodoc-skip-member', autodoc_skip_member)
-
-"""
