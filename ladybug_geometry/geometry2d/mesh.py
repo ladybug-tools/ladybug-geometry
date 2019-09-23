@@ -69,7 +69,7 @@ class Mesh2D(MeshBase):
             {
             "type": "Mesh2D",
             "vertices": [[0, 0], [10, 0], [0, 10]],
-            "faces": [(0, 1, 2)],
+            "faces": [[0, 1, 2]],
             "colors": [{"r": 255, "g": 0, "b": 0}]
             }
         """
@@ -296,12 +296,16 @@ class Mesh2D(MeshBase):
         Returns:
             A list with two elements.
 
-            - new_mesh: A mesh where the vertices have been removed according
-            to the input pattern.
-            
-            - face_pattern: A list of boolean values that corresponds to the
-            original mesh faces noting whether the face is in the new mesh (True)
-            or has been removed from the new mesh (False).
+            -
+                new_mesh:
+                A mesh where the vertices have been removed according
+                to the input pattern.
+
+            -
+                face_pattern:
+                A list of boolean values that corresponds to the
+                original mesh faces noting whether the face is in the new mesh (True)
+                or has been removed from the new mesh (False).
         """
         _new_verts, _new_faces, _new_colors, _new_f_cent, _new_f_area, face_pattern = \
             self._remove_vertices(pattern)
@@ -322,12 +326,16 @@ class Mesh2D(MeshBase):
         Returns:
             A list with two elements.
 
-            - new_mesh: A mesh where the faces have been removed according
-            to the input pattern.
+            -
+                new_mesh:
+                A mesh where the faces have been removed according
+                to the input pattern.
 
-            - vertex_pattern: A list of boolean values that corresponds to the
-            original mesh vertices noting whether the vertex is in the new mesh
-            (True) or has been removed from the new mesh (False).
+            -
+                vertex_pattern:
+                A list of boolean values that corresponds to the
+                original mesh vertices noting whether the vertex is in the new mesh
+                (True) or has been removed from the new mesh (False).
         """
         vertex_pattern = self._vertex_pattern_from_remove_faces(pattern)
         _new_verts, _new_faces, _new_colors, _new_f_cent, _new_f_area, face_pattern = \

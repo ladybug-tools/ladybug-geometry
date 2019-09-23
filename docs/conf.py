@@ -245,3 +245,18 @@ def autodoc_process_docstring(app, what, name, obj, options, lines):
 
 def setup(app):
     app.connect('autodoc-process-docstring', autodoc_process_docstring)
+
+
+"""
+# -- Docstring preprocessing example
+
+def autodoc_skip_member(app, what, name, obj, skip, options):
+    exclusions = (
+                  )
+    exclude = name in exclusions
+    return skip or exclusions
+
+def setup(app):
+    app.connect('autodoc-skip-member', autodoc_skip_member)
+
+"""

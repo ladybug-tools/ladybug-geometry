@@ -1231,10 +1231,12 @@ class Face3D(Base2DIn3D):
 
             - top_edge: A LineSegment3D representing the top of the rectangle.
 
-            - other_faces: A list of Face3D objects for the parts of this face not
-            included in the rectangle. The length of this list will be between
-            0 (if this face is already rectangular) and 2 (if there are non-
-            rectangular geometries on either side of the rectangle.)
+            -
+                other_faces:
+                A list of Face3D objects for the parts of this face not
+                included in the rectangle. The length of this list will be between
+                0 (if this face is already rectangular) and 2 (if there are non-
+                rectangular geometries on either side of the rectangle.)
         """
         # perform checks on the face to see if a rectangle is extractable
         if self.has_holes:
