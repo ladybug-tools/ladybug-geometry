@@ -255,12 +255,10 @@ def autodoc_process_docstring(app, what, name, obj, options, lines):
 def make_field_bolded(lines):
     """Make field font bolded in 'field: value:' line format.
 
-    Note the purpose of this change is to match the format of the class 'Parameters'
-    or 'Args' format.
+    Note the purpose of this change is to match the class 'Parameters'
+    and 'Args' fields format.
 
     Args:
-        what: the type of the object which the docstring belongs to (one of "module",
-            "class", "exception", "function", "method", "attribute")
         lines: the lines of the docstring
     """
     import re
