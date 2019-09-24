@@ -32,11 +32,13 @@ class Polyface3D(Base2DIn3D):
             from the vertices and face_indices inuputs. Edge information
             should be formatted as a dictionary with two keys as follows:
 
-            * 'edge_indices':
+            *
+                'edge_indices':
                 A list of tuple objects that each contain two integers.
                 These integers correspond to indices within the vertices list and
                 each tuple represents a line sengment for an edge of the polyface.
-            * 'edge_types':
+            *
+                'edge_types':
                 A list of integers for each edge that parallels
                 the edge_indices list. An integer of 0 denotes a naked edge, an
                 integer of 1 denotes an internal edge. Anything higher is a
