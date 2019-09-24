@@ -221,42 +221,68 @@ autodoc_default_options = {
 autodoc_member_order = 'groupwise'
 
 
-# -- Docstring preprocessing
+# Autodoc event handlers
 def autodoc_process_docstring(app, what, name, obj, options, lines):
+    """Function to handle the autodoc-process-docstring event.
 
-    # Make bolded items in class properties when descriptions are included
-    prev_line = ""
+    Emitted when autodoc has read and processed a docstring. lines is a list of
+    strings – the lines of the processed docstring – that the event handler
+    can modify in place to change what Sphinx puts into the output.
+
+    More information on sphinx documentation:
+        http://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
+        #event-autodoc-process-docstring
+
+    Args:
+        app: the Sphinx application object
+        what: the type of the object which the docstring belongs to (one of "module",
+            "class", "exception", "function", "method", "attribute")
+        name: the fully qualified name of the object
+        obj: the object itself
+        options: the options given to the directive: an object with attributes
+            inherited_members, undoc_members, show_inheritance and noindex that
+            are true if the flag option of same name was given to the auto directive
+        lines: the lines of the docstring
+    """
+
+    # Make class properties bolded
     if what == 'class':
-        for i, line in enumerate(lines):
-            if line.strip(" ").startswith("* ") and ":" in line:  # Typical bulleted line
-                right = line.find(":")
-                left = line.find("* ")
-                lines[i] = line[:left] + "* **" + line[left+2:right] + "** -- " +\
-                    line[right+1:]
-            elif prev_line.strip(" ") == "*" and ":" in line:  # Special multi-line cases
-                right = line.find(":")
-                left = len(line) - len(line.lstrip(" "))
-                lines[i] = line[:left] + "**" + line[left:right] + "** -- " +\
-                    line[right+1:]
-            prev_line = line
+        make_field_bolded(lines)
 
     return lines
 
 
+def make_field_bolded(lines):
+    """Make field font bolded in 'field: value:' line format.
+
+    Note the purpose of this change is to match the format of the class 'Parameters'
+    or 'Args' format.
+
+    Args:
+        what: the type of the object which the docstring belongs to (one of "module",
+            "class", "exception", "function", "method", "attribute")
+        lines: the lines of the docstring
+    """
+    import re
+    # Regex pattern to detect 'field: value:' possible formats
+    reg_pat = re.compile(r"(\s*\*\s*)(\w+)(\s*:)(.+)")
+    # Run lines through pattern matching
+    matches = [reg_pat.match(line) for line in lines]
+    # Include bolded field names on matching lines
+    new_lines = [line if match is None else "{0[0]}**{0[1]}** --{0[3]}".format(
+             match.groups()) for match, line in zip(matches, lines)]
+    # Copy changes back to lines (in place)
+    for i in range(len(lines)):
+        lines[i] = new_lines[i]
+
+    return
+
+
 def setup(app):
+    """Run custom code with access to the Shinx application object
+
+    Args:
+        app: the Sphinx application object
+    """
+    # Register the event handler for 'autodoc-process-docstring' event
     app.connect('autodoc-process-docstring', autodoc_process_docstring)
-
-
-"""
-# -- Docstring preprocessing example
-
-def autodoc_skip_member(app, what, name, obj, skip, options):
-    exclusions = (
-                  )
-    exclude = name in exclusions
-    return skip or exclusions
-
-def setup(app):
-    app.connect('autodoc-skip-member', autodoc_skip_member)
-
-"""
