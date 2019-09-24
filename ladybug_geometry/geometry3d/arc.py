@@ -22,9 +22,8 @@ class Arc3D(object):
         a2: A number between 0 and 2 * pi for the end angle of the arc.
 
     Properties:
-        *
-          plane: A plane in which the Arc lies. The origin of the plane will be the
-          center point of the circle on which the arc lies.
+        *   plane: A plane in which the Arc lies. The origin of the plane will be the
+            center point of the circle on which the arc lies.
         * radius: Radius of arc
         * a1: Start angle of the arc in radians
         * a2: End angle of the arc in radians (arc occupies counterclockwise difference)
