@@ -178,15 +178,13 @@ class Mesh3D(MeshBase):
                 The length of this list must match the number of this mesh's vertices.
 
         Returns:
-            A list with two elements.
+            A tuple with two elements.
 
-            -
-                new_mesh:
+            -   new_mesh:
                 A mesh where the vertices have been removed according
                 to the input pattern.
 
-            -
-                face_pattern:
+            -   face_pattern:
                 A list of boolean values that corresponds to the
                 original mesh faces noting whether the face is in the new mesh
                 (True) or has been removed from the new mesh (False).
@@ -208,15 +206,13 @@ class Mesh3D(MeshBase):
                 The length of this list must match the number of this mesh's faces.
 
         Returns:
-            A list with two elements.
+            A tuple with two elements.
 
-            -
-                new_mesh:
+            -   new_mesh:
                 A mesh where the faces have been removed according
                 to the input pattern.
 
-            -
-                vertex_pattern:
+            -   vertex_pattern:
                 A list of boolean values that corresponds to the
                 original mesh vertices noting whether the vertex is in the new mesh
                 (True) or has been removed from the new mesh (False).
