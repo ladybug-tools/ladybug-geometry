@@ -1206,16 +1206,14 @@ class Face3D(Base2DIn3D):
 
         This method will only return geometry if:
 
-        1) There are no holes in the face.
+        1)  There are no holes in the face.
 
-        2) The face is not parallel to the World XY plane.
+        2)  The face is not parallel to the World XY plane.
 
-        3)
-            There are two parallel edges to this face, which are either
+        3)  There are two parallel edges to this face, which are either
             oriented horizontally or vertically.
 
-        4)
-            There must be enough overlap between these edges for a rectangle
+        4)  There must be enough overlap between these edges for a rectangle
             to be drawn between them.
 
         If this Face does not satisfy this criteria, None will be returned.
@@ -1225,14 +1223,13 @@ class Face3D(Base2DIn3D):
                 considered a part of a rectangle.
 
         Returns:
-            A list with three elements
+            A tuple with three elements
 
-            - bottom_edge: A LineSegment3D representing the bottom of the rectangle.
+            -   bottom_edge: A LineSegment3D representing the bottom of the rectangle.
 
-            - top_edge: A LineSegment3D representing the top of the rectangle.
+            -   top_edge: A LineSegment3D representing the top of the rectangle.
 
-            -
-                other_faces:
+            -   other_faces:
                 A list of Face3D objects for the parts of this face not
                 included in the rectangle. The length of this list will be between
                 0 (if this face is already rectangular) and 2 (if there are non-
