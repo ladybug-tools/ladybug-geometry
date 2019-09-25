@@ -185,7 +185,7 @@ def closest_point2d_between_line2d(line_ray_a, line_ray_b):
             be determined.
 
     Returns:
-        A list with two elements.
+        A tuple with two elements
 
         - dists[0]: The distance between the two LineSegment2D objects.
         - pts[0]: A tuple of two Point2D objects representing:
