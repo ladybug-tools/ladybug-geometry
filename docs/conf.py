@@ -105,6 +105,13 @@ html_theme_options = {
     'bootstrap_version': "3",
 }
 
+# Bootstrap theme custom file paths (relative to this file)
+# Layout.html path (already added above, include if different)
+# templates_path = ['_templates']
+# Stylesheet path
+html_static_path = ["_static"]
+
+
 # on_rtd is whether we are on readthedocs.org
 # on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
@@ -129,7 +136,6 @@ html_theme_options = {
 html_sidebars = {
     '**': ['localtoc.html']
 }
-
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -284,3 +290,6 @@ def setup(app):
     """
     # Register the event handler for 'autodoc-process-docstring' event
     app.connect('autodoc-process-docstring', autodoc_process_docstring)
+
+    # Add bootstrap theme custom stylesheet
+    app.add_stylesheet("custom.css")
