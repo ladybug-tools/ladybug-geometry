@@ -222,7 +222,7 @@ table.field-list {
   /* Widen the fixed sidenav */
   .bs-sidenav.affix,
   .bs-sidenav.affix-bottom {
-    width: 292px;
+    width: 213px;
   }
   .bs-sidenav.affix {
     position: fixed; /* Undo the static from mobile first approach */
@@ -240,7 +240,7 @@ table.field-list {
   /* Widen the fixed sidenav again */
   .bs-sidenav.affix-bottom,
   .bs-sidenav.affix {
-    width: 360px;
+    width: 263px;
   }
 }
 
