@@ -6,6 +6,9 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
+
+import re
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -259,27 +262,27 @@ def autodoc_process_docstring(app, what, name, obj, options, lines):
 
 
 def make_field_bolded(lines):
-    """Make field font bolded in 'field: value:' line format.
+    """Make field font bolded in 'field: value' line format.
 
     Note the purpose of this change is to match the class 'Parameters'
     and 'Args' fields format.
+    Regex pattern "(\s*\*\s*)(\w+)(\s*:)(.+)" detects range of 'field: value'
+    formats.
 
     Args:
         lines: the lines of the docstring
     """
-    import re
-    # Regex pattern to detect 'field: value:' possible formats
-    reg_pat = re.compile(r"(\s*\*\s*)(\w+)(\s*:)(.+)")
-    # Run lines through pattern matching
-    matches = [reg_pat.match(line) for line in lines]
-    # Include bolded field names on matching lines
-    new_lines = [line if match is None else "{0[0]}**{0[1]}** --{0[3]}".format(
-             match.groups()) for match, line in zip(matches, lines)]
+
+    # Include boldface (reST inline markup '**') in field names of matching lines
+    def replace(match):
+        return "{0[0]} **{0[1]}** --{0[3]}".format(match.groups())
+
+    # Substitute macthing lines
+    new_lines = [re.sub(r"(\s*\*\s*)(\w+)(\s*:)(.+)", replace, line) for line in lines]
+
     # Copy changes back to lines (in place)
     for i in range(len(lines)):
         lines[i] = new_lines[i]
-
-    return
 
 
 def setup(app):
