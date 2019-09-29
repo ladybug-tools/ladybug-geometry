@@ -12,11 +12,11 @@ class Vector3D(object):
     """3D Vector object.
 
     Properties:
-        x
-        y
-        z
-        magnitude
-        magnitude_squared
+        * x
+        * y
+        * z
+        * magnitude
+        * magnitude_squared
     """
     __slots__ = ('_x', '_y', '_z')
 
@@ -31,10 +31,15 @@ class Vector3D(object):
         """Create a Vector3D/Point3D from a dictionary.
 
         Args:
-            data: {
+            data: A python dictionary in the following format
+
+        .. code-block:: json
+
+            {
             "x": 10,
             "y": 0,
-            "z": 0}
+            "z": 0
+            }
         """
         return cls(data['x'], data['y'], data['z'])
 
@@ -304,9 +309,9 @@ class Point3D(Vector3D):
     """3D Point object.
 
     Properties:
-        x
-        y
-        z
+        * x
+        * y
+        * z
     """
     __slots__ = ()
 

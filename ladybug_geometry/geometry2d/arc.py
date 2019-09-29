@@ -12,28 +12,28 @@ import math
 class Arc2D(object):
     """2D arc object.
 
+    Args:
+        c: A Point2D representing the center of the arc.
+        r: A number representing the radius of the arc.
+        a1: A number between 0 and 2 * pi for the start angle of the arc.
+        a2: A number between 0 and 2 * pi for the end angle of the arc.
+
     Properties:
-        c: Center point of the circle on which the arc lies
-        r: Radius of arc
-        a1: Start angle of the arc in radians
-        a2: End angle of the arc in radians (arc occupies counterclockwise difference)
-        p1: Start point
-        p2: End point
-        midpoint: Mid point of arc
-        length: The length of the arc
-        angle: The total angle of the arc in radians
-        is_circle: Boolean for whether the arc is a full circle (True) or not (False).
+        * c: Center point of the circle on which the arc lies
+        * r: Radius of arc
+        * a1: Start angle of the arc in radians
+        * a2: End angle of the arc in radians (arc occupies counterclockwise difference)
+        * p1: Start point
+        * p2: End point
+        * midpoint: Mid point of arc
+        * length: The length of the arc
+        * angle: The total angle of the arc in radians
+        * is_circle: Boolean for whether the arc is a full circle (True) or not (False).
     """
     __slots__ = ('_c', '_r', '_a1', '_a2', '_cos_a1', '_sin_a1', '_cos_a2', '_sin_a2')
 
     def __init__(self, c, r, a1=0, a2=2*math.pi):
         """Initilize Arc2D.
-
-        Args:
-            c: A Point2D representing the center of the arc.
-            r: A number representing the radius of the arc.
-            a1: A number between 0 and 2 * pi for the start angle of the arc.
-            a2: A number between 0 and 2 * pi for the end angle of the arc.
         """
         assert isinstance(c, Point2D), "Expected Point2D. Got {}.".format(type(c))
         assert r > 0, 'Arc radius must be greater than 0. Got {}.'.format(r)
@@ -55,12 +55,17 @@ class Arc2D(object):
         """Create a Arc2D from a dictionary.
 
         Args:
-            data: {
+            data: A python dictionary in the following format
+
+        .. code-block:: json
+
+            {
             "type": "Arc2D"
             "c": [10, 0],
             "r": 5,
             "a1": 0,
-            "a2": 3.14159}
+            "a2": 3.14159
+            }
         """
         return cls(Point2D(data['c'][0], data['c'][1]),
                    data['r'], data['a1'], data['a2'])

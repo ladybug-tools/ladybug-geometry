@@ -32,9 +32,14 @@ class Base1DIn2D(object):
         """Create a LineSegment2D/Ray2D from a dictionary.
 
         Args:
-            data: {
+            data: A python dictionary in the following format
+
+        .. code-block:: json
+
+            {
             "p": [10, 0],
-            "v": [10, 10]}
+            "v": [10, 10]
+            }
         """
         return cls(Point2D(data['p'][0], data['p'][1]),
                    Vector2D(data['v'][0], data['v'][1]))

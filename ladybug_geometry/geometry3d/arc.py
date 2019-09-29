@@ -14,32 +14,32 @@ import math
 class Arc3D(object):
     """3D arc object.
 
+    Args:
+        plane: A Plane in which the arc lies with an origin representing the
+            center of the circle for the arc.
+        radius: A number representing the radius of the arc.
+        a1: A number between 0 and 2 * pi for the start angle of the arc.
+        a2: A number between 0 and 2 * pi for the end angle of the arc.
+
     Properties:
-        plane: A plane in which the Arc lies. The origin of the plane will be the
-            center point of the circle on which the arc lies
-        radius: Radius of arc
-        a1: Start angle of the arc in radians
-        a2: End angle of the arc in radians (arc occupies counterclockwise difference)
-        p1: Start point
-        p2: End point
-        midpoint: Mid point of arc
-        c: Center point of the arc on which the arc lies.
-        length: The length of the arc
-        angle: The total angle of the arc in radians
-        is_circle: Boolean for whether the arc is a full circle (True) or not (False).
-        arc2d: An Arc2D within the plane of the Arc3D.
+        *   plane: A plane in which the Arc lies. The origin of the plane will be the
+            center point of the circle on which the arc lies.
+        * radius: Radius of arc
+        * a1: Start angle of the arc in radians
+        * a2: End angle of the arc in radians (arc occupies counterclockwise difference)
+        * p1: Start point
+        * p2: End point
+        * midpoint: Mid point of arc
+        * c: Center point of the arc on which the arc lies.
+        * length: The length of the arc
+        * angle: The total angle of the arc in radians
+        * is_circle: Boolean for whether the arc is a full circle (True) or not (False).
+        * arc2d: An Arc2D within the plane of the Arc3D.
     """
     __slots__ = ('_plane', '_arc2d')
 
     def __init__(self, plane, radius, a1=0, a2=2*math.pi):
         """Initilize Arc3D.
-
-        Args:
-            plane: A Plane in which the arc lies with an origin representing the
-                center of the circle for the arc.
-            radius: A number representing the radius of the arc.
-            a1: A number between 0 and 2 * pi for the start angle of the arc.
-            a2: A number between 0 and 2 * pi for the end angle of the arc.
         """
         assert isinstance(plane, Plane), "Expected Plane. Got {}.".format(type(plane))
         self._plane = plane
@@ -50,12 +50,17 @@ class Arc3D(object):
         """Create a Arc3D from a dictionary.
 
         Args:
-            data: {
+            data: A python dictionary in the following format
+
+        .. code-block:: json
+
+            {
             "type": "Arc3D"
             "plane": {"n": [0, 0, 1], "o": [0, 10, 0], "x": [1, 0, 0]},
             "radius": 5,
             "a1": 0,
-            "a2": 3.14159}
+            "a2": 3.14159
+            }
         """
         return cls(Plane.from_dict(data['plane']), data['radius'],
                    data['a1'], data['a2'])

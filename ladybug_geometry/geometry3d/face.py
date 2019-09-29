@@ -25,31 +25,55 @@ if (sys.version_info > (3, 0)):  # python 3
 class Face3D(Base2DIn3D):
     """Planar Face in 3D space.
 
+    Args:
+        boundary: A list or tuple of Point3D objects representing the outer
+            boundary vertices of the face.
+        plane: A Plane object indicating the plane in which the face exists.
+            If None, the Plane normal will automatically be calculated by
+            analyzing the first three boundary vertices and the origin of the
+            plane will be the first vertex of the input vertices.
+        holes: Optional list of lists with one list for each hole in the face.
+            Each hole should be a list of at least 3 Point3D objects.
+            If None, it will be assumed that there are no holes in the face.
+            The boundary and holes are stored as separate lists of Point3Ds on the
+            `boundary` and `holes` properties of this object. However, the
+            `vertices` property will always contain all vertices across the shape.
+            For a Face3D that has holes, it will trace out a single shape that
+            turns inwards from the boundary to cut out the holes.
+        enforce_right_hand: Boolean to note whether a check should be run to
+            ensure that input vertices are counterclockwise within the input plane,
+            thereby enforcing the right-hand rule. By default, this is True
+            and ensures that all Face3D objects adhere to the right-hand rule.
+            It is recommended that this only be set to False in cases where you
+            are certain that the input vertices are counter-clockwise
+            within the input plane and you would like to avoid the extra
+            unnecessary check.
+
     Properties:
-        vertices
-        plane
-        boundary
-        holes
-        polygon2d
-        boundary_polygon2d
-        hole_polygon2d
-        triangulated_mesh2d
-        triangulated_mesh3d
-        boundary_segments
-        hole_segments
-        normal
-        min
-        max
-        center
-        perimeter
-        area
-        centroid
-        is_clockwise
-        is_convex
-        is_self_intersecting
-        is_valid
-        has_holes
-        upper_left_counter_clockwise_vertices
+        * vertices
+        * plane
+        * boundary
+        * holes
+        * polygon2d
+        * boundary_polygon2d
+        * hole_polygon2d
+        * triangulated_mesh2d
+        * triangulated_mesh3d
+        * boundary_segments
+        * hole_segments
+        * normal
+        * min
+        * max
+        * center
+        * perimeter
+        * area
+        * centroid
+        * is_clockwise
+        * is_convex
+        * is_self_intersecting
+        * is_valid
+        * has_holes
+        * upper_left_counter_clockwise_vertices
     """
     __slots__ = ('_plane', '_polygon2d', '_mesh2d', '_mesh3d',
                  '_boundary', '_holes', '_boundary_segments', '_hole_segments',
@@ -59,30 +83,6 @@ class Face3D(Base2DIn3D):
 
     def __init__(self, boundary, plane=None, holes=None, enforce_right_hand=True):
         """Initilize Face3D.
-
-        Args:
-            boundary: A list or tuple of Point3D objects representing the outer
-                boundary vertices of the face.
-            plane: A Plane object indicating the plane in which the face exists.
-                If None, the Plane normal will automatically be calculated by
-                analyzing the first three boundary vertices and the origin of the
-                plane will be the first vertex of the input vertices.
-            holes: Optional list of lists with one list for each hole in the face.
-                Each hole should be a list of at least 3 Point3D objects.
-                If None, it will be assumed that there are no holes in the face.
-                The boundary and holes are stored as separate lists of Point3Ds on the
-                `boundary` and `holes` properties of this object. However, the
-                `vertices` property will always contain all vertices across the shape.
-                For a Face3D that has holes, it will trace out a single shape that
-                turns inwards from the boundary to cut out the holes.
-            enforce_right_hand: Boolean to note whether a check should be run to
-                ensure that input vertices are counterclockwise within the input plane,
-                thereby enforcing the right-hand rule. By default, this is True
-                and ensures that all Face3D objects adhere to the right-hand rule.
-                It is recommended that this only be set to False in cases where you
-                are certain that the input vertices are counter-clockwise
-                within the input plane and you would like to avoid the extra
-                unnecessary check.
         """
         # process the boundary and plane inputs
         self._boundary = self._check_vertices_input(boundary)
@@ -140,7 +140,11 @@ class Face3D(Base2DIn3D):
         """Create a Face3D from a dictionary.
 
         Args:
-            data: {
+            data: A python dictionary in the following format
+
+        .. code-block:: json
+
+            {
             "type": "Face3D",
             "boundary": [[0, 0, 0], [10, 0, 0], [0, 10, 0]],
             "plane": {"n": [0, 0, 1], "o": [0, 0, 0], "x": [1, 0, 0]},
@@ -858,7 +862,7 @@ class Face3D(Base2DIn3D):
 
         Returns:
             Point3D for the point projected onto this face. Will be None if the
-                point cannot be projected to within the boundary of the face.
+            point cannot be projected to within the boundary of the face.
         """
         _plane_int = point.project(self._plane.n, self._plane.o)
         _plane_int2d = self._plane.xyz_to_xy(_plane_int)
@@ -1201,12 +1205,17 @@ class Face3D(Base2DIn3D):
         """Extract top and bottom line segments of a rectangle within this Face.
 
         This method will only return geometry if:
-            1. There are no holes in the face.
-            2. The face is not parallel to the World XY plane.
-            3. There are two parallel edges to this face, which are either
-                oriented horizontally or vertically.
-            4. There must be enough overlap between these edges for a rectangle
-                to be drawn between them.
+
+        1)  There are no holes in the face.
+
+        2)  The face is not parallel to the World XY plane.
+
+        3)  There are two parallel edges to this face, which are either
+            oriented horizontally or vertically.
+
+        4)  There must be enough overlap between these edges for a rectangle
+            to be drawn between them.
+
         If this Face does not satisfy this criteria, None will be returned.
 
         Args:
@@ -1214,9 +1223,14 @@ class Face3D(Base2DIn3D):
                 considered a part of a rectangle.
 
         Returns:
-            bottom_edge: A LineSegment3D representing the bottom of the rectangle.
-            top_edge: A LineSegment3D representing the top of the rectangle.
-            other_faces: A list of Face3D objects for the parts of this face not
+            A tuple with three elements
+
+            -   bottom_edge: A LineSegment3D representing the bottom of the rectangle.
+
+            -   top_edge: A LineSegment3D representing the top of the rectangle.
+
+            -   other_faces:
+                A list of Face3D objects for the parts of this face not
                 included in the rectangle. The length of this list will be between
                 0 (if this face is already rectangular) and 2 (if there are non-
                 rectangular geometries on either side of the rectangle.)

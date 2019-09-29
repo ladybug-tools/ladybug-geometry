@@ -18,22 +18,46 @@ except ImportError:
 class Polyface3D(Base2DIn3D):
     """Object with Multiple Planar Faces in 3D Space. Includes solid objects and polyhedra.
 
+    Args:
+        vertices: A list of Point3D objects representing the vertices of
+            this PolyFace.
+        face_indices: A list of lists with one list for each face of the polyface.
+            Each face list must contain at least one tuple of integers corresponding
+            to indices within the vertices list. Additional tuples of integers may
+            follow this one such that the first tuple denotes the boundary of the
+            face while each subsequent tuple denotes a hole in the face.
+        edge_information: Optional edge information, which will speed up the
+            creation of the Polyface object if it is available but should be left
+            as None if it is unknown. If None, edge_information will be computed
+            from the vertices and face_indices inuputs. Edge information
+            should be formatted as a dictionary with two keys as follows:
+
+            *   'edge_indices':
+                A list of tuple objects that each contain two integers.
+                These integers correspond to indices within the vertices list and
+                each tuple represents a line sengment for an edge of the polyface.
+            *   'edge_types':
+                A list of integers for each edge that parallels
+                the edge_indices list. An integer of 0 denotes a naked edge, an
+                integer of 1 denotes an internal edge. Anything higher is a
+                non-manifold edge.
+
     Properties:
-        vertices
-        faces
-        edges
-        naked_edges
-        internal_edges
-        non_manifold_edges
-        face_indices
-        edge_indices
-        edge_types
-        min
-        max
-        center
-        area
-        volume
-        is_solid
+        * vertices
+        * faces
+        * edges
+        * naked_edges
+        * internal_edges
+        * non_manifold_edges
+        * face_indices
+        * edge_indices
+        * edge_types
+        * min
+        * max
+        * center
+        * area
+        * volume
+        * is_solid
     """
     __slots__ = ('_faces', '_edges',
                  '_naked_edges', '_internal_edges', '_non_manifold_edges',
@@ -42,27 +66,6 @@ class Polyface3D(Base2DIn3D):
 
     def __init__(self, vertices, face_indices, edge_information=None):
         """Initilize Polyface3D.
-
-        Args:
-            vertices: A list of Point3D objects representing the vertices of
-                this PolyFace.
-            face_indices: A list of lists with one list for each face of the polyface.
-                Each face list must contain at least one tuple of integers corresponding
-                to indices within the vertices list. Additional tuples of integers may
-                follow this one such that the first tuple denotes the boundary of the
-                face while each subsequent tuple denotes a hole in the face.
-            edge_information: Optional edge information, which will speed up the
-                creation of the Polyface object if it is available but should be left
-                as None if it is unknown. If None, edge_information will be computed
-                from the vertices and face_indices inuputs. Edge information
-                should be formatted as a dictionary with two keys as follows:
-                'edge_indices': A list of tuple objects that each contain two integers.
-                    These integers correspond to indices within the vertices list and
-                    each tuple represents a line sengment for an edge of the polyface.
-                'edge_types': A list of integers for each edge that parallels
-                    the edge_indices list. An integer of 0 denotes a naked edge, an
-                    integer of 1 denotes an internal edge. Anything higher is a
-                    non-manifold edge.
         """
         # assign input properties
         self._vertices = self._check_vertices_input(vertices)
@@ -115,11 +118,15 @@ class Polyface3D(Base2DIn3D):
         """Create a Face3D from a dictionary.
 
         Args:
-            data:
-            {"type": "Polyface3D",
+            data: A python dictionary in the following format
+
+        .. code-block:: json
+
+            {
+            "type": "Polyface3D",
             "vertices": [[0, 0, 0], [10, 0, 0], [10, 10, 0], [0, 10, 0]],
-            "face_indices": [[(0, 1, 2)], [(3, 0, 1)]],
-            "edge_information": {"edge_indices":[(0, 1), (1, 2), (2, 0), (2, 3), (3, 0)],
+            "face_indices": [[[0, 1, 2]], [[3, 0, 1]]],
+            "edge_information": {"edge_indices":[[0, 1], [1, 2], [2, 0], [2, 3], [3, 0]],
                                  "edge_types":[0, 0, 1, 0, 0]}
             }
         """
@@ -416,11 +423,15 @@ class Polyface3D(Base2DIn3D):
         The default test of edge conditions that runs upon creation of a polyface does
         not check for cases where overlapping colinear edges could be considered
         a single internal edge such as the case below:
+
+        .. code-block:: shell
+
                              |           1          |
                             A|______________________|C
                              |          B|          |
                              |           |          |
                              |     2     |     3    |
+
         If Face 1 only has edge AC and not two separate edges for AB and BC, the
         creation of the polyface will yield naked edges for AC, AB, and BC, meaning
         the shape would not be considered solid when it might actually be so. This
@@ -688,8 +699,8 @@ class Polyface3D(Base2DIn3D):
                 faces at which point the faces are considered to have a single edge.
 
         Returns:
-            outward_faces: A list of the input Face3D objects that all point outwards
-                (provided the input faces form a solid).
+            outward_faces -- A list of the input Face3D objects that all point outwards
+            (provided the input faces form a solid).
         """
         outward_faces = []
         for i, face in enumerate(faces):

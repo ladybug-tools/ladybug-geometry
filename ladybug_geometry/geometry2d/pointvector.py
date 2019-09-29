@@ -10,10 +10,10 @@ class Vector2D(object):
     """2D Vector object.
 
     Properties:
-        x
-        y
-        magnitude
-        magnitude_squared
+        * x
+        * y
+        * magnitude
+        * magnitude_squared
     """
     __slots__ = ('_x', '_y')
 
@@ -27,9 +27,14 @@ class Vector2D(object):
         """Create a Vector2D/Point2D from a dictionary.
 
         Args:
-            data: {
+            data: A python dictionary in the following format
+
+        .. code-block:: json
+
+            {
             "x": 10,
-            "y": 0}
+            "y": 0
+            }
         """
         return cls(data['x'], data['y'])
 
@@ -275,8 +280,8 @@ class Point2D(Vector2D):
     """2D Point object.
 
     Properties:
-        x
-        y
+        * x
+        * y
     """
     __slots__ = ()
 

@@ -34,9 +34,11 @@ def intersect_plane_plane(plane_a, plane_b):
         plane_b: Another Plane object to intersect.
 
     Returns:
-        Two objects that define the intersection between two planes:
-            1) A Point3D that lies along the intersection of the two planes.
-            2) A Vector3D that describes the direction of the intersection.
+        Two objects that define the intersection between two planes
+
+        1) A Point3D that lies along the intersection of the two planes.
+        2) A Vector3D that describes the direction of the intersection.
+
         Will be None if no intersection exists (planes are parallel).
     """
     n1_m = plane_a.n.magnitude_squared
@@ -115,15 +117,16 @@ def closest_point3d_between_line3d_plane(line_ray, plane):
     """Get the two closest Point3D between a LineSegment3D/Ray3D and a Plane.
 
     Args:
-        Args:
-            line_ray: A LineSegment3D or Ray3D object along wich the closest point
-                will be determined.
-            plane: A Plane object on which a closest point will be determined.
+        line_ray: A LineSegment3D or Ray3D object along wich the closest point
+            will be determined.
+        plane: A Plane object on which a closest point will be determined.
 
     Returns:
-        Two Point3D objects representing:
-            1) The point on the line_ray that is closest to the plane
-            2) The point on the plane that is closest to the line_ray
+        Two Point3D objects representing
+
+        1) The point on the line_ray that is closest to the plane
+        2) The point on the plane that is closest to the line_ray
+
         Will be None if there is an intersection between line_ray and the plane
     """
     d = plane.n.dot(line_ray.v)

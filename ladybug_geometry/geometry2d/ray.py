@@ -9,18 +9,18 @@ from ._1d import Base1DIn2D
 class Ray2D(Base1DIn2D):
     """2D Ray object.
 
+    Args:
+        p: A Point2D representing the base of the ray.
+        v: A Vector2D representing the direction of the ray.
+
     Properties:
-        p: Base point
-        v: Direction vector
+        * p: Base point
+        * v: Direction vector
     """
     __slots__ = ()
 
     def __init__(self, p, v):
         """Initilize Ray2D.
-
-        Args:
-            p: A Point2D representing the base of the ray.
-            v: A Vector2D representing the direction of the ray.
         """
         assert isinstance(p, Point2D), "Expected Point2D. Got {}.".format(type(p))
         assert isinstance(v, Vector2D), "Expected Vector2D. Got {}.".format(type(v))

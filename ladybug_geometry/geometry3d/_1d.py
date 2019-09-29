@@ -33,9 +33,14 @@ class Base1DIn3D(object):
         """Create a LineSegment3D/Ray3D from a dictionary.
 
         Args:
-            data: {
+            data: A python dictionary in the following format
+
+        .. code-block:: json
+
+            {
             "p": [10, 0, 0],
-            "v": [10, 10, 0]}
+            "v": [10, 10, 0]
+            }
         """
         return cls(Point3D(data['p'][0], data['p'][1], data['p'][2]),
                    Vector3D(data['v'][0], data['v'][1], data['v'][2]))

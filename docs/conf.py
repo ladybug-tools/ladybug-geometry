@@ -6,6 +6,9 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
+
+import re
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -99,11 +102,18 @@ html_theme_options = {
     # Fix navigation bar to top of page?
     # Values: "true" (default) or "false"
     'navbar_fixed_top': "true",
-	'navbar_pagenav': True,
+    'navbar_pagenav': True,
     'source_link_position': "nav",
-	'bootswatch_theme': "united",
+    'bootswatch_theme': "united",
     'bootstrap_version': "3",
-	}
+}
+
+# Bootstrap theme custom file paths (relative to this file)
+# Layout.html path (already added above, include if different)
+# templates_path = ['_templates']
+# Stylesheet path
+html_static_path = ["_static"]
+
 
 # on_rtd is whether we are on readthedocs.org
 # on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
@@ -129,7 +139,6 @@ html_theme_options = {
 html_sidebars = {
     '**': ['localtoc.html']
 }
-
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -212,3 +221,78 @@ epub_exclude_files = ['search.html']
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+# -- Options for autodoc extension --------------------------------------------
+autodoc_default_options = {
+    'inherited-members': True,
+}
+
+autodoc_member_order = 'groupwise'
+
+
+# Autodoc event handlers
+def autodoc_process_docstring(app, what, name, obj, options, lines):
+    """Function to handle the autodoc-process-docstring event.
+
+    Emitted when autodoc has read and processed a docstring. lines is a list of
+    strings – the lines of the processed docstring – that the event handler
+    can modify in place to change what Sphinx puts into the output.
+
+    More information on sphinx documentation:
+        http://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
+        #event-autodoc-process-docstring
+
+    Args:
+        app: the Sphinx application object
+        what: the type of the object which the docstring belongs to (one of "module",
+            "class", "exception", "function", "method", "attribute")
+        name: the fully qualified name of the object
+        obj: the object itself
+        options: the options given to the directive: an object with attributes
+            inherited_members, undoc_members, show_inheritance and noindex that
+            are true if the flag option of same name was given to the auto directive
+        lines: the lines of the docstring
+    """
+
+    # Make class properties bolded
+    if what == 'class':
+        make_field_bolded(lines)
+
+    return lines
+
+
+def make_field_bolded(lines):
+    """Make field font bolded in 'field: value' line format.
+
+    Note the purpose of this change is to match the class 'Parameters'
+    and 'Args' fields format.
+    Regex pattern "(\s*\*\s*)(\w+)(\s*:)(.+)" detects range of 'field: value'
+    formats.
+
+    Args:
+        lines: the lines of the docstring
+    """
+
+    # Include boldface (reST inline markup '**') in field names of matching lines
+    def replace(match):
+        return "{0[0]} **{0[1]}** --{0[3]}".format(match.groups())
+
+    # Substitute macthing lines
+    new_lines = [re.sub(r"(\s*\*\s*)(\w+)(\s*:)(.+)", replace, line) for line in lines]
+
+    # Copy changes back to lines (in place)
+    for i in range(len(lines)):
+        lines[i] = new_lines[i]
+
+
+def setup(app):
+    """Run custom code with access to the Shinx application object
+
+    Args:
+        app: the Sphinx application object
+    """
+    # Register the event handler for 'autodoc-process-docstring' event
+    app.connect('autodoc-process-docstring', autodoc_process_docstring)
+
+    # Add bootstrap theme custom stylesheet
+    app.add_stylesheet("custom.css")
