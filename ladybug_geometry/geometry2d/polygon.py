@@ -717,6 +717,30 @@ class Polygon2D(Base2DIn2D):
             _a += vertices[i - 1].x * pt.y - vertices[i - 1].y * pt.x
         return _a < 0
 
+    @staticmethod
+    def _intersect_polygon_segments(polygon1, polygon2):
+        polygon1_updates = []
+        polygon2_updates = []
+        for i1, seg1 in enumerate(polygon1.segments):
+            for i2, seg2 in enumerate(polygon2.segments):
+                intersect = intersect_line2d(seg1, seg2)
+                if intersect is not None and intersect not in polygon1.vertices:
+                    polygon1_updates.append([i1, intersect])
+                if intersect is not None and intersect not in polygon2.vertices:
+                    polygon2_updates.append([i2, intersect])
+
+        poly_points = list(polygon1.vertices)
+        for update in polygon1_updates[::-1]:   # Traverse list backwards to avoid disrupting vertex numbering
+            poly_points.insert(update[0] + 1, update[1])
+        polygon1 = Polygon2D(poly_points)
+
+        poly_points = list(polygon2.vertices)
+        for update in polygon2_updates[::-1]:
+            poly_points.insert(update[0] + 1, update[1])
+        polygon2 = Polygon2D(poly_points)
+
+        return polygon1, polygon2
+
     def __copy__(self):
         _new_poly = Polygon2D(self.vertices)
         return _new_poly

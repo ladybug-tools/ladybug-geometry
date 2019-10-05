@@ -498,3 +498,22 @@ def test_is_polygon_inside_outside():
     assert polygon.is_polygon_outside(hole_2) is False
     assert polygon.is_polygon_outside(hole_3) is False
     assert polygon.is_polygon_outside(hole_4) is True
+
+
+def test_intersect_polygon_segments():
+    pts0 = (Point2D(1, 0), Point2D(4, 0), Point2D(4, 2), Point2D(1, 2))
+    polygon0 = Polygon2D(pts0)
+    pts1 = (Point2D(0, 2), Point2D(3, 2), Point2D(3, 4), Point2D(0, 4))
+    polygon1 = Polygon2D(pts1)
+
+    polygon0, polygon1 = Polygon2D._intersect_polygon_segments(polygon0, polygon1)
+
+    assert len(polygon0.segments) == 5
+    assert polygon0.vertices[3] == Point2D(3, 2)
+    assert polygon0.segments[2].p2 == Point2D(3, 2)
+    assert polygon0.segments[3].p1 == Point2D(3, 2)
+
+    assert len(polygon1.segments) == 5
+    assert polygon1.vertices[1] == Point2D(1, 2)
+    assert polygon1.segments[0].p2 == Point2D(1, 2)
+    assert polygon1.segments[1].p1 == Point2D(1, 2)
