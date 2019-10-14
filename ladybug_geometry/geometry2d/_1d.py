@@ -10,8 +10,8 @@ class Base1DIn2D(object):
     """Base class for all 1D geometries in 2D space (Ray2D and LineSegment2D).
 
     Properties:
-        p: End Point2D of object
-        v: Vector2D along object
+        * p
+        * v
     """
     __slots__ = ('_p', '_v')
 
@@ -34,7 +34,7 @@ class Base1DIn2D(object):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "p": [10, 0],

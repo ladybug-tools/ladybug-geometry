@@ -58,7 +58,7 @@ class Polygon2D(Base2DIn2D):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "type": "Polygon2D",

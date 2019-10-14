@@ -23,11 +23,11 @@ class Plane(object):
             If None, the default will find an X-Axis in the world XY plane.
 
     Properties:
-        * n: Normal vector
-        * o: Origin point
-        * k: Scalar constant relating origin point to normal vector
-        * x: Plane X-Axis
-        * y: Plane Y-Axis
+        * n
+        * o
+        * k
+        * x
+        * y
     """
     __slots__ = ('_n', '_o', '_k', '_x', '_y')
 
@@ -63,7 +63,7 @@ class Plane(object):
     def from_dict(cls, data):
         """Create a Plane from a dictionary.
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "type": "Plane"

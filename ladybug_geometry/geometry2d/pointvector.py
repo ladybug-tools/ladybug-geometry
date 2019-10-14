@@ -29,7 +29,7 @@ class Vector2D(object):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "x": 10,

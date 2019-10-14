@@ -120,7 +120,7 @@ class Polyface3D(Base2DIn3D):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "type": "Polyface3D",

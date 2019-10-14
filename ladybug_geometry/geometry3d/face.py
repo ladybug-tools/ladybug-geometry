@@ -142,7 +142,7 @@ class Face3D(Base2DIn3D):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "type": "Face3D",

@@ -66,7 +66,7 @@ class Mesh3D(MeshBase):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "type": "Mesh3D",

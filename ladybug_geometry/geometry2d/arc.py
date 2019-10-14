@@ -19,16 +19,16 @@ class Arc2D(object):
         a2: A number between 0 and 2 * pi for the end angle of the arc.
 
     Properties:
-        * c: Center point of the circle on which the arc lies
-        * r: Radius of arc
-        * a1: Start angle of the arc in radians
-        * a2: End angle of the arc in radians (arc occupies counterclockwise difference)
-        * p1: Start point
-        * p2: End point
-        * midpoint: Mid point of arc
-        * length: The length of the arc
-        * angle: The total angle of the arc in radians
-        * is_circle: Boolean for whether the arc is a full circle (True) or not (False).
+        * c
+        * r
+        * a1
+        * a2
+        * p1
+        * p2
+        * midpoint
+        * length
+        * angle
+        * is_circle
     """
     __slots__ = ('_c', '_r', '_a1', '_a2', '_cos_a1', '_sin_a1', '_cos_a2', '_sin_a2')
 
@@ -57,7 +57,7 @@ class Arc2D(object):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "type": "Arc2D"

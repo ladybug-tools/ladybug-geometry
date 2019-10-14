@@ -14,11 +14,11 @@ class LineSegment3D(Base1DIn3D):
         v: A Vector3D representing the vector to the second point.
 
     Properties:
-        * p: Base point
-        * v: Direction vector
-        * p1: First point (same as p)
-        * p2: Second point
-        * length: The length of the line segement
+        * p
+        * v
+        * p1
+        * p2
+        * length
     """
     __slots__ = ()
 
