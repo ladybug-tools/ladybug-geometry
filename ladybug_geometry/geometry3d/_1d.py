@@ -11,8 +11,8 @@ class Base1DIn3D(object):
     """Base class for all 1D geometries in 3D space (Ray3D and LineSegment3D).
 
     Properties:
-        p: End Point3D of object
-        v: Vector3D along object
+        * p
+        * v
     """
     __slots__ = ('_p', '_v')
 
@@ -35,7 +35,7 @@ class Base1DIn3D(object):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "p": [10, 0, 0],

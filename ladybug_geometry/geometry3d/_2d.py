@@ -9,10 +9,10 @@ class Base2DIn3D(object):
     """Base class for 2D geometries in 3D space (Surface3D and Mesh3D).
 
     Properties:
-        vertices
-        min
-        max
-        center
+        * vertices
+        * min
+        * max
+        * center
     """
     __slots__ = ('_vertices', '_min', '_max', '_center')
 

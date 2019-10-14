@@ -9,10 +9,10 @@ class Base2DIn2D(object):
     """Base class for 2D geometries in 2D space (Polygon2D and Mesh2D).
 
     Properties:
-        vertices
-        min
-        max
-        center
+        * vertices
+        * min
+        * max
+        * center
     """
     __slots__ = ('_vertices', '_min', '_max', '_center')
 

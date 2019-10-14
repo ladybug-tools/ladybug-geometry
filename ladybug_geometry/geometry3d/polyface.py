@@ -120,7 +120,7 @@ class Polyface3D(Base2DIn3D):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "type": "Polyface3D",
@@ -739,7 +739,7 @@ class Polyface3D(Base2DIn3D):
                 'vertices': [(v.x, v.y, v.z) for v in self.vertices],
                 'face_indices': self.face_indices}
         if include_edge_information:
-                base['edge_information'] = self.edge_information
+            base['edge_information'] = self.edge_information
         return base
 
     def _get_edge_type(self, edge_type):

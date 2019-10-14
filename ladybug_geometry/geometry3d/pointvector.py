@@ -33,7 +33,7 @@ class Vector3D(object):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "x": 10,

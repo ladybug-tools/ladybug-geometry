@@ -14,8 +14,8 @@ class Ray2D(Base1DIn2D):
         v: A Vector2D representing the direction of the ray.
 
     Properties:
-        * p: Base point
-        * v: Direction vector
+        * p
+        * v
     """
     __slots__ = ()
 
