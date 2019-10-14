@@ -6,9 +6,6 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
-
-import re
-
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -49,8 +46,8 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
-	'sphinxcontrib.fulltoc',
-	'sphinx.ext.napoleon'
+    'sphinxcontrib.fulltoc',
+    'sphinx.ext.napoleon'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -230,69 +227,12 @@ autodoc_default_options = {
 autodoc_member_order = 'groupwise'
 
 
-# Autodoc event handlers
-def autodoc_process_docstring(app, what, name, obj, options, lines):
-    """Function to handle the autodoc-process-docstring event.
-
-    Emitted when autodoc has read and processed a docstring. lines is a list of
-    strings – the lines of the processed docstring – that the event handler
-    can modify in place to change what Sphinx puts into the output.
-
-    More information on sphinx documentation:
-        http://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html
-        #event-autodoc-process-docstring
-
-    Args:
-        app: the Sphinx application object
-        what: the type of the object which the docstring belongs to (one of "module",
-            "class", "exception", "function", "method", "attribute")
-        name: the fully qualified name of the object
-        obj: the object itself
-        options: the options given to the directive: an object with attributes
-            inherited_members, undoc_members, show_inheritance and noindex that
-            are true if the flag option of same name was given to the auto directive
-        lines: the lines of the docstring
-    """
-
-    # Make class properties bolded
-    if what == 'class':
-        make_field_bolded(lines)
-
-    return lines
-
-
-def make_field_bolded(lines):
-    """Make field font bolded in 'field: value' line format.
-
-    Note the purpose of this change is to match the class 'Parameters'
-    and 'Args' fields format.
-    Regex pattern "(\s*\*\s*)(\w+)(\s*:)(.+)" detects range of 'field: value'
-    formats.
-
-    Args:
-        lines: the lines of the docstring
-    """
-
-    # Include boldface (reST inline markup '**') in field names of matching lines
-    def replace(match):
-        return "{0[0]} **{0[1]}** --{0[3]}".format(match.groups())
-
-    # Substitute macthing lines
-    new_lines = [re.sub(r"(\s*\*\s*)(\w+)(\s*:)(.+)", replace, line) for line in lines]
-
-    # Copy changes back to lines (in place)
-    for i in range(len(lines)):
-        lines[i] = new_lines[i]
-
-
 def setup(app):
     """Run custom code with access to the Shinx application object
 
     Args:
         app: the Sphinx application object
     """
-    # Register the event handler for 'autodoc-process-docstring' event
-    app.connect('autodoc-process-docstring', autodoc_process_docstring)
 
     # Add bootstrap theme custom stylesheet
     app.add_stylesheet("custom.css")
