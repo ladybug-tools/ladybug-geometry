@@ -38,8 +38,8 @@ class Base1DIn3D(object):
         .. code-block:: python
 
             {
-            "p": [10, 0, 0],
-            "v": [10, 10, 0]
+            "p": (10, 0, 0),
+            "v": (10, 10, 0)
             }
         """
         return cls(Point3D(data['p'][0], data['p'][1], data['p'][2]),

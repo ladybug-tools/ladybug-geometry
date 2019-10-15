@@ -37,8 +37,8 @@ class Base1DIn2D(object):
         .. code-block:: python
 
             {
-            "p": [10, 0],
-            "v": [10, 10]
+            "p": (10, 0),
+            "v": (10, 10)
             }
         """
         return cls(Point2D(data['p'][0], data['p'][1]),
