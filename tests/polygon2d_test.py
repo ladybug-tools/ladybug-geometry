@@ -510,11 +510,13 @@ def test_intersect_polygon_segments():
 
     polygon0, polygon1 = Polygon2D._intersect_polygon_segments(polygon0, polygon1, tolerance)
 
+    # Extra vertex added to polygon0, as expected
     assert len(polygon0.segments) == 5
     assert polygon0.vertices[3] == Point2D(3, 1.99)
     assert polygon0.segments[2].p2 == Point2D(3, 1.99)
     assert polygon0.segments[3].p1 == Point2D(3, 1.99)
 
+    # Extra vertex added to polygon1, as expected
     assert len(polygon1.segments) == 5
     assert polygon1.vertices[1] == Point2D(1, 2)
     assert polygon1.segments[0].p2 == Point2D(1, 2)
@@ -545,11 +547,13 @@ def test_intersect_polygon_segments_with_colinear_edges():
 
     polygon0, polygon1 = Polygon2D._intersect_polygon_segments(polygon0, polygon1)
 
+    # Extra vertex added to polygon0, as expected
     assert len(polygon0.segments) == 5
     assert polygon0.vertices[3] == Point2D(3, 2)
     assert polygon0.segments[2].p2 == Point2D(3, 2)
     assert polygon0.segments[3].p1 == Point2D(3, 2)
 
+    # Extra vertex added to polygon1, as expected
     assert len(polygon1.segments) == 5
     assert polygon1.vertices[1] == Point2D(1, 2)
     assert polygon1.segments[0].p2 == Point2D(1, 2)
@@ -567,13 +571,14 @@ def test_intersect_polygon_segments_with_3_rectangles():
 
     polygons = Polygon2D.intersect_polygon_segments([polygon0, polygon1, polygon2])
 
+    # Extra vertex added to largest polygon, as expected
     assert len(polygons[0].segments) == 5
     assert polygons[0].vertices[1] == Point2D(2, 2)
     assert polygons[0].segments[0].p2 == Point2D(2, 2)
     assert polygons[0].segments[1].p1 == Point2D(2, 2)
 
-    assert len(polygon1.segments) == 4
-    assert len(polygon2.segments) == 4
+    assert len(polygon1.segments) == 4  # No extra vertex added
+    assert len(polygon2.segments) == 4  # No extra vertex added
 
 
 def test_intersect_polygon_segments_with_3_angled_rectangles():
@@ -591,10 +596,11 @@ def test_intersect_polygon_segments_with_3_angled_rectangles():
 
     polygons = Polygon2D.intersect_polygon_segments([polygon0, polygon1, polygon2], tolerance)
 
+    # Extra vertex added to largest polygon, as expected
     assert len(polygons[0].segments) == 5
     assert Polygon2D._is_close(polygons[0].vertices[2].distance_to_point(expected_point), tolerance)
     assert polygons[0].segments[1].p2 == polygons[0].vertices[2]
     assert polygons[0].segments[2].p1 == polygons[0].vertices[2]
 
-    assert len(polygon1.segments) == 4
-    assert len(polygon2.segments) == 4
+    assert len(polygon1.segments) == 4  # No extra vertex added
+    assert len(polygon2.segments) == 4  # No extra vertex added

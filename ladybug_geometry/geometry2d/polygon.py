@@ -756,28 +756,32 @@ class Polygon2D(Base2DIn2D):
         polygon1_height = polygon1.max.y - polygon1.min.y
         polygon2_width = polygon2.max.x - polygon2.min.x
         polygon2_height = polygon2.max.y - polygon2.min.y
-        if (abs(polygon1.min.x - polygon2.min.x) * 2 <= (polygon1_width + polygon2_width + tolerance)) and \
-                (abs(polygon1.min.y - polygon2.min.y) * 2 <= (polygon1_height + polygon2_height + tolerance)):
-            pass
-        else:
+        if not((abs(polygon1.min.x - polygon2.min.x) * 2 <= (polygon1_width + polygon2_width + tolerance)) and
+                (abs(polygon1.min.y - polygon2.min.y) * 2 <= (polygon1_height + polygon2_height + tolerance))):
             return polygon1, polygon2
 
         for i1, seg1 in enumerate(polygon1.segments):
             for i2, seg2 in enumerate(polygon2.segments):
+                # Test to see if each point of polygon2 is within the tolerance distance of any segment
+                # of polygon1.  If so, add the closest point on the segment to the polygon1 update list.
                 x = closest_point2d_on_line2d(seg2.p1, seg1)
-                if all([p.distance_to_point(x) > tolerance for p in polygon1.vertices]) and\
+                if all(p.distance_to_point(x) > tolerance for p in polygon1.vertices) and \
                         Polygon2D._is_close(x.distance_to_point(seg2.p1), tolerance):
                     polygon1_updates.append([i1, x])
+                # Test to see if each point of polygon1 is within the tolerance distance of any segment
+                # of polygon2.  If so, add the closest point on the segment to the polygon2 update list.
                 y = closest_point2d_on_line2d(seg1.p1, seg2)
-                if all([p.distance_to_point(y) > tolerance for p in polygon2.vertices]) and\
+                if all(p.distance_to_point(y) > tolerance for p in polygon2.vertices) and \
                         Polygon2D._is_close(y.distance_to_point(seg1.p1), tolerance):
                     polygon2_updates.append([i2, y])
 
+        # Apply any updates to polygon1
         poly_points = list(polygon1.vertices)
         for update in polygon1_updates[::-1]:   # Traverse list backwards to avoid disrupting vertex numbering
             poly_points.insert(update[0] + 1, update[1])
         polygon1 = Polygon2D(poly_points)
 
+        # Apply any updates to polygon2
         poly_points = list(polygon2.vertices)
         for update in polygon2_updates[::-1]:
             poly_points.insert(update[0] + 1, update[1])
@@ -799,6 +803,8 @@ class Polygon2D(Base2DIn2D):
             The input list of polygon objects with extra vertices inserted into each where necessary.
         """
         for i in range(len(polygon_list) - 1):
+            # No need for j to start at 0 since both polygons passed to _intersect_polygon_segments()
+            # are compared against each other within that method.
             for j in range(i + 1, len(polygon_list)):
                 polygon_list[i], polygon_list[j] = Polygon2D._intersect_polygon_segments(polygon_list[i],
                                                                                          polygon_list[j],
