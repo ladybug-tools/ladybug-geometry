@@ -62,7 +62,7 @@ class Polygon2D(Base2DIn2D):
 
             {
             "type": "Polygon2D",
-            "vertices": [[0, 0], [10, 0], [0, 10]]
+            "vertices": [(0, 0), (10, 0), (0, 10)]
             }
         """
         return cls(tuple(Point2D(pt[0], pt[1]) for pt in data['vertices']))
