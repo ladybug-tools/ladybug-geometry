@@ -58,11 +58,11 @@ class Polygon2D(Base2DIn2D):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "type": "Polygon2D",
-            "vertices": [[0, 0], [10, 0], [0, 10]]
+            "vertices": [(0, 0), (10, 0), (0, 10)]
             }
         """
         return cls(tuple(Point2D(pt[0], pt[1]) for pt in data['vertices']))

@@ -10,18 +10,18 @@ from ..intersection3d import closest_point3d_on_line3d, \
 class Base1DIn3D(object):
     """Base class for all 1D geometries in 3D space (Ray3D and LineSegment3D).
 
+    Args:
+        p: A Point2D representing the base.
+        v: A Vector2D representing the direction.
+
     Properties:
-        p: End Point3D of object
-        v: Vector3D along object
+        * p
+        * v
     """
     __slots__ = ('_p', '_v')
 
     def __init__(self, p, v):
         """Initilize Base1DIn3D.
-
-        Args:
-            p: A Point2D representing the base.
-            v: A Vector2D representing the direction.
         """
         assert isinstance(p, Point3D), "Expected Point3D. Got {}.".format(type(p))
         assert isinstance(v, Vector3D), "Expected Vector3D. Got {}.".format(type(v))
@@ -35,11 +35,11 @@ class Base1DIn3D(object):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
-            "p": [10, 0, 0],
-            "v": [10, 10, 0]
+            "p": (10, 0, 0),
+            "v": (10, 10, 0)
             }
         """
         return cls(Point3D(data['p'][0], data['p'][1], data['p'][2]),

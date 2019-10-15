@@ -22,19 +22,18 @@ class Arc3D(object):
         a2: A number between 0 and 2 * pi for the end angle of the arc.
 
     Properties:
-        *   plane: A plane in which the Arc lies. The origin of the plane will be the
-            center point of the circle on which the arc lies.
-        * radius: Radius of arc
-        * a1: Start angle of the arc in radians
-        * a2: End angle of the arc in radians (arc occupies counterclockwise difference)
-        * p1: Start point
-        * p2: End point
-        * midpoint: Mid point of arc
-        * c: Center point of the arc on which the arc lies.
-        * length: The length of the arc
-        * angle: The total angle of the arc in radians
-        * is_circle: Boolean for whether the arc is a full circle (True) or not (False).
-        * arc2d: An Arc2D within the plane of the Arc3D.
+        * plane
+        * radius
+        * a1
+        * a2
+        * p1
+        * p2
+        * midpoint
+        * c
+        * length
+        * angle
+        * is_circle
+        * arc2d
     """
     __slots__ = ('_plane', '_arc2d')
 
@@ -52,11 +51,11 @@ class Arc3D(object):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "type": "Arc3D"
-            "plane": {"n": [0, 0, 1], "o": [0, 10, 0], "x": [1, 0, 0]},
+            "plane": {"n": (0, 0, 1), "o": (0, 10, 0), "x": (1, 0, 0)},
             "radius": 5,
             "a1": 0,
             "a2": 3.14159

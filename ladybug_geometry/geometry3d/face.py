@@ -142,13 +142,13 @@ class Face3D(Base2DIn3D):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "type": "Face3D",
-            "boundary": [[0, 0, 0], [10, 0, 0], [0, 10, 0]],
-            "plane": {"n": [0, 0, 1], "o": [0, 0, 0], "x": [1, 0, 0]},
-            "holes": [[[2, 2, 0], [5, 2, 0], [2, 5, 0]]]
+            "boundary": [(0, 0, 0), (10, 0, 0), (0, 10, 0)],
+            "plane": {"n": (0, 0, 1), "o": (0, 0, 0), "x": (1, 0, 0)},
+            "holes": [[(2, 2, 0), (5, 2, 0), (2, 5, 0)]]
             }
         """
         holes = None

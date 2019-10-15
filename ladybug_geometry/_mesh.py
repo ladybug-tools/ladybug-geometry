@@ -11,14 +11,14 @@ class MeshBase(object):
     """Base class for all Mesh objects.
 
     Properties:
-        vertices
-        faces
-        colors
-        is_color_by_face
-        face_areas
-        area
-        face_centroids
-        vertex_connected_faces
+        * vertices
+        * faces
+        * colors
+        * is_color_by_face
+        * face_areas
+        * area
+        * face_centroids
+        * vertex_connected_faces
     """
     __slots__ = ('_vertices', '_faces', '_colors', '_is_color_by_face',
                  '_area', '_face_areas', '_face_centroids', '_vertex_connected_faces')

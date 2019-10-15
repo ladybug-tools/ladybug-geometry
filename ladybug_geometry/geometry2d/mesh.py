@@ -64,12 +64,12 @@ class Mesh2D(MeshBase):
         Args:
             data: A python dictionary in the following format
 
-        .. code-block:: json
+        .. code-block:: python
 
             {
             "type": "Mesh2D",
-            "vertices": [[0, 0], [10, 0], [0, 10]],
-            "faces": [[0, 1, 2]],
+            "vertices": [(0, 0), (10, 0), (0, 10)],
+            "faces": [(0, 1, 2)],
             "colors": [{"r": 255, "g": 0, "b": 0}]
             }
         """
