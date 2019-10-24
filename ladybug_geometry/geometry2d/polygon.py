@@ -646,6 +646,36 @@ class Polygon2D(Base2DIn2D):
         return {'type': 'Polygon2D',
                 'vertices': [(pt.x, pt.y) for pt in self.vertices]}
 
+    @staticmethod
+    def intersect_polygon_segments(polygon_list, tolerance):
+        """Intersect the line segments of a Polygon2D array to ensure matching segments.
+
+        Specifically, this method checks a list of polygons in a pairwise manner to
+        see if one contains a vertex along an edge segment of the other within the
+        given tolerance. If so, the method creates a co-located vertex at that point,
+        partitioning the edge segment into two edge segments. Point ordering is
+        reserved within each Polygon2D and the order of Polygon2Ds within the input
+        polygon_list is also preserved.
+
+        Args:
+            polygon_list: List of Polygon2Ds which will have their segments
+                intersected with one another.
+            tolerance: Distance within which two points are considered to be
+                co-located.
+
+        Returns:
+            The input list of Polygon2D objects with extra vertices inserted
+                where necessary.
+        """
+        for i in range(len(polygon_list) - 1):
+            # No need for j to start at 0 since two polygons are passed
+            # and they are compared against one other within _intersect_segments.
+            for j in range(i + 1, len(polygon_list)):
+                polygon_list[i], polygon_list[j] = \
+                    Polygon2D._intersect_segments(polygon_list[i], polygon_list[j],
+                                                  tolerance)
+        return polygon_list
+
     def _transfer_properties(self, new_polygon):
         """Transfer properties from this polygon to a new polygon.
 
@@ -718,27 +748,13 @@ class Polygon2D(Base2DIn2D):
         return _a < 0
 
     @staticmethod
-    def _is_close(a, b, rel_tol=1e-9, abs_tol=0.0):
-        """
-        Implementation of PEP0485 to enable python version prior to 3.5 to perform floating-point comparisons.
-         See: https://www.python.org/dev/peps/pep-0485/#proposed-implementation
+    def _intersect_segments(polygon1, polygon2, tolerance):
+        """Intersect the line segments of two Polygon2Ds to ensure matching segments.
 
-        Args:
-            a and b: are the two values to be tested to relative closeness.
-            rel_tol: is the relative tolerance -- it is the amount of error allowed, relative
-                     to the larger absolute value of a or b.  Must be greater than 0.0.
-            abs_tol: is a minimum absolute tolerance level -- useful for comparisons near zero.
-
-        Returns:
-            True if the two numbers a and b are relatively close.  False otherwise.
-        """
-        return abs(a - b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
-
-    @staticmethod
-    def _intersect_polygon_segments(polygon1, polygon2, tolerance=0.0):
-        """Check two adjacent polygons to see if one contains a vertex along an edge segment
-        of the other within the given tolerance. Creates a co-located vertex at that point,
-        partitioning the edge segment into two edge segments.  Point ordering is preserved.
+        Specifically, this method checks two adjacent polygons to see if one contains
+        a vertex along an edge segment of the other within the given tolerance. If so,
+        it creates a co-located vertex at that point, partitioning the edge segment
+        into two edge segments. Point ordering is preserved.
 
         Args:
             polygon1: First polygon to check.
@@ -751,65 +767,49 @@ class Polygon2D(Base2DIn2D):
         polygon1_updates = []
         polygon2_updates = []
 
-        # Bounding rectangle check
+        # Bounding rectangle check using the Separating Axis Theorem
         polygon1_width = polygon1.max.x - polygon1.min.x
-        polygon1_height = polygon1.max.y - polygon1.min.y
         polygon2_width = polygon2.max.x - polygon2.min.x
+        dist_btwn_x = abs(polygon1.min.x - polygon2.min.x)
+        x_gap_btwn_rect = dist_btwn_x - (0.5 * polygon1_width) - (0.5 * polygon2_width)
+
         polygon2_height = polygon2.max.y - polygon2.min.y
-        if not((abs(polygon1.min.x - polygon2.min.x) * 2 <= (polygon1_width + polygon2_width + tolerance)) and
-                (abs(polygon1.min.y - polygon2.min.y) * 2 <= (polygon1_height + polygon2_height + tolerance))):
+        polygon1_height = polygon1.max.y - polygon1.min.y
+        dist_btwn_y = abs(polygon1.min.y - polygon2.min.y)
+        y_gap_btwn_rect = dist_btwn_y - (0.5 * polygon1_height) - (0.5 * polygon2_height)
+
+        if x_gap_btwn_rect > tolerance or y_gap_btwn_rect > tolerance:  # no overlap
             return polygon1, polygon2
 
+        # Test if each point of polygon2 is within the tolerance distance of any segment
+        # of polygon1.  If so, add the closest point on the segment to the polygon1
+        # update list. And vice versa (testing polygon2 against polygon1).
         for i1, seg1 in enumerate(polygon1.segments):
             for i2, seg2 in enumerate(polygon2.segments):
-                # Test to see if each point of polygon2 is within the tolerance distance of any segment
-                # of polygon1.  If so, add the closest point on the segment to the polygon1 update list.
+                # Test polygon1 against polygon2
                 x = closest_point2d_on_line2d(seg2.p1, seg1)
-                if all(p.distance_to_point(x) > tolerance for p in polygon1.vertices) and \
-                        Polygon2D._is_close(x.distance_to_point(seg2.p1), tolerance):
+                if all(p.distance_to_point(x) > tolerance for p in polygon1.vertices) \
+                        and x.distance_to_point(seg2.p1) <= tolerance:
                     polygon1_updates.append([i1, x])
-                # Test to see if each point of polygon1 is within the tolerance distance of any segment
-                # of polygon2.  If so, add the closest point on the segment to the polygon2 update list.
+                # Test polygon2 against polygon1
                 y = closest_point2d_on_line2d(seg1.p1, seg2)
-                if all(p.distance_to_point(y) > tolerance for p in polygon2.vertices) and \
-                        Polygon2D._is_close(y.distance_to_point(seg1.p1), tolerance):
+                if all(p.distance_to_point(y) > tolerance for p in polygon2.vertices) \
+                        and y.distance_to_point(seg1.p1) <= tolerance:
                     polygon2_updates.append([i2, y])
 
         # Apply any updates to polygon1
         poly_points = list(polygon1.vertices)
-        for update in polygon1_updates[::-1]:   # Traverse list backwards to avoid disrupting vertex numbering
+        for update in polygon1_updates[::-1]:  # Traverse backwards to preserve order
             poly_points.insert(update[0] + 1, update[1])
         polygon1 = Polygon2D(poly_points)
 
         # Apply any updates to polygon2
         poly_points = list(polygon2.vertices)
-        for update in polygon2_updates[::-1]:
+        for update in polygon2_updates[::-1]:  # Traverse backwards to preserve order
             poly_points.insert(update[0] + 1, update[1])
         polygon2 = Polygon2D(poly_points)
 
         return polygon1, polygon2
-
-    @staticmethod
-    def intersect_polygon_segments(polygon_list, tolerance=0.0):
-        """Check a list of polygons in a pairwise manner to see if one contains a vertex along an edge
-        segment of the other within the given tolerance. Creates a co-located vertex at that point,
-        partitioning the edge segment into two edge segments.  Point ordering is preserved.
-
-        Args:
-            polygon_list: List of polygons to pairwise check.
-            tolerance: Distance within which two points are considered to be co-located.
-
-        Returns:
-            The input list of polygon objects with extra vertices inserted into each where necessary.
-        """
-        for i in range(len(polygon_list) - 1):
-            # No need for j to start at 0 since both polygons passed to _intersect_polygon_segments()
-            # are compared against each other within that method.
-            for j in range(i + 1, len(polygon_list)):
-                polygon_list[i], polygon_list[j] = Polygon2D._intersect_polygon_segments(polygon_list[i],
-                                                                                         polygon_list[j],
-                                                                                         tolerance)
-        return polygon_list
 
     def __copy__(self):
         _new_poly = Polygon2D(self.vertices)
