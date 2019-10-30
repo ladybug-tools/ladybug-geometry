@@ -95,6 +95,9 @@ class Base2DIn2D(object):
 
     def __iter__(self):
         return iter(self.vertices)
+    
+    def __copy__(self):
+        return Base2DIn2D(self._vertices)
 
     def ToString(self):
         """Overwrite .NET ToString."""

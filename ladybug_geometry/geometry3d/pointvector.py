@@ -17,6 +17,7 @@ class Vector3D(object):
         * z
         * magnitude
         * magnitude_squared
+        * is_zero
     """
     __slots__ = ('_x', '_y', '_z')
 
@@ -67,6 +68,11 @@ class Vector3D(object):
     def magnitude_squared(self):
         """Get the magnitude squared of the vector."""
         return self.x ** 2 + self.y ** 2 + self.z ** 2
+    
+    @property
+    def is_zero(self):
+        """Boolean to note whether the vector has a magnitude of zero."""
+        return self.x == 0 and self.y == 0 and self.z == 0
 
     def normalize(self):
         """Get a copy of the vector that is a unit vector (magnitude=1)."""
@@ -249,16 +255,12 @@ class Vector3D(object):
     def __div__(self, other):
         assert type(other) in (int, float), \
             'Cannot divide types {} and {}'.format(self.__class__.__name__, type(other))
-        return Vector3D(operator.div(self.x, other),
-                        operator.div(self.y, other),
-                        operator.div(self.z, other))
+        return Vector3D(self.x / other, self.y / other, self.z / other)
 
     def __rdiv__(self, other):
         assert type(other) in (int, float), \
             'Cannot divide types {} and {}'.format(self.__class__.__name__, type(other))
-        return Vector3D(operator.div(other, self.x),
-                        operator.div(other, self.y),
-                        operator.div(other, self.z))
+        return Vector3D(other / self.x, other / self.y, other / self.z)
 
     def __floordiv__(self, other):
         assert type(other) in (int, float), \

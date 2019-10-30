@@ -912,7 +912,7 @@ class Face3D(Base2DIn3D):
             vert_3d = tuple(self._plane.xy_to_xyz(pt)
                             for pt in grid_mesh2d.vertices)
         else:
-            _off_num = -offset if flip is True else offset
+            _off_num = -1 * offset if flip is True else offset
             _off_plane = self.plane.move(self.plane.n * _off_num)
             vert_3d = tuple(_off_plane.xy_to_xyz(pt)
                             for pt in grid_mesh2d.vertices)
@@ -1628,13 +1628,25 @@ class Face3D(Base2DIn3D):
         The first 3 vertices will be used to make the plane.
         """
         try:
-            pt1, pt2, pt3 = vertices[:3]
-            v1 = pt2 - pt1
-            v2 = pt3 - pt1
-            n = v1.cross(v2)
+            i = 0
+            n = Vector3D(0, 0, 0)
+            while n.is_zero:
+                n = Face3D._normal_from_3pts(*vertices[i:i + 3])
+                i += 1
         except Exception as e:
             raise ValueError('Incorrect vertices input for Face3D:\n\t{}'.format(e))
-        return Plane(n, pt1)
+        return Plane(n, vertices[0])
+
+    @staticmethod
+    def _normal_from_3pts(pt1, pt2, pt3):
+        """Get a normal vecort from 3 vertices.
+
+        The vector will have a magnitude of 0 if vertices are colinear.
+        """
+        v1 = pt2 - pt1
+        v2 = pt3 - pt1
+        n = v1.cross(v2)
+        return n
 
     @staticmethod
     def _corner_pt_verts(corner_pt, verts3d, verts2d):
