@@ -71,23 +71,23 @@ class LineSegment3D(Base1DIn3D):
         """The length of the line segment."""
         return self.v.magnitude
 
-    def is_horizontal(edge, tolerance):
+    def is_horizontal(self, tolerance):
         """Test whether this line segment is horizontal within a certain tolerance.
 
         Args:
             tolerance: The maximum difference between the z values of the start and
                 end coordinates at which the line segment is considered horizontal.
         """
-        return abs(edge.v.z) <= tolerance
+        return abs(self.v.z) <= tolerance
 
-    def is_vertical(edge, tolerance):
+    def is_vertical(self, tolerance):
         """Test whether this line segment is vertical within a certain tolerance.
 
         Args:
             tolerance: The maximum difference between the x and y values of the start
                 and end coordinates at which the line segment is considered horizontal.
         """
-        return abs(edge.v.x) <= tolerance and abs(edge.v.y) <= tolerance
+        return abs(self.v.x) <= tolerance and abs(self.v.y) <= tolerance
 
     def flip(self):
         """Get a copy of this line segment that is flipped."""

@@ -95,6 +95,18 @@ def test_face3d_init_from_vertices():
     assert face.vertices[0] == face[0]
 
 
+def test_face3d_init_from_vertices_colinear():
+    """Test the initalization of Face3D objects with colinear vertices."""
+    pts = (Point3D(0, 0, 2), Point3D(0, 1, 2), Point3D(0, 2, 2), Point3D(2, 2, 2),
+           Point3D(2, 0, 2))
+    face = Face3D(pts)
+
+    assert not face.normal.is_zero
+    assert face.plane.n == Vector3D(0, 0, -1)
+    assert face.plane.n == face.normal
+    assert face.plane.o == Point3D(0, 0, 2)
+
+
 def test_face3d_init_from_extrusion():
     """Test the initalization of Face3D from_extrusion."""
     line_seg = LineSegment3D(Point3D(0, 0, 0), Vector3D(2, 0, 0))
