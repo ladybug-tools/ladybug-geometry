@@ -312,7 +312,7 @@ def test_polyface3d_init_from_offset_face_hole():
     """Test the initalization of Poyface3D from_offset_face for a face witha hole."""
     bound_pts = [Point3D(0, 0), Point3D(3, 0), Point3D(3, 3), Point3D(0, 3)]
     hole_pts = [Point3D(1, 1), Point3D(2, 1), Point3D(2, 2), Point3D(1, 2)]
-    face = Face3D(bound_pts, None, [hole_pts])
+    face = Face3D(bound_pts, 0, [hole_pts])
 
     polyface = Polyface3D.from_offset_face(face, 1)
 
@@ -363,7 +363,7 @@ def test_polyface3d_to_from_dict_hole():
     """Test the to/from dict of Polyface3D objects with a hole."""
     bound_pts = [Point3D(0, 0), Point3D(3, 0), Point3D(3, 3), Point3D(0, 3)]
     hole_pts = [Point3D(1, 1), Point3D(2, 1), Point3D(2, 2), Point3D(1, 2)]
-    face = Face3D(bound_pts, None, [hole_pts])
+    face = Face3D(bound_pts, 0, [hole_pts])
     polyface = Polyface3D.from_offset_face(face, 1)
 
     polyface_dict = polyface.to_dict()

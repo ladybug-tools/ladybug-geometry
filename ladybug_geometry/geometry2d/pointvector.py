@@ -59,10 +59,14 @@ class Vector2D(object):
         """Get the magnitude squared of the vector."""
         return self.x ** 2 + self.y ** 2
     
-    @property
-    def is_zero(self):
-        """Boolean to note whether the vector has a magnitude of zero."""
-        return self.x == 0 and self.y == 0
+    def is_zero(self, tolerance=0):
+        """Boolean to note whether the vector is within a given zero tolerance.
+        
+        Args:
+            tolerance: The tolerance below which the vector is considered to
+                be a zero vector.
+        """
+        return abs(self.x) <= tolerance and abs(self.y) <= tolerance 
 
     def normalize(self):
         """Get a copy of the vector that is a unit vector (magnitude=1)."""

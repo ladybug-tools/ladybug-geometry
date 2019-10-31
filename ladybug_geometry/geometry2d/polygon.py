@@ -747,12 +747,12 @@ class Polygon2D(Base2DIn2D):
         # Bounding rectangle check using the Separating Axis Theorem
         polygon1_width = polygon1.max.x - polygon1.min.x
         polygon2_width = polygon2.max.x - polygon2.min.x
-        dist_btwn_x = abs(polygon1.min.x - polygon2.min.x)
+        dist_btwn_x = abs(polygon1.center.x - polygon2.center.x)
         x_gap_btwn_rect = dist_btwn_x - (0.5 * polygon1_width) - (0.5 * polygon2_width)
 
         polygon1_height = polygon1.max.y - polygon1.min.y
         polygon2_height = polygon2.max.y - polygon2.min.y
-        dist_btwn_y = abs(polygon1.min.y - polygon2.min.y)
+        dist_btwn_y = abs(polygon1.center.y - polygon2.center.y)
         y_gap_btwn_rect = dist_btwn_y - (0.5 * polygon1_height) - (0.5 * polygon2_height)
 
         if x_gap_btwn_rect > tolerance or y_gap_btwn_rect > tolerance:
