@@ -17,6 +17,7 @@ def test_vector2_init():
     assert vec[1] == 2
     assert vec.magnitude == 2
     assert vec.magnitude_squared == 4
+    assert not vec.is_zero()
 
     assert len(vec) == 2
     pt_tuple = tuple(i for i in vec)
@@ -32,6 +33,7 @@ def test_zero_magnitude_vector():
     """Test properties with a zero magnitude vecotr."""
     vec = Vector2D(0, 0)
 
+    assert vec.is_zero()
     assert vec.magnitude == 0
     assert vec.normalize() == vec
 

@@ -56,7 +56,7 @@ def test_face3d_to_from_dict():
 
     bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
     hole_pts = [Point3D(1, 1), Point3D(3, 1), Point3D(3, 3), Point3D(1, 3)]
-    face = Face3D(bound_pts, None, [hole_pts])
+    face = Face3D(bound_pts, 0, [hole_pts])
     face_dict = face.to_dict()
     new_face = Face3D.from_dict(face_dict)
     assert isinstance(new_face, Face3D)
@@ -101,7 +101,7 @@ def test_face3d_init_from_vertices_colinear():
            Point3D(2, 0, 2))
     face = Face3D(pts)
 
-    assert not face.normal.is_zero
+    assert not face.normal.is_zero()
     assert face.plane.n == Vector3D(0, 0, -1)
     assert face.plane.n == face.normal
     assert face.plane.o == Point3D(0, 0, 2)
@@ -209,7 +209,7 @@ def test_face3d_init_from_shape_with_hole():
     """Test the initalization of Face3D from_shape_with_holes with one hole."""
     bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
     hole_pts = [Point3D(1, 1), Point3D(3, 1), Point3D(3, 3), Point3D(1, 3)]
-    face = Face3D(bound_pts, None, [hole_pts])
+    face = Face3D(bound_pts, 0, [hole_pts])
 
     assert face.plane.n == Vector3D(0, 0, 1)
     assert face.plane.n == face.normal
@@ -243,7 +243,7 @@ def test_face3d_init_from_shape_with_holes():
     bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
     hole_pts_1 = [Point3D(1, 1), Point3D(1.5, 1), Point3D(1.5, 1.5), Point3D(1, 1.5)]
     hole_pts_2 = [Point3D(2, 2), Point3D(3, 2), Point3D(3, 3), Point3D(2, 3)]
-    face = Face3D(bound_pts, None, [hole_pts_1, hole_pts_2])
+    face = Face3D(bound_pts, 0, [hole_pts_1, hole_pts_2])
 
     assert face.plane.n == Vector3D(0, 0, 1)
     assert face.plane.n == face.normal
@@ -275,7 +275,7 @@ def test_face3d_init_from_punched_geometry():
     hole_pts_1 = [Point3D(1, 1), Point3D(1.5, 1), Point3D(1.5, 1.5), Point3D(1, 1.5)]
     hole_pts_2 = [Point3D(2, 2), Point3D(3, 2), Point3D(3, 3), Point3D(2, 3)]
     face_1 = Face3D(bound_pts)
-    face_2 = Face3D(bound_pts, None, [hole_pts_1])
+    face_2 = Face3D(bound_pts, 0, [hole_pts_1])
     sub_face = Face3D(hole_pts_2)
 
     face = Face3D.from_punched_geometry(face_1, [sub_face])

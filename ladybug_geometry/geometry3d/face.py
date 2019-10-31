@@ -28,10 +28,13 @@ class Face3D(Base2DIn3D):
     Args:
         boundary: A list or tuple of Point3D objects representing the outer
             boundary vertices of the face.
-        plane: A Plane object indicating the plane in which the face exists.
-            If None, the Plane normal will automatically be calculated by
-            analyzing the first three boundary vertices and the origin of the
-            plane will be the first vertex of the input vertices.
+        plane_or_tolerance: A Plane object indicating the plane in which the face exists.
+            This can also be a number for the zero-tolerance to be used when
+            automatically calculating the face's Plane from the input vertices. Such
+            a zero-tolerance is used to ensure the normal vector of the plane is
+            computed correctly when the planarity of the vertices differ by small
+            amounts. For plane auto-calculation, the origin of the plane will
+            always be the first vertex of the input vertices. Default: 0.
         holes: Optional list of lists with one list for each hole in the face.
             Each hole should be a list of at least 3 Point3D objects.
             If None, it will be assumed that there are no holes in the face.
@@ -81,17 +84,15 @@ class Face3D(Base2DIn3D):
                  '_perimeter', '_area', '_centroid',
                  '_is_convex', '_is_self_intersecting')
 
-    def __init__(self, boundary, plane=None, holes=None, enforce_right_hand=True):
+    def __init__(self, boundary, plane_or_tolerance=0, holes=None,
+                 enforce_right_hand=True):
         """Initilize Face3D.
         """
         # process the boundary and plane inputs
         self._boundary = self._check_vertices_input(boundary)
-        if plane is not None:
-            assert isinstance(plane, Plane), 'Expected Plane for Face3D.' \
-                ' Got {}.'.format(type(plane))
-        else:
-            plane = self._plane_from_vertices(boundary)
-        self._plane = plane
+        if not isinstance(plane_or_tolerance, Plane):
+            plane_or_tolerance = self._plane_from_vertices(boundary, plane_or_tolerance)
+        self._plane = plane_or_tolerance
 
         # process boundary and holes input
         if holes is None:
@@ -104,11 +105,12 @@ class Face3D(Base2DIn3D):
             self._holes = tuple(
                 self._check_vertices_input(hole, 'hole') for hole in holes)
             # create a Polygon2D from the vertices
-            _boundary2d = [plane.xyz_to_xy(_v) for _v in boundary]
-            _holes2d = [[plane.xyz_to_xy(_v) for _v in hole] for hole in holes]
+            _boundary2d = [self._plane.xyz_to_xy(_v) for _v in boundary]
+            _holes2d = [[self._plane.xyz_to_xy(_v) for _v in hole] for hole in holes]
             _polygon2d = Polygon2D.from_shape_with_holes(_boundary2d, _holes2d)
             # convert Polygon2D vertices to 3D to become the vertices of the face.
-            self._vertices = tuple(plane.xy_to_xyz(_v) for _v in _polygon2d.vertices)
+            self._vertices = tuple(self._plane.xy_to_xyz(_v)
+                                   for _v in _polygon2d.vertices)
             self._polygon2d = _polygon2d
 
         # perform a check of vertex orientation and enforce counter clockwise vertices
@@ -1622,15 +1624,18 @@ class Face3D(Base2DIn3D):
         return (close_pt_1, close_pt_2, close_pt_3, close_pt_4), other_faces
 
     @staticmethod
-    def _plane_from_vertices(vertices):
+    def _plane_from_vertices(vertices, tolerance):
         """Get a plane from a list of vertices.
 
-        The first 3 vertices will be used to make the plane.
+        Args:
+            vertices: The vertices to be used to extract the normal.
+            tolerance: The max difference between x, y, and z values for a
+                normal vector to be considered non=zerp.
         """
         try:
             i = 0
             n = Vector3D(0, 0, 0)
-            while n.is_zero:
+            while n.is_zero(tolerance):
                 n = Face3D._normal_from_3pts(*vertices[i:i + 3])
                 i += 1
         except Exception as e:

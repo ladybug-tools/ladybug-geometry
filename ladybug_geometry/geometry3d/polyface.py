@@ -209,9 +209,11 @@ class Polyface3D(Base2DIn3D):
         polyface = cls(_verts, _face_indices, {'edge_indices': _edge_indices,
                                                'edge_types': [1] * 12})
         verts = tuple(tuple(_verts[i] for i in face[0]) for face in _face_indices)
-        bottom = Face3D(verts[0], plane=base_plane.flip(), enforce_right_hand=False)
+        bottom = Face3D(verts[0], plane_or_tolerance=base_plane.flip(),
+                        enforce_right_hand=False)
         middle = tuple(Face3D(v, enforce_right_hand=False) for v in verts[1:5])
-        top = Face3D(verts[5], plane=base_plane.move(_h_vec), enforce_right_hand=False)
+        top = Face3D(verts[5], plane_or_tolerance=base_plane.move(_h_vec),
+                     enforce_right_hand=False)
         polyface._faces = (bottom,) + middle + (top,)
         polyface._volume = width * depth * height
         return polyface
@@ -698,17 +700,17 @@ class Polyface3D(Base2DIn3D):
         # Bounding box check using the Separating Axis Theorem
         polyf1_width = polyface1.max.x - polyface1.min.x
         polyf2_width = polyface2.max.x - polyface2.min.x
-        dist_btwn_x = abs(polyface1.min.x - polyface2.min.x)
+        dist_btwn_x = abs(polyface1.center.x - polyface2.center.x)
         x_gap_btwn_box = dist_btwn_x - (0.5 * polyf1_width) - (0.5 * polyf2_width)
 
         polyf1_depth = polyface1.max.y - polyface1.min.y
         polyf2_depth = polyface2.max.y - polyface2.min.y
-        dist_btwn_y = abs(polyface1.min.y - polyface2.min.y)
+        dist_btwn_y = abs(polyface1.center.y - polyface2.center.y)
         y_gap_btwn_box = dist_btwn_y - (0.5 * polyf1_depth) - (0.5 * polyf2_depth)
 
         polyf1_height = polyface1.max.z - polyface1.min.z
         polyf2_height = polyface2.max.z - polyface2.min.z
-        dist_btwn_z = abs(polyface1.min.z - polyface2.min.z)
+        dist_btwn_z = abs(polyface1.center.z - polyface2.center.z)
         z_gap_btwn_box = dist_btwn_z - (0.5 * polyf1_height) - (0.5 * polyf2_height)
 
         if x_gap_btwn_box > tolerance or y_gap_btwn_box > tolerance or \
