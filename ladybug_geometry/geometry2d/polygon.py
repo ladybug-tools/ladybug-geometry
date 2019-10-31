@@ -669,12 +669,95 @@ class Polygon2D(Base2DIn2D):
         """
         for i in range(len(polygon_list) - 1):
             # No need for j to start at 0 since two polygons are passed
-            # and they are compared against one other within _intersect_segments.
+            # and they are compared against one other within intersect_segments.
             for j in range(i + 1, len(polygon_list)):
                 polygon_list[i], polygon_list[j] = \
-                    Polygon2D._intersect_segments(polygon_list[i], polygon_list[j],
-                                                  tolerance)
+                    Polygon2D.intersect_segments(polygon_list[i], polygon_list[j],
+                                                 tolerance)
         return polygon_list
+    
+    @staticmethod
+    def intersect_segments(polygon1, polygon2, tolerance):
+        """Intersect the line segments of two Polygon2Ds to ensure matching segments.
+
+        Specifically, this method checks two adjacent polygons to see if one contains
+        a vertex along an edge segment of the other within the given tolerance. If so,
+        it creates a co-located vertex at that point, partitioning the edge segment
+        into two edge segments. Point ordering is preserved.
+
+        Args:
+            polygon1: First polygon to check.
+            polygon2: Second polygon to check.
+            tolerance: Distance within which two points are considered to be co-located.
+
+        Returns:
+            Two polygon objects with extra vertices inserted if necessary.
+        """
+        polygon1_updates = []
+        polygon2_updates = []
+
+        # Bounding rectangle check
+        if not Polygon2D.overlapping_bounding_rect(polygon1, polygon2, tolerance):
+            return polygon1, polygon2  # no overlap
+
+        # Test if each point of polygon2 is within the tolerance distance of any segment
+        # of polygon1.  If so, add the closest point on the segment to the polygon1
+        # update list. And vice versa (testing polygon2 against polygon1).
+        for i1, seg1 in enumerate(polygon1.segments):
+            for i2, seg2 in enumerate(polygon2.segments):
+                # Test polygon1 against polygon2
+                x = closest_point2d_on_line2d(seg2.p1, seg1)
+                if all(p.distance_to_point(x) > tolerance for p in polygon1.vertices) \
+                        and x.distance_to_point(seg2.p1) <= tolerance:
+                    polygon1_updates.append([i1, x])
+                # Test polygon2 against polygon1
+                y = closest_point2d_on_line2d(seg1.p1, seg2)
+                if all(p.distance_to_point(y) > tolerance for p in polygon2.vertices) \
+                        and y.distance_to_point(seg1.p1) <= tolerance:
+                    polygon2_updates.append([i2, y])
+
+        # Apply any updates to polygon1
+        poly_points = list(polygon1.vertices)
+        for update in polygon1_updates[::-1]:  # Traverse backwards to preserve order
+            poly_points.insert(update[0] + 1, update[1])
+        polygon1 = Polygon2D(poly_points)
+
+        # Apply any updates to polygon2
+        poly_points = list(polygon2.vertices)
+        for update in polygon2_updates[::-1]:  # Traverse backwards to preserve order
+            poly_points.insert(update[0] + 1, update[1])
+        polygon2 = Polygon2D(poly_points)
+
+        return polygon1, polygon2
+    
+    @staticmethod
+    def overlapping_bounding_rect(polygon1, polygon2, tolerance):
+        """Check if the bounding rectangles of two polygons overlap within a tolerance.
+
+        This is particularly useful as a check before performing computationally intense
+        processes between two polygons like intersection or checking for adjacency.
+        Checking the overlap of the bounding boxes is extremely quick given this
+        method's use of the Separating Axis Theorem.
+
+        Args:
+            polygon1: The first polygon to check.
+            polygon2: The second polygon to check.
+            tolerance: Distance within which two points are considered to be co-located.
+        """
+        # Bounding rectangle check using the Separating Axis Theorem
+        polygon1_width = polygon1.max.x - polygon1.min.x
+        polygon2_width = polygon2.max.x - polygon2.min.x
+        dist_btwn_x = abs(polygon1.min.x - polygon2.min.x)
+        x_gap_btwn_rect = dist_btwn_x - (0.5 * polygon1_width) - (0.5 * polygon2_width)
+
+        polygon1_height = polygon1.max.y - polygon1.min.y
+        polygon2_height = polygon2.max.y - polygon2.min.y
+        dist_btwn_y = abs(polygon1.min.y - polygon2.min.y)
+        y_gap_btwn_rect = dist_btwn_y - (0.5 * polygon1_height) - (0.5 * polygon2_height)
+
+        if x_gap_btwn_rect > tolerance or y_gap_btwn_rect > tolerance:
+            return False  # no overlap
+        return True  # overlap exists
 
     def _transfer_properties(self, new_polygon):
         """Transfer properties from this polygon to a new polygon.
@@ -746,70 +829,6 @@ class Polygon2D(Base2DIn2D):
         for i, pt in enumerate(vertices):
             _a += vertices[i - 1].x * pt.y - vertices[i - 1].y * pt.x
         return _a < 0
-
-    @staticmethod
-    def _intersect_segments(polygon1, polygon2, tolerance):
-        """Intersect the line segments of two Polygon2Ds to ensure matching segments.
-
-        Specifically, this method checks two adjacent polygons to see if one contains
-        a vertex along an edge segment of the other within the given tolerance. If so,
-        it creates a co-located vertex at that point, partitioning the edge segment
-        into two edge segments. Point ordering is preserved.
-
-        Args:
-            polygon1: First polygon to check.
-            polygon2: Second polygon to check.
-            tolerance: Distance within which two points are considered to be co-located.
-
-        Returns:
-            Two polygon objects with extra vertices inserted if necessary.
-        """
-        polygon1_updates = []
-        polygon2_updates = []
-
-        # Bounding rectangle check using the Separating Axis Theorem
-        polygon1_width = polygon1.max.x - polygon1.min.x
-        polygon2_width = polygon2.max.x - polygon2.min.x
-        dist_btwn_x = abs(polygon1.min.x - polygon2.min.x)
-        x_gap_btwn_rect = dist_btwn_x - (0.5 * polygon1_width) - (0.5 * polygon2_width)
-
-        polygon2_height = polygon2.max.y - polygon2.min.y
-        polygon1_height = polygon1.max.y - polygon1.min.y
-        dist_btwn_y = abs(polygon1.min.y - polygon2.min.y)
-        y_gap_btwn_rect = dist_btwn_y - (0.5 * polygon1_height) - (0.5 * polygon2_height)
-
-        if x_gap_btwn_rect > tolerance or y_gap_btwn_rect > tolerance:  # no overlap
-            return polygon1, polygon2
-
-        # Test if each point of polygon2 is within the tolerance distance of any segment
-        # of polygon1.  If so, add the closest point on the segment to the polygon1
-        # update list. And vice versa (testing polygon2 against polygon1).
-        for i1, seg1 in enumerate(polygon1.segments):
-            for i2, seg2 in enumerate(polygon2.segments):
-                # Test polygon1 against polygon2
-                x = closest_point2d_on_line2d(seg2.p1, seg1)
-                if all(p.distance_to_point(x) > tolerance for p in polygon1.vertices) \
-                        and x.distance_to_point(seg2.p1) <= tolerance:
-                    polygon1_updates.append([i1, x])
-                # Test polygon2 against polygon1
-                y = closest_point2d_on_line2d(seg1.p1, seg2)
-                if all(p.distance_to_point(y) > tolerance for p in polygon2.vertices) \
-                        and y.distance_to_point(seg1.p1) <= tolerance:
-                    polygon2_updates.append([i2, y])
-
-        # Apply any updates to polygon1
-        poly_points = list(polygon1.vertices)
-        for update in polygon1_updates[::-1]:  # Traverse backwards to preserve order
-            poly_points.insert(update[0] + 1, update[1])
-        polygon1 = Polygon2D(poly_points)
-
-        # Apply any updates to polygon2
-        poly_points = list(polygon2.vertices)
-        for update in polygon2_updates[::-1]:  # Traverse backwards to preserve order
-            poly_points.insert(update[0] + 1, update[1])
-        polygon2 = Polygon2D(poly_points)
-
-        return polygon1, polygon2
 
     def __copy__(self):
         _new_poly = Polygon2D(self.vertices)
