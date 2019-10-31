@@ -41,6 +41,10 @@ class Polyface3D(Base2DIn3D):
                 the edge_indices list. An integer of 0 denotes a naked edge, an
                 integer of 1 denotes an internal edge. Anything higher is a
                 non-manifold edge.
+        tolerance: The tolerance to be used in the generation of the Polyface3D's
+            constituient Face3Ds. Such tolerance is used to ensure the normal
+            vector of each face plane is computed correctly when the planarity
+            of the vertices differ by small amounts. Default: 0.
 
     Properties:
         * vertices
@@ -64,7 +68,7 @@ class Polyface3D(Base2DIn3D):
                  '_face_indices', '_edge_indices', '_edge_types',
                  '_area', '_volume', '_is_solid')
 
-    def __init__(self, vertices, face_indices, edge_information=None):
+    def __init__(self, vertices, face_indices, edge_information=None, tolerance=0):
         """Initilize Polyface3D.
         """
         # assign input properties
@@ -100,9 +104,25 @@ class Polyface3D(Base2DIn3D):
             if edge != 1:
                 self._is_solid = False
                 break
+        
+        # generate the faces property
+        if tolerance is not None:
+            faces = []
+            for face in self._face_indices:
+                boundary = tuple(self.vertices[i] for i in face[0])
+                if len(face) == 1:
+                    faces.append(Face3D(boundary, tolerance))
+                else:
+                    holes = tuple(tuple(self.vertices[i] for i in f) for f in face[1:])
+                    faces.append(Face3D(boundary, tolerance, holes))
+            if self._is_solid:
+                self._faces = Polyface3D.get_outward_faces(faces)
+            else:
+                self._faces = tuple(faces)
+        else:  # this should only be the case when the input comes from a classmethod
+            self._faces = None  # will be assigned within a classmethod that is faster
 
         # assign default properties
-        self._faces = None
         self._edges = None
         self._naked_edges = None
         self._internal_edges = None
@@ -114,11 +134,12 @@ class Polyface3D(Base2DIn3D):
         self._volume = None
 
     @classmethod
-    def from_dict(cls, data):
+    def from_dict(cls, data, tolerance=0):
         """Create a Face3D from a dictionary.
 
         Args:
-            data: A python dictionary in the following format
+            data: A python dictionary in the format below.
+            tolerance: The tolerance with which the geometry should be re-interpreted.
 
         .. code-block:: python
 
@@ -136,7 +157,7 @@ class Polyface3D(Base2DIn3D):
             edge_information = None
 
         return cls(tuple(Point3D(pt[0], pt[1], pt[2]) for pt in data['vertices']),
-                   data['face_indices'], edge_information)
+                   data['face_indices'], edge_information, tolerance)
 
     @classmethod
     def from_faces(cls, faces, tolerance=0):
@@ -171,7 +192,7 @@ class Polyface3D(Base2DIn3D):
             face_indices.append(tuple(ind))
 
         # get the polyface object and assign correct faces to it
-        return cls(vertices, face_indices)
+        return cls(vertices, face_indices, tolerance=tolerance)
 
     @classmethod
     def from_box(cls, width, depth, height, base_plane=None):
@@ -206,14 +227,13 @@ class Polyface3D(Base2DIn3D):
                          [(0, 3, 7, 4)], [(0, 4, 5, 1)], [(7, 6, 5, 4)])
         _edge_indices = ((3, 0), (0, 1), (1, 2), (2, 3), (0, 4), (4, 5),
                          (5, 1), (3, 7), (7, 4), (6, 2), (5, 6), (6, 7))
-        polyface = cls(_verts, _face_indices, {'edge_indices': _edge_indices,
-                                               'edge_types': [1] * 12})
+        polyface = cls(_verts, _face_indices,
+                        {'edge_indices': _edge_indices, 'edge_types': [1] * 12},
+                        tolerance=None)
         verts = tuple(tuple(_verts[i] for i in face[0]) for face in _face_indices)
-        bottom = Face3D(verts[0], plane_or_tolerance=base_plane.flip(),
-                        enforce_right_hand=False)
+        bottom = Face3D(verts[0], base_plane.flip(), enforce_right_hand=False)
         middle = tuple(Face3D(v, enforce_right_hand=False) for v in verts[1:5])
-        top = Face3D(verts[5], plane_or_tolerance=base_plane.move(_h_vec),
-                     enforce_right_hand=False)
+        top = Face3D(verts[5], base_plane.move(_h_vec), enforce_right_hand=False)
         polyface._faces = (bottom,) + middle + (top,)
         polyface._volume = width * depth * height
         return polyface
@@ -273,7 +293,8 @@ class Polyface3D(Base2DIn3D):
         # create the polysurface and assign known properties.
         polyface = Polyface3D(verts, faces_ind,
                               {'edge_indices': edge_indices,
-                               'edge_types': [1] * len(edge_indices)})
+                               'edge_types': [1] * len(edge_indices)},
+                              tolerance=None)
         polyface._volume = face.area * offset
         face_verts = tuple(
             tuple(tuple(verts[i] for i in loop) for loop in f) for f in faces_ind)
@@ -301,19 +322,6 @@ class Polyface3D(Base2DIn3D):
     @property
     def faces(self):
         """Tuple of all Face3D objects making up this polyface."""
-        if self._faces is None:
-            faces = []
-            for face in self._face_indices:
-                boundary = tuple(self.vertices[i] for i in face[0])
-                if len(face) == 1:
-                    faces.append(Face3D(boundary))
-                else:
-                    holes = tuple(tuple(self.vertices[i] for i in f) for f in face[1:])
-                    faces.append(Face3D(boundary=boundary, holes=holes))
-            if self._is_solid:
-                self._faces = Polyface3D.get_outward_faces(faces)
-            else:
-                self._faces = tuple(faces)
         return self._faces
 
     @property
