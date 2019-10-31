@@ -706,3 +706,17 @@ def test_is_point_inside():
     assert polyface.is_point_inside(Point3D(4, 1, 1)) is False
     assert polyface.is_point_inside(Point3D(-1, 1, 1)) is False
     assert polyface.is_point_inside(Point3D(4, 4, 4)) is False
+
+
+def test_overlapping_bounding_boxes():
+    """Test the Polyface3D overlapping_bounding_boxes method."""
+    polyface_1 = Polyface3D.from_box(1, 1, 1, Plane(o=Point3D(1, 1, 2)))
+    polyface_2 = Polyface3D.from_box(1, 1, 1, Plane(o=Point3D(1, 1, 1)))
+    polyface_3 = Polyface3D.from_box(1, 1, 1, Plane(o=Point3D(2, 1, 2)))
+    polyface_4 = Polyface3D.from_box(1, 1, 1, Plane(o=Point3D(1, 2, 2)))
+    polyface_5 = Polyface3D.from_box(1, 1, 1, Plane(o=Point3D(0, 0, 0)))
+
+    assert Polyface3D.overlapping_bounding_boxes(polyface_1, polyface_2, 0.01)
+    assert Polyface3D.overlapping_bounding_boxes(polyface_1, polyface_3, 0.01)
+    assert Polyface3D.overlapping_bounding_boxes(polyface_1, polyface_4, 0.01)
+    assert not Polyface3D.overlapping_bounding_boxes(polyface_1, polyface_5, 0.01)

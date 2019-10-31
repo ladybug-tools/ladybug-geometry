@@ -682,6 +682,41 @@ class Polyface3D(Base2DIn3D):
         return _inters
 
     @staticmethod
+    def overlapping_bounding_boxes(polyface1, polyface2, tolerance):
+        """Check if the bounding boxes of two polyfaces overlap within a tolerance.
+
+        This is particularly useful as a check before performing computationally
+        intenseprocesses between two polyfaces like intersection or checking for
+        adjacency. Checking the overlap of the bounding boxes is extremely quick
+        given this method's use of the Separating Axis Theorem.
+
+        Args:
+            polyface1: The first polyface to check.
+            polyface2: The second polyface to check.
+            tolerance: Distance within which two points are considered to be co-located.
+        """
+        # Bounding box check using the Separating Axis Theorem
+        polyf1_width = polyface1.max.x - polyface1.min.x
+        polyf2_width = polyface2.max.x - polyface2.min.x
+        dist_btwn_x = abs(polyface1.min.x - polyface2.min.x)
+        x_gap_btwn_box = dist_btwn_x - (0.5 * polyf1_width) - (0.5 * polyf2_width)
+
+        polyf1_depth = polyface1.max.y - polyface1.min.y
+        polyf2_depth = polyface2.max.y - polyface2.min.y
+        dist_btwn_y = abs(polyface1.min.y - polyface2.min.y)
+        y_gap_btwn_box = dist_btwn_y - (0.5 * polyf1_depth) - (0.5 * polyf2_depth)
+
+        polyf1_height = polyface1.max.z - polyface1.min.z
+        polyf2_height = polyface2.max.z - polyface2.min.z
+        dist_btwn_z = abs(polyface1.min.z - polyface2.min.z)
+        z_gap_btwn_box = dist_btwn_z - (0.5 * polyf1_height) - (0.5 * polyf2_height)
+
+        if x_gap_btwn_box > tolerance or y_gap_btwn_box > tolerance or \
+                z_gap_btwn_box > tolerance:
+            return False  # no overlap
+        return True  # overlap exists
+
+    @staticmethod
     def get_outward_faces(faces, tolerance=0):
         """Get faces that are all pointing outward from a list of faces together forming a solid.
 

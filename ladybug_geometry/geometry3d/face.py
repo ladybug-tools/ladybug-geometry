@@ -609,13 +609,13 @@ class Face3D(Base2DIn3D):
             return False
         if not abs(self.area - face.area) <= tolerance:  # area check
             return False
-        # construct a ray using this face's normal and a point on this face
+        # construct a ray using this face's normal and a point just behind this face
         v1 = self.boundary[-1] - self.boundary[0]
         v2 = self.boundary[1] - self.boundary[0]
-        move_vec = Vector3D(
+        move_vec = Vector3D(  # vector moving from the edge towards the center of Face
             (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)).normalize()
         move_vec = move_vec * (tolerance + 0.00001)
-        point_on_face = self.boundary[0] + move_vec
+        point_on_face = self.boundary[0] + move_vec - (self.normal * tolerance)
         test_ray = Ray3D(point_on_face, self.normal)
         # shoot ray from this face to the other to verify adjacency
         if face.intersect_line_ray(test_ray):

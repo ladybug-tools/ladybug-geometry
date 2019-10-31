@@ -508,7 +508,7 @@ def test_intersect_segments():
     pts1 = (Point2D(0, 2), Point2D(3, 2), Point2D(3, 4), Point2D(0, 4))
     polygon1 = Polygon2D(pts1)
 
-    polygon0, polygon1 = Polygon2D._intersect_segments(polygon0, polygon1, tolerance)
+    polygon0, polygon1 = Polygon2D.intersect_segments(polygon0, polygon1, tolerance)
 
     # Extra vertex added to polygon0, as expected
     assert len(polygon0.segments) == 5
@@ -530,14 +530,14 @@ def test_intersect_segments_zero_tolerance():
     pts1 = (Point2D(0, 2), Point2D(3, 2), Point2D(3, 4), Point2D(0, 4))
     polygon1 = Polygon2D(pts1)
 
-    polygon2, polygon3 = Polygon2D._intersect_segments(polygon0, polygon1, 0)
+    polygon2, polygon3 = Polygon2D.intersect_segments(polygon0, polygon1, 0)
 
     assert len(polygon2.segments) == 4  # No new points
     assert all([polygon0.vertices[i] == polygon2.vertices[i] for i in range(len(polygon0.vertices))])
     assert len(polygon3.segments) == 4  # No new points
     assert all([polygon1.vertices[i] == polygon3.vertices[i] for i in range(len(polygon1.vertices))])
 
-    polygon2, polygon3 = Polygon2D._intersect_segments(polygon0, polygon1, 0.02)
+    polygon2, polygon3 = Polygon2D.intersect_segments(polygon0, polygon1, 0.02)
 
     assert len(polygon2.segments) == 5  # Intersection within tolerance
     assert len(polygon3.segments) == 5  # Intersection within tolerance
@@ -550,7 +550,7 @@ def test_intersect_segments_with_colinear_edges():
     pts1 = (Point2D(0, 2), Point2D(3, 2), Point2D(3, 4), Point2D(0, 4))
     polygon1 = Polygon2D(pts1)
 
-    polygon0, polygon1 = Polygon2D._intersect_segments(polygon0, polygon1, 0)
+    polygon0, polygon1 = Polygon2D.intersect_segments(polygon0, polygon1, 0)
 
     # Extra vertex added to polygon0, as expected
     assert len(polygon0.segments) == 5
