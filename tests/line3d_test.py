@@ -261,6 +261,19 @@ def test_subdivide():
     assert divisions[4] == Point3D(2, 4, 2)
 
 
+def test_subdivide_tolerance_issue():
+    """Test the LineSegment3D subdivide method handles Python tolerance.
+
+    This case was taken from an originally failing situation in Rhino.
+    """
+    origin = Point3D(-68.773857131759087, 20.836167334772536, 18.897600000000001)
+    dir = Vector3D(-0.026879795220556984, -0.99963867302585929, 0.0)
+    bottom_seg = LineSegment3D.from_sdl(origin, dir, 21.5037894118)
+
+    assert len(bottom_seg.subdivide_evenly(5)) == 6
+    assert len(bottom_seg.subdivide_evenly(7)) == 8
+
+
 def test_closest_point():
     """Test the LineSegment3D closest_point method."""
     pt = Point3D(2, 2, 2)

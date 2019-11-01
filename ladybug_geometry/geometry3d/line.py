@@ -172,15 +172,17 @@ class LineSegment3D(Base1DIn3D):
         """Get Point3D values along the line that divide it into evenly-spaced segments.
 
         Args:
-            number: The number of segments into which the line will be divided.
+            number: Integer for the number of segments into which the line will
+                be divided.
         """
-        interval = 1 / number
+        interval = 1 / number  # can create tolerance issue where interval * number < 1
         parameter = interval
         sub_pts = [self.p]
         while parameter < 1:
             sub_pts.append(self.point_at(parameter))
             parameter += interval
-        sub_pts.append(self.p2)
+        if len(sub_pts) != number + 1:  # avoid tolerance issue from interval division
+            sub_pts.append(self.p2)
         return sub_pts
 
     def point_at(self, parameter):
