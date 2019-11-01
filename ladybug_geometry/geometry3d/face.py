@@ -28,13 +28,10 @@ class Face3D(Base2DIn3D):
     Args:
         boundary: A list or tuple of Point3D objects representing the outer
             boundary vertices of the face.
-        plane_or_tolerance: A Plane object indicating the plane in which the face exists.
-            This can also be a number for the zero-tolerance to be used when
-            automatically calculating the face's Plane from the input vertices. Such
-            a zero-tolerance is used to ensure the normal vector of the plane is
-            computed correctly when the planarity of the vertices differ by small
-            amounts. For plane auto-calculation, the origin of the plane will
-            always be the first vertex of the input vertices. Default: 0.
+        plane: A Plane object indicating the plane in which the face exists.
+            If None, the Plane normal will automatically be calculated by
+            analyzing the input vertices and the origin of the plane will be
+            the first vertex of the input vertices. Default: None.
         holes: Optional list of lists with one list for each hole in the face.
             Each hole should be a list of at least 3 Point3D objects.
             If None, it will be assumed that there are no holes in the face.
@@ -84,15 +81,17 @@ class Face3D(Base2DIn3D):
                  '_perimeter', '_area', '_centroid',
                  '_is_convex', '_is_self_intersecting')
 
-    def __init__(self, boundary, plane_or_tolerance=0, holes=None,
-                 enforce_right_hand=True):
+    def __init__(self, boundary, plane=None, holes=None, enforce_right_hand=True):
         """Initilize Face3D.
         """
         # process the boundary and plane inputs
         self._boundary = self._check_vertices_input(boundary)
-        if not isinstance(plane_or_tolerance, Plane):
-            plane_or_tolerance = self._plane_from_vertices(boundary, plane_or_tolerance)
-        self._plane = plane_or_tolerance
+        if plane is not None:
+            assert isinstance(plane, Plane), 'Expected Plane for Face3D.' \
+                ' Got {}.'.format(type(plane))
+        else:
+            plane = self._plane_from_vertices(boundary)
+        self._plane = plane
 
         # process boundary and holes input
         if holes is None:
@@ -1624,34 +1623,38 @@ class Face3D(Base2DIn3D):
         return (close_pt_1, close_pt_2, close_pt_3, close_pt_4), other_faces
 
     @staticmethod
-    def _plane_from_vertices(vertices, tolerance):
-        """Get a plane from a list of vertices.
+    def _plane_from_vertices(vertices):
+        """Get a plane from a list of non-colinear vertices.
 
         Args:
             vertices: The vertices to be used to extract the normal.
-            tolerance: The max difference between x, y, and z values for a
-                normal vector to be considered non=zerp.
         """
         try:
-            i = 0
-            n = Vector3D(0, 0, 0)
-            while n.is_zero(tolerance):
-                n = Face3D._normal_from_3pts(*vertices[i:i + 3])
-                i += 1
+            normal = [0, 0, 0]
+            # walk around the whole shape to avoid colinear vertices
+            for i in range(len(vertices) - 2):
+                x, y, z = Face3D._normal_from_3pts(*vertices[i:i + 3])
+                normal[0] += x
+                normal[1] += y
+                normal[2] += z
         except Exception as e:
             raise ValueError('Incorrect vertices input for Face3D:\n\t{}'.format(e))
-        return Plane(n, vertices[0])
+        return Plane(Vector3D(normal[0], normal[1], normal[2]), vertices[0])
 
     @staticmethod
     def _normal_from_3pts(pt1, pt2, pt3):
-        """Get a normal vecort from 3 vertices.
+        """Get a tuple representing a normal vector from 3 vertices.
 
         The vector will have a magnitude of 0 if vertices are colinear.
+        This method effectively performs the cross product of two vectors but
+        the ladybug_geometry objects are not used in order to remove assertions
+        and increase speed.
         """
-        v1 = pt2 - pt1
-        v2 = pt3 - pt1
-        n = v1.cross(v2)
-        return n
+        v1 = (pt2.x - pt1.x, pt2.y - pt1.y, pt2.z - pt1.z)
+        v2 = (pt3.x - pt1.x, pt3.y - pt1.y, pt3.z - pt1.z)
+        return (v1[1] * v2[2] - v1[2] * v2[1],
+                -v1[0] * v2[2] + v1[2] * v2[0],
+                v1[0] * v2[1] - v1[1] * v2[0])
 
     @staticmethod
     def _corner_pt_verts(corner_pt, verts3d, verts2d):
