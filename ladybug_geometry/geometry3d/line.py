@@ -175,14 +175,12 @@ class LineSegment3D(Base1DIn3D):
             number: Integer for the number of segments into which the line will
                 be divided.
         """
-        interval = 1 / number  # can create tolerance issue where interval * number < 1
+        interval = 1 / number
         parameter = interval
         sub_pts = [self.p]
-        while parameter < 1:
+        while parameter <= 1:
             sub_pts.append(self.point_at(parameter))
             parameter += interval
-        if len(sub_pts) != number + 1:  # avoid tolerance issue from interval division
-            sub_pts.append(self.p2)
         return sub_pts
 
     def point_at(self, parameter):
