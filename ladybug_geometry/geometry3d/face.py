@@ -11,7 +11,7 @@ from ._2d import Base2DIn3D
 
 from ..intersection3d import closest_point3d_on_line3d
 
-from ..geometry2d.pointvector import Point2D
+from ..geometry2d.pointvector import Point2D, Vector2D
 from ..geometry2d.ray import Ray2D
 from ..geometry2d.polygon import Polygon2D
 from ..geometry2d.mesh import Mesh2D
@@ -938,15 +938,18 @@ class Face3D(Base2DIn3D):
 
         return grid_mesh3d
 
-    def countour_by_number(self, contour_count, direction_vector=Vector3D(0, 0, 1),
+    def countour_by_number(self, contour_count, direction_vector=Vector2D(0, 1),
                            flip_side=False, tolerance=0):
         """Generate a list of LineSegment3D objects contouring the face.
 
         Args:
             contour_count: A positive integer for the number of contours
                 to generate over the face.
-            direction_vector: A Vector3D for the direction along which contours
-                are generated. Default is Z-Axis, which generates horizontal contours.
+            direction_vector: A Vector2D for the direction along which contours
+                are generated. This 2D vector will be interpreted into a 3D vector
+                within the plane of this Face. (0, 1) will usually generate
+                horizontal contours in 3D space, (1, 0) will generate vertical
+                contours, and (1, 1) will generate diagonal contours. Default: (0, 1).
             flip_side: Boolean to note whether the side the contours start from
                 should be flipped. Default is False to have contours on top or right.
                 Setting to True will start contours on the bottom or left.
@@ -954,28 +957,40 @@ class Face3D(Base2DIn3D):
                 than the tolerance. Default is 0, which will include all contours
                 no matter how small.
         """
-        plane_normal = direction_vector.normalize()
-        tol_pt = Point3D(0.0000001, 0.0000001, 0.0000001)
-        diagonal = LineSegment3D.from_end_points(self.min + tol_pt, self.max - tol_pt)
-        diagonal = diagonal.flip() if flip_side is False else diagonal
+        # interpret the 2D direction_vector into one that exists in 3D space
+        ref_plane = Plane(self._plane.n, Point3D(0, 0, 0), self._plane.x)
+        if ref_plane.y.z < 0:
+            ref_plane = ref_plane.rotate(ref_plane.n, math.pi, ref_plane.o)
+        plane_normal = ref_plane.xy_to_xyz(direction_vector).normalize()
+
+        # get a diagonal going across the face
+        diagonal = self._diagonal_along_self(direction_vector, tolerance)
+        if not flip_side:
+            diagonal = diagonal.flip()  # flip diagonal if user has requested it
+
+        # generate the contours
         contours = []
         for pt in diagonal.subdivide_evenly(contour_count)[:-1]:
             result = self.intersect_plane(Plane(plane_normal, pt))
             if result is not None:
                 contours.extend(result)
+
+        # remove any contours that are smaller than the tolerance.
         if tolerance != 0:
             contours = [l_seg for l_seg in contours if l_seg.length >= tolerance]
         return contours
 
-    def countour_by_distance_between(self, distance, direction_vector=Vector3D(0, 0, 1),
+    def countour_by_distance_between(self, distance, direction_vector=Vector2D(0, 1),
                                      flip_side=False, tolerance=0):
         """Generate a list of LineSegment3D objects contouring the face.
 
         Args:
-            distance: A number for the approximate distance between each contour.
-                The actual distance will be computed from
-            direction_vector: A Vector3D for the direction along which contours
-                are generated. Default is Z-Axis, which generates horizontal contours.
+            distance: A number for the distance between each contour.
+            direction_vector: A Vector2D for the direction along which contours
+                are generated. This 2D vector will be interpreted into a 3D vector
+                within the plane of this Face. (0, 1) will usually generate
+                horizontal contours in 3D space, (1, 0) will generate vertical
+                contours, and (1, 1) will generate diagonal contours. Default: (0, 1).
             flip_side: Boolean to note whether the side the contours start from
                 should be flipped. Default is False to have contours on top or right.
                 Setting to True will start contours on the bottom or left.
@@ -983,23 +998,37 @@ class Face3D(Base2DIn3D):
                 than the tolerance. Default is 0, which will include all contours
                 no matter how small.
         """
-        plane_normal = direction_vector.normalize()
-        tol_pt = Point3D(0.0000001, 0.0000001, 0.0000001)
-        diagonal = LineSegment3D.from_end_points(self.min + tol_pt, self.max - tol_pt)
-        angle = direction_vector.angle(diagonal.v)
+        # interpret the 2D direction_vector into one that exists in 3D space
+        ref_plane = Plane(self._plane.n, Point3D(0, 0, 0), self._plane.x)
+        if ref_plane.y.z < 0:
+            ref_plane = ref_plane.rotate(ref_plane.n, math.pi, ref_plane.o)
+        plane_normal = ref_plane.xy_to_xyz(direction_vector).normalize()
+
+        # get a diagonal going across the face
+        diagonal = self._diagonal_along_self(direction_vector, tolerance)
+        if not flip_side:
+            diagonal = diagonal.flip()  # flip diagonal if user has requested it
+
+        # compute the diagonal subdivision distance using the plane_normal
+        angle = plane_normal.angle(diagonal.v)
+        angle = abs(angle - math.pi) if angle > math.pi / 2 else angle
         proj_dist = distance / math.cos(angle)
-        diagonal = diagonal.flip() if flip_side is False else diagonal
+
+        # generate the contours
         contours = []
         for pt in diagonal.subdivide(proj_dist)[:-1]:
+            pass
             result = self.intersect_plane(Plane(plane_normal, pt))
             if result is not None:
                 contours.extend(result)
+
+        # remove any contours that are smaller than the tolerance.
         if tolerance != 0:
             contours = [l_seg for l_seg in contours if l_seg.length >= tolerance]
         return contours
 
     def countour_fins_by_number(self, fin_count, depth, offset=0, angle=0,
-                                contour_vector=Vector3D(0, 0, 1), flip_side=False,
+                                contour_vector=Vector2D(0, 1), flip_side=False,
                                 tolerance=0):
         """Generate a list of Fac3D objects over this face (like louvers or fins).
 
@@ -1010,8 +1039,11 @@ class Face3D(Base2DIn3D):
                 Default is 0 for no offset.
             angle: A number for the for an angle to rotate the fins in radians.
                 Default is 0 for no rotation.
-            contour_vector: A Vector3D for the direction along which contours
-                are generated. Default is Z-Axis, which generates horizontal fins.
+            contour_vector: A Vector2D for the direction along which contours
+                are generated. This 2D vector will be interpreted into a 3D vector
+                within the plane of this Face. (0, 1) will usually generate
+                horizontal contours in 3D space, (1, 0) will generate vertical
+                contours, and (1, 1) will generate diagonal contours. Default: (0, 1).
             flip_side: Boolean to note whether the side the fins start from
                 should be flipped. Default is False to have contours on top or right.
                 Setting to True will start contours on the bottom or left.
@@ -1025,7 +1057,7 @@ class Face3D(Base2DIn3D):
         return self._get_extrusion_fins(contours, extru_vec, offset)
 
     def countour_fins_by_distance_between(self, distance, depth, offset=0, angle=0,
-                                          contour_vector=Vector3D(0, 0, 1),
+                                          contour_vector=Vector2D(0, 1),
                                           flip_side=False, tolerance=0):
         """Generate a list of Fac3D objects over this face (like louvers or fins).
 
@@ -1036,8 +1068,11 @@ class Face3D(Base2DIn3D):
                 Default is 0 for no offset.
             angle: A number for the for an angle to rotate the fins in radians.
                 Default is 0 for no rotation.
-            contour_vector: A Vector3D for the direction along which contours
-                are generated. Default is Z-Axis, which generates horizontal fins.
+            contour_vector: A Vector2D for the direction along which contours
+                are generated. This 2D vector will be interpreted into a 3D vector
+                within the plane of this Face. (0, 1) will usually generate
+                horizontal contours in 3D space, (1, 0) will generate vertical
+                contours, and (1, 1) will generate diagonal contours. Default: (0, 1).
             flip_side: Boolean to note whether the side the fins start from
                 should be flipped. Default is False to have contours on top or right.
                 Setting to True will start contours on the bottom or left.
@@ -1543,15 +1578,32 @@ class Face3D(Base2DIn3D):
             if self[vert_ind].is_equivalent(end_pt, tolerance):
                 found_other = True
         return new_verts
+    
+    def _diagonal_along_self(self, direction_vector, tolerance):
+        """Get the diagonal oriented along this face and always starts on the left."""
+        tol_pt = Point3D(1.0e-7, 1.0e-7, 1.0e-7)  # closer to Python tolerance than input
+        diagonal = LineSegment3D.from_end_points(self.min + tol_pt, self.max - tol_pt)
+        # invert the diagonal XY if it is not oriented with the face plane
+        if self._plane.distance_to_point(diagonal.p) > tolerance:
+            start = Point3D(diagonal.p1.x, diagonal.p2.y, diagonal.p1.z)
+            end = Point3D(diagonal.p2.x, diagonal.p1.y, diagonal.p2.z)
+            diagonal = LineSegment3D.from_end_points(start, end)
+        # flip if there's a horixzontal direction_vector to ensure always starts on left
+        if direction_vector.x != 0 and self.normal.y > 0:
+            diagonal = diagonal.flip()
+        return diagonal
 
     def _get_fin_extrusion_vector(self, depth, angle, contour_vector):
         """Get the vector with which to extrude fins."""
         extru_vec = self.plane.n * depth
         if angle != 0:
-            if contour_vector.x == 0 and contour_vector.y == 0:
-                axis = Vector3D(1, 0, 0)
-            else:
-                axis = Vector3D(contour_vector.y, -contour_vector.x, 0)
+            # interpret the complement of the 2D contour_vector into a 3D axis
+            cont_vec_complement = Vector2D(contour_vector.y, -contour_vector.x)
+            ref_plane = Plane(self._plane.n, Point3D(0, 0, 0), self._plane.x)
+            if ref_plane.y.z < 0:
+                ref_plane = ref_plane.rotate(ref_plane.n, math.pi, ref_plane.o)
+            axis = ref_plane.xy_to_xyz(cont_vec_complement).normalize()
+            # rotate the extrusion vector around the axis
             extru_vec = extru_vec.rotate(axis, angle)
         return extru_vec
 
