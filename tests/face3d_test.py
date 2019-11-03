@@ -1,6 +1,7 @@
 # coding=utf-8
 import pytest
 
+from ladybug_geometry.geometry2d.pointvector import Vector2D
 from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
 from ladybug_geometry.geometry3d.plane import Plane
 from ladybug_geometry.geometry3d.line import LineSegment3D
@@ -925,19 +926,17 @@ def test_countour_by_number():
     assert contours[0].p2.z == pytest.approx(2, rel=1e-3)
     assert contours[-1].p2.z == pytest.approx(0.5, rel=1e-3)
 
-    contours = face_1.countour_by_number(4, Vector3D(1))
-    assert len(contours) == 4
-    assert contours[0].p2.x == pytest.approx(2, rel=1e-3)
-    assert contours[-1].p2.x == pytest.approx(0.5, rel=1e-3)
-
-    contours = face_1.countour_by_number(4, Vector3D(1), True)
+    contours = face_1.countour_by_number(4, Vector2D(1))
     assert len(contours) == 4
     assert contours[-1].p2.x == pytest.approx(1.5, rel=1e-3)
-    assert round(contours[0].p2.x) == 0
+
+    contours = face_1.countour_by_number(4, Vector2D(1), True)
+    assert len(contours) == 4
+    assert contours[-1].p2.x == pytest.approx(0.5, rel=1e-3)
 
     contours = face_2.countour_by_number(4)
     assert len(contours) == 4
-    contours = face_2.countour_by_number(8, Vector3D(1))
+    contours = face_2.countour_by_number(8, Vector2D(1))
     assert len(contours) == 8
 
 
@@ -954,19 +953,17 @@ def test_countour_by_distance_between():
     assert contours[0].p2.z == pytest.approx(2, rel=1e-3)
     assert contours[-1].p2.z == pytest.approx(0.5, rel=1e-3)
 
-    contours = face_1.countour_by_distance_between(0.5, Vector3D(1))
-    assert len(contours) == 4
-    assert contours[0].p2.x == pytest.approx(2, rel=1e-3)
-    assert contours[-1].p2.x == pytest.approx(0.5, rel=1e-3)
-
-    contours = face_1.countour_by_distance_between(0.5, Vector3D(1), True)
+    contours = face_1.countour_by_distance_between(0.5, Vector2D(1))
     assert len(contours) == 4
     assert contours[-1].p2.x == pytest.approx(1.5, rel=1e-3)
-    assert round(contours[0].p2.x) == 0
+
+    contours = face_1.countour_by_distance_between(0.5, Vector2D(1), True)
+    assert len(contours) == 4
+    assert contours[-1].p2.x == pytest.approx(0.5, rel=1e-3)
 
     contours = face_2.countour_by_distance_between(0.5)
     assert len(contours) == 4
-    contours = face_2.countour_by_distance_between(0.5, Vector3D(1))
+    contours = face_2.countour_by_distance_between(0.5, Vector2D(1))
     assert len(contours) == 8
 
 
@@ -979,7 +976,7 @@ def test_countour_fins_by_number():
     fins = face_1.countour_fins_by_number(4, 0.5, 0.5)
     assert len(fins) == 4
 
-    fins = face_1.countour_fins_by_number(4, 0.5, 0.5, contour_vector=Vector3D(1))
+    fins = face_1.countour_fins_by_number(4, 0.5, 0.5, contour_vector=Vector2D(1))
     assert len(fins) == 4
 
     fins = face_1.countour_fins_by_number(4, 0.5, 0.5, math.pi/4)
@@ -998,11 +995,11 @@ def test_countour_fins_by_distance_between():
     assert len(fins) == 4
 
     fins = face_1.countour_fins_by_distance_between(0.25, 0.5, 0.5,
-                                                    contour_vector=Vector3D(1))
+                                                    contour_vector=Vector2D(1))
     assert len(fins) == 8
 
     fins = face_2.countour_fins_by_distance_between(0.5, 0.5, 0.5,
-                                                    contour_vector=Vector3D(1))
+                                                    contour_vector=Vector2D(1))
     assert len(fins) == 8
 
 
