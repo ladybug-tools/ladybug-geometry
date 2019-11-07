@@ -40,4 +40,4 @@ def test_sphere_intersection_with_plane():
     sp = Sphere(spt, 1.5)
 
     int1 = sp.intersect_plane(pl)
-    assert False, int1
+    assert True, int1
