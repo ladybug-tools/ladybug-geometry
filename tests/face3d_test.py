@@ -1144,26 +1144,26 @@ def test_sub_faces_by_ratio():
     assert sum(areas) == pytest.approx(face_2.area * 0.5, rel=1e-3)
 
 
-def test_sub_faces_by_dimensions():
-    """Test the sub_faces_by_dimensions method."""
-    pts_1 = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
-    pts_2 = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 1), Point3D(1, 1),
-             Point3D(1, 2), Point3D(0, 2))
-    plane = Plane(Vector3D(0, 0, 1))
-    face_1 = Face3D(pts_1, plane)
-    face_2 = Face3D(pts_2, plane)
-    window_height = 2
+def test_sub_faces_by_dimensions():
+    """Test the sub_faces_by_dimensions method."""
+    pts_1 = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
+    pts_2 = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 1), Point3D(1, 1),
+             Point3D(1, 2), Point3D(0, 2))
+    plane = Plane(Vector3D(0, 0, 1))
+    face_1 = Face3D(pts_1, plane)
+    face_2 = Face3D(pts_2, plane)
+    sub_face_height = 2
     sill_height = 1
     rect_height = 6
     wall_length = 4
 
-    sub_faces_1 = face_1.sub_faces_by_dimensions(
-        window_height, 6.0, wall_length, 1.0, sill_height, rect_height, None)
-    assert len(sub_faces_1) == 1
-    assert sub_faces_1[0].area == pytest.approx(face_1.area * 0.5, rel=1e-3)
+    sub_faces_1 = face_1.__sub_faces_by_dimensions(
+        sub_face_height, 6.0, wall_length, 1.0, sill_height, rect_height, None)
+    assert len(sub_faces_1) == 1
+    assert sub_faces_1[0].area == pytest.approx(face_1.area * 0.5, rel=1e-3)
 
-    sub_faces_2 = face_2.sub_faces_by_dimensions(
-        window_height, 6.0, wall_length, 1.0, sill_height, rect_height, None)
-    assert len(sub_faces_2) == 4
-    areas = [srf.area for srf in sub_faces_2]
-    assert sum(areas) == pytest.approx(face_2.area * 0.5, rel=1e-3)
+    sub_faces_2 = face_2.__sub_faces_by_dimensions(
+        sub_face_height, 6.0, wall_length, 1.0, sill_height, rect_height, None)
+    assert len(sub_faces_2) == 4
+    areas = [srf.area for srf in sub_faces_2]
+    assert sum(areas) == pytest.approx(face_2.area * 0.5, rel=1e-3)

@@ -1187,18 +1187,18 @@ class Face3D(Base2DIn3D):
             sub_faces.extend(face.sub_faces_by_ratio(ratio))
         return sub_faces
 
-    def sub_faces_by_dimensions(self, window_height, window_width, wall_length,
+    def __sub_faces_by_dimensions(self, sub_face_height, sub_face_width, wall_length,
                                 dist_breakup, sill_height, rect_height, changed_var):
         """Get a list of faces with a combined area equal to the glazing ratio
         times this face area. The glazing ratio is derived internally using the
-        specified window height and width along with other parameters.
+        specified sub face height and width along with other parameters.
 
         All sub faces will lie inside the boundaries of this face.
 
         Args:
-            height: window height
-            width: window width
-            wall_length: total length (width) of window wall
+            height: sub face height
+            width: sub face width
+            wall_length: total length (width) of sub face wall
             dist_breakup: distance by which main rectangle is meant to be 
                 divided up into points on the bottom
             sill_height: A number for the target height above the bottom edge of
@@ -1213,42 +1213,24 @@ class Face3D(Base2DIn3D):
         Returns:
             A list of Face3D objects for sub faces.
         """
-        win_height_final = window_height
-        if window_height > rect_height:
-            win_height_final = rect_height
+        sub_face_height_final = rect_height if sub_face_height > rect_height else sub_face_height
+        sill_height_final = 0 if sill_height < 0.01 * rect_height else rect_height-0.1 if sill_height > rect_height-0.1 else sill_height
 
-        sill_height_final = sill_height
-        if sill_height < 0.01 * rect_height:
-            sill_height_final = 0
-        elif sill_height > rect_height-0.1:
-            sill_height_final = rect_height-0.1
-
-        if win_height_final + sill_height_final > rect_height:
+        if sub_face_height_final + sill_height_final > rect_height:
             if changed_var == "sill_height_value":
-                win_height_final = rect_height - sill_height_final
+                sub_face_height_final = rect_height - sill_height_final
             else:
-                sill_height_final = rect_height - win_height_final
+                sill_height_final = rect_height - sub_face_height_final
 
         max_width_break_up = wall_length/2
-
-        if wall_length > dist_breakup/2:
-            num_divisions = round(wall_length/dist_breakup)
-        else:
-            num_divisions = 1
-        if window_width < max_width_break_up and num_divisions * window_width <= wall_length and num_divisions != 1:
-            if num_divisions == 1:
-                div_dist = wall_length/2
-            elif num_divisions * window_width + (num_divisions-1) * (dist_breakup - window_width) > wall_length:
+        num_divisions = round(wall_length/dist_breakup) if wall_length > dist_breakup/2 else 1
+        if sub_face_width < max_width_break_up and num_divisions * sub_face_width <= wall_length and num_divisions != 1:
+            div_dist = wall_length/2 if num_divisions == 1 else dist_breakup
+            if num_divisions * sub_face_width + (num_divisions-1) * (dist_breakup - sub_face_width) > wall_length:
                 num_divisions = math.floor(wall_length/dist_breakup)
-                div_dist = dist_breakup
-            else:
-                div_dist = dist_breakup
 
             is_odd = lambda num: num % 2
-            if is_odd(num_divisions) == 0:
-                start_pt_x = (num_divisions / 2) * div_dist
-            else:
-                start_pt_x = (math.floor(num_divisions / 2) + 0.5) * div_dist
+            start_pt_x = (num_divisions / 2) * div_dist if is_odd(num_divisions) == 0 else (math.floor(num_divisions / 2) + 0.5) * div_dist
 
             btm_div_pts = [[start_pt_x, 0, sill_height_final]]
             remainder = wall_length - (div_dist * num_divisions)
@@ -1259,61 +1241,37 @@ class Face3D(Base2DIn3D):
                 next_pt = (wall_length / 2) - total_dist
                 btm_div_pts.append([next_pt, 0, sill_height_final])
 
-            win_lines_start = []
-            pt_index = 0
-            for i in range(len(btm_div_pts)):
-                point = btm_div_pts[i]
-                if pt_index < num_divisions:
-                    win_lines_start.append([point, btm_div_pts[pt_index+1]])
-                    pt_index += 1
+            sub_face_lines_start = [[btm_div_pts[i], btm_div_pts[i+1]] for i in range(num_divisions)]
 
-            line_cent_pt = []
-            for i in range(len(win_lines_start)):
-                line = win_lines_start[i]
-                line_cent_pt.append([line[1][0]+((line[0][0]-line[1][0])/2), 0, line[0][2]])
-            if num_divisions != 1:
-                dist_cent_line = div_dist
-            else:
-                dist_cent_line = wall_length
+            line_cent_pt = [[line[1][0]+((line[0][0]-line[1][0])/2), 0, line[0][2]]
+                            for line in sub_face_lines_start]
+            dist_cent_line = div_dist if num_divisions != 1 else wall_length
 
-            win_line_scale = window_width / div_dist
+            sub_face_line_scale = sub_face_width / div_dist
 
-            for i in range(len(win_lines_start)):
-                line = win_lines_start[i]
-                line_center_pt = line_cent_pt[i]
-                new_start_pt = [line[0][0] - ((line[0][0]-line_center_pt[0])*(1-win_line_scale)), 0, line[0][2]]
-                new_end_pt = [line[1][0] + ((line_center_pt[0]-line[1][0])*(1-win_line_scale)), 0, line[0][2]]
-                win_lines_start[i] = [new_start_pt, new_end_pt]
+            sub_face_lines_start = [[[x[0][0] - ((x[0][0]-y[0])*(1-sub_face_line_scale)), 0, x[0][2]],[x[1][0] + ((y[0]-x[1][0])*(1-sub_face_line_scale)), 0, x[0][2]]]
+                                    for x, y in zip(sub_face_lines_start, line_cent_pt)]
 
-            glz_area = 0
-            final_glz_coords = []
-            for i in range(len(win_lines_start)):
-                line = win_lines_start[i]
-                window_coord = []
-                window_coord.append(line[1])
-                window_coord.append(line[0])
-                window_coord.append([line[0][0], 0, line[0][2] + win_height_final])
-                window_coord.append([line[1][0], 0, line[1][2] + win_height_final])
-                final_glz_coords.append(window_coord)
-                glz_area += win_height_final * window_width
+            final_glz_coords = [[line[1], line[0], [line[0][0], 0, line[0][2] + sub_face_height_final], [line[1][0], 0, line[1][2] + sub_face_height_final]]
+                                for line in sub_face_lines_start]
+            glz_area = sub_face_height_final * sub_face_width * len(sub_face_lines_start)
         else:
-            if window_width > wall_length:
-                window_width = wall_length
-            win_lines_start = [[wall_length/2, 0, sill_height_final],[-wall_length/2, 0, sill_height_final]]
+            if sub_face_width > wall_length:
+                sub_face_width = wall_length
+            sub_face_lines_start = [[wall_length/2, 0, sill_height_final],[-wall_length/2, 0, sill_height_final]]
 
             dist_cent_line = wall_length
-            win_line_scale = window_width / wall_length
+            sub_face_line_scale = sub_face_width / wall_length
             line_cent_pt = [0,0,0]
-            new_start_pt = [win_lines_start[0][0] - ((win_lines_start[0][0]-line_cent_pt[0])*(1-win_line_scale)), 0, win_lines_start[0][2]]
-            new_end_pt = [win_lines_start[1][0] + ((line_cent_pt[0]-win_lines_start[1][0])*(1-win_line_scale)), 0, win_lines_start[0][2]]
-            win_lines_start = [new_start_pt, new_end_pt]
+            new_start_pt = [sub_face_lines_start[0][0] - ((sub_face_lines_start[0][0]-line_cent_pt[0])*(1-sub_face_line_scale)), 0, sub_face_lines_start[0][2]]
+            new_end_pt = [sub_face_lines_start[1][0] + ((line_cent_pt[0]-sub_face_lines_start[1][0])*(1-sub_face_line_scale)), 0, sub_face_lines_start[0][2]]
+            sub_face_lines_start = [new_start_pt, new_end_pt]
 
-            glz_area = win_height_final * window_width
-            final_glz_coords = []
-            final_glz_coords[0].append(win_lines_start[1])
-            final_glz_coords[0].append(win_lines_start[0])
-            final_glz_coords[0].append([win_lines_start[0][0], 0, win_lines_start[0][2] + win_height_final])
-            final_glz_coords[0].append([win_lines_start[1][0], 0, win_lines_start[1][2] + win_height_final])
+            glz_area = sub_face_height_final * sub_face_width
+            final_glz_coords = [
+                sub_face_lines_start[1], sub_face_lines_start[0], [sub_face_lines_start[0][0], 0, sub_face_lines_start[0][2] + sub_face_height_final],
+                [sub_face_lines_start[1][0], 0, sub_face_lines_start[1][2] + sub_face_height_final]
+            ]
         glazing_ratio = glz_area/(wall_length * rect_height)
         return self.sub_faces_by_ratio(glazing_ratio)
 
