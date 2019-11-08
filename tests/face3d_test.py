@@ -1157,12 +1157,12 @@ def test_sub_faces_by_dimensions():
     rect_height = 6
     wall_length = 4
 
-    sub_faces_1 = face_1.__sub_faces_by_dimensions(
+    sub_faces_1 = face_1._sub_faces_by_dimensions(
         sub_face_height, 6.0, wall_length, 1.0, sill_height, rect_height, None)
     assert len(sub_faces_1) == 1
     assert sub_faces_1[0].area == pytest.approx(face_1.area * 0.5, rel=1e-3)
 
-    sub_faces_2 = face_2.__sub_faces_by_dimensions(
+    sub_faces_2 = face_2._sub_faces_by_dimensions(
         sub_face_height, 6.0, wall_length, 1.0, sill_height, rect_height, None)
     assert len(sub_faces_2) == 4
     areas = [srf.area for srf in sub_faces_2]

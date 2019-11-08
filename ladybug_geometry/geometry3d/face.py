@@ -1187,7 +1187,7 @@ class Face3D(Base2DIn3D):
             sub_faces.extend(face.sub_faces_by_ratio(ratio))
         return sub_faces
 
-    def __sub_faces_by_dimensions(self, sub_face_height, sub_face_width, wall_length,
+    def _sub_faces_by_dimensions(self, sub_face_height, sub_face_width, wall_length,
                                 dist_breakup, sill_height, rect_height, changed_var):
         """Get a list of faces with a combined area equal to the glazing ratio
         times this face area. The glazing ratio is derived internally using the
