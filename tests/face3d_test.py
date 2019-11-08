@@ -1152,10 +1152,10 @@ def test_sub_faces_by_dimensions():
     plane = Plane(Vector3D(0, 0, 1))
     face_1 = Face3D(pts_1, plane)
     face_2 = Face3D(pts_2, plane)
-    sub_face_height = 2
-    sill_height = 1
-    rect_height = 6
-    wall_length = 4
+    sub_face_height = 2.0
+    sill_height = 1.0
+    rect_height = 4.0
+    wall_length = 4.0
 
     sub_faces_1 = face_1._sub_faces_by_dimensions(
         sub_face_height, 6.0, wall_length, 1.0, sill_height, rect_height, None)
