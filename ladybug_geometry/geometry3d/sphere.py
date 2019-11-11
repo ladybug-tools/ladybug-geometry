@@ -117,7 +117,7 @@ class Sphere(object):
 
         Returns:
             Arc3D representing a full circle if it exists.
-            None if no intersection exists.
+            None if no full intersection exists.
         """
         r = self.radius
         pt_c = self.center
@@ -125,16 +125,15 @@ class Sphere(object):
         v_n = plane.n.normalize()
 
         # Resulting circle radius. Radius² = r² - [(c-p).n]²
-        v_d = ((pt_c + pt_o) * v_n)
-        d = v_d.magnitude  # d = plane.distance_to_point(self._center)
-        if r < d:  # No intersection if negative
+        d = (pt_o - pt_c).dot(v_n)
+        if abs(r) < abs(d):  # No intersection if (r ** 2 - d ** 2) negative
             return None
         cut_r = math.sqrt(r ** 2 - d ** 2)
         if cut_r == 0:  # Tangent intersection ignored - results in a point
             return None
 
-        # Resulting circle center point. Center_point = p - [(c-p).n]n
-        cut_center = pt_c + v_d * v_n
+        # Intersection circle center point. Center_point = p - [(c-p).n]n
+        cut_center = pt_c + (d * v_n)
         cut_plane = Plane(v_n, cut_center)
         return Arc3D(cut_plane, cut_r)
 

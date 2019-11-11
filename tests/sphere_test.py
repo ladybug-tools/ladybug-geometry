@@ -32,12 +32,11 @@ def test_sphere_intersection_with_line_ray():
 
 def test_sphere_intersection_with_plane():
     """Test the Sphere intersect_plane method."""
-    ppt = Point3D(-1.5, 0, 0)
-    vec = Vector3D(1, 0, 1)
-    pl = Plane(vec, ppt)
-    print pl
+    ppt = Point3D(-1.5, 0, 1.46)
+    vec = Vector3D(0.1, 0, 1)
+    pl = Plane(n=vec, o=ppt)
     spt = Point3D(0, 0, 0)
     sp = Sphere(spt, 1.5)
 
     int1 = sp.intersect_plane(pl)
-    assert True, int1
+    # assert False, int1
