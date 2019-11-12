@@ -3,6 +3,11 @@
 from __future__ import division
 
 from .geometry3d.pointvector import Point3D
+from .geometry3d.plane import Plane
+from .geometry3d.arc import Arc3D
+from .geometry3d.line import LineSegment3D
+
+import math
 
 
 def intersect_line3d_plane(line_ray, plane):
@@ -140,3 +145,73 @@ def closest_point3d_between_line3d_plane(line_ray, plane):
                            line_ray.p.z + u * line_ray.v.z)
         return close_pt, closest_point3d_on_plane(close_pt, plane)
     return None  # intersection
+
+
+def intersect_line3d_sphere3d(line_ray, sphere):
+    """Get the intersection between this Sphere3D object and a Ray2D/LineSegment2D.
+
+    Args:
+        line_ray: A LineSegment3D or Ray3D that will be extended infinitely
+            for intersection.
+        sphere: A Sphere3D to intersect.
+
+    Returns:
+        A list of 2 Point3D objects if a full intersection exists.
+        None if no full intersection exists.
+    """
+    L = line_ray
+    S = sphere
+    a = L.v.magnitude_squared
+    b = 2 * (L.v.x * (L.p.x - S.center.x) +
+             L.v.y * (L.p.y - S.center.y) +
+             L.v.z * (L.p.z - S.center.z))
+    c = S.center.magnitude_squared + \
+        L.p.magnitude_squared - \
+        2 * S.center.dot(L.p) - \
+        S.radius ** 2
+    det = b ** 2 - 4 * a * c
+    if det < 0:
+        return None
+    sq = math.sqrt(det)
+    u1 = (-b + sq) / (2 * a)
+    u2 = (-b - sq) / (2 * a)
+    if not L._u_in(u1):
+        u1 = max(min(u1, 1.0), 0.0)
+    if not L._u_in(u2):
+        u2 = max(min(u2, 1.0), 0.0)
+    return LineSegment3D.from_end_points(Point3D(L.p.x + u1 * L.v.x,
+                                                 L.p.y + u1 * L.v.y,
+                                                 L.p.z + u1 * L.v.z),
+                                         Point3D(L.p.x + u2 * L.v.x,
+                                                 L.p.y + u2 * L.v.y,
+                                                 L.p.z + u2 * L.v.z))
+
+
+def intersect_plane_sphere3d(plane, sphere):
+    """Get the intersection of a plane with this Sphere3D object
+
+    Args:
+        plane: A Plane object
+        sphere: A Sphere3D to intersect.
+
+    Returns:
+        Arc3D representing a full circle if it exists.
+        None if no full intersection exists.
+    """
+    r = sphere.radius
+    pt_c = sphere.center
+    pt_o = plane.o
+    v_n = plane.n.normalize()
+
+    # Resulting circle radius. Radius² = r² - [(c-p).n]²
+    d = (pt_o - pt_c).dot(v_n)
+    if abs(r) < abs(d):  # No intersection if (r ** 2 - d ** 2) negative
+        return None
+    cut_r = math.sqrt(r ** 2 - d ** 2)
+    if cut_r == 0:  # Tangent intersection ignored - results in a point
+        return None
+
+    # Intersection circle center point. Center_point = p - [(c-p).n]n
+    cut_center = pt_c + (d * v_n)
+    cut_plane = Plane(v_n, cut_center)
+    return Arc3D(cut_plane, cut_r)
