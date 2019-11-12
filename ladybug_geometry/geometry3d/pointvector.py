@@ -68,10 +68,10 @@ class Vector3D(object):
     def magnitude_squared(self):
         """Get the magnitude squared of the vector."""
         return self.x ** 2 + self.y ** 2 + self.z ** 2
-    
+
     def is_zero(self, tolerance=0):
         """Boolean to note whether the vector is within a given zero tolerance.
-        
+
         Args:
             tolerance: The tolerance below which the vector is considered to
                 be a zero vector.
@@ -321,6 +321,20 @@ class Point3D(Vector3D):
         * z
     """
     __slots__ = ()
+
+    @classmethod
+    def from_array(cls, array):
+        """Initialize a Point3D from an array.
+
+        Args:
+            array: A tuple or list with three numbers representing the x, y and z
+                values of the point.
+        """
+        return cls(array[0], array[1], array[2])
+
+    def to_array(self):
+        """Get Point3D as a tuple of three numbers"""
+        return (self.x, self.y, self.z)
 
     def move(self, moving_vec):
         """Get a point that has been moved along a vector.
