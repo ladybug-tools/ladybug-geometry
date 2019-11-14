@@ -3,9 +3,6 @@
 from __future__ import division
 
 from .geometry3d.pointvector import Point3D
-from .geometry3d.plane import Plane
-from .geometry3d.arc import Arc3D
-from .geometry3d.line import LineSegment3D
 
 import math
 
@@ -151,13 +148,14 @@ def intersect_line3d_sphere3d(line_ray, sphere):
     """Get the intersection between this Sphere3D object and a Ray2D/LineSegment2D.
 
     Args:
-        line_ray: A LineSegment3D or Ray3D that will be extended infinitely
-            for intersection.
+        line_ray: A LineSegment3D or Ray3D for intersection.
         sphere: A Sphere3D to intersect.
 
     Returns:
-        A list of 2 Point3D objects if a full intersection exists.
-        None if no full intersection exists.
+        Two Point3D objects if a full intersection exists.
+        A Point3D if a tangent intersection exists.
+        Will be None if no intersection exists.
+
     """
     L = line_ray
     S = sphere
@@ -179,12 +177,12 @@ def intersect_line3d_sphere3d(line_ray, sphere):
         u1 = max(min(u1, 1.0), 0.0)
     if not L._u_in(u2):
         u2 = max(min(u2, 1.0), 0.0)
-    return LineSegment3D.from_end_points(Point3D(L.p.x + u1 * L.v.x,
-                                                 L.p.y + u1 * L.v.y,
-                                                 L.p.z + u1 * L.v.z),
-                                         Point3D(L.p.x + u2 * L.v.x,
-                                                 L.p.y + u2 * L.v.y,
-                                                 L.p.z + u2 * L.v.z))
+    p1 = Point3D(L.p.x + u1 * L.v.x, L.p.y + u1 * L.v.y, L.p.z + u1 * L.v.z)
+    if u1 == u2:
+        return p1
+    else:
+        p2 = Point3D(L.p.x + u2 * L.v.x, L.p.y + u2 * L.v.y, L.p.z + u2 * L.v.z)
+        return p1, p2
 
 
 def intersect_plane_sphere3d(plane, sphere):
@@ -195,8 +193,14 @@ def intersect_plane_sphere3d(plane, sphere):
         sphere: A Sphere3D to intersect.
 
     Returns:
-        Arc3D representing a full circle if it exists.
-        None if no full intersection exists.
+        If a full intersection exists, three objects that represent
+
+        1) The center of the intersection circle
+        2) The normal vector of the intersection cirlce
+        3) The radius of the intersection circle
+
+        A Point3D Object if a tangent intersection exists
+        None if no intersection exists.
     """
     r = sphere.radius
     pt_c = sphere.center
@@ -208,10 +212,9 @@ def intersect_plane_sphere3d(plane, sphere):
     if abs(r) < abs(d):  # No intersection if (r ** 2 - d ** 2) negative
         return None
     cut_r = math.sqrt(r ** 2 - d ** 2)
-    if cut_r == 0:  # Tangent intersection ignored - results in a point
-        return None
 
     # Intersection circle center point. Center_point = p - [(c-p).n]n
     cut_center = pt_c + (d * v_n)
-    cut_plane = Plane(v_n, cut_center)
-    return Arc3D(cut_plane, cut_r)
+
+    return (cut_center, v_n, cut_r) if cut_r != 0 else \
+        cut_center
