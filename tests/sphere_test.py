@@ -7,6 +7,8 @@ from ladybug_geometry.geometry3d.plane import Plane
 from ladybug_geometry.geometry3d.line import LineSegment3D
 from ladybug_geometry.geometry3d.arc import Arc3D
 
+import math
+
 
 def test_sphere_init():
     """Test the initalization of Sphere3D objects and basic properties."""
@@ -18,6 +20,12 @@ def test_sphere_init():
     assert sp.center == Point3D(2, 0, 2)
     assert sp.radius == 3
     assert sp.to_dict()['center'] == (2, 0, 2)
+
+    sp2 = sp.rotate(Vector3D(0, 0, 1), math.pi, Point3D(0, 0, 0))
+    assert sp2.center.x == -2
+
+    sp3 = sp2.reflect(Vector3D(1, 0, 0), Point3D(0, 0, 0))
+    assert sp3.center.x == 2
 
 
 def test_sphere_intersection_with_line_ray():
@@ -31,6 +39,12 @@ def test_sphere_intersection_with_line_ray():
     int1 = sp.intersect_line_ray(seg)
     assert isinstance(int1, LineSegment3D)
     assert int1.p == Point3D(1.5, 0, 0)
+
+    lpt = Point3D(-2, 0, 1.5)
+    vec = Vector3D(4, 0, 0)
+    seg = LineSegment3D(lpt, vec)
+    int2 = sp.intersect_line_ray(seg)
+    assert isinstance(int2, Point3D)
 
 
 def test_sphere_intersection_with_plane():
@@ -46,6 +60,12 @@ def test_sphere_intersection_with_plane():
     ppt = Point3D(0, 0, 0)
     vec = Vector3D(0, 0, 1)
     pl = Plane(vec, ppt)
-    int1 = sp.intersect_plane(pl)
-    assert int1.c == ppt
-    assert int1.radius == 1.5
+    int2 = sp.intersect_plane(pl)
+    assert int2.c == ppt
+    assert int2.radius == 1.5
+
+    ppt = Point3D(0, 0, 1.5)
+    vec = Vector3D(0, 0, 1)
+    pl = Plane(vec, ppt)
+    int3 = sp.intersect_plane(pl)
+    assert int3 is None
