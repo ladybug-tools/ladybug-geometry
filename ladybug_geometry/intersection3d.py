@@ -126,8 +126,8 @@ def closest_point3d_between_line3d_plane(line_ray, plane):
     Returns:
         Two Point3D objects representing
 
-        1) The point on the line_ray that is closest to the plane
-        2) The point on the plane that is closest to the line_ray
+        1) The point on the line_ray that is closest to the plane.
+        2) The point on the plane that is closest to the line_ray.
 
         Will be None if there is an intersection between line_ray and the plane
     """
@@ -153,7 +153,7 @@ def intersect_line3d_sphere3d(line_ray, sphere):
 
     Returns:
         Two Point3D objects if a full intersection exists.
-        A Point3D if a tangent intersection exists.
+        A Point3D if a point of tangentcy exists.
         Will be None if no intersection exists.
 
     """
@@ -189,17 +189,17 @@ def intersect_plane_sphere3d(plane, sphere):
     """Get the intersection of a plane with this Sphere3D object
 
     Args:
-        plane: A Plane object
+        plane: A Plane object.
         sphere: A Sphere3D to intersect.
 
     Returns:
-        If a full intersection exists, three objects that represent
+        If a full intersection exists
 
-        1) The center of the intersection circle
-        2) The normal vector of the intersection cirlce
-        3) The radius of the intersection circle
+        1) A Point3D that represents the center of the intersection circle.
+        2) A Vector3D that represents the normal of the intersection cirlce.
+        3) A number that represents the radius of the intersection circle.
 
-        A Point3D Object if a tangent intersection exists
+        A Point3D Object if a point of tangentcy exists.
         None if no intersection exists.
     """
     r = sphere.radius
@@ -216,5 +216,4 @@ def intersect_plane_sphere3d(plane, sphere):
     # Intersection circle center point. Center_point = p - [(c-p).n]n
     cut_center = pt_c + (d * v_n)
 
-    return (cut_center, v_n, cut_r) if cut_r != 0 else \
-        cut_center
+    return (cut_center, v_n, cut_r) if cut_r != 0 else cut_center
