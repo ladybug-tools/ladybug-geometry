@@ -154,7 +154,7 @@ class Sphere3D(object):
         """Get the intersection of a plane with this Sphere3D object
 
         Args:
-            plane: A Plane object
+            plane: A Plane object.
 
         Returns:
             Arc3D representing a full circle if it exists.
@@ -191,7 +191,7 @@ class Sphere3D(object):
                 'radius': self.radius}
 
     def __copy__(self):
-        return self.Sphere3D(self.center, self.radius)
+        return Sphere3D(self.center, self.radius)
 
     def ToString(self):
         """Overwrite .NET ToString."""
