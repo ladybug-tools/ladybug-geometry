@@ -19,6 +19,12 @@ def test_sphere_init():
 
     assert sp.center == Point3D(2, 0, 2)
     assert sp.radius == 3
+    assert sp.min.z == -1
+    assert sp.max.z == 5
+    assert sp.diameter == 6
+    assert isinstance(sp.circumference, float)
+    assert isinstance(sp.area, float)
+    assert isinstance(sp.volume, float)
     assert sp.to_dict()['center'] == (2, 0, 2)
 
     sp2 = sp.rotate(Vector3D(0, 0, 1), math.pi, Point3D(0, 0, 0))
@@ -26,6 +32,25 @@ def test_sphere_init():
 
     sp3 = sp2.reflect(Vector3D(1, 0, 0), Point3D(0, 0, 0))
     assert sp3.center.x == 2
+
+    sp4 = sp3.move(Vector3D(2, 2, 2))
+    assert sp4.center.x == 4
+    assert int(sp4.center.y) == 2
+    assert int(sp4.center.z) == 4
+
+    d = sp4.to_dict()
+    sp4 = Sphere3D.from_dict(d)
+    assert sp4.center.x == 4
+
+    sp5 = sp4.rotate_xy(1.5, Point3D(0, 0, 0))
+    assert isinstance(sp5, Sphere3D)
+
+    sp6 = sp5.scale(2, pt)
+    assert sp6.radius == 6
+
+    sp7 = sp6.duplicate()
+    assert isinstance(sp7, Sphere3D)
+    print (sp7)
 
 
 def test_sphere_intersection_with_line_ray():
