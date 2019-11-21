@@ -42,8 +42,8 @@ class Base1DIn3D(object):
             "v": (10, 10, 0)
             }
         """
-        return cls(Point3D(data['p'][0], data['p'][1], data['p'][2]),
-                   Vector3D(data['v'][0], data['v'][1], data['v'][2]))
+        return cls(Point3D.from_array(data['p']),
+                   Vector3D.from_array(data['v']))
 
     @property
     def p(self):
@@ -120,8 +120,8 @@ class Base1DIn3D(object):
 
     def to_dict(self):
         """Get LineSegment3D/Ray3D as a dictionary."""
-        return {'p': (self.p.x, self.p.y, self.p.z),
-                'v': (self.v.x, self.v.y, self.v.z)}
+        return {'p': self.p.to_array(),
+                'v': self.v.to_array()}
 
     def __copy__(self):
         return self.__class__(self.p, self.v)

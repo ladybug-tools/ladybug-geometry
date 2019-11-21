@@ -65,7 +65,7 @@ class Polygon2D(Base2DIn2D):
             "vertices": [(0, 0), (10, 0), (0, 10)]
             }
         """
-        return cls(tuple(Point2D(pt[0], pt[1]) for pt in data['vertices']))
+        return cls(tuple(Point2D.from_array(pt) for pt in data['vertices']))
 
     @classmethod
     def from_rectangle(cls, base_point, height_vector, base, height):
@@ -644,7 +644,7 @@ class Polygon2D(Base2DIn2D):
     def to_dict(self):
         """Get Polygon2D as a dictionary."""
         return {'type': 'Polygon2D',
-                'vertices': [(pt.x, pt.y) for pt in self.vertices]}
+                'vertices': [pt.to_array() for pt in self.vertices]}
 
     @staticmethod
     def intersect_polygon_segments(polygon_list, tolerance):
@@ -675,7 +675,7 @@ class Polygon2D(Base2DIn2D):
                     Polygon2D.intersect_segments(polygon_list[i], polygon_list[j],
                                                  tolerance)
         return polygon_list
-    
+
     @staticmethod
     def intersect_segments(polygon1, polygon2, tolerance):
         """Intersect the line segments of two Polygon2Ds to ensure matching segments.
@@ -729,7 +729,7 @@ class Polygon2D(Base2DIn2D):
         polygon2 = Polygon2D(poly_points)
 
         return polygon1, polygon2
-    
+
     @staticmethod
     def overlapping_bounding_rect(polygon1, polygon2, tolerance):
         """Check if the bounding rectangles of two polygons overlap within a tolerance.

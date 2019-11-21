@@ -39,6 +39,16 @@ class Vector2D(object):
         """
         return cls(data['x'], data['y'])
 
+    @classmethod
+    def from_array(cls, array):
+        """Initialize a Vector2D/Point2D from an array.
+
+        Args:
+            array: A tuple or list with two numbers representing the x and y
+                values of the point.
+        """
+        return cls(array[0], array[1])
+
     @property
     def x(self):
         """Get the X coordinate."""
@@ -58,15 +68,15 @@ class Vector2D(object):
     def magnitude_squared(self):
         """Get the magnitude squared of the vector."""
         return self.x ** 2 + self.y ** 2
-    
+
     def is_zero(self, tolerance=0):
         """Boolean to note whether the vector is within a given zero tolerance.
-        
+
         Args:
             tolerance: The tolerance below which the vector is considered to
                 be a zero vector.
         """
-        return abs(self.x) <= tolerance and abs(self.y) <= tolerance 
+        return abs(self.x) <= tolerance and abs(self.y) <= tolerance
 
     def normalize(self):
         """Get a copy of the vector that is a unit vector (magnitude=1)."""
@@ -145,6 +155,10 @@ class Vector2D(object):
         return {'type': 'Vector2D',
                 'x': self.x,
                 'y': self.y}
+
+    def to_array(self):
+        """Get Vector2D/Point2D as a tuple of two numbers"""
+        return (self.x, self.y)
 
     def _cast_to_float(self, value):
         """Ensure that an input coordinate value is a float."""
