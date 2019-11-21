@@ -155,7 +155,7 @@ class Polyface3D(Base2DIn3D):
         face_indices = []  # collection of face indices
         for f in faces:
             ind = []
-            loops = [f.boundary] if not f.has_holes else [f.boundary] + f.holes
+            loops = (f.boundary,) if not f.has_holes else (f.boundary,) + f.holes
             for j, loop in enumerate(loops):
                 ind.append([])
                 for v in loop:
