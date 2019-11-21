@@ -83,7 +83,7 @@ class Mesh3D(MeshBase):
                 raise ImportError('Colors are specified in input Mesh2D dictionary '
                                   'but failed to import ladybug.color')
             colors = tuple(Color.from_dict(col) for col in data['colors'])
-        return cls(tuple(Point3D(pt[0], pt[1], pt[2]) for pt in data['vertices']),
+        return cls(tuple(Point3D.from_array(pt) for pt in data['vertices']),
                    data['faces'], colors)
 
     @classmethod
@@ -347,7 +347,7 @@ class Mesh3D(MeshBase):
     def to_dict(self):
         """Get Mesh3D as a dictionary."""
         base = {'type': 'Mesh3D',
-                'vertices': [(pt.x, pt.y, pt.z) for pt in self.vertices],
+                'vertices': [pt.to_array() for pt in self.vertices],
                 'faces': self.faces}
         if self.colors is not None:
             base['colors'] = [col.to_dict() for col in self.colors]
