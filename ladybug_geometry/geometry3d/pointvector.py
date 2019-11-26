@@ -44,6 +44,16 @@ class Vector3D(object):
         """
         return cls(data['x'], data['y'], data['z'])
 
+    @classmethod
+    def from_array(cls, array):
+        """Initialize a Vector3D/Point3D from an array.
+
+        Args:
+            array: A tuple or list with three numbers representing the x, y and z
+                values of the point.
+        """
+        return cls(array[0], array[1], array[2])
+
     @property
     def x(self):
         """Get the X coordinate."""
@@ -151,6 +161,10 @@ class Vector3D(object):
                 'x': self.x,
                 'y': self.y,
                 'z': self.z}
+
+    def to_array(self):
+        """Get Vector3D/Point3D as a tuple of three numbers"""
+        return (self.x, self.y, self.z)
 
     def _cast_to_float(self, value):
         """Ensure that an input coordinate value is a float."""
@@ -321,20 +335,6 @@ class Point3D(Vector3D):
         * z
     """
     __slots__ = ()
-
-    @classmethod
-    def from_array(cls, array):
-        """Initialize a Point3D from an array.
-
-        Args:
-            array: A tuple or list with three numbers representing the x, y and z
-                values of the point.
-        """
-        return cls(array[0], array[1], array[2])
-
-    def to_array(self):
-        """Get Point3D as a tuple of three numbers"""
-        return (self.x, self.y, self.z)
 
     def move(self, moving_vec):
         """Get a point that has been moved along a vector.

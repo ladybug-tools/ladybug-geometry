@@ -155,11 +155,11 @@ class Face3D(Base2DIn3D):
         holes = None
         if 'holes' in data and data['holes'] is not None:
             holes = tuple(tuple(
-                Point3D(pt[0], pt[1], pt[2]) for pt in hole) for hole in data['holes'])
+                Point3D.from_array(pt) for pt in hole) for hole in data['holes'])
         plane = None
         if 'plane' in data and data['plane'] is not None:
             plane = Plane.from_dict(data['plane'])
-        return cls(tuple(Point3D(pt[0], pt[1], pt[2]) for pt in data['boundary']),
+        return cls(tuple(Point3D.from_array(pt) for pt in data['boundary']),
                    plane, holes)
 
     @classmethod
@@ -1439,14 +1439,14 @@ class Face3D(Base2DIn3D):
         """
         base = {'type': 'Face3D'}
         if not enforce_upper_left:
-            base['boundary'] = [(pt.x, pt.y, pt.z) for pt in self.boundary]
+            base['boundary'] = [pt.to_array() for pt in self.boundary]
         else:
-            base['boundary'] = [(pt.x, pt.y, pt.z) for pt in
+            base['boundary'] = [pt.to_array() for pt in
                                 self.upper_left_counter_clockwise_boundary]
         if include_plane:
             base['plane'] = self.plane.to_dict()
         if self.has_holes:
-            base['holes'] = [[(pt.x, pt.y, pt.z) for pt in hole]
+            base['holes'] = [[pt.to_array() for pt in hole]
                              for hole in self.holes]
         return base
 
@@ -1578,7 +1578,7 @@ class Face3D(Base2DIn3D):
             if self[vert_ind].is_equivalent(end_pt, tolerance):
                 found_other = True
         return new_verts
-    
+
     def _diagonal_along_self(self, direction_vector, tolerance):
         """Get the diagonal oriented along this face and always starts on the left."""
         tol_pt = Point3D(1.0e-7, 1.0e-7, 1.0e-7)  # closer to Python tolerance than input

@@ -135,7 +135,7 @@ class Polyface3D(Base2DIn3D):
         else:
             edge_information = None
 
-        return cls(tuple(Point3D(pt[0], pt[1], pt[2]) for pt in data['vertices']),
+        return cls(tuple(Point3D.from_array(pt) for pt in data['vertices']),
                    data['face_indices'], edge_information)
 
     @classmethod
@@ -770,10 +770,10 @@ class Polyface3D(Base2DIn3D):
                 it is de-serialized. Default True.
         """
         base = {'type': 'Polyface3D',
-                'vertices': [(v.x, v.y, v.z) for v in self.vertices],
+                'vertices': [v.to_array() for v in self.vertices],
                 'face_indices': self.face_indices}
         if include_edge_information:
-                base['edge_information'] = self.edge_information
+            base['edge_information'] = self.edge_information
         return base
 
     def _get_edge_type(self, edge_type):

@@ -41,8 +41,8 @@ class Base1DIn2D(object):
             "v": (10, 10)
             }
         """
-        return cls(Point2D(data['p'][0], data['p'][1]),
-                   Vector2D(data['v'][0], data['v'][1]))
+        return cls(Point2D.from_array(data['p']),
+                   Vector2D.from_array(data['v']))
 
     @property
     def p(self):
@@ -95,8 +95,8 @@ class Base1DIn2D(object):
 
     def to_dict(self):
         """Get LineSegment2D/Ray2D as a dictionary."""
-        return {'p': (self.p.x, self.p.y),
-                'v': (self.v.x, self.v.y)}
+        return {'p': self.p.to_array(),
+                'v': self.v.to_array()}
 
     def __copy__(self):
         return self.__class__(self.p, self.v)

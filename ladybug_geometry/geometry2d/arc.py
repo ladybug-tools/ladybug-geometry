@@ -67,7 +67,7 @@ class Arc2D(object):
             "a2": 3.14159
             }
         """
-        return cls(Point2D(data['c'][0], data['c'][1]),
+        return cls(Point2D.from_array(data['c']),
                    data['r'], data['a1'], data['a2'])
 
     @classmethod
@@ -374,7 +374,7 @@ class Arc2D(object):
 
     def to_dict(self):
         """Get Arc2D as a dictionary."""
-        return {'type': 'Arc2D', 'c': (self.c.x, self.c.y),
+        return {'type': 'Arc2D', 'c': self.c.to_array(),
                 'r': self.r, 'a1': self.a1, 'a2': self.a2}
 
     def _pt_in(self, point):
