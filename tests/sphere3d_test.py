@@ -27,6 +27,20 @@ def test_sphere_init():
     assert isinstance(sp.volume, float)
 
 
+def test_equality():
+    """Test the equality of Polygon2D objects."""
+    sphere = Sphere3D(Point3D(2, 0, 2), 3)
+    sphere_dup = sphere.duplicate()
+    sphere_alt = Sphere3D(Point3D(2, 0.1, 2), 3)
+
+    assert sphere is sphere
+    assert sphere is not sphere_dup
+    assert sphere == sphere_dup
+    assert hash(sphere) == hash(sphere_dup)
+    assert sphere != sphere_alt
+    assert hash(sphere) != hash(sphere_alt)
+
+
 def test_sphere_to_from_dict():
     """Test the Sphere3D to_dict and from_dict methods."""
     sp = Sphere3D(Point3D(4, 0, 2), 3)

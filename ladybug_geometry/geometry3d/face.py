@@ -1730,6 +1730,16 @@ class Face3D(Base2DIn3D):
         _new_face._mesh2d = self._mesh2d
         _new_face._mesh3d = self._mesh3d
         return _new_face
+    
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return tuple(hash(pt) for pt in self._vertices) + (hash(self._plane),)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return isinstance(other, Face3D) and self.__key() == other.__key()
 
     def __repr__(self):
         return 'Face3D ({} vertices)'.format(len(self))

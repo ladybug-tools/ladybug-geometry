@@ -45,6 +45,23 @@ def test_face3d_init():
     assert face.vertices[0] == face[0]
 
 
+def test_equality():
+    """Test the equality of Face3D objects."""
+    pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
+    pts_2 = (Point3D(0.1, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
+    plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+    face = Face3D(pts, plane)
+    face_dup = face.duplicate()
+    face_alt = Face3D(pts_2, plane)
+
+    assert face is face
+    assert face is not face_dup
+    assert face == face_dup
+    assert hash(face) == hash(face_dup)
+    assert face != face_alt
+    assert hash(face) != hash(face_alt)
+
+
 def test_face3d_to_from_dict():
     """Test the to/from dict of Face3D objects."""
     pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))

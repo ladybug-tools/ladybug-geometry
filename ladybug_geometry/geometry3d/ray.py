@@ -98,15 +98,19 @@ class Ray3D(Base1DIn3D):
 
     def _u_in(self, u):
         return u >= 0.0
+    
+    def __copy__(self):
+        return Ray3D(self.p, self.v)
+
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return (hash(self.p), hash(self.v))
+
+    def __hash__(self):
+        return hash(self.__key())
 
     def __eq__(self, other):
-        if isinstance(other, Ray3D):
-            return self.p == other.p and self.v == other.v
-        else:
-            return False
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
+        return isinstance(other, Ray3D) and self.__key() == other.__key()
 
     def __repr__(self):
         return 'Ray3D (point <%.2f, %.2f, %.2f>) (vector <%.2f, %.2f, %.2f>)' % \

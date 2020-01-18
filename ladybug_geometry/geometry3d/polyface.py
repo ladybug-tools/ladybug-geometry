@@ -33,14 +33,13 @@ class Polyface3D(Base2DIn3D):
             should be formatted as a dictionary with two keys as follows:
 
             *   'edge_indices':
-                A list of tuple objects that each contain two integers.
+                An array objects that each contain two integers.
                 These integers correspond to indices within the vertices list and
                 each tuple represents a line sengment for an edge of the polyface.
             *   'edge_types':
-                A list of integers for each edge that parallels
-                the edge_indices list. An integer of 0 denotes a naked edge, an
-                integer of 1 denotes an internal edge. Anything higher is a
-                non-manifold edge.
+                An array of integers for each edge that parallels the edge_indices
+                list. An integer of 0 denotes a naked edge, an integer of 1
+                denotes an internal edge. Anything higher is a non-manifold edge.
 
     Properties:
         * vertices
@@ -807,6 +806,17 @@ class Polyface3D(Base2DIn3D):
         _new_poly = Polyface3D(self.vertices, self.face_indices, self.edge_information)
         _new_poly._faces = self._faces
         return _new_poly
+    
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return tuple(hash(pt) for pt in self._vertices) + \
+            tuple(hash(face) for face in self._face_indices)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return isinstance(other, Polyface3D) and self.__key() == other.__key()
 
     def __repr__(self):
         return 'Polyface3D ({} faces) ({} vertices)'.format(

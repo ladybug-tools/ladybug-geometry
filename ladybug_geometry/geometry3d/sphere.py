@@ -187,11 +187,25 @@ class Sphere3D(object):
 
     def to_dict(self):
         """Get Sphere as a dictionary."""
-        return {'type': 'Sphere3D', 'center': self.center.to_array(),
+        return {'type': 'Sphere3D',
+                'center': self.center.to_array(),
                 'radius': self.radius}
 
     def __copy__(self):
-        return Sphere3D(self.center, self.radius)
+        return Sphere3D(self._center, self._radius)
+
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return (self._center, self._radius)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return isinstance(other, Sphere3D) and self.__key() == other.__key()
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def ToString(self):
         """Overwrite .NET ToString."""

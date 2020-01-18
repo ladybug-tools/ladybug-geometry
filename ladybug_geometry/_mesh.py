@@ -331,13 +331,30 @@ class MeshBase(object):
         return vertices, face_collector
 
     def __len__(self):
-        return len(self.vertices)
+        return len(self._vertices)
 
     def __getitem__(self, key):
-        return self.vertices[key]
+        return self._vertices[key]
 
     def __iter__(self):
-        return iter(self.vertices)
+        return iter(self._vertices)
+
+    def __copy__(self):
+        return MeshBase(self._vertices, self._faces, self._colors)
+
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return tuple(hash(pt) for pt in self._vertices) + \
+            tuple(hash(face) for face in self._faces)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return isinstance(other, MeshBase) and self.__key() == other.__key()
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def ToString(self):
         """Overwrite .NET ToString."""

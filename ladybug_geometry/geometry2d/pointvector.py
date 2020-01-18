@@ -187,11 +187,16 @@ class Vector2D(object):
     def __copy__(self):
         return self.__class__(self.x, self.y)
 
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return (self.x, self.y)
+
+    def __hash__(self):
+        return hash(self.__key())
+
     def __eq__(self, other):
-        if isinstance(other, (Vector2D, Point2D)):
-            return self.x == other.x and self.y == other.y
-        else:
-            return False
+        return isinstance(other, (Vector2D, Point2D)) and \
+            self.__key() == other.__key()
 
     def __ne__(self, other):
         return not self.__eq__(other)

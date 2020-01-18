@@ -324,7 +324,20 @@ class Arc3D(object):
         return Plane(n, pt1)
 
     def __copy__(self):
-        return self.__class__(self.plane, self.radius, self.a1, self.a2)
+        return Arc3D(self.plane, self.radius, self.a1, self.a2)
+
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return (hash(self.plane), self.radius, self.a1, self.a2)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return isinstance(other, Arc3D) and self.__key() == other.__key()
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def ToString(self):
         """Overwrite .NET ToString."""

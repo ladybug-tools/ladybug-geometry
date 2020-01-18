@@ -31,6 +31,20 @@ def test_vector3_init():
     assert norm_vec.magnitude == 1
 
 
+def test_equality():
+    """Test the equality of Point3D objects."""
+    pt_1 = Point3D(0, 2, 1)
+    pt_1_dup = pt_1.duplicate()
+    pt_1_alt = Point3D(0.1, 2, 1)
+
+    assert pt_1 is pt_1
+    assert pt_1 is not pt_1_dup
+    assert pt_1 == pt_1_dup
+    assert hash(pt_1) == hash(pt_1_dup)
+    assert pt_1 != pt_1_alt
+    assert hash(pt_1) != hash(pt_1_alt)
+
+
 def test_vector3_to_from_dict():
     """Test the initalization of Vector3D objects and basic properties."""
     vec = Vector3D(0, 2, 0)

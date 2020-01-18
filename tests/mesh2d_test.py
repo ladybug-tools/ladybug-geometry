@@ -40,6 +40,22 @@ def test_mesh2d_init():
         assert len(vf) == 1
 
 
+def test_equality():
+    """Test the equality of Polygon2D objects."""
+    pts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0))
+    pts_2 = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0.1))
+    mesh = Mesh2D(pts, [(0, 1, 2, 3)])
+    mesh_dup = mesh.duplicate()
+    mesh_alt = Mesh2D(pts_2, [(0, 1, 2, 3)])
+
+    assert mesh is mesh
+    assert mesh is not mesh_dup
+    assert mesh == mesh_dup
+    assert hash(mesh) == hash(mesh_dup)
+    assert mesh != mesh_alt
+    assert hash(mesh) != hash(mesh_alt)
+
+
 def test_mesh2d_to_from_dict():
     """Test the to/from dict of Mesh2D objects."""
     pts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0))

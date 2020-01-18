@@ -361,13 +361,20 @@ class Plane(object):
                 'x': self.x.to_array()}
 
     def __copy__(self):
-        return self.__class__(self.n, self.o)
+        return Plane(self.n, self.o, self.x)
+
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return (self.n, self.o, self.x)
+
+    def __hash__(self):
+        return hash(self.__key())
 
     def __eq__(self, other):
-        if isinstance(other, Plane):
-            return self.n == other.n and self.o == other.o and self.x == other.x
-        else:
-            return False
+        return isinstance(other, Plane) and self.__key() == other.__key()
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def ToString(self):
         """Overwrite .NET ToString."""

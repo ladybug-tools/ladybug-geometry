@@ -28,6 +28,22 @@ def test_linesegment3d_init():
     assert flip_seg.v == Vector3D(0, -2, 0)
 
 
+def test_equality():
+    """Test the equality of LineSegement3D objects."""
+    pt = Point3D(2, 0, 2)
+    vec = Vector3D(0, 2, 0)
+    seg = LineSegment3D(pt, vec)
+    seg_dup = seg.duplicate()
+    seg_alt = LineSegment3D(Point3D(2, 0.1, 2), vec)
+
+    assert seg is seg
+    assert seg is not seg_dup
+    assert seg == seg_dup
+    assert hash(seg) == hash(seg_dup)
+    assert seg != seg_alt
+    assert hash(seg) != hash(seg_alt)
+
+
 def test_linesegment3_to_from_dict():
     """Test the to/from dict of LineSegment3D objects."""
     pt = Point3D(2, 0, 2)
@@ -65,8 +81,8 @@ def test_init_from_sdl():
     assert seg.length == 2
 
 
-def test_linesegment3d_mutability():
-    """Test the mutability and immutability of LineSegment3D objects."""
+def test_linesegment3d_immutability():
+    """Test the immutability of LineSegment3D objects."""
     pt = Point3D(2, 0, 0)
     vec = Vector3D(0, 2, 0)
     seg = LineSegment3D(pt, vec)

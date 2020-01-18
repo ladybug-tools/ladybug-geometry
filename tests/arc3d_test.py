@@ -153,6 +153,21 @@ def test_arc3_to_from_dict():
     assert new_arc.to_dict() == arc_dict
 
 
+def test_equality():
+    """Test the equality of Arc3D objects."""
+    pt = Point3D(2, 0, 2)
+    arc = Arc3D(Plane(o=pt), 1, 0, math.pi)
+    arc_dup = arc.duplicate()
+    arc_alt = Arc3D(Plane(o=Point3D(2, 0.1, 2)), 1, 0.1, math.pi)
+
+    assert arc is arc
+    assert arc is not arc_dup
+    assert arc == arc_dup
+    assert hash(arc) == hash(arc_dup)
+    assert arc != arc_alt
+    assert hash(arc) != hash(arc_alt)
+
+
 def test_move():
     """Test the Arc3D move method."""
     pt = Point3D(2, 0, 0)

@@ -39,6 +39,22 @@ def test_mesh3d_init():
         assert len(vf) == 1
 
 
+def test_equality():
+    """Test the equality of Mesh3D objects."""
+    pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
+    pts_2 = (Point3D(0.1, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
+    mesh = Mesh3D(pts, [(0, 1, 2, 3)])
+    mesh_dup = mesh.duplicate()
+    mesh_alt = Mesh3D(pts_2, [(0, 1, 2, 3)])
+
+    assert mesh is mesh
+    assert mesh is not mesh_dup
+    assert mesh == mesh_dup
+    assert hash(mesh) == hash(mesh_dup)
+    assert mesh != mesh_alt
+    assert hash(mesh) != hash(mesh_alt)
+
+
 def test_mesh3d_to_from_dict():
     """Test the to/from dict of Mesh3D objects."""
     pts = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
