@@ -37,6 +37,22 @@ def test_polygon2d_init():
     assert polygon.vertices[0] == polygon[0]
 
 
+def test_equality():
+    """Test the equality of Polygon2D objects."""
+    pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+    pts_2 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0.1, 2))
+    polygon = Polygon2D(pts)
+    polygon_dup = polygon.duplicate()
+    polygon_alt = Polygon2D(pts_2)
+
+    assert polygon is polygon
+    assert polygon is not polygon_dup
+    assert polygon == polygon_dup
+    assert hash(polygon) == hash(polygon_dup)
+    assert polygon != polygon_alt
+    assert hash(polygon) != hash(polygon_alt)
+
+
 def test_polygon2d_to_from_dict():
     """Test the to/from dict of Polygon2D objects."""
     pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))

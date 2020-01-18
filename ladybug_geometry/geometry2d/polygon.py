@@ -831,8 +831,17 @@ class Polygon2D(Base2DIn2D):
         return _a < 0
 
     def __copy__(self):
-        _new_poly = Polygon2D(self.vertices)
-        return _new_poly
+        return Polygon2D(self._vertices)
+
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return tuple(hash(pt) for pt in self._vertices)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return isinstance(other, Polygon2D) and self.__key() == other.__key()
 
     def __repr__(self):
         return 'Polygon2D ({} vertices)'.format(len(self))

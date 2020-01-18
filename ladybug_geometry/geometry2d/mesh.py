@@ -605,6 +605,17 @@ class Mesh2D(MeshBase):
         _new_mesh._centroid = self._centroid
         return _new_mesh
 
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return tuple(hash(pt) for pt in self._vertices) + \
+            tuple(hash(face) for face in self._faces)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return isinstance(other, Mesh2D) and self.__key() == other.__key()
+
     def __repr__(self):
         return 'Ladybug Mesh2D ({} faces) ({} vertices)'.format(
             len(self.faces), len(self))

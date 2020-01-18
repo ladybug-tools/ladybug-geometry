@@ -22,6 +22,22 @@ def test_ray3d_init():
     assert flip_ray.v == Vector3D(0, -2, 0)
 
 
+def test_equality():
+    """Test the equality of Ray3D objects."""
+    pt = Point3D(2, 0, 2)
+    vec = Vector3D(0, 2, 0)
+    ray = Ray3D(pt, vec)
+    ray_dup = ray.duplicate()
+    ray_alt = Ray3D(Point3D(2, 0.1, 2), vec)
+
+    assert ray is ray
+    assert ray is not ray_dup
+    assert ray == ray_dup
+    assert hash(ray) == hash(ray_dup)
+    assert ray != ray_alt
+    assert hash(ray) != hash(ray_alt)
+
+
 def test_ray3_to_from_dict():
     """Test the to/from dict of Ray3D objects."""
     pt = Point3D(2, 0, 2)
@@ -33,7 +49,7 @@ def test_ray3_to_from_dict():
     assert new_ray.to_dict() == ray_dict
 
 
-def test_linerayment2_mutability():
+def test_ray3d_immutability():
     """Test the immutability of Ray3D objects."""
     pt = Point3D(2, 0, 0)
     vec = Vector3D(0, 2, 0)

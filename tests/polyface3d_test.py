@@ -42,6 +42,26 @@ def test_polyface3d_init_solid():
     assert polyface.faces[5].normal == Vector3D(0, 0, 1)
 
 
+def test_equality():
+    """Test the equality of Polyface3D objects."""
+    pts = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0),
+           Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2)]
+    face_indices = [[(0, 1, 2, 3)], [(0, 4, 5, 1)], [(0, 3, 7, 4)],
+                    [(2, 1, 5, 6)], [(2, 3, 7, 6)], [(4, 5, 6, 7)]]
+    face_indices_2 = [[(0, 1, 2, 3)], [(0, 4, 5, 1)], [(0, 3, 7, 4)],
+                      [(2, 1, 5, 6)], [(2, 3, 7, 6)]]
+    polyface = Polyface3D(pts, face_indices)
+    polyface_dup = polyface.duplicate()
+    polyface_alt = Polyface3D(pts, face_indices_2)
+
+    assert polyface is polyface
+    assert polyface is not polyface_dup
+    assert polyface == polyface_dup
+    assert hash(polyface) == hash(polyface_dup)
+    assert polyface != polyface_alt
+    assert hash(polyface) != hash(polyface_alt)
+
+
 def test_polyface3d_init_open():
     """Test the initalization of Poyface3D and basic properties of open objects."""
     pts = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0),

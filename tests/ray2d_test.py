@@ -33,8 +33,8 @@ def test_ray2_to_from_dict():
     assert new_ray.to_dict() == ray_dict
 
 
-def test_ray2d_mutability():
-    """Test the mutability and immutability of Ray2D objects."""
+def test_ray2d_immutability():
+    """Test the immutability of Ray2D objects."""
     pt = Point2D(2, 0)
     vec = Vector2D(0, 2)
     ray = Ray2D(pt, vec)
@@ -52,6 +52,22 @@ def test_ray2d_mutability():
     ray_copy = ray.duplicate()
     assert ray.p == ray_copy.p
     assert ray.v == ray_copy.v
+
+
+def test_equality():
+    """Test the equality of Ray2D objects."""
+    pt = Point2D(2, 0)
+    vec = Vector2D(0, 2)
+    ray = Ray2D(pt, vec)
+    ray_dup = ray.duplicate()
+    ray_alt = Ray2D(Point2D(2, 0.1), vec)
+
+    assert ray is ray
+    assert ray is not ray_dup
+    assert ray == ray_dup
+    assert hash(ray) == hash(ray_dup)
+    assert ray != ray_alt
+    assert hash(ray) != hash(ray_alt)
 
 
 def test_move():

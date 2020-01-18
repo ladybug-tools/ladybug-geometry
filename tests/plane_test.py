@@ -40,6 +40,22 @@ def test_plane_init():
     assert plane_flip.k == 0
 
 
+def test_equality():
+    """Test the equality of Plane objects."""
+    pt = Point3D(2, 0, 2)
+    vec = Vector3D(0, 2, 0)
+    plane = Plane(vec, pt)
+    plane_dup = plane.duplicate()
+    plane_alt = Plane(vec, Point3D(2, 0.1, 2))
+
+    assert plane is plane
+    assert plane is not plane_dup
+    assert plane == plane_dup
+    assert hash(plane) == hash(plane_dup)
+    assert plane != plane_alt
+    assert hash(plane) != hash(plane_alt)
+
+
 def test_plane_to_from_dict():
     """Test the initalization of Plane objects and basic properties."""
     pt = Point3D(2, 0, 2)

@@ -88,16 +88,29 @@ class Base2DIn2D(object):
         return vertices
 
     def __len__(self):
-        return len(self.vertices)
+        return len(self._vertices)
 
     def __getitem__(self, key):
-        return self.vertices[key]
+        return self._vertices[key]
 
     def __iter__(self):
-        return iter(self.vertices)
+        return iter(self._vertices)
 
     def __copy__(self):
         return Base2DIn2D(self._vertices)
+
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return tuple(hash(pt) for pt in self._vertices)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return isinstance(other, Base2DIn2D) and self.__key() == other.__key()
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def ToString(self):
         """Overwrite .NET ToString."""

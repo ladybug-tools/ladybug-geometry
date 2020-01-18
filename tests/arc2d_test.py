@@ -146,6 +146,21 @@ def test_arc2_to_from_dict():
     assert new_arc.to_dict() == arc_dict
 
 
+def test_equality():
+    """Test the equality of Arc2D objects."""
+    pt = Point2D(2, 0)
+    arc = Arc2D(pt, 1, 0, math.pi)
+    arc_dup = arc.duplicate()
+    arc_alt = Arc2D(pt, 1, 0.1, math.pi)
+
+    assert arc is arc
+    assert arc is not arc_dup
+    assert arc == arc_dup
+    assert hash(arc) == hash(arc_dup)
+    assert arc != arc_alt
+    assert hash(arc) != hash(arc_alt)
+
+
 def test_move():
     """Test the Arc2D move method."""
     pt = Point2D(2, 0)

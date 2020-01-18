@@ -77,14 +77,15 @@ class Ray2D(Base1DIn2D):
     def _u_in(self, u):
         return u >= 0.0
 
-    def __eq__(self, other):
-        if isinstance(other, Ray2D):
-            return self.p == other.p and self.v == other.v
-        else:
-            return False
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return (hash(self.p), hash(self.v))
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return isinstance(other, Ray2D) and self.__key() == other.__key()
 
     def __repr__(self):
         return 'Ray2D (point <%.2f, %.2f>) (vector <%.2f, %.2f>)' % \

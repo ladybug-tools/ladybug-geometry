@@ -101,6 +101,19 @@ class Base1DIn2D(object):
     def __copy__(self):
         return self.__class__(self.p, self.v)
 
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return (hash(self.p), hash(self.v))
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return isinstance(other, Base1DIn2D) and self.__key() == other.__key()
+    
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def ToString(self):
         """Overwrite .NET ToString."""
         return self.__repr__()

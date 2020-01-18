@@ -65,8 +65,8 @@ def test_init_from_sdl():
     assert seg.length == 2
 
 
-def test_linesegment2_mutability():
-    """Test the mutability and immutability of LineSegement2D objects."""
+def test_linesegment2_immutability():
+    """Test the immutability of LineSegement2D objects."""
     pt = Point2D(2, 0)
     vec = Vector2D(0, 2)
     seg = LineSegment2D(pt, vec)
@@ -84,6 +84,22 @@ def test_linesegment2_mutability():
     seg_copy = seg.duplicate()
     assert seg.p == seg_copy.p
     assert seg.v == seg_copy.v
+
+
+def test_equality():
+    """Test the equality of LineSegement2D objects."""
+    pt = Point2D(2, 0)
+    vec = Vector2D(0, 2)
+    seg = LineSegment2D(pt, vec)
+    seg_dup = seg.duplicate()
+    seg_alt = LineSegment2D(Point2D(2, 0.1), vec)
+
+    assert seg is seg
+    assert seg is not seg_dup
+    assert seg == seg_dup
+    assert hash(seg) == hash(seg_dup)
+    assert seg != seg_alt
+    assert hash(seg) != hash(seg_alt)
 
 
 def test_move():

@@ -63,8 +63,22 @@ def test_distance_to_point():
     assert pt_1.distance_to_point(pt_2) == 2
 
 
+def test_equality():
+    """Test the equality of Point2D objects."""
+    pt_1 = Point2D(0, 2)
+    pt_1_dup = pt_1.duplicate()
+    pt_1_alt = Point2D(0.1, 2)
+
+    assert pt_1 is pt_1
+    assert pt_1 is not pt_1_dup
+    assert pt_1 == pt_1_dup
+    assert hash(pt_1) == hash(pt_1_dup)
+    assert pt_1 != pt_1_alt
+    assert hash(pt_1) != hash(pt_1_alt)
+
+
 def test_is_equivalent():
-    """Test the is_equivalent method."""
+    """Test the is_equivalent method using tolerances."""
     pt_1 = Point2D(0, 2)
     pt_2 = Point2D(0.00001, 2)
     pt_3 = Point2D(0, 1)

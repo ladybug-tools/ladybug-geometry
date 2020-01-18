@@ -212,12 +212,19 @@ class LineSegment3D(Base1DIn3D):
 
     def __abs__(self):
         return abs(self.v)
+    
+    def __copy__(self):
+        return LineSegment3D(self.p, self.v)
+
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return (hash(self.p), hash(self.v))
+
+    def __hash__(self):
+        return hash(self.__key())
 
     def __eq__(self, other):
-        if isinstance(other, LineSegment3D):
-            return self.p == other.p and self.v == other.v
-        else:
-            return False
+        return isinstance(other, LineSegment3D) and self.__key() == other.__key()
 
     def __repr__(self):
         return 'LineSegment3D (<%.2f, %.2f, %.2f> to <%.2f, %.2f, %.2f>)' % \
