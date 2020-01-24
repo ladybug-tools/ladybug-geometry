@@ -1260,16 +1260,14 @@ class Face3D(Base2DIn3D):
                                          for i, pt in enumerate(btm_div_pts[:-1]))
             # scale the line segments along their center points
             line_cent_pt = [
-                Point3D(LineSegment3D.from_end_points(line.p1, line.p2).midpoint.x,
-                        0, line.p1.z)
+                LineSegment3D.from_end_points(line.p1, line.p2).point_at(0.5)
                 for line in sub_face_lines_start
             ]
 
             sub_face_line_scale = sub_face_width / div_dist
 
             sub_face_lines_start = tuple(LineSegment3D.from_end_points(
-                Point3D(a.p1.scale(sub_face_line_scale, b).x, 0, a.p1.z),
-                Point3D(a.p2.scale(sub_face_line_scale, b).x, 0, a.p1.z))
+                a.p1, a.p2).scale(sub_face_line_scale, b)
                 for a, b in zip(sub_face_lines_start, line_cent_pt)
             )
             # generate the vertices by 'extruding' along window height vector
