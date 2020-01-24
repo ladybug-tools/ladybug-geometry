@@ -11,11 +11,11 @@ class Cone3D(object):
     """Cone3D object.
 
     Args:
-        vertex: A Point3D representing the vertex of the cone.
-        axis: A Vector3D representing the direction of the cone.
-        angle: A degree in radians representing the half angle between
+        vertex: A Point3D at the tip of the cone.
+        axis: A Vector3D representing the direction and height of the cone.
+            The vector extends from the vertex to the center of the base.
+        angle: An angle in radians representing the half angle between
             the axis and the surface.
-        height: A number representing the height of the cone.
 
     Properties:
         * vertex
@@ -27,9 +27,9 @@ class Cone3D(object):
         * area
         * volume
     """
-    __slots__ = ('_vertex', '_axis', '_angle', 'height')
+    __slots__ = ('_vertex', '_axis', '_angle')
 
-    def __init__(self, vertex, axis, angle, height):
+    def __init__(self, vertex, axis, angle):
         """Initilize Cone3D.
         """
         assert isinstance(vertex, Point3D), \
@@ -37,11 +37,9 @@ class Cone3D(object):
         assert isinstance(axis, Vector3D), \
             "Expected Vector3D. Got {}.".format(type(vertex))
         assert angle > 0, 'Cone angle must be greater than 0. Got {}.'.format(angle)
-        assert height > 0, 'Cone height must be greater than 0. Got {}.'.format(height)
         self._vertex = vertex
         self._axis = axis
         self._angle = angle
-        self._height = height
 
     @classmethod
     def from_dict(cls, data):
@@ -57,13 +55,11 @@ class Cone3D(object):
             "vertex": (10, 0, 0),
             "axis": (0, 0, 1),
             "angle": 1.0,
-            "height": 1.0
             }
         """
         return cls(Point3D.from_array(data['vertex']),
                    Vector3D.from_array(data['axis']),
-                   data['angle'],
-                   data['height'])
+                   data['angle'])
 
     @property
     def vertex(self):
@@ -83,7 +79,7 @@ class Cone3D(object):
     @property
     def height(self):
         """Height of cone"""
-        return self._height
+        return self.axis.magnitude
 
     @property
     def radius(self):
@@ -97,7 +93,7 @@ class Cone3D(object):
 
     @property
     def area(self):
-        """Surface of a cone"""
+        """Surface area of a cone"""
         return math.pi * self.radius ** 2 + math.pi * self.radius * self.slant_height
 
     @property
@@ -111,7 +107,7 @@ class Cone3D(object):
         Args:
             moving_vec: A Vector3D with the direction and distance to move the cone.
         """
-        return Cone3D(self.vertex.move(moving_vec), self.axis, self.angle, self.height)
+        return Cone3D(self.vertex.move(moving_vec), self.axis, self.angle)
 
     def rotate(self, axis, angle, origin):
         """Rotate this cone by a certain angle around an axis and origin.
@@ -126,9 +122,8 @@ class Cone3D(object):
             origin: A Point3D for the origin around which the sphere will be rotated.
         """
         return Cone3D(self.vertex.rotate(axis, angle, origin),
-                      self.axis.rotate(axis, angle, origin),
-                      self.angle,
-                      self.height)
+                      self.axis.rotate(axis, angle),
+                      self.angle)
 
     def rotate_xy(self, angle, origin):
         """Get a cone that is rotated counterclockwise in the world XY plane by an angle.
@@ -138,9 +133,8 @@ class Cone3D(object):
             origin: A Point3D for the origin around which the sphere will be rotated.
         """
         return Cone3D(self.vertex.rotate_xy(angle, origin),
-                      self.axis.rotate_xy(angle, origin),
-                      self.angle,
-                      self.height)
+                      self.axis.rotate_xy(angle),
+                      self.angle)
 
     def reflect(self, normal, origin):
         """Get a cone reflected across a plane with the input normal vector and origin.
@@ -151,9 +145,8 @@ class Cone3D(object):
             origin: A Point3D representing the origin from which to reflect.
         """
         return Cone3D(self.vertex.reflect(normal, origin),
-                      self.axis.reflect(normal, origin),
-                      self.angle,
-                      self.height)
+                      self.axis.reflect(normal),
+                      self.angle)
 
     def scale(self, factor, origin=None):
         """Scale a cone by a factor from an origin point.
@@ -163,10 +156,9 @@ class Cone3D(object):
             origin: A Point3D representing the origin from which to scale.
                 If None, it will be scaled from the World origin (0, 0, 0).
         """
-        return Cone3D(self.origin.scale(factor, origin),
-                      self.axis,
-                      self.angle,
-                      self.height)
+        return Cone3D(self.vertex.scale(factor, origin),
+                      self.axis * factor,
+                      self.angle)
 
     def duplicate(self):
         """Get a copy of this object."""
@@ -175,17 +167,28 @@ class Cone3D(object):
     def to_dict(self):
         """Get Cone as a dictionary."""
         return {'type': 'Cone3D', 'vertex': self.vertex.to_array(),
-                'axis': self.axis.to_array(), 'angle': self.angle, 'height': self.height}
+                'axis': self.axis.to_array(), 'angle': self.angle}
 
     def __copy__(self):
-        return Cone3D(self.vertex, self.axis, self.angle, self.height)
+        return Cone3D(self.vertex, self.axis, self.angle)
+
+    def __key(self):
+        """A tuple based on the object properties, useful for hashing."""
+        return (self._vertex, self._axis, self._angle)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return isinstance(other, Cone3D) and self.__key() == other.__key()
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     def ToString(self):
         """Overwrite .NET ToString."""
         return self.__repr__()
 
     def __repr__(self):
-        return 'Cone3D (vertex {}) (axis {}) (angle {}) (height {}))'.format(self.vertex,
-                                                                             self.axis,
-                                                                             self.angle,
-                                                                             self.height)
+        return 'Cone3D (vertex {}) (axis {}) (angle {}) (height {})'.\
+            format(self.vertex, self.axis, self.angle, self.height)
