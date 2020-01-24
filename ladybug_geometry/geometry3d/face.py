@@ -1187,9 +1187,9 @@ class Face3D(Base2DIn3D):
             sub_faces.extend(face.sub_faces_by_ratio(ratio))
         return sub_faces
 
-    def _sub_faces_by_dimensions(self, base_plane, rect_base, rect_height,
-                                 sub_face_height, sub_face_width,
-                                 sill_height, dist_breakup):
+    @staticmethod
+    def _sub_faces_by_dimensions(base_plane, rect_base, rect_height, sub_face_height,
+                                 sub_face_width, sill_height, dist_breakup):
         """Get a list of rectangular Face3D objects using parameters to define them.
 
         Args:
@@ -1218,22 +1218,23 @@ class Face3D(Base2DIn3D):
         Returns:
             A list of Face3D objects for sub faces.
         """
+        assert dist_breakup > 0, 'Target breakup distance must be greater than 0. ' \
+            'Got {}.'.format(dist_breakup)
         # if sub_face_height > rect_height, set it to just under rect_height
-        sub_face_height_final = (
-            rect_height - 0.01 if sub_face_height > rect_height - 0.01
-            else sub_face_height)
+        sub_face_height_final = rect_height - 0.01 * rect_height if \
+            sub_face_height > rect_height else sub_face_height
         # if sill_height is close to 0, set it to just above 0
-        sill_height_final = (
-            0.01 * rect_height if sill_height < 0.01 * rect_height else sill_height)
+        sill_height_final = 0.01 * rect_height if sill_height < 0.01 * rect_height \
+            else sill_height
         # adjust sill_height_final if sum of it and sub_face_height_final > rect_height
         if sub_face_height_final + sill_height_final > rect_height:
             sill_height_final = rect_height - sub_face_height_final
 
         max_width_break_up = rect_base / 2
-        num_divisions = (
-            round(rect_base / dist_breakup) if rect_base > dist_breakup / 2 else 1)
-        if (sub_face_width < max_width_break_up and
-            num_divisions * sub_face_width <= rect_base):
+        num_divisions = round(rect_base / dist_breakup) if \
+            rect_base > dist_breakup / 2 else 1
+        if sub_face_width < max_width_break_up and \
+                num_divisions * sub_face_width <= rect_base:
             # divide up the rectangle into points on the bottom
             div_dist = rect_base / 2 if num_divisions == 1 else dist_breakup
             if (num_divisions * sub_face_width + (num_divisions - 1) * \
@@ -1259,17 +1260,16 @@ class Face3D(Base2DIn3D):
                                          for i, pt in enumerate(btm_div_pts[:-1]))
             # scale the line segments along their center points
             line_cent_pt = [
-                Point3D(line.p2.x + ((line.p1.x - line.p2.x) / 2), 0, line.p1.z)
+                Point3D(LineSegment3D.from_end_points(line.p1, line.p2).midpoint.x,
+                        0, line.p1.z)
                 for line in sub_face_lines_start
             ]
 
             sub_face_line_scale = sub_face_width / div_dist
 
             sub_face_lines_start = tuple(LineSegment3D.from_end_points(
-                Point3D(a.p1.x - ((a.p1.x - b.x) * (1 - sub_face_line_scale)),
-                        0, a.p1.z),
-                Point3D(a.p2.x + ((b.x - a.p2.x) * (1 - sub_face_line_scale)),
-                        0, a.p1.z))
+                Point3D(a.p1.scale(sub_face_line_scale, b).x, 0, a.p1.z),
+                Point3D(a.p2.scale(sub_face_line_scale, b).x, 0, a.p1.z))
                 for a, b in zip(sub_face_lines_start, line_cent_pt)
             )
             # generate the vertices by 'extruding' along window height vector
@@ -1277,8 +1277,8 @@ class Face3D(Base2DIn3D):
             final_faces = [Face3D((line.p2, line.p1, line.p1 + y_vec, line.p2 + y_vec),
                                   base_plane) for line in sub_face_lines_start]
         else: # make a single sub-rectangle at an appropriate sill height
-            if sub_face_width > rect_base:
-                sub_face_width = rect_base
+            if sub_face_width >= rect_base:
+                sub_face_width = rect_base * 0.98
             sub_face_lines_start = LineSegment3D.from_end_points(
                 Point3D(sub_face_width / 2, 0, sill_height_final),
                 Point3D(-sub_face_width / 2, 0, sill_height_final))

@@ -1159,7 +1159,7 @@ def test_sub_faces_by_dimensions():
     sub_faces_1 = face_1._sub_faces_by_dimensions(
         plane, 2.0, rect_height, sub_face_height, 3.0, sill_height, div_dist)
     assert len(sub_faces_1) == 1
-    assert sub_faces_1[0].area == pytest.approx(face_1.area * 0.5, rel=1e-3)
+    assert sub_faces_1[0].area == pytest.approx(face_1.area * 0.49, rel=1e-3)
 
     sub_faces_2 = face_2._sub_faces_by_dimensions(
         plane, 4.0, rect_height, sub_face_height, 1.0, sill_height, div_dist)
