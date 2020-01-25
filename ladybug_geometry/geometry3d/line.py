@@ -156,6 +156,8 @@ class LineSegment3D(Base1DIn3D):
         """
         if isinstance(distances, (float, int)):
             distances = [distances]
+        # this assert prevents the while loop from being infinite
+        assert sum(distances) > 0, 'Segment subdivisions must be greater than 0'
         line_length = self.length
         dist = distances[0]
         index = 0
@@ -175,6 +177,8 @@ class LineSegment3D(Base1DIn3D):
             number: Integer for the number of segments into which the line will
                 be divided.
         """
+        # this assert prevents the while loop from being infinite
+        assert number > 0, 'Segment subdivisions must be greater than 0'
         interval = 1 / number
         parameter = interval
         sub_pts = [self.p]
