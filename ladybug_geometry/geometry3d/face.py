@@ -1180,112 +1180,46 @@ class Face3D(Base2DIn3D):
         bottom_seg, top_seg, other_faces = rect_res
         height_seg = LineSegment3D.from_end_points(bottom_seg.p, top_seg.p)
         base_plane = Plane(self.normal, bottom_seg.p, bottom_seg.v)
-        sub_faces = Face3D.sub_rectangles_from_rectangle(
+        sub_faces = Face3D.sub_rects_from_rect_ratio(
             base_plane, bottom_seg.length, height_seg.length, ratio,
             sub_rect_height, sill_height, horizontal_separation, vertical_separation)
         for face in other_faces:
             sub_faces.extend(face.sub_faces_by_ratio(ratio))
         return sub_faces
+    
+    def sub_faces_by_dimension_rectangle(self, sub_rect_height, sub_rect_width,
+                                         sill_height, horizontal_separation, tolerance):
+        """Get a list of rectangualr faces within this Face3D.
 
-    @staticmethod
-    def _sub_faces_by_dimensions(base_plane, rect_base, rect_height, sub_face_height,
-                                 sub_face_width, sill_height, dist_breakup):
-        """Get a list of rectangular Face3D objects using parameters to define them.
+        Note that this method will only yeild results if there is a rectangle to
+        be extracted from this Face3D's geometry.
 
         Args:
-            rect_base: A number indicating the length of the base of the
-                parent rectangle.
-            rect_height: A number indicating the length of the height of the
-                parent rectangle.
-            sub_face_height: A number for the target height of the output rectangles.
-                If the ratio is too large for the height, the ratio will take 
-                precedence and the sub-rectangle height will be larger than this value.
-            sub_face_width: A number for the target width of the output rectangles.
-                If the ratio is too large for the width, the ratio will take 
-                precedence and the sub-rectangle width will be larger than this value.
-            dist_breakup: A number for the target breakup separation distance between
+            sub_rect_height: A number for the target height of the output rectangles.
+            sub_rect_width: A number for the target width of the output rectangles.
+            sill_height: A number for the target height above the bottom edge of
+                the rectangle to start the sub-rectangles. If the sub_rect_height
+                is too large for the sill_height to fit within the rectangle,
+                the sub_rect_height will take precedence.
+            horizontal_separation: A number for the target separation between
                 individual sub-rectangle centerlines.  If this number is larger than
                 the parent rectangle base, only one sub-rectangle will be produced.
-            sill_height: A number for the target height above the bottom edge of
-                the rectangle to start the sub-rectangles. If the ratio is too
-                large for the height, the ratio will take precedence and the
-                sub-rectangle height will be smaller than this value.
-            base_plane: A Plane object in which the rectangle exists.
-                The origin of this plane will be the lower left corner of the
-                rectangle and the X and Y axes will form the sides.
-                Default is the world XY plane.
+            tolerance: The maximum difference between point values for them to be
+                considered a part of a rectangle.
 
         Returns:
             A list of Face3D objects for sub faces.
         """
-        assert dist_breakup > 0, 'Target breakup distance must be greater than 0. ' \
-            'Got {}.'.format(dist_breakup)
-        # if sub_face_height > rect_height, set it to just under rect_height
-        sub_face_height_final = rect_height - 0.01 * rect_height if \
-            sub_face_height > rect_height else sub_face_height
-        # if sill_height is close to 0, set it to just above 0
-        sill_height_final = 0.01 * rect_height if sill_height < 0.01 * rect_height \
-            else sill_height
-        # adjust sill_height_final if sum of it and sub_face_height_final > rect_height
-        if sub_face_height_final + sill_height_final > rect_height:
-            sill_height_final = rect_height - sub_face_height_final
-
-        max_width_break_up = rect_base / 2
-        num_divisions = round(rect_base / dist_breakup) if \
-            rect_base > dist_breakup / 2 else 1
-        if sub_face_width < max_width_break_up and \
-                num_divisions * sub_face_width <= rect_base:
-            # divide up the rectangle into points on the bottom
-            div_dist = rect_base / 2 if num_divisions == 1 else dist_breakup
-            if (num_divisions * sub_face_width + (num_divisions - 1) * \
-                (dist_breakup - sub_face_width) > rect_base):
-                num_divisions = math.floor(rect_base / dist_breakup)
-
-            is_odd = lambda num: num % 2
-            start_pt_x = (
-                (num_divisions / 2) * div_dist if is_odd(num_divisions) == 0
-                else (math.floor(num_divisions / 2) + 0.5) * div_dist)
-
-            btm_div_pts = [Point3D(start_pt_x, 0, sill_height_final)]
-            remainder = rect_base - (div_dist * num_divisions)
-            total_dist = remainder / 2
-
-            while total_dist < rect_base:
-                total_dist += div_dist
-                next_pt = (rect_base / 2) - total_dist
-                btm_div_pts.append(Point3D(next_pt, 0, sill_height_final))
-
-            sub_face_lines_start = tuple(LineSegment3D.from_end_points(
-                                         pt, btm_div_pts[i + 1])
-                                         for i, pt in enumerate(btm_div_pts[:-1]))
-            # scale the line segments along their center points
-            line_cent_pt = [
-                LineSegment3D.from_end_points(line.p1, line.p2).point_at(0.5)
-                for line in sub_face_lines_start
-            ]
-
-            sub_face_line_scale = sub_face_width / div_dist
-
-            sub_face_lines_start = tuple(LineSegment3D.from_end_points(
-                a.p1, a.p2).scale(sub_face_line_scale, b)
-                for a, b in zip(sub_face_lines_start, line_cent_pt)
-            )
-            # generate the vertices by 'extruding' along window height vector
-            y_vec = Vector3D(y=sub_face_height_final)
-            final_faces = [Face3D((line.p2, line.p1, line.p1 + y_vec, line.p2 + y_vec),
-                                  base_plane) for line in sub_face_lines_start]
-        else: # make a single sub-rectangle at an appropriate sill height
-            if sub_face_width >= rect_base:
-                sub_face_width = rect_base * 0.98
-            sub_face_lines_start = LineSegment3D.from_end_points(
-                Point3D(sub_face_width / 2, 0, sill_height_final),
-                Point3D(-sub_face_width / 2, 0, sill_height_final))
-            # generate the vertices by 'extruding' along window height vector
-            y_vec = Vector3D(y=sub_face_height_final)
-            final_faces = [Face3D((sub_face_lines_start.p2, sub_face_lines_start.p1,
-                                  sub_face_lines_start.p1 + y_vec,
-                                  sub_face_lines_start.p2 + y_vec), base_plane)]
-        return final_faces
+        rect_res = self.extract_rectangle(tolerance)
+        if rect_res is None:
+            return []
+        bottom_seg, top_seg, other_faces = rect_res
+        height_seg = LineSegment3D.from_end_points(bottom_seg.p, top_seg.p)
+        base_plane = Plane(self.normal, bottom_seg.p, bottom_seg.v)
+        sub_faces = Face3D.sub_rects_from_rect_dimensions(
+            base_plane, bottom_seg.length, height_seg.length, sub_rect_height,
+            sub_rect_width, sill_height, horizontal_separation)
+        return sub_faces
 
     def get_top_bottom_horizontal_edges(self, tolerance):
         """Get top and bottom horizontal edges of this Face if they exist.
@@ -1402,10 +1336,10 @@ class Face3D(Base2DIn3D):
         return None
 
     @staticmethod
-    def sub_rectangles_from_rectangle(base_plane, parent_base, parent_height, ratio,
-                                      sub_rect_height, sill_height,
-                                      horizontal_separation, vertical_separation=0):
-        """Get a list of rectangular Face3D objects using parameters to define them.
+    def sub_rects_from_rect_ratio(
+            base_plane, parent_base, parent_height, ratio, sub_rect_height, sill_height,
+            horizontal_separation, vertical_separation=0):
+        """Get a list of rectangular Face3D objects using an area ratio and parameters.
 
         All of the resulting Face3D objects lie within a parent rectangle defined
         by the parent_base, parent_height, and base_plane. The combined area of the
@@ -1438,6 +1372,9 @@ class Face3D(Base2DIn3D):
                 The origin of this plane will be the lower left corner of the
                 rectangle and the X and Y axes will form the sides.
                 Default is the world XY plane.
+        
+        Returns:
+            A list of Face3D objects for sub faces.
         """
         # calculate the target area to make the combined sub-rectangles
         target_area = parent_base * parent_height * ratio
@@ -1523,6 +1460,98 @@ class Face3D(Base2DIn3D):
                 h_vec = base_plane.y * (target_area / (parent_base * 0.98))
                 final_faces = [Face3D((seg.p1, seg.p2, seg.p2 + h_vec, seg.p1 + h_vec),
                                       base_plane)]
+        return final_faces
+    
+    @staticmethod
+    def sub_rects_from_rect_dimensions(
+            base_plane, parent_base, parent_height, sub_rect_height, sub_rect_width,
+            sill_height, horizontal_separation):
+        """Get a list of rectangular Face3D objects from dimensions and parameters.
+
+        All of the resulting Face3D objects lie within a parent rectangle defined
+        by the parent_base, parent_height, and base_plane. 
+
+        Args:
+            base_plane: A Plane object in which the rectangle exists.
+                The origin of this plane will be the lower left corner of the
+                rectangle and the X and Y axes will form the sides.
+                Default is the world XY plane.
+            parent_base: A number indicating the length of the base of the
+                parent rectangle.
+            parent_height: A number indicating the length of the height of the
+                parent rectangle.
+            sub_rect_height: A number for the target height of the output rectangles.
+            sub_rect_width: A number for the target width of the output rectangles.
+            sill_height: A number for the target height above the bottom edge of
+                the rectangle to start the sub-rectangles. If the sub_rect_height
+                is too large for the sill_height to fit within the rectangle,
+                the sub_rect_height will take precedence.
+            horizontal_separation: A number for the target separation between
+                individual sub-rectangle centerlines.  If this number is larger than
+                the parent rectangle base, only one sub-rectangle will be produced.
+
+        Returns:
+            A list of Face3D objects for sub faces.
+        """
+        # if sub_rect_height > parent_height, set it to just under parent_height
+        sub_rect_height = parent_height - 0.02 * parent_height if \
+            sub_rect_height >= parent_height else sub_rect_height
+        # if sill_height is close to 0, set it to just above 0
+        sill_hgt = 0.01 * parent_height if sill_height < 0.01 * parent_height \
+            else sill_height
+        # adjust sill_hgt if sum of it and sub_rect_height > parent_height
+        if sub_rect_height + sill_hgt >= parent_height:
+            sill_hgt = parent_height - sub_rect_height - (parent_height * 0.01)
+        
+        # ensure that the horizontal_separation is always greater than sub_rect_width
+        if sub_rect_width >= horizontal_separation:
+            horizontal_separation = sub_rect_width * 1.02
+        
+        # determine if the parameters should yeild multiple sub-windows or just one
+        max_width_break_up = parent_base / 2
+        num_div = round(parent_base / horizontal_separation) if \
+            parent_base > horizontal_separation / 2 else 1
+        # properties used throughout the computation of sub-rectangles
+        sill_vec = base_plane.y * sill_hgt
+        bottom_seg = LineSegment3D.from_sdl(base_plane.o, base_plane.x, parent_base)
+        
+        if sub_rect_width < max_width_break_up:
+            # determine the number of times that the rectangle should be subdivided
+            div_dist = parent_base / 2 if num_div == 1 else horizontal_separation
+            if num_div * sub_rect_width + (num_div - 1) * \
+                    (horizontal_separation - sub_rect_width) > parent_base:
+                num_div = math.floor(parent_base / horizontal_separation)
+
+            # Get a segment in the center of the bottom
+            scale_fac = (div_dist * num_div) / parent_base
+            rect_seg = bottom_seg.scale(scale_fac, bottom_seg.point_at(0.5))
+            rect_seg = rect_seg.move(sill_vec)
+            btm_div_pts = rect_seg.subdivide_evenly(num_div)
+            if len(btm_div_pts) == num_div:
+                btm_div_pts.append(rect_seg.p2)
+
+            # divide up the rectangle into points on the bottom
+            btm_div_segs = tuple(LineSegment3D.from_end_points(pt, btm_div_pts[i + 1])
+                                for i, pt in enumerate(btm_div_pts[:-1]))
+            # scale the line segments along their center points
+            line_cent_pt = tuple(line.point_at(0.5) for line in btm_div_segs)
+            scale_factor = sub_rect_width / div_dist
+            btm_div_segs = tuple(line.scale(scale_factor, mid_pt)
+                                for line, mid_pt in zip(btm_div_segs, line_cent_pt))
+            # generate the vertices by 'extruding' along window height vector
+            h_vec = base_plane.y * sub_rect_height
+            final_faces = [Face3D((line.p2, line.p1, line.p1 + h_vec, line.p2 + h_vec),
+                                base_plane) for line in btm_div_segs]
+        else:  # make a single sub-rectangle at an appropriate sill height
+            if sub_rect_width >= parent_base:
+                sub_rect_width = parent_base * 0.98
+            scale_fac = sub_rect_width / parent_base
+            rect_seg = bottom_seg.scale(scale_fac, bottom_seg.point_at(0.5))
+            seg = rect_seg.move(sill_vec)
+            # generate the vertices by 'extruding' along window height vector
+            h_vec = base_plane.y * sub_rect_height
+            final_faces = [Face3D((seg.p2, seg.p1, seg.p1 + h_vec, seg.p2 + h_vec),
+                                base_plane)]
         return final_faces
 
     def to_dict(self, include_plane=True, enforce_upper_left=False):

@@ -1144,25 +1144,27 @@ def test_sub_faces_by_ratio():
     assert sum(areas) == pytest.approx(face_2.area * 0.5, rel=1e-3)
 
 
-def test_sub_faces_by_dimensions():
-    """Test the sub_faces_by_dimensions method."""
-    pts_1 = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
-    pts_2 = (Point3D(0, 0), Point3D(0, 2), Point3D(4, 2), Point3D(4, 0))
+def test_sub_faces_by_dimension_rectangle():
+    """Test the sub_faces_by_dimension_rectangle method."""
+    pts_1 = (Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 0, 0))
+    pts_2 = (Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(4, 0, 2), Point3D(4, 0, 0))
     plane = Plane(Vector3D(0, 0, 1))
-    face_1 = Face3D(pts_1, plane)
-    face_2 = Face3D(pts_2, plane)
+    face_1 = Face3D(pts_1)
+    face_2 = Face3D(pts_2)
     sub_face_height = 1.0
     sill_height = 1.0
     rect_height = 2.0
     div_dist = 1.0
 
-    sub_faces_1 = face_1._sub_faces_by_dimensions(
-        plane, 2.0, rect_height, sub_face_height, 3.0, sill_height, div_dist)
+    sub_faces_1 = face_1.sub_faces_by_dimension_rectangle(
+        sub_face_height, 3.0, sill_height, div_dist, 0.1)
     assert len(sub_faces_1) == 1
-    assert sub_faces_1[0].area == pytest.approx(face_1.area * 0.49, rel=1e-3)
+    segs_1 = sub_faces_1[0].boundary_segments
+    assert segs_1[1].length == sub_face_height
 
-    sub_faces_2 = face_2._sub_faces_by_dimensions(
-        plane, 4.0, rect_height, sub_face_height, 1.0, sill_height, div_dist)
-    assert len(sub_faces_2) == 4
-    areas = [srf.area for srf in sub_faces_2]
-    assert sum(areas) == pytest.approx(face_2.area * 0.5, rel=1e-3)
+    sub_faces_2 = face_2.sub_faces_by_dimension_rectangle(
+        sub_face_height, 1.0, sill_height, div_dist, 0.1)
+    assert len(sub_faces_2) == 3
+    segs_2 = sub_faces_2[0].boundary_segments
+    assert segs_2[0].length == 1.0
+    assert segs_2[1].length == sub_face_height
