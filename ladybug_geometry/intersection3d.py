@@ -144,12 +144,12 @@ def closest_point3d_between_line3d_plane(line_ray, plane):
     return None  # intersection
 
 
-def intersect_line3d_sphere3d(line_ray, sphere):
-    """Get the intersection between this Sphere3D object and a Ray2D/LineSegment2D.
+def intersect_line3d_sphere(line_ray, sphere):
+    """Get the intersection between this Sphere object and a Ray2D/LineSegment2D.
 
     Args:
         line_ray: A LineSegment3D or Ray3D for intersection.
-        sphere: A Sphere3D to intersect.
+        sphere: A Sphere to intersect.
 
     Returns:
         Two Point3D objects if a full intersection exists.
@@ -185,12 +185,12 @@ def intersect_line3d_sphere3d(line_ray, sphere):
         return p1, p2
 
 
-def intersect_plane_sphere3d(plane, sphere):
-    """Get the intersection of a plane with this Sphere3D object
+def intersect_plane_sphere(plane, sphere):
+    """Get the intersection of a plane with this Sphere object
 
     Args:
         plane: A Plane object.
-        sphere: A Sphere3D to intersect.
+        sphere: A Sphere to intersect.
 
     Returns:
         If a full intersection exists
