@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Cylinder3D"""
+"""Cylinder"""
 from __future__ import division
 
 from .pointvector import Point3D, Vector3D
@@ -7,8 +7,8 @@ from .pointvector import Point3D, Vector3D
 import math
 
 
-class Cylinder3D(object):
-    """Cylinder3D object.
+class Cylinder(object):
+    """Cylinder object.
 
     Args:
         center: A Point3D at the center of the bottom base of the cylinder.
@@ -28,7 +28,7 @@ class Cylinder3D(object):
     __slots__ = ('_center', '_axis', '_radius')
 
     def __init__(self, center, axis, radius):
-        """Initilize Cylinder3D.
+        """Initilize Cylinder.
         """
         assert isinstance(center, Point3D), \
             "Expected Point3D. Got {}.".format(type(center))
@@ -42,7 +42,7 @@ class Cylinder3D(object):
 
     @classmethod
     def from_dict(cls, data):
-        """Create a Cylinder3D from a dictionary.
+        """Create a Cylinder from a dictionary.
 
         Args:
             data: A python dictionary in the following format
@@ -50,7 +50,7 @@ class Cylinder3D(object):
         .. code-block:: python
 
             {
-            "type": "Cylinder3D"
+            "type": "Cylinder"
             "center": (10, 0, 0),
             "axis": (0, 0, 1),
             "radius": 1.0,
@@ -101,7 +101,7 @@ class Cylinder3D(object):
         Args:
             moving_vec: A Vector3D with the direction and distance to move the Cylinder.
         """
-        return Cylinder3D(self.center.move(moving_vec), self.axis, self.radius)
+        return Cylinder(self.center.move(moving_vec), self.axis, self.radius)
 
     def rotate(self, axis, angle, origin):
         """Rotate this Cylinder by a certain angle around an axis and origin.
@@ -113,22 +113,22 @@ class Cylinder3D(object):
         Args:
             axis: A Vector3D axis representing the axis of rotation.
             angle: An angle for rotation in radians.
-            origin: A Point3D for the origin around which the sphere will be rotated.
+            origin: A Point3D for the origin around which the cylinder will be rotated.
         """
-        return Cylinder3D(self.center.rotate(axis, angle, origin),
-                          self.axis.rotate(axis, angle),
-                          self.radius)
+        return Cylinder(self.center.rotate(axis, angle, origin),
+                        self.axis.rotate(axis, angle),
+                        self.radius)
 
     def rotate_xy(self, angle, origin):
         """Get a Cylinder that is rotated counterclockwise in the world XY plane by an angle.
 
         Args:
             angle: An angle for rotation in radians.
-            origin: A Point3D for the origin around which the sphere will be rotated.
+            origin: A Point3D for the origin around which the cylinder will be rotated.
         """
-        return Cylinder3D(self.center.rotate_xy(angle, origin),
-                          self.axis.rotate_xy(angle),
-                          self.radius)
+        return Cylinder(self.center.rotate_xy(angle, origin),
+                        self.axis.rotate_xy(angle),
+                        self.radius)
 
     def reflect(self, normal, origin):
         """Get a Cylinder reflected across a plane with the input normal vector and origin.
@@ -138,9 +138,9 @@ class Cylinder3D(object):
                 which the arc will be reflected. THIS VECTOR MUST BE NORMALIZED.
             origin: A Point3D representing the origin from which to reflect.
         """
-        return Cylinder3D(self.center.reflect(normal, origin),
-                          self.axis.reflect(normal),
-                          self.radius)
+        return Cylinder(self.center.reflect(normal, origin),
+                        self.axis.reflect(normal),
+                        self.radius)
 
     def scale(self, factor, origin=None):
         """Scale a Cylinder by a factor from an origin point.
@@ -150,9 +150,9 @@ class Cylinder3D(object):
             origin: A Point3D representing the origin from which to scale.
                 If None, it will be scaled from the World origin (0, 0, 0).
         """
-        return Cylinder3D(self.center.scale(factor, origin),
-                          self.axis * factor,
-                          self.radius)
+        return Cylinder(self.center.scale(factor, origin),
+                        self.axis * factor,
+                        self.radius)
 
     def duplicate(self):
         """Get a copy of this object."""
@@ -160,11 +160,11 @@ class Cylinder3D(object):
 
     def to_dict(self):
         """Get Cylinder as a dictionary."""
-        return {'type': 'Cylinder3D', 'center': self.center.to_array(),
+        return {'type': 'Cylinder', 'center': self.center.to_array(),
                 'axis': self.axis.to_array(), 'radius': self.radius}
 
     def __copy__(self):
-        return Cylinder3D(self.center, self.axis, self.radius)
+        return Cylinder(self.center, self.axis, self.radius)
 
     def __key(self):
         """A tuple based on the object properties, useful for hashing."""
@@ -174,7 +174,7 @@ class Cylinder3D(object):
         return hash(self.__key())
 
     def __eq__(self, other):
-        return isinstance(other, Cylinder3D) and self.__key() == other.__key()
+        return isinstance(other, Cylinder) and self.__key() == other.__key()
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -184,5 +184,5 @@ class Cylinder3D(object):
         return self.__repr__()
 
     def __repr__(self):
-        return 'Cylinder3D (center {}) (axis {}) (radius {})'.\
+        return 'Cylinder (center {}) (axis {}) (radius {})'.\
             format(self.center, self.axis, self.radius)
