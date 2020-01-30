@@ -28,7 +28,7 @@ def test_sphere_init():
 
 
 def test_equality():
-    """Test the equality of Polygon2D objects."""
+    """Test the equality of Sphere objects."""
     sphere = Sphere(Point3D(2, 0, 2), 3)
     sphere_dup = sphere.duplicate()
     sphere_alt = Sphere(Point3D(2, 0.1, 2), 3)

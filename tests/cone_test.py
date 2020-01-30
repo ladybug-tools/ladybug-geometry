@@ -121,7 +121,7 @@ def test_cone_move():
 
 
 def test_cone_scale():
-    """Test the Sphere3D scale method."""
+    """Test the Cone scale method."""
     c = Cone(Point3D(4, 0.5, 2), Vector3D(1, 0, 2.5), 0.7)
     test = c.scale(2, Point3D(0, 0, 0))
     assert test.vertex.x == pytest.approx(8, rel=1e-3)
