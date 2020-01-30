@@ -20,6 +20,7 @@ class Cylinder(object):
         * center
         * axis
         * radius
+        * center_end
         * diameter
         * height
         * area
@@ -76,9 +77,14 @@ class Cylinder(object):
         return self._radius
 
     @property
+    def center_end(self):
+        """Center of oposite end of Cylinder."""
+        return self.center + self.axis
+
+    @property
     def diameter(self):
         """Diameter of Cylinder"""
-        return self._radius * 2
+        return self.radius * 2
 
     @property
     def height(self):
@@ -152,7 +158,7 @@ class Cylinder(object):
         """
         return Cylinder(self.center.scale(factor, origin),
                         self.axis * factor,
-                        self.radius)
+                        self.radius * factor)
 
     def duplicate(self):
         """Get a copy of this object."""
