@@ -42,6 +42,20 @@ class Cylinder(object):
         self._radius = radius
 
     @classmethod
+    def from_start_end(cls, p1, p2, radius):
+        """Initialize a new cylinder from start and end points.
+
+        Args:
+            p1: The start point of the cylinder, represents the center of the
+                bottom base of the cylinder.
+            p2: The end point of the cylinder, represents the center of the top
+                base of the cylinder
+            radius: A number representing the radius of the cylinder.
+        """
+        axis = p2 - p1
+        return cls(p1, axis, radius)
+
+    @classmethod
     def from_dict(cls, data):
         """Create a Cylinder from a dictionary.
 

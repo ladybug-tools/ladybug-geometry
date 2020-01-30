@@ -24,6 +24,19 @@ def test_cylinder_init():
     assert isinstance(c.area, float)
     assert isinstance(c.volume, float)
 
+    p1 = Point3D(1, 1, 0)
+    p2 = Point3D(1, 1, 5)
+    radius = 1.2
+    c2 = Cylinder.from_start_end(p1, p2, radius)
+    assert c2.center == Point3D(1, 1, 0)
+    assert c2.axis == Vector3D(0, 0, 5)
+    assert c2.radius == 1.2
+    assert c2.height == c2.axis.magnitude
+    assert c2.center_end == c2.center + c2.axis
+    assert c2.diameter == c2.radius * 2
+    assert isinstance(c2.area, float)
+    assert isinstance(c2.volume, float)
+
 
 def test_equality():
     """Test the equality of Cylinder objects."""
