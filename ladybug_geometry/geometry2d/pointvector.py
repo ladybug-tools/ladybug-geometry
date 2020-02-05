@@ -314,19 +314,6 @@ class Point2D(Vector2D):
     """
     __slots__ = ()
 
-    def __lt__(self, other):
-        """
-        From euclid.py, used in heap and binary data tree structures.
-        These are 1D data structures (they iteratively sort values based on value
-        comparisons).
-        Args:
-            other: Point2D or Vector2D for comparison.
-        Returns:
-             boolean based on comparison to vector x coords
-        """
-        if isinstance(other, Vector2D):
-            return self.x < other.x
-
     def move(self, moving_vec):
         """Get a point that has been moved along a vector.
 

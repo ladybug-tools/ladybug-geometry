@@ -72,6 +72,10 @@ class LineSegment2D(Base1DIn2D):
         """The length of the line segment."""
         return self.v.magnitude
 
+    def to_array(self):
+        """ To nested list """
+        return (self.p1.to_array(), self.p2.to_array())
+
     def flip(self):
         """Get a copy of this line segment that is flipped."""
         return LineSegment2D(self.p2, self.v.reverse())

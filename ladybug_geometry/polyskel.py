@@ -7,7 +7,7 @@ from __future__ import division
 
 import logging
 import heapq
-from itertools import *
+from itertools import tee, islice, cycle, chain
 from collections import namedtuple
 import operator
 
@@ -18,12 +18,13 @@ from ladybug_geometry.geometry2d.line import LineSegment2D
 from ladybug_geometry.geometry2d.ray import Ray2D
 from ladybug_geometry import intersection2d
 
+
 log = logging.getLogger("__name__")
 
-
-# For Debugging
-
-class Debug:
+class _Debug:
+	"""
+	For Debugging
+	"""
 	def __init__(self, image):
 		if image is not None:
 			self.im = image[0]
@@ -44,14 +45,25 @@ class Debug:
 		if self.do:
 			self.im.show()
 
-_debug = Debug(None)
+_debug = _Debug(None)
 
 def set_debug(image):
 	global _debug
-	_debug = Debug(image)
-
+	_debug = _Debug(image)
 
 # Skeleton Code
+def _polyskel_point2d_lt(self, other):
+	"""
+	From euclid.py, used in heap and binary data tree structures.
+	These are 1D data structures (they iteratively sort values based on value
+	comparisons).
+	Args:
+		other: Point2D or Vector2D for comparison.
+	Returns:
+		 boolean based on comparison to vector x coords
+	"""
+	if isinstance(other, Vector2D):
+		return self.x < other.x
 
 def _window(lst):
 	prevs, items, nexts = tee(lst, 3)
@@ -116,7 +128,7 @@ class _LAVertex:
 		self.next = None
 		self.lav = None
 		self._valid = True; # this should be handled better. Maybe membership in lav implies validity?
-		edge_left._v = Point2D.normalize(edge_left.v)
+		edge_left._v = edge_left.v.normalize()
 		edge_right._v = Point2D.normalize(edge_right.v)
 		creator_vectors = (edge_left.v * -1, edge_right.v)
 		if direction_vectors is None:
@@ -506,6 +518,7 @@ class _EventQueue:
 		for item in self.__data:
 			print(item)
 
+
 def skeletonize(polygon, holes=None):
 	"""
 	Compute the straight skeleton of a polygon.
@@ -516,6 +529,9 @@ def skeletonize(polygon, holes=None):
 	Returns the straight skeleton as a list of "subtrees", which are in the form of (source, height, sinks),
 	where source is the highest points, height is its height, and sinks are the point connected to the source.
 	"""
+
+	# Add polyskel-specific point2d magic method to Point2D used by heapq
+	Point2D.__lt__ = _polyskel_point2d_lt
 
 	# Current code actually works on cw and ccw order for polygons and holes, respectively
 	# Sol reverse vertice order for both inputs
