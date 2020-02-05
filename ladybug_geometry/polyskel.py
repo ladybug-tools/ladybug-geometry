@@ -93,8 +93,8 @@ def _normalize_contour(contour):
 	contour = [Point2D(float(x), float(y)) for (x,y) in contour]
 	normed_contour = []
 	for prev, point, next in _window(contour):
-		normed_prev = Point2D.normalize(point-prev)
-		normed_next = Point2D.normalize(next-point)
+		normed_prev = (point-prev).normalize()
+		normed_next = (next-point).normalize()
 		if not (point == next or normed_prev == normed_next):
 			normed_contour.append(point)
 
@@ -129,7 +129,7 @@ class _LAVertex:
 		self.lav = None
 		self._valid = True; # this should be handled better. Maybe membership in lav implies validity?
 		edge_left._v = edge_left.v.normalize()
-		edge_right._v = Point2D.normalize(edge_right.v)
+		edge_right._v = edge_right.v.normalize()
 		creator_vectors = (edge_left.v * -1, edge_right.v)
 		if direction_vectors is None:
 			direction_vectors = creator_vectors
@@ -178,9 +178,9 @@ class _LAVertex:
 				# potentially parallel edge)
 
 				# Make normalized copies of vectors
-				norm_edge_left_v  = Vector2D.normalize(self.edge_left.v)
-				norm_edge_right_v = Vector2D.normalize(self.edge_right.v)
-				norm_edge_v = Vector2D.normalize(edge.edge.v)
+				norm_edge_left_v  = self.edge_left.v.normalize()
+				norm_edge_right_v = self.edge_right.v.normalize()
+				norm_edge_v = edge.edge.v.normalize()
 
 				# Compute dot
 				leftdot  = abs(norm_edge_left_v.dot(norm_edge_v))
@@ -194,8 +194,8 @@ class _LAVertex:
 				i = intersection2d.intersect_line2d(self_edge_copy, edge_edge_copy)
 				if i is not None and not _approximately_equals(i, self.point):
 					#locate candidate b
-					linvec = Point2D.normalize(self.point - i)
-					edvec  = Point2D.normalize(edge.edge.v)
+					linvec = (self.point - i).normalize()
+					edvec  = edge.edge.v.normalize()
 					if linvec.dot(edvec)<0:
 						edvec = -edvec
 
@@ -444,8 +444,8 @@ class _LAV:
 		vertex.lav = None
 
 	def unify(self, vertex_a, vertex_b, point):
-		normed_b_bisector = Vector2D.normalize(vertex_b.bisector.v)
-		normed_a_bisector = Vector2D.normalize(vertex_a.bisector.v)
+		normed_b_bisector = vertex_b.bisector.v.normalize()
+		normed_a_bisector = vertex_a.bisector.v.normalize()
 		replacement =_LAVertex(
 			point,
 			vertex_a.edge_left,
