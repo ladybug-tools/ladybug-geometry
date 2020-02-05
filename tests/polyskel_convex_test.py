@@ -20,7 +20,7 @@ import numpy as np
 #     if path not in sys.path: sys.path.insert(0,path)
 # import polyskel as orig_polyskel
 
-#TODO: move to updated polyskel once we import lb-geom
+#TODO: move to updated polyskel once we import lb-geom?
 def skeleton_edges(skeleton):
     """
     Consumes list of polyskeleton subtrees.
@@ -44,6 +44,7 @@ def skeleton_edges(skeleton):
             L.append(edge)
     return L
 
+# TODO Make this a from_array() method
 def helper_mtx2line2d(lst):
     """ List of tuples of point coordinates to LineSegment2D"""
     p1, p2 = lst[0], lst[1]
@@ -52,6 +53,7 @@ def helper_mtx2line2d(lst):
         )
     return line2d
 
+# TODO Make this a from_array() method
 def helper_mtx2polygon2d(lst):
     polygon = Polygon2D([Point2D(*pt) for pt in lst])
     return polygon
@@ -216,72 +218,9 @@ def test_polyskel_complex_convex():
 
     assert helper_assert_polygon_equality(polygon, chk_edges, lb=True)
 
-# def test_polyskel_concave():
-#     """ Test rectangle with side poked in."""
-#     polygon = [
-#         [0,0],
-#         [2,0],
-#         [2,2],
-#         [1,1],
-#         [0,2]
-#     ]
-#
-#     # Make actual geom that we already solved
-#     chk_edges = [
-#         [(1.0, 0.41421356237309503), (1.0, 1.0)],
-#         [(0.585786437626905, 0.585786437626905), (1.0, 0.41421356237309503)],
-#         [(0.585786437626905, 0.585786437626905), (0.0, 0.0)],
-#         [(0.585786437626905, 0.585786437626905), (0.0, 2.0)],
-#         [(1.414213562373095, 0.585786437626905), (1.0, 0.41421356237309503)],
-#         [(1.414213562373095, 0.585786437626905), (2.0, 2.0)],
-#         [(1.414213562373095, 0.585786437626905), (2.0, 0.0)]
-#     ]
-#
-#     assert helper_assert_polygon_equality(polygon, chk_edges)
-#
-# def test_polyskel_concave_two_holes():
-#     """ Test concave with two holes"""
-#     polygon = [
-#         [0,0],
-#         [0,2],
-#         [1,1],
-#         [2,2],
-#         [2,0],
-#         [0.7,0.2]
-#     ]
-#
-#     hole1 = [
-#         [0.6, 0.6],
-#         [1.5, 0.6],
-#         [1, 0.8],
-#         [0.6, 1.2]
-#     ]
-#     hole2 = [
-#         [1.1, 0.25],
-#         [1.5, 0.25],
-#         [1.3,0.5]
-#     ]
-#
-#     # Make actual geoms we already solved
-#     chk_edges = [
-#         [(1.3, 0.3461249694973139), (1.3, 0.5)],
-#         [(1.3, 0.3461249694973139), (1.5, 0.25)],
-#         [(1.3, 0.3461249694973139), (1.1, 0.25)],
-#         [(0.9393204034059653, 0.7079770243431964), (1.0, 0.8)],
-#         [(0.9393204034059653, 0.7079770243431964), (1.5, 0.6)],
-#         [(0.7757359312880715, 0.7757359312880714), (0.6, 1.2)],
-#         [(0.7757359312880715, 0.7757359312880714),
-#          (0.9393204034059653, 0.7079770243431964)],
-#         [(0.7757359312880715, 0.7757359312880714), (0.6, 0.6)]
-#     ]
-#
-#     holes = [hole1,hole2]
-#     assert helper_assert_polygon_equality(polygon, chk_edges, holes)
 
 if __name__ == "__main__":
     test_polyskel_triangle()
     test_polyskel_square()
     test_polyskel_pentagon()
     test_polyskel_complex_convex()
-    #test_polyskel_concave()
-    #test_polyskel_concave_two_holes()
