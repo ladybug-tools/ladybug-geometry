@@ -404,3 +404,9 @@ class Point2D(Vector2D):
     def __repr__(self):
         """Point2D representation."""
         return 'Point2D (%.2f, %.2f)' % (self.x, self.y)
+
+    def __lt__(self, other):
+        """Used for storing points in external 1D data structure libraries
+        """
+        if isinstance(other, Vector2D):
+            return self.x < other.x

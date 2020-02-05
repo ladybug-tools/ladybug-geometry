@@ -319,6 +319,10 @@ class Polygon2D(Base2DIn2D):
         """
         return not self.area == 0
 
+    def to_array(self):
+        """ Nested list of nested list of points. """
+        return tuple(pt.to_array() for pt in self.vertices)
+
     def remove_colinear_vertices(self, tolerance):
         """Get a version of this polygon without colinear or duplicate vertices.
 
