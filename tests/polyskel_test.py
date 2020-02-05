@@ -9,8 +9,8 @@ from ladybug_geometry.geometry2d.pointvector import Point2D
 from ladybug_geometry.geometry2d.line import LineSegment2D
 from ladybug_geometry import polyskel as lb_polyskel
 
-import math
 from pprint import pprint as pp
+import numpy as np
 
 # TODO Figure out if we need this later
 # # For comparison
@@ -91,7 +91,11 @@ def helper_assert_polygon_equality(polygon, chk_edges, holes=None, lb=True):
     # Assumes order is constant
     is_equal = True
     for chk_edge, tst_edge in zip(chk_edges, tst_edges):
-        is_equal = is_equal and chk_edge == tst_edge
+        is_equal = is_equal and np.allclose(
+            np.array(chk_edge.to_array()),
+            np.array(tst_edge.to_array()),
+            atol = 1e-10
+            )
         break
 
     if not is_equal:
@@ -100,9 +104,9 @@ def helper_assert_polygon_equality(polygon, chk_edges, holes=None, lb=True):
         print('and actual edges:')
         pp(tst_edges)
         print('\nSpecifically:')
-        pp(chk_edge)
+        pp(chk_edge.to_array())
         print('!=')
-        pp(tst_edge)
+        pp(tst_edge.to_array())
         print('\n')
         raise Exception('Equality error.')
 
@@ -154,7 +158,6 @@ def test_polyskel_pentagon():
         [0., 10.]
     ]
     # Make actual geom that we already sovled
-    v1 = 7.9289321881345245
     chk_edges = [
         [(5.0, 7.9289321881345245), (0.,  10.)],
         [(5.0, 7.9289321881345245), (5.0, 15.)],
@@ -164,6 +167,52 @@ def test_polyskel_pentagon():
         [(5.0, 5.0),                (10.,  0.)],
         [(5.0, 5.0),                (0.,   0.)]
     ]
+
+    assert helper_assert_polygon_equality(polygon, chk_edges, lb=True)
+
+def test_polyskel_complex_convex():
+    """
+    Complicated convex with many edges.
+    :return:
+    """
+
+    polygon = [
+        [0.,  0. ],
+        [2., -1. ],
+        [4., -1.5],
+        [10., 0. ],
+        [11., 5. ],
+        [11., 7. ],
+        [10.,10. ],
+        [5., 15. ],
+        [2., 15. ],
+        [0., 10. ]
+    ]
+
+    # Make actual geom that we already sovled
+    chk_edges = [
+        [(3.8612649295852073, 12.250850349054728), (2.0, 15.0)],
+        [(3.8612649295852073, 12.250850349054728), (5.0, 15.0)],
+        [(3.0723397575512923, 1.8988103951543103), (2.0, -1.0)],
+        [(3.0723397575512923, 1.8988103951543103), (0.0, 0.0)],
+        [(4.000000000000001, 2.6231056256176615), (4.0, -1.5)],
+        [(4.000000000000001, 2.6231056256176615),
+        (3.0723397575512923, 1.8988103951543103)],
+        [(4.501197221853484, 9.133148620085219), (0.0, 10.0)],
+        [(4.501197221853484, 9.133148620085219),
+        (3.8612649295852073, 12.250850349054728)],
+        [(5.336088038559574, 7.117543887292627),
+        (4.501197221853484, 9.133148620085219)],
+        [(5.336088038559574, 7.117543887292627), (10.0, 10.0)],
+        [(5.386560499934439, 4.398979599985999), (10.0, 0.0)],
+        [(5.386560499934439, 4.398979599985999),
+        (4.000000000000001, 2.6231056256176615)],
+        [(5.5, 6.107472869073913), (5.336088038559574, 7.117543887292627)],
+        [(5.5, 6.107472869073913), (11.0, 7.0)],
+        [(5.5, 5.544607324760315), (5.5, 6.107472869073913)],
+        [(5.5, 5.544607324760315), (11.0, 5.0)],
+        [(5.5, 5.544607324760315), (5.386560499934439, 4.398979599985999)]
+        ]
 
     assert helper_assert_polygon_equality(polygon, chk_edges, lb=True)
 
@@ -233,5 +282,6 @@ if __name__ == "__main__":
     test_polyskel_triangle()
     test_polyskel_square()
     test_polyskel_pentagon()
+    test_polyskel_complex_convex()
     #test_polyskel_concave()
     #test_polyskel_concave_two_holes()
