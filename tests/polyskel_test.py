@@ -12,13 +12,14 @@ from pprint import pprint as pp
 import numpy as np
 
 # For comparison import both polyskel
-import sys
-paths = ['/app/polyskel/']
-for path in paths:
-    if path not in sys.path: sys.path.insert(0,path)
+#import sys
+#paths = ['/app/polyskel/']
+#for path in paths:
+#    if path not in sys.path: sys.path.insert(0,path)
 
-import polyskel as orig_polyskel
+#import polyskel as orig_polyskel
 from ladybug_geometry import polyskel as lb_polyskel
+from tests.test_data import polyskel as orig_polyskel
 
 def helper_check_lavertex(v1, v2):
     """ Checking equality of different LAVertex properties
