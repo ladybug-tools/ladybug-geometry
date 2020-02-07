@@ -39,7 +39,8 @@ class LineSegment2D(Base1DIn2D):
             p1: A Point2D representing the first point of the line segment.
             p2: A Point2D representing the second point of the line segment.
         """
-        return cls(p1, p2 - p1)
+        v = p2 - p1
+        return cls(p1, Vector2D(v.x, v.y))
 
     @classmethod
     def from_sdl(cls, s, d, length):

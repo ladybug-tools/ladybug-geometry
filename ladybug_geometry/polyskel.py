@@ -21,12 +21,13 @@ from ladybug_geometry.geometry2d.line import LineSegment2D
 from ladybug_geometry.geometry2d.ray import Ray2D
 from ladybug_geometry import intersection2d
 
+TOL = 1e-10 # point tolerance
 
 _OriginalEdge = namedtuple('_OriginalEdge', 'edge bisector_left, bisector_right')
 Subtree = namedtuple('Subtree', 'source, height, sinks')
-_SplitEventTuple = namedtuple('_SplitEvent',
+_SplitEventSubClass = namedtuple('_SplitEvent',
 							  'distance, intersection_point, vertex, opposite_edge')
-_EdgeEventTuple = namedtuple('_EdgeEvent',
+_EdgeEventSubClass = namedtuple('_EdgeEvent',
 							 'distance intersection_point vertex_a vertex_b')
 
 log = logging.getLogger("__name__")
@@ -55,7 +56,7 @@ class _Debug:
 		if self.do:
 			self.im.show()
 
-class _SplitEvent(_SplitEventTuple):
+class _SplitEvent(_SplitEventSubClass):
 	"""A Split Event is a reflex vertex that splits an Edge Event. They therefore split
 	the entire polygon and create new adjacencies between the split edge and each of
 	the two edges incident to the reflex vertex (Felkel and Obdrzalek 1998, 1).
@@ -71,7 +72,7 @@ class _SplitEvent(_SplitEventTuple):
 			self.opposite_edge
 			)
 
-class _EdgeEvent(_EdgeEventTuple):
+class _EdgeEvent(_EdgeEventSubClass):
 	"""
 	An Edge Event is an edge extended from a perimeter edge, that shrinks to zero,
 	making its neighoring edges adjacent (Felkel and Obdrzalek 1998, 2).
@@ -86,6 +87,44 @@ class _EdgeEvent(_EdgeEventTuple):
 			self.vertex_b
 			)
 
+
+#FIXME: Temporary intersection class until I figure out diff btwn
+# lb and polyskel ints
+def _intersect_line2_line2(A, B):
+	d = B.v.y * A.v.x - B.v.x * A.v.y
+	if d == 0:
+		return None
+
+	dy = A.p.y - B.p.y
+	dx = A.p.x - B.p.x
+	ua = (B.v.x * dy - B.v.y * dx) / d
+	if not A._u_in(ua):
+		return None
+	# ub = (A.v.x * dy - A.v.y * dx) / d
+	# if not B._u_in(ub):
+	# 	return None
+
+	return Point2D(A.p.x + ua * A.v.x,
+				  A.p.y + ua * A.v.y)
+
+# Distance to point
+def distance(line, pt):
+
+	def _connect_point2_line2(P, L):
+		d = L.v.magnitude_squared
+		assert d != 0
+		u = ((P.x - L.p.x) * L.v.x + \
+			 (P.y - L.p.y) * L.v.y) / d
+		if not L._u_in(u):
+			u = max(min(u, 1.0), 0.0)
+		return LineSegment2D.from_end_points(
+			P, Point2D(L.p.x + u * L.v.x, L.p.y + u * L.v.y))
+
+	c = _connect_point2_line2(pt, line)
+	if c:
+		return c.length
+	return 0.0
+
 class _LAVertex:
 	"""A LAVertex is a vertex in a double connected circular list of active vertices
 	(LAV) (Felkel and Obdrzalek 1998, 3).
@@ -99,12 +138,9 @@ class _LAVertex:
 		self.lav = None
 		# this should be handled better. Maybe membership in lav implies validity?
 		self._valid = True
-		edge_left._v = edge_left.v.normalize()
-		edge_right._v = edge_right.v.normalize()
-		creator_vectors = (edge_left.v * -1, edge_right.v)
+		creator_vectors = (edge_left.v.normalize() * -1, edge_right.v.normalize())
 		if direction_vectors is None:
 			direction_vectors = creator_vectors
-
 		# The determinant of two 2d vectors equals the sign of their cross product
 		# If second vector is to left, then sign of det is pos, else neg
 		# So if cw polygon, convex angle will be neg (since second vector to right)
@@ -144,7 +180,7 @@ class _LAVertex:
 			# split events happen when a vertex hits an opposite edge,
 			# splitting the polygon in two.
 			log.debug("looking for split candidates for vertex %s", self)
-			for edge in self.original_edges:
+			for iii, edge in enumerate(self.original_edges):
 				if edge.edge == self.edge_left or edge.edge == self.edge_right:
 					continue
 
@@ -171,8 +207,9 @@ class _LAVertex:
 				# Make copies of edges and compute intersection
 				self_edge_copy = LineSegment2D(selfedge.p, selfedge.v)
 				edge_edge_copy = LineSegment2D(edge.edge.p, edge.edge.v)
-				i = intersection2d.intersect_line2d(self_edge_copy, edge_edge_copy)
-				if i is not None and not _approximately_equals(i, self.point):
+				#FIXME: temp interesection methods
+				i = _intersect_line2_line2(edge_edge_copy, self_edge_copy)
+				if (i is not None) and (not i.is_equivalent(self.point, TOL)):
 					#locate candidate b
 					linvec = (self.point - i).normalize()
 					edvec  = edge.edge.v.normalize()
@@ -183,26 +220,36 @@ class _LAVertex:
 					if abs(bisecvec) == 0:
 						continue
 					bisector = LineSegment2D(i, bisecvec)
-					b = bisector.intersect(self.bisector)
-
+					#FIXME: temp intersection methods
+					#b = intersection2d.intersect_line2d(bisector, self.bisector)
+					b = _intersect_line2_line2(self.bisector, bisector)
 					if b is None:
 						continue
 
 					#check eligibility of b
 					# a valid b should lie within the area limited by the edge and the
 					# bisectors of its two vertices:
-					xleft = _determinant(
-						edge.bisector_left.v.normalized(),
-						(b - edge.bisector_left.p).normalized()
-						) > 0
-					xright = _determinant(
-						edge.bisector_right.v.normalized(),
-						(b - edge.bisector_right.p).normalized()
-						) < 0
-					xedge = _determinant(
-						edge.edge.v.normalized(),
-						(b - edge.edge.p).normalized()
-						) < 0
+					_left_bisector_norm = edge.bisector_left.v.normalize()
+					_left_to_b_norm = (b - edge.bisector_left.p).normalize()
+					xleft = _left_bisector_norm.determinant(_left_to_b_norm) > 0
+					# xleft = _determinant(
+					# 	edge.bisector_left.v.normalized(),
+					# 	(b - edge.bisector_left.p).normalized()
+					# 	) > 0
+					_right_bisector_norm = edge.bisector_right.v.normalize()
+					_right_to_b_norm = (b - edge.bisector_right.p).normalize()
+					xright = _right_bisector_norm.determinant(_right_to_b_norm) < 0
+					# xright = _determinant(
+					# 	edge.bisector_right.v.normalized(),
+					# 	(b - edge.bisector_right.p).normalized()
+					# 	) < 0
+					_edge_edge_norm = edge.edge.v.normalize()
+					_b_to_edge_norm = (b - edge.edge.p).normalize()
+					xedge = _edge_edge_norm.determinant(_b_to_edge_norm) < 0
+					# xedge = _determinant(
+					# 	edge.edge.v.normalized(),
+					# 	(b - edge.edge.p).normalized()
+					# 	) < 0
 
 					if not (xleft and xright and xedge):
 						log.debug(
@@ -213,33 +260,29 @@ class _LAVertex:
 						continue
 
 					log.debug('\t\tFound valid candidate %s', b)
-					events.append(
-						_SplitEvent(
-							Line2(edge.edge).distance(b),
-							b,
-							self,
-							edge.edge
-							)
+					_dist_line_to_b = distance(
+						LineSegment2D(edge.edge.p, edge.edge.v), b
 						)
+					_new_split_event = _SplitEvent(_dist_line_to_b, b, self, edge.edge)
+					events.append(_new_split_event)
 
 		# Intersect line2d with line2d (does not assume lines are infinite)
-		i_prev = intersection2d.intersect_line2d(self.bisector, self.prev.bisector)
-		i_next = intersection2d.intersect_line2d(self.bisector, self.prev.bisector)
-
-		# Calc distances from edge to intersection
-		dist_to_i_prev = LineSegment2D(
-			self.edge_left.p.duplicate(),
-			self.edge_left.v.duplicate())
-		dist_to_i_prev = dist_to_i_prev.distance_to_point(i_prev)
-		dist_to_i_next = LineSegment2D(
-			self.edge_right.p.duplicate(),
-			self.edge_right.v.duplicate())
-		dist_to_i_next = dist_to_i_next.distance_to_point(i_next)
+		# FIXME: temp intersection methods
+		#i_prev = intersection2d.intersect_line2d(self.bisector, self.prev.bisector)
+		#i_next = intersection2d.intersect_line2d(self.bisector, self.prev.bisector)
+		i_prev = _intersect_line2_line2(self.prev.bisector, self.bisector)
+		i_next = _intersect_line2_line2(self.next.bisector, self.bisector)
 
 		# Make EdgeEvent and append to events
 		if i_prev is not None:
+			dist_to_i_prev = distance(
+				LineSegment2D(self.edge_left.p.duplicate(),self.edge_left.v.duplicate()),
+				i_prev)
 			events.append(_EdgeEvent(dist_to_i_prev, i_prev, self.prev, self))
 		if i_next is not None:
+			dist_to_i_next = distance(
+				LineSegment2D(self.edge_right.p.duplicate(),self.edge_right.v.duplicate()),
+				i_next)
 			events.append(_EdgeEvent(dist_to_i_next, i_next, self, self.next))
 
 		if not events:
@@ -395,27 +438,29 @@ class _SLAV:
 		vertices = []
 		x = None   # right vertex
 		y = None   # left vertex
-		norm = event.opposite_edge.v.normalized()
+		norm = event.opposite_edge.v.normalize()
 		for v in chain.from_iterable(self._lavs):
 			log.debug('%s in %s', v, v.lav)
 			equal_to_edge_left_p  = event.opposite_edge.p == v.edge_left.p
 			equal_to_edge_right_p = event.opposite_edge.p == v.edge_right.p
-			if norm == v.edge_left.v.normalized() and equal_to_edge_left_p:
+			if norm == v.edge_left.v.normalize() and equal_to_edge_left_p:
 				x = v
 				y = x.prev
-			elif norm == v.edge_right.v.normalized() and equal_to_edge_right_p:
+			elif norm == v.edge_right.v.normalize() and equal_to_edge_right_p:
 				y=v
 				x=y.next
 
 			if x:
-				xleft = _determinant(
-					y.bisector.v.normalized(),
-					(event.intersection_point - y.point).normalized()
-					) >= 0
-				xright = _determinant(
-					x.bisector.v.normalized(),
-					(event.intersection_point - x.point).normalized()
-					) <= 0
+				xleft = y.bisector.v.normalize().determinant(
+					(event.intersection_point - y.point).normalize()) >= 0
+				# xleft = _determinant(y.bisector.v.normalized(),
+				# 					 (event.intersection_point - y.point).normalized()) >= 0
+
+				xright = x.bisector.v.normalize().determinant(
+					(event.intersection_point - x.point).normalize()) <= 0
+
+				# xright = _determinant(x.bisector.v.normalized(),
+				# 					  (event.intersection_point - x.point).normalized()) <= 0
 
 				log.debug(
 					'Vertex %s holds edge as %s edge (%s, %s)',
@@ -518,7 +563,6 @@ class _LAV:
 				LineSegment2D.from_end_points(prev, point),
 				LineSegment2D.from_end_points(point, next)
 				)
-
 			vertex.lav = lav
 			if lav.head == None:
 				lav.head = vertex
@@ -699,17 +743,21 @@ def skeletonize(polygon, holes=None):
 	Compute the straight skeleton of a polygon.
 
 	The polygon should be given as a list of vertices in counter-clockwise order.
-	Holes is a list of the contours of the holes, the vertices of which should be in
-	clockwise order.
+	Holes is a similiar list with the vertices of which should be in clockwise order.
 
-	Returns the straight skeleton as a list of "subtrees", which are in the form of
-	(source, height, sinks), where source is the highest points, height is its height,
-	and sinks are the point connected to the source.
+	#FIXME: revise subtrees into list.
+	Returns the straight skeleton as a list of "subtrees", which are in
+	the form of (source, height, sinks), where source is the highest points, height is
+	its height, and sinks are the point connected to the source.
 
 	Args:
-		TODO
+		polygon: list of list of point coordinates in ccw order.
+			Example square: [[0,0], [1,0], [1,1], [0,1]]
+		holes: list of polygons representing holes in cw order.
+			Example hole: [[.25,.75], [.75,.75], [.75,.25], [.25,.25]]
 	Returns:
-		TODO
+		List of list of list of skeleton edges.
+			#TODO: skeleton edges
 	"""
 
 	# Code works on cw and ccw order for polygons and holes,

@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Classes for computing straight skeleton for 2D polygons."""
+"""Classes for computing straight skeleton for 2D convex polygons."""
 from __future__ import division
 
 import pytest
@@ -13,12 +13,12 @@ from pprint import pprint as pp
 import numpy as np
 
 # TODO Figure out if we need this later
-# # For comparison
-# import sys
-# paths = ['/app/polyskel/']
-# for path in paths:
-#     if path not in sys.path: sys.path.insert(0,path)
-# import polyskel as orig_polyskel
+# For comparison
+import sys
+paths = ['/app/polyskel/']
+for path in paths:
+    if path not in sys.path: sys.path.insert(0,path)
+import polyskel as orig_polyskel
 
 #TODO: move to updated polyskel once we import lb-geom?
 def skeleton_edges(skeleton):
