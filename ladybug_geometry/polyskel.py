@@ -21,42 +21,43 @@ from ladybug_geometry.geometry2d.line import LineSegment2D
 from ladybug_geometry.geometry2d.ray import Ray2D
 from ladybug_geometry import intersection2d
 
-TOL = 1e-10  # point tolerance
-
 _OriginalEdge = namedtuple('_OriginalEdge', 'edge bisector_left, bisector_right')
 Subtree = namedtuple('Subtree', 'source, height, sinks')
 _SplitEventSubClass = namedtuple('_SplitEvent',
                                  'distance, intersection_point, vertex, opposite_edge')
 _EdgeEventSubClass = namedtuple('_EdgeEvent',
                                 'distance intersection_point vertex_a vertex_b')
-
 log = logging.getLogger("__name__")
 
-
 class _Debug:
-	"""
-	For Debugging
-	"""
-	
-	def __init__(self, image):
-		if image is not None:
-			self.im = image[0]
-			self.draw = image[1]
-			self.do = True
-		else:
-			self.do = False
-	
-	def line(self, *args, **kwargs):
-		if self.do:
-			self.draw.line(*args, **kwargs)
-	
-	def rectangle(self, *args, **kwargs):
-		if self.do:
-			self.draw.rectangle(*args, **kwargs)
-	
-	def show(self):
-		if self.do:
-			self.im.show()
+    """For Debugging"""
+    def __init__(self, image):
+        if image is not None:
+            self.im = image[0]
+            self.draw = image[1]
+            self.do = True
+        else:
+            self.do = False
+
+    def line(self, *args, **kwargs):
+        if self.do:
+            self.draw.line(*args, **kwargs)
+
+    def rectangle(self, *args, **kwargs):
+        if self.do:
+            self.draw.rectangle(*args, **kwargs)
+
+    def show(self):
+        if self.do:
+            self.im.show()
+
+_debug = _Debug(None)
+
+
+# Debug set function
+def set_debug(image):
+	global _debug
+	_debug = _Debug(image)
 
 
 class _SplitEvent(_SplitEventSubClass):
@@ -74,7 +75,6 @@ class _SplitEvent(_SplitEventSubClass):
 			self.vertex,
 			self.opposite_edge
 			)
-
 
 class _EdgeEvent(_EdgeEventSubClass):
 	"""
@@ -114,13 +114,14 @@ class _LAVertex:
 	(LAV) (Felkel and Obdrzalek 1998, 3).
 	"""
 	
-	def __init__(self, point, edge_left, edge_right, direction_vectors=None):
+	def __init__(self, point, edge_left, edge_right, direction_vectors=None, tol=1e-10):
 		self.point = point
 		self.edge_left = edge_left
 		self.edge_right = edge_right
 		self.prev = None
 		self.next = None
 		self.lav = None
+		self.tol = tol
 		# this should be handled better. Maybe membership in lav implies validity?
 		self._valid = True
 		creator_vectors = (edge_left.v.normalize() * -1, edge_right.v.normalize())
@@ -196,7 +197,7 @@ class _LAVertex:
 				i = intersection2d.intersect_line2d_infinite(
 					edge_edge_copy, self_edge_copy)
 
-				if (i is not None) and (not i.is_equivalent(self.point, TOL)):
+				if (i is not None) and (not i.is_equivalent(self.point, self.tol)):
 					# locate candidate b
 					linvec = (self.point - i).normalize()
 					edvec = edge.edge.v.normalize()
@@ -305,27 +306,18 @@ class _LAVertex:
 			self.edge_right
 			)
 
-
-_debug = _Debug(None)
-
-
-# Debug set function
-def set_debug(image):
-	global _debug
-	_debug = _Debug(image)
-
-
 class _SLAV:
 	""" A SLAV is a set of circular lists of active vertices. It stores a loop of
 	vertices for the outer boundary, and for all holes and sub-polyons created durnig
 	the straight skeleton computation (Felkel and Obdrzalek 1998, 2).
 	"""
 	
-	def __init__(self, polygon, holes):
+	def __init__(self, polygon, holes, tol):
+		self.tol = tol
 		contours = [_normalize_contour(polygon)]
 		contours.extend([_normalize_contour(hole) for hole in holes])
 		
-		self._lavs = [_LAV.from_polygon(contour, self) for contour in contours]
+		self._lavs = [_LAV.from_polygon(contour, self, tol) for contour in contours]
 		
 		# store original polygon edges for calculating split events
 		self._original_edges = [
@@ -458,12 +450,14 @@ class _SLAV:
 		v1 = _LAVertex(
 			event.intersection_point,
 			event.vertex.edge_left,
-			event.opposite_edge
+			event.opposite_edge,
+			tol=self.tol
 			)
 		v2 = _LAVertex(
 			event.intersection_point,
 			event.opposite_edge,
-			event.vertex.edge_right
+			event.vertex.edge_right,
+			tol=self.tol
 			)
 		
 		v1.prev = event.vertex.prev
@@ -481,9 +475,9 @@ class _SLAV:
 		if lav != x.lav:
 			# the split event actually merges two lavs
 			self._lavs.remove(x.lav)
-			new_lavs = [_LAV.from_chain(v1, self)]
+			new_lavs = [_LAV.from_chain(v1, self, self.tol)]
 		else:
-			new_lavs = [_LAV.from_chain(v1, self), _LAV.from_chain(v2, self)]
+			new_lavs = [_LAV.from_chain(v1, self, self.tol), _LAV.from_chain(v2, self, self.tol)]
 		
 		for l in new_lavs:
 			log.debug(l)
@@ -514,27 +508,29 @@ class _LAV:
 	and Obdrzalek 1998, 2).
 	"""
 	
-	def __init__(self, slav):
+	def __init__(self, slav, tol):
 		self.head = None
 		self._slav = slav
 		self._len = 0
+		self.tol = 1e-10
 		log.debug('Created LAV %s', self)
 	
 	@classmethod
-	def from_polygon(cls, polygon, slav):
+	def from_polygon(cls, polygon, slav, tol):
 		"""TODO: Fill in description.
 		Args:
 			TODO
 		Returns:
 			TODO
 		"""
-		lav = cls(slav)
+		lav = cls(slav,tol)
 		for prev, point, next in _window(polygon):
 			lav._len += 1
 			vertex = _LAVertex(
 				point,
 				LineSegment2D.from_end_points(prev, point),
-				LineSegment2D.from_end_points(point, next)
+				LineSegment2D.from_end_points(point, next),
+				tol=tol
 				)
 			vertex.lav = lav
 			if lav.head == None:
@@ -548,14 +544,14 @@ class _LAV:
 		return lav
 	
 	@classmethod
-	def from_chain(cls, head, slav):
+	def from_chain(cls, head, slav, tol):
 		"""TODO: Fill in description.
 		Args:
 			TODO
 		Returns:
 			TODO
 		"""
-		lav = cls(slav)
+		lav = cls(slav, tol=tol)
 		lav.head = head
 		for vertex in lav:
 			lav._len += 1
@@ -589,7 +585,8 @@ class _LAV:
 			point,
 			vertex_a.edge_left,
 			vertex_b.edge_right,
-			(normed_b_bisector, normed_a_bisector)
+			(normed_b_bisector, normed_a_bisector),
+			tol=vertex_a.tol,
 			)
 		replacement.lav = self
 		
@@ -741,7 +738,7 @@ def subtree_to_edge_mtx(skeleton):
 	return edge_lst
 
 
-def skeletonize(polygon, holes=None):
+def skeletonize(polygon, holes=None, tol=1e-10):
 	"""
 	Compute the straight skeleton of a polygon.
 
@@ -759,14 +756,14 @@ def skeletonize(polygon, holes=None):
 	Returns:
 		List of list of skeleton edges (list of point coordinates as tuples)
 	"""
-	
+
 	# Code works on cw and ccw order for polygons and holes,
 	# respectively. So reverse vertex order for both inputs
 	polygon = polygon[::-1]
 	if holes is not None:
 		holes = [hole[::-1] for hole in holes]
 	
-	slav = _SLAV(polygon, holes)
+	slav = _SLAV(polygon, holes, tol)
 	output = []
 	prioque = _EventQueue()
 	

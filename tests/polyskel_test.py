@@ -96,15 +96,11 @@ def test_polygon_init():
         [1,1],
         [0,2]
     ]
+    
     # With LB
-    SLAV = lb_polyskel._SLAV(polygon, [])
+    SLAV = lb_polyskel._SLAV(polygon, [], tol=1e-10)
     contour = lb_polyskel._normalize_contour(polygon)
-    lav = lb_polyskel._LAV.from_polygon(contour, SLAV)
-
-    # With LB
-    SLAV = lb_polyskel._SLAV(polygon, [])
-    contour = lb_polyskel._normalize_contour(polygon)
-    lb_lav = lb_polyskel._LAV.from_polygon(contour, SLAV)
+    lb_lav = lb_polyskel._LAV.from_polygon(contour, SLAV, 1e-10)
 
     # With orig
     SLAV = orig_polyskel._SLAV(polygon, [])
