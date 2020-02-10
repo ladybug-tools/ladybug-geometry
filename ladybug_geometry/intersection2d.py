@@ -10,6 +10,17 @@ import math
 def intersect_line2d(line_ray_a, line_ray_b):
     """Get the intersection between any Ray2D or LineSegment2D objects as a Point2D.
 
+    This function calculates scaling parameters for ua and ub where:
+        A.p + ua * A.v = B.p + ub * B.v
+    Which represents the intersection point between line A and line B.
+
+    The derivation of ua is achieved by crossing both sides of the above equation
+    with the direction vector of B, and rearranging the formula:
+        A.p + ua * A.v = B.p + ub * B.v
+        (A.p + ua * A.v) x B.v = (B.p + ub * B.v) x B.v # Cross both sides with B.v
+        (A.p x B.v) + (ua * A.v x B.v) = (B.p x B.v) + (ub * B.v x B.v) # B.v x B.v = 0
+        ua = (B.p - A.p) x B.v / (A.v x B.v)
+
     Args:
         line_ray_a: A LineSegment2D or Ray2D object.
         line_ray_b: Another LineSegment2D or Ray2D to intersect.
@@ -17,17 +28,29 @@ def intersect_line2d(line_ray_a, line_ray_b):
     Returns:
         Point2D of intersection if it exists. None if no intersection exists.
     """
+    # d is the determinant between lines, if 0 lines are collinear
     d = line_ray_b.v.y * line_ray_a.v.x - line_ray_b.v.x * line_ray_a.v.y
     if d == 0:
         return None
+
+    # (dx, dy) = A.p - B.p
     dy = line_ray_a.p.y - line_ray_b.p.y
     dx = line_ray_a.p.x - line_ray_b.p.x
+
+    # Find parameters ua and ub for intersection between two lines
+
+    # Calculate scaling parameter for line_ray_b
     ua = (line_ray_b.v.x * dy - line_ray_b.v.y * dx) / d
+    # Checks the bounds of ua to ensure it obeys ray/line behaviour
     if not line_ray_a._u_in(ua):
         return None
+
+    # Calculate scaling parameter for line_ray_b
     ub = (line_ray_a.v.x * dy - line_ray_a.v.y * dx) / d
+    # Checks the bounds of ub to ensure it obeys ray/line behaviour
     if not line_ray_b._u_in(ub):
         return None
+
     return Point2D(line_ray_a.p.x + ua * line_ray_a.v.x,
                    line_ray_a.p.y + ua * line_ray_a.v.y)
 
