@@ -196,7 +196,6 @@ def closest_point2d_on_line2d(point, line_ray):
         u = max(min(u, 1.0), 0.0)
     return Point2D(line_ray.p.x + u * line_ray.v.x, line_ray.p.y + u * line_ray.v.y)
 
-
 def closest_point2d_between_line2d(line_ray_a, line_ray_b):
     """Get the two closest Point2D between two LineSegment2D objects.
 

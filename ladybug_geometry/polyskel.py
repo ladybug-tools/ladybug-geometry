@@ -224,8 +224,9 @@ class _LAVertex:
                         continue
 
                     log.debug('\t\tFound valid candidate %s', b)
-                    _dist_line_to_b = distance(
-                        LineSegment2D(edge.edge.p, edge.edge.v), b)
+                    _dist_line_to_b = _pt_to_line_distance(
+                        b,
+                        LineSegment2D(edge.edge.p, edge.edge.v), self.tol)
                     _new_split_event = _SplitEvent(_dist_line_to_b, b, self, edge.edge)
                     events.append(_new_split_event)
 
@@ -237,16 +238,19 @@ class _LAVertex:
 
         # Make EdgeEvent and append to events
         if i_prev is not None:
-            dist_to_i_prev = distance(
+            dist_to_i_prev = _pt_to_line_distance(
+                i_prev,
                 LineSegment2D(self.edge_left.p.duplicate(),
-                              self.edge_left.v.duplicate()),
-                i_prev)
+                              self.edge_left.v.duplicate()), self.tol)
+
             events.append(_EdgeEvent(dist_to_i_prev, i_prev, self.prev, self))
+
         if i_next is not None:
-            dist_to_i_next = distance(
+            dist_to_i_next = _pt_to_line_distance(
+                i_next,
                 LineSegment2D(self.edge_right.p.duplicate(),
-                              self.edge_right.v.duplicate()),
-                i_next)
+                              self.edge_right.v.duplicate()), self.tol)
+
             events.append(_EdgeEvent(dist_to_i_next, i_next, self, self.next))
 
         if not events:
@@ -658,43 +662,24 @@ class _EventQueue:
 
 
 # Skeleton Code
-def distance(line, pt):
-    """ Calculates the distance from a line to a point.
+def _pt_to_line_distance(pt, line, tol):
+    """Helper to computes closest point on line to given pt, and returns
+    distance between them.
+
     Args:
-        line: Line2D object
-        pt: Point2D object
-    Returns:
-        Distance as float.
+        pt: Point2D
+        line: Line2D from which closest point is computed.
+        tol: point equality tolerance.
+    Return:
+        float of distance.
     """
-    def _connect_point2_line2(P, L):
-        d = L.v.magnitude_squared
-        assert d != 0
-        u = ((P.x - L.p.x) * L.v.x +
-             (P.y - L.p.y) * L.v.y) / d
-        if not L._u_in(u):
-            u = max(min(u, 1.0), 0.0)
-        return LineSegment2D.from_end_points(
-            P,
-            Point2D(L.p.x + u * L.v.x,
-                    L.p.y + u * L.v.y))
+    pt2 = intersection2d.closest_point2d_on_line2d(pt, line)
+    if not pt.is_equivalent(pt2, tol):
+        dist = LineSegment2D.from_end_points(pt, pt2).length
+    else:
+        dist = 0.0
 
-    c = _connect_point2_line2(pt, line)
-    if c:
-        return c.length
-    return 0.0
-
-
-def _polyskel_point2d_lt(self, other):
-    """
-    Need for use in heap, binary trees, or other 1D data structures
-    that need to sort values based on value comparisons.
-    Args:
-        other: Point2D or Vector2D for comparison.
-    Returns:
-         boolean based on comparison to vector x coords
-    """
-    if isinstance(other, Vector2D):
-        return self.x < other.x
+    return dist
 
 
 def _window(lst):
