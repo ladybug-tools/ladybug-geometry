@@ -406,7 +406,15 @@ class Point2D(Vector2D):
         return 'Point2D (%.2f, %.2f)' % (self.x, self.y)
 
     def __lt__(self, other):
-        """Used for storing points in external 1D data structure libraries
+        """ Lesser then inequality method. This is used by certain external
+        data structure libraries to efficiently store and retrieve point data.
         """
         if isinstance(other, Vector2D):
             return self.x < other.x
+
+    def __gt__(self, other):
+        """ Greater then inequality method. This is used by certain external
+        data structure libraries to efficiently store and retrieve point data.
+        """
+        if isinstance(other, Vector2D):
+            return self.x > other.x

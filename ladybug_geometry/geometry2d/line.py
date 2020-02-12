@@ -74,7 +74,11 @@ class LineSegment2D(Base1DIn2D):
         return self.v.magnitude
 
     def to_array(self):
-        """ To nested list """
+        """ A nested list representing the two line endpoint coordinates.
+            Returns: 
+                Nested tuples ((pt1.x, pt1.y), (pt2.x, pt2.y)), where
+                pt1 and pt2 represent the endpoints of the line segment.
+        """
         return (self.p1.to_array(), self.p2.to_array())
 
     def flip(self):

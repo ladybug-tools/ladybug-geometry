@@ -31,8 +31,6 @@ class Polygon2D(Base2DIn2D):
         * is_convex
         * is_self_intersecting
         * is_valid
-
-
     """
     __slots__ = ('_segments', '_triangulated_mesh', '_perimeter', '_area',
                  '_is_clockwise', '_is_convex', '_is_self_intersecting')
