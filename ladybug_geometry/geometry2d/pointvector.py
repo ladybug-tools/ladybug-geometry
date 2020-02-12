@@ -404,3 +404,17 @@ class Point2D(Vector2D):
     def __repr__(self):
         """Point2D representation."""
         return 'Point2D (%.2f, %.2f)' % (self.x, self.y)
+
+    def __lt__(self, other):
+        """ Lesser then inequality method. This is used by certain external
+        data structure libraries to efficiently store and retrieve point data.
+        """
+        if isinstance(other, Vector2D):
+            return self.x < other.x
+
+    def __gt__(self, other):
+        """ Greater then inequality method. This is used by certain external
+        data structure libraries to efficiently store and retrieve point data.
+        """
+        if isinstance(other, Vector2D):
+            return self.x > other.x

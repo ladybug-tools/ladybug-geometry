@@ -31,8 +31,6 @@ class Polygon2D(Base2DIn2D):
         * is_convex
         * is_self_intersecting
         * is_valid
-
-
     """
     __slots__ = ('_segments', '_triangulated_mesh', '_perimeter', '_area',
                  '_is_clockwise', '_is_convex', '_is_self_intersecting')
@@ -318,6 +316,10 @@ class Polygon2D(Base2DIn2D):
         will remove duplicate/colinear vertices.
         """
         return not self.area == 0
+
+    def to_array(self):
+        """ Nested list of nested list of points. """
+        return tuple(pt.to_array() for pt in self.vertices)
 
     def remove_colinear_vertices(self, tolerance):
         """Get a version of this polygon without colinear or duplicate vertices.

@@ -39,7 +39,8 @@ class LineSegment2D(Base1DIn2D):
             p1: A Point2D representing the first point of the line segment.
             p2: A Point2D representing the second point of the line segment.
         """
-        return cls(p1, p2 - p1)
+        v = p2 - p1
+        return cls(p1, Vector2D(v.x, v.y))
 
     @classmethod
     def from_sdl(cls, s, d, length):
@@ -71,6 +72,14 @@ class LineSegment2D(Base1DIn2D):
     def length(self):
         """The length of the line segment."""
         return self.v.magnitude
+
+    def to_array(self):
+        """ A nested list representing the two line endpoint coordinates.
+            Returns: 
+                Nested tuples ((pt1.x, pt1.y), (pt2.x, pt2.y)), where
+                pt1 and pt2 represent the endpoints of the line segment.
+        """
+        return (self.p1.to_array(), self.p2.to_array())
 
     def flip(self):
         """Get a copy of this line segment that is flipped."""

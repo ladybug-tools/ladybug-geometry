@@ -71,6 +71,14 @@ class LineSegment3D(Base1DIn3D):
         """The length of the line segment."""
         return self.v.magnitude
 
+    def to_array(self):
+        """ A nested list representing the two line endpoint coordinates.
+            Returns:
+                Nested tuples ((pt1.x, pt1.y, pt1.z), (pt2.x, pt2.y, pt2.z)),
+                where pt1 and pt2 represent the endpoints of the line segment.
+        """
+        return (self.p1.to_array(), self.p2.to_array())
+
     def is_horizontal(self, tolerance):
         """Test whether this line segment is horizontal within a certain tolerance.
 
