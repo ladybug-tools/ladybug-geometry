@@ -77,6 +77,18 @@ class LineSegment2D(Base1DIn2D):
         """
         return (self.p1.to_array(), self.p2.to_array())
 
+    @classmethod
+    def from_array(cls, line_array):
+        """ Consumes a nested list representing the two line endpoint coordinates
+        and returns a LineSegment2D.
+            Args:
+                Nested tuples ((pt1.x, pt1.y), (pt2.x, pt2.y)), where
+                pt1 and pt2 represent the endpoints of the line segment.
+            Returns: 
+                LineSegment2D.
+        """
+        return LineSegment2D.from_end_points(*tuple(Point2D(*pt) for pt in line_array))
+
     def flip(self):
         """Get a copy of this line segment that is flipped."""
         return LineSegment2D(self.p2, self.v.reverse())

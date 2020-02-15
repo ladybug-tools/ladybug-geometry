@@ -7,7 +7,9 @@ from .line import LineSegment2D
 from .ray import Ray2D
 from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
     does_intersection_exist_line2d, closest_point2d_on_line2d
+from ..geometry3d.pointvector import Vector3D
 from ._2d import Base2DIn2D
+
 
 from collections import deque
 import math
@@ -316,6 +318,18 @@ class Polygon2D(Base2DIn2D):
     def to_array(self):
         """Get a list of lists whenre each sub-list represents a Point2D vetex."""
         return tuple(pt.to_array() for pt in self.vertices)
+
+    @classmethod
+    def from_array(cls, polygon_array):
+        """ Consumes nested list of nested list of points, 
+        and returns Polygon2D.
+            
+        Args:
+            polygon_array: nested list of point lists
+        Returns:
+            Polygon2D
+        """
+        return Polygon2D([Point2D(*point) for point in polygon_array])
 
     def remove_colinear_vertices(self, tolerance):
         """Get a version of this polygon without colinear or duplicate vertices.
@@ -843,3 +857,22 @@ class Polygon2D(Base2DIn2D):
 
     def __repr__(self):
         return 'Polygon2D ({} vertices)'.format(len(self))
+    
+    def offset(self, distance, tol):
+        """
+        #TODO
+        """
+        line = LineSegment2D.from_array(((2,0), (2,2)))
+        # line2 = LineSegment2D.from_array((2,0), (2,2))
+
+        # Normal facing into polygon 
+        line_v = Vector3D(*line.v.to_array(), 0)
+        down_v = Vector3D(0, 0, -1)
+        normal = line_v.cross(down_v).normalize() * distance
+        
+        # Move
+        mv_line = line.move(normal)
+
+        print(mv_line.to_array())
+        print(normal)
+        return -1

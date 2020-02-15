@@ -631,3 +631,12 @@ def test_intersect_polygon_segments_with_3_angled_rectangles():
 
     assert len(polygon1.segments) == 4  # No extra vertex added
     assert len(polygon2.segments) == 4  # No extra vertex added
+
+def test_polygon2d_offset():
+    pts = (Point2D(0, 2), Point2D(4, 2), Point2D(4, 4), Point2D(0, 4))
+    poly = Polygon2D(pts)
+    poly.offset(1,1e-10)
+
+if __name__ == "__main__":
+    pts = (Point2D(0, 2), Point2D(4, 2), Point2D(4, 4), Point2D(0, 4))
+    Polygon2D(pts).offset(0.5, 1e-10)
