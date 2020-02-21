@@ -20,12 +20,8 @@ class Ray3D(Base1DIn3D):
     __slots__ = ()
 
     def __init__(self, p, v):
-        """Initilize Ray3D.
-        """
-        assert isinstance(p, Point3D), "Expected Point3D. Got {}.".format(type(p))
-        assert isinstance(v, Vector3D), "Expected Vector3D. Got {}.".format(type(v))
-        self._p = p
-        self._v = v
+        """Initilize Ray3D."""
+        Base1DIn3D.__init__(self, p, v)
 
     def reverse(self):
         """Get a copy of this ray that is reversed."""

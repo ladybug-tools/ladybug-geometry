@@ -20,8 +20,7 @@ class Base2DIn3D(object):
     __slots__ = ('_vertices', '_min', '_max', '_center')
 
     def __init__(self, vertices):
-        """Initilize Base2DIn3D.
-        """
+        """Initilize Base2DIn3D."""
         self._vertices = self._check_vertices_input(vertices)
         self._min = None
         self._max = None

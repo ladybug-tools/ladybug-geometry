@@ -32,8 +32,7 @@ class Plane(object):
     __slots__ = ('_n', '_o', '_k', '_x', '_y')
 
     def __init__(self, n=Vector3D(0, 0, 1), o=Point3D(0, 0, 0), x=None):
-        """Initilize Plane.
-        """
+        """Initilize Plane."""
         assert isinstance(n, Vector3D), \
             "Expected Vector3D for plane normal. Got {}.".format(type(n))
         assert isinstance(o, Point3D), \

@@ -38,8 +38,7 @@ class Arc3D(object):
     __slots__ = ('_plane', '_arc2d')
 
     def __init__(self, plane, radius, a1=0, a2=2*math.pi):
-        """Initilize Arc3D.
-        """
+        """Initilize Arc3D."""
         assert isinstance(plane, Plane), "Expected Plane. Got {}.".format(type(plane))
         self._plane = plane
         self._arc2d = Arc2D(Point2D(0, 0), radius, a1, a2)

@@ -9,6 +9,10 @@ import operator
 class Vector2D(object):
     """2D Vector object.
 
+    Args:
+        x: Number for the X coordinate.
+        y: Number for the Y coordinate.
+
     Properties:
         * x
         * y
@@ -307,6 +311,10 @@ class Vector2D(object):
 
 class Point2D(Vector2D):
     """2D Point object.
+
+    Args:
+        x: Number for the X coordinate.
+        y: Number for the Y coordinate.
 
     Properties:
         * x

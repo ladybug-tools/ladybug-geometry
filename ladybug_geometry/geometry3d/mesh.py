@@ -42,8 +42,7 @@ class Mesh3D(MeshBase):
     __slots__ = ('_min', '_max', '_center', '_face_normals', '_vertex_normals')
 
     def __init__(self, vertices, faces, colors=None):
-        """Initilize Mesh3D.
-        """
+        """Initilize Mesh3D."""
         self._vertices = self._check_vertices_input(vertices)
         self._faces = self._check_faces_input(faces)
 

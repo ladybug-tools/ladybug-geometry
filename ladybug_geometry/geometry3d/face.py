@@ -82,8 +82,7 @@ class Face3D(Base2DIn3D):
                  '_is_convex', '_is_self_intersecting')
 
     def __init__(self, boundary, plane=None, holes=None, enforce_right_hand=True):
-        """Initilize Face3D.
-        """
+        """Initilize Face3D."""
         # process the boundary and plane inputs
         self._boundary = self._check_vertices_input(boundary)
         if plane is not None:

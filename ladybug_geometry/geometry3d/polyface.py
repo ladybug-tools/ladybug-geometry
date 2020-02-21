@@ -64,10 +64,9 @@ class Polyface3D(Base2DIn3D):
                  '_area', '_volume', '_is_solid')
 
     def __init__(self, vertices, face_indices, edge_information=None):
-        """Initilize Polyface3D.
-        """
+        """Initilize Polyface3D."""
         # assign input properties
-        self._vertices = self._check_vertices_input(vertices)
+        Base2DIn3D.__init__(self, vertices)
         self._face_indices = tuple(tuple(tuple(loop) for loop in face)
                                    for face in face_indices)
 
@@ -106,9 +105,6 @@ class Polyface3D(Base2DIn3D):
         self._naked_edges = None
         self._internal_edges = None
         self._non_manifold_edges = None
-        self._min = None
-        self._max = None
-        self._center = None
         self._area = None
         self._volume = None
 

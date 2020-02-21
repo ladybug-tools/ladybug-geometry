@@ -8,6 +8,9 @@ from .pointvector import Point2D
 class Base2DIn2D(object):
     """Base class for 2D geometries in 2D space (Polygon2D and Mesh2D).
 
+    Args:
+        vertices: A list of Point2D objects representing the vertices.
+
     Properties:
         * vertices
         * min
@@ -17,11 +20,7 @@ class Base2DIn2D(object):
     __slots__ = ('_vertices', '_min', '_max', '_center')
 
     def __init__(self, vertices):
-        """Initilize Base2DIn2D.
-
-        Args:
-            vertices: A list of Point2D objects representing the vertices.
-        """
+        """Initilize Base2DIn2D."""
         self._vertices = self._check_vertices_input(vertices)
         self._min = None
         self._max = None
