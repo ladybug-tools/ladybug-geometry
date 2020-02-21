@@ -32,17 +32,13 @@ class Polygon2D(Base2DIn2D):
         * is_self_intersecting
         * is_valid
     """
-    __slots__ = ('_segments', '_triangulated_mesh', '_perimeter', '_area',
+    __slots__ = ('_segments', '_perimeter', '_area',
                  '_is_clockwise', '_is_convex', '_is_self_intersecting')
 
     def __init__(self, vertices):
-
-        self._vertices = self._check_vertices_input(vertices)
+        """Initilize Polygon2D."""
+        Base2DIn2D.__init__(self, vertices)
         self._segments = None
-        self._triangulated_mesh = None
-        self._min = None
-        self._max = None
-        self._center = None
         self._perimeter = None
         self._area = None
         self._is_clockwise = None
@@ -231,7 +227,7 @@ class Polygon2D(Base2DIn2D):
     def segments(self):
         """Tuple of all line segments in the polygon."""
         if self._segments is None:
-            _segs = Polygon2D._segments_from_vertices(self.vertices)
+            _segs = self._segments_from_vertices(self.vertices)
             self._segments = tuple(_segs)
         return self._segments
 
@@ -318,7 +314,7 @@ class Polygon2D(Base2DIn2D):
         return not self.area == 0
 
     def to_array(self):
-        """ Nested list of nested list of points. """
+        """Get a list of lists whenre each sub-list represents a Point2D vetex."""
         return tuple(pt.to_array() for pt in self.vertices)
 
     def remove_colinear_vertices(self, tolerance):
@@ -329,7 +325,7 @@ class Polygon2D(Base2DIn2D):
                 before it is considered colinear.
         """
         if len(self.vertices) == 3:
-            return self
+            return self  # Polygon2D cannot have fewer than 3 vertices
         new_vertices = []
         for i, _v in enumerate(self.vertices):
             _a = self[i - 2].determinant(self[i - 1]) + self[i - 1].determinant(_v) + \

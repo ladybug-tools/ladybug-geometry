@@ -21,8 +21,7 @@ class Base1DIn3D(object):
     __slots__ = ('_p', '_v')
 
     def __init__(self, p, v):
-        """Initilize Base1DIn3D.
-        """
+        """Initilize Base1DIn3D."""
         assert isinstance(p, Point3D), "Expected Point3D. Got {}.".format(type(p))
         assert isinstance(v, Vector3D), "Expected Vector3D. Got {}.".format(type(v))
         self._p = p

@@ -11,6 +11,11 @@ import operator
 class Vector3D(object):
     """3D Vector object.
 
+    Args:
+        x: Number for the X coordinate.
+        y: Number for the Y coordinate.
+        z: Number for the Z coordinate.
+
     Properties:
         * x
         * y
@@ -333,6 +338,11 @@ class Vector3D(object):
 
 class Point3D(Vector3D):
     """3D Point object.
+
+    Args:
+        x: Number for the X coordinate.
+        y: Number for the Y coordinate.
+        z: Number for the Z coordinate.
 
     Properties:
         * x

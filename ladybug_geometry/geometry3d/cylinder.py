@@ -29,8 +29,7 @@ class Cylinder(object):
     __slots__ = ('_center', '_axis', '_radius')
 
     def __init__(self, center, axis, radius):
-        """Initilize Cylinder.
-        """
+        """Initilize Cylinder."""
         assert isinstance(center, Point3D), \
             "Expected Point3D. Got {}.".format(type(center))
         assert isinstance(axis, Vector3D), \

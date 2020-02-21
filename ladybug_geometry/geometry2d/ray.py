@@ -20,12 +20,8 @@ class Ray2D(Base1DIn2D):
     __slots__ = ()
 
     def __init__(self, p, v):
-        """Initilize Ray2D.
-        """
-        assert isinstance(p, Point2D), "Expected Point2D. Got {}.".format(type(p))
-        assert isinstance(v, Vector2D), "Expected Vector2D. Got {}.".format(type(v))
-        self._p = p
-        self._v = v
+        """Initilize Ray2D."""
+        Base1DIn2D.__init__(self, p, v)
 
     def reverse(self):
         """Get a copy of this ray that is reversed."""

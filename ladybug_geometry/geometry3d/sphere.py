@@ -32,8 +32,7 @@ class Sphere(object):
     __slots__ = ('_center', '_radius')
 
     def __init__(self, center, radius):
-        """Initilize Sphere.
-        """
+        """Initilize Sphere."""
         assert isinstance(center, Point3D), \
             "Expected Point3D. Got {}.".format(type(center))
         assert radius > 0, 'Sphere radius must be greater than 0. Got {}.'.format(radius)

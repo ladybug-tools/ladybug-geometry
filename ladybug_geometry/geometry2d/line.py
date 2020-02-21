@@ -24,12 +24,8 @@ class LineSegment2D(Base1DIn2D):
     __slots__ = ()
 
     def __init__(self, p, v):
-        """Initilize LineSegment2D.
-        """
-        assert isinstance(p, Point2D), "Expected Point2D. Got {}.".format(type(p))
-        assert isinstance(v, Vector2D), "Expected Vector2D. Got {}.".format(type(v))
-        self._p = p
-        self._v = v
+        """Initilize LineSegment2D."""
+        Base1DIn2D.__init__(self, p, v)
 
     @classmethod
     def from_end_points(cls, p1, p2):

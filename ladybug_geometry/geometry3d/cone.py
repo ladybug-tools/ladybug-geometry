@@ -30,8 +30,7 @@ class Cone(object):
     __slots__ = ('_vertex', '_axis', '_angle')
 
     def __init__(self, vertex, axis, angle):
-        """Initilize Cone.
-        """
+        """Initilize Cone."""
         assert isinstance(vertex, Point3D), \
             "Expected Point3D. Got {}.".format(type(vertex))
         assert isinstance(axis, Vector3D), \

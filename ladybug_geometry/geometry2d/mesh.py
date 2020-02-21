@@ -41,8 +41,7 @@ class Mesh2D(MeshBase):
     __slots__ = ('_min', '_max', '_center', '_centroid')
 
     def __init__(self, vertices, faces, colors=None):
-        """Initilize Mesh2D.
-        """
+        """Initilize Mesh2D."""
         self._vertices = self._check_vertices_input(vertices)
         self._faces = self._check_faces_input(faces)
         self._is_color_by_face = False  # default if colors is None
