@@ -2,11 +2,12 @@
 """2D Polyline"""
 from __future__ import division
 
+from ._2d import Base2DIn2D
 from .pointvector import Point2D
 from .line import LineSegment2D
 from .polygon import Polygon2D
 from ..intersection2d import intersect_line2d, intersect_line2d_infinite
-from ._2d import Base2DIn2D
+from .._polyline import _group_vertices
 
 
 class Polyline2D(Base2DIn2D):
@@ -56,11 +57,6 @@ class Polyline2D(Base2DIn2D):
         """
         interp = data['interpolated'] if 'interpolated' in data else False
         return cls(tuple(Point2D.from_array(pt) for pt in data['vertices']), interp)
-
-    @property
-    def vertices(self):
-        """Tuple of all vertices in this geometry."""
-        return self._vertices
 
     @property
     def segments(self):
@@ -267,19 +263,8 @@ class Polyline2D(Base2DIn2D):
             joined segments.
         """
         # group the vertices that make up polylines
-        grouped_verts = []
-        base_seg = segments[0]
-        remain_segs = list(segments[1:])
-        while len(remain_segs) > 0:
-            grouped_verts.append(
-                Polyline2D._build_polyline(base_seg, remain_segs, tolerance))
-            if len(remain_segs) > 1:
-                base_seg = remain_segs[0]
-                del remain_segs[0]
-            elif len(remain_segs) == 1:  # lone last segment
-                grouped_verts.append([segments[0].p1, segments[0].p2])
-                del remain_segs[0]
-        
+        grouped_verts = _group_vertices(segments, tolerance)
+
         # create the Polyline2D and LineSegment2D objects
         joined_lines = []
         for v_list in grouped_verts:
@@ -290,69 +275,10 @@ class Polyline2D(Base2DIn2D):
         return joined_lines
 
     def _transfer_properties(self, new_polyline):
-        """Transfer properties from this polyline to a new polyline.
-
-        This is used by the transform methods that don't alter the relationship of
-        face vertices to one another (move, rotate, reflect).
-        """
+        """Transfer properties from this polyline to a new polyline."""
         new_polyline._interpolated = self._interpolated
         new_polyline._length = self._length
         new_polyline._is_self_intersecting = self._is_self_intersecting
-    
-    @staticmethod
-    def _build_polyline(base_seg, other_segs, tol):
-        """Attempt to build a list of polyline vertices from a base segment.
-        
-        Args:
-            base_seg: A LineSegment2D to serve as the base of the Polyline.
-            other_segs: A list of other LineSegment2D objects to attempt to
-                connect to the base_seg. This method will delete any segments
-                that are successfully connected to the output from this list. 
-            tol: The tolerance to be used for connecting the line.
-        
-        Returns:
-            A list of vertices that represent the longest Polyline to which the
-            base_seg can be a part of given the other_segs as connections.
-        """
-        poly_verts = [base_seg.p1, base_seg.p2]
-        more_to_check = True
-        while more_to_check:
-            for i, r_seg in enumerate(other_segs):
-                if Polyline2D._connect_seg_to_poly(poly_verts, r_seg, tol):
-                    del other_segs[i]
-                    break
-            else:
-                more_to_check = False
-        return poly_verts
-
-    @staticmethod
-    def _connect_seg_to_poly(poly_verts, seg, tol):
-        """Connect a LineSegment2D to a list of polyline vertices.
-
-        If successful, a Point2D will be appended to the poly_verts list and True
-        will be returned. If not successful, the poly_verts list will remain unchanged
-        and False will be returned.
-
-        Args:
-            poly_verts: An ordered list of Poin2Ds to which the segment should
-                be connected.
-            seg: A LineSegment2D to connect to the poly_verts.
-            tol: The tolerance to be used for connecting the line.
-        """
-        p1, p2 = seg.p1, seg.p2
-        if poly_verts[-1].is_equivalent(p1, tol):
-            poly_verts.append(p2)
-            return True
-        elif poly_verts[0].is_equivalent(p2, tol):
-            poly_verts.insert(0, p1)
-            return True
-        elif poly_verts[-1].is_equivalent(p2, tol):
-            poly_verts.append(p1)
-            return True
-        elif poly_verts[0].is_equivalent(p1, tol):
-            poly_verts.insert(0, p2)
-            return True
-        return False
 
     def __copy__(self):
         return Polyline2D(self._vertices, self._interpolated)

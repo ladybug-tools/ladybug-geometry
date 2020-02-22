@@ -320,7 +320,7 @@ class Arc2D(object):
         return intersect_line2d_arc2d(line_ray, self)
 
     def intersect_line_infinite(self, line_ray):
-        """Get the intersection between this Arc2D and an infinitely extending Ray2D .
+        """Get the intersection between this Arc2D and an infinitely extending Ray2D.
 
         Args:
             line_ray: Another LineSegment2D or Ray2D or to intersect.
@@ -341,14 +341,14 @@ class Arc2D(object):
 
         Returns:
             A list with 2 or 3 Arc2D objects if the split was successful.
-            None if no intersection exists.
+            Will be a list with 1 Arc2D if no intersection exists.
         """
         inters = intersect_line2d_infinite_arc2d(line_ray, self)
         if inters is None:
-            return None
+            return [self]
         elif self.is_circle:
             if len(inters) != 2:
-                return None
+                return [self]
             a1 = self._a_from_pt(inters[0])
             a2 = self._a_from_pt(inters[1])
             return [Arc2D(self.c, self.r, a1, a2), Arc2D(self.c, self.r, a2, a1)]

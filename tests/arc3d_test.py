@@ -317,6 +317,26 @@ def test_arc3_closest_point():
     assert arc.distance_to_point(Point3D(1, -1, 2)) == pytest.approx(1, rel=1e-2)
 
 
+def test_arc3_intersect_with_plane():
+    """Test the Arc3D intersect_with_plane method."""
+    pt = Point3D(2, 0, 2)
+    arc = Arc3D(Plane(o=pt), 1, 0, math.pi)
+    circle = Arc3D(Plane(o=pt), 1)
+
+    plane_1 = Plane(Vector3D(0, 1, 0), Point3D(0, 0, 0))
+    int1 = circle.intersect_plane(plane_1)
+
+    assert len(int1) == 2
+    assert int1[0].x == pytest.approx(3, rel=1e-2)
+    assert int1[0].y == pytest.approx(0, rel=1e-2)
+    assert int1[1].x == pytest.approx(1, rel=1e-2)
+    assert int1[1].y == pytest.approx(0, rel=1e-2)
+
+    plane_2 = Plane(Vector3D(0, 1, 0), Point3D(0, 0.5, 0))
+    int2 = arc.intersect_plane(plane_2)
+    assert len(int2) == 2
+
+
 def test_arc3_split_with_plane():
     """Test the Arc3D split_with_plane method."""
     pt = Point3D(2, 0, 2)

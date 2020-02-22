@@ -280,14 +280,14 @@ class Arc3D(object):
         close_pt = self.closest_point(point)
         return point.distance_to_point(close_pt)
 
-    def split_with_plane(self, plane):
-        """Split this Arc3D in 2 or 3 smaller arcs using a Plane.
+    def intersect_plane(self, plane):
+        """Get the intersection between this Arc3D and a Plane.
 
         Args:
-            plane: A Plane that will be used to split this arc.
+            plane: A Plane that will be intersected with this arc.
 
         Returns:
-            A list with two Arc3D objects if the split was successful.
+            A list of Point3D objects if the intersection was successful.
             None if no intersection exists.
         """
         _plane_int_ray = plane.intersect_plane(self.plane)
@@ -296,11 +296,32 @@ class Arc3D(object):
             _p22d = self.plane.xyz_to_xy(_plane_int_ray.p + _plane_int_ray.v)
             _v2d = _p22d - _p12d
             _int_ray2d = Ray2D(_p12d, _v2d)
-            _int_pt2d = self.arc2d.split_line_infinite(_int_ray2d)
+            _int_pt2d = self.arc2d.intersect_line_infinite(_int_ray2d)
             if _int_pt2d is not None:
+                return [self.plane.xy_to_xyz(pt) for pt in _int_pt2d]
+        return None
+
+    def split_with_plane(self, plane):
+        """Split this Arc3D in 2 or 3 smaller arcs using a Plane.
+
+        Args:
+            plane: A Plane that will be used to split this arc.
+
+        Returns:
+            A list with two or three Arc3D objects if the split was successful.
+            Will be a list with 1 Arc3D if no intersection exists.
+        """
+        _plane_int_ray = plane.intersect_plane(self.plane)
+        if _plane_int_ray is not None:
+            _p12d = self.plane.xyz_to_xy(_plane_int_ray.p)
+            _p22d = self.plane.xyz_to_xy(_plane_int_ray.p + _plane_int_ray.v)
+            _v2d = _p22d - _p12d
+            _int_ray2d = Ray2D(_p12d, _v2d)
+            _int_pt2d = self.arc2d.split_line_infinite(_int_ray2d)
+            if len(_int_pt2d) != 1:
                 return [Arc3D(self.plane, self.radius, arc.a1, arc.a2)
                         for arc in _int_pt2d]
-        return None
+        return [self]
 
     def duplicate(self):
         """Get a copy of this object."""
