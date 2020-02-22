@@ -309,6 +309,17 @@ def test_xy_to_xyz():
     assert isinstance(plane.xy_to_xyz(test_pt), Point3D)
 
 
+def test_is_point_above():
+    """Test the Plane is_point_above method."""
+    plane = Plane()
+    assert plane.is_point_above(Point3D(0, 0, 1))
+    assert not plane.is_point_above(Point3D(0, 0, -1))
+
+    plane = Plane(n=Vector3D(1, 0, 0))
+    assert not plane.is_point_above(Point3D(-1, 0, 1))
+    assert plane.is_point_above(Point3D(1, 0, -1))
+
+
 def test_closest_point():
     """Test the Plane closest_point method."""
     pt = Point3D(2, 2, 2)

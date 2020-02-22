@@ -4,7 +4,7 @@ from __future__ import division
 
 from .pointvector import Point3D, Vector3D
 from ..intersection3d import closest_point3d_on_line3d, \
-    closest_point3d_on_line3d_infinite
+    closest_point3d_on_line3d_infinite, intersect_line3d_plane
 
 
 class Base1DIn3D(object):
@@ -112,6 +112,18 @@ class Base1DIn3D(object):
         """
         close_pt = self.closest_point(point)
         return point.distance_to_point(close_pt)
+
+    def intersect_plane(self, plane):
+        """Get the intersection between this object and a Plane.
+
+        Args:
+            plane: A Plane that will be intersected with this object.
+
+        Returns:
+            A Point3D object if the intersection was successful.
+            None if no intersection exists.
+        """
+        return intersect_line3d_plane(self, plane)
 
     def duplicate(self):
         """Get a copy of this object."""

@@ -3,6 +3,7 @@ import pytest
 
 from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
 from ladybug_geometry.geometry3d.line import LineSegment3D
+from ladybug_geometry.geometry3d.plane import Plane
 
 import math
 
@@ -316,3 +317,27 @@ def test_distance_to_point():
     assert seg.distance_to_point(near_pt) == 2
     near_pt = Point3D(2, 5, 2)
     assert seg.distance_to_point(near_pt) == 1
+
+
+def test_intersect_plane():
+    """Test the LineSegment3D intersect_plane method."""
+    pt = Point3D(2, 2, 2)
+    vec = Vector3D(0, 2, 0)
+    seg = LineSegment3D(pt, vec)
+
+    plane_1 = Plane(n=Vector3D(0, 1, 0), o=Point3D(2, 3, 2))
+    assert isinstance(seg.intersect_plane(plane_1), Point3D)
+    plane_2 = Plane(n=Vector3D(0, 1, 0), o=Point3D(2, 0, 2))
+    assert seg.intersect_plane(plane_2) is None
+
+
+def test_split_with_plane():
+    """Test the LineSegment3D split_with_plane method."""
+    pt = Point3D(2, 2, 2)
+    vec = Vector3D(0, 2, 0)
+    seg = LineSegment3D(pt, vec)
+
+    plane_1 = Plane(n=Vector3D(0, 1, 0), o=Point3D(2, 3, 2))
+    assert len(seg.split_with_plane(plane_1)) == 2
+    plane_2 = Plane(n=Vector3D(0, 1, 0), o=Point3D(2, 0, 2))
+    assert len(seg.split_with_plane(plane_2)) == 1

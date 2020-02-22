@@ -209,6 +209,22 @@ class LineSegment3D(Base1DIn3D):
         """
         return self.p + self.v * (length / self.length)
 
+    def split_with_plane(self, plane):
+        """Split this LineSegment3D in 2 smaller LineSegment3Ds using a Plane.
+
+        Args:
+            plane: A Plane that will be used to split this line segment.
+
+        Returns:
+            A list of two LineSegment3D objects if the split was successful.
+            Will be a list with 1 LineSegment3D if no intersection exists.
+        """
+        _plane_int = self.intersect_plane(plane)
+        if _plane_int is not None:
+            return [LineSegment3D.from_end_points(self.p1, _plane_int),
+                    LineSegment3D.from_end_points(_plane_int, self.p2)]
+        return [self]
+
     def to_dict(self):
         """Get LineSegment3D as a dictionary."""
         base = Base1DIn3D.to_dict(self)

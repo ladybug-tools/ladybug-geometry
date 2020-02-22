@@ -204,11 +204,26 @@ class Plane(object):
         """Get a Point3D from a Point2D in the coordinate system of this plane."""
         # This method returns the same result as the following code:
         # self.o + (self.x * point.x) + (self.y * point.y)
-        # It has been wirtten explicitly to cut out the isinstance() calls for speed
+        # It has been wirtten explicitly to cut out the isinstance() checks for speed
         _u = (self.x.x * point.x, self.x.y * point.x, self.x.z * point.x)
         _v = (self.y.x * point.y, self.y.y * point.y, self.y.z * point.y)
         return Point3D(
             self.o.x + _u[0] + _v[0], self.o.y + _u[1] + _v[1], self.o.z + _u[2] + _v[2])
+    
+    def is_point_above(self, point):
+        """Test if a given point is above or below this plane.
+        
+        Above is defined as being on the side of the plane that the plane normal
+        is pointing towards.
+
+        Args:
+            point: A Point3D object to test.
+
+        Returns:
+            True is point is above; False if below.
+        """
+        vec = Vector3D(point.x - self.o.x, point.y - self.o.y, point.z - self.o.z)
+        return self.n.dot(vec) > 0
 
     def closest_point(self, point):
         """Get the closest Point3D on this plane to another Point3D.
