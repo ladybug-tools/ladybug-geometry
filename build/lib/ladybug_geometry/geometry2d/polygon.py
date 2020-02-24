@@ -34,13 +34,17 @@ class Polygon2D(Base2DIn2D):
         * is_self_intersecting
         * is_valid
     """
-    __slots__ = ('_segments', '_perimeter', '_area',
+    __slots__ = ('_segments', '_triangulated_mesh', '_perimeter', '_area',
                  '_is_clockwise', '_is_convex', '_is_self_intersecting')
 
     def __init__(self, vertices):
-        """Initilize Polygon2D."""
-        Base2DIn2D.__init__(self, vertices)
+
+        self._vertices = self._check_vertices_input(vertices)
         self._segments = None
+        self._triangulated_mesh = None
+        self._min = None
+        self._max = None
+        self._center = None
         self._perimeter = None
         self._area = None
         self._is_clockwise = None
@@ -229,7 +233,7 @@ class Polygon2D(Base2DIn2D):
     def segments(self):
         """Tuple of all line segments in the polygon."""
         if self._segments is None:
-            _segs = self._segments_from_vertices(self.vertices)
+            _segs = Polygon2D._segments_from_vertices(self.vertices)
             self._segments = tuple(_segs)
         return self._segments
 
@@ -315,48 +319,8 @@ class Polygon2D(Base2DIn2D):
         """
         return not self.area == 0
 
-    def is_equivalent(self, other, tolerance):
-        """ Boolean noting equivalence (based on point tolerance) between this polygon and
-        another polygon. The order of the polygon vertices do not have to start from the
-        same vertex for equivalence to be true, but must be in the same counterclockwise or
-        clockwise order.
-
-        Args:
-            other: Polygon2D for comparison.
-            tolerance: float representing point tolerance.
-
-        Returns:
-            True if equivalent else False
-        """
-
-        # Check number of points
-        if len(self.vertices) != len(other.vertices):
-            return False
-
-        vertices = list(self.vertices)
-
-        # Check order
-        if not vertices[0].is_equivalent(other.vertices[0], tolerance):
-            self_idx = None
-            other_pt = other.vertices[0]
-            for i, pt in enumerate(self.vertices):
-                if pt.is_equivalent(other_pt, tolerance):
-                    self_idx = i
-                    break
-
-            if self_idx is None:
-                return False
-
-            # Re-order polygon vertices to match othe
-            vertices = vertices[self_idx:] + vertices[:self_idx]
-
-        is_equivalent = True
-        for pt, other_pt in zip(vertices[1:], other.vertices[1:]):
-            is_equivalent = is_equivalent and pt.is_equivalent(other_pt, tolerance)
-        return is_equivalent
-
     def to_array(self):
-        """Get a list of lists whenre each sub-list represents a Point2D vetex."""
+        """ Returns polygon as nested list of nested list of points. """
         return tuple(pt.to_array() for pt in self.vertices)
 
     @classmethod
@@ -379,7 +343,7 @@ class Polygon2D(Base2DIn2D):
                 before it is considered colinear.
         """
         if len(self.vertices) == 3:
-            return self  # Polygon2D cannot have fewer than 3 vertices
+            return self
         new_vertices = []
         for i, _v in enumerate(self.vertices):
             _a = self[i - 2].determinant(self[i - 1]) + self[i - 1].determinant(_v) + \
