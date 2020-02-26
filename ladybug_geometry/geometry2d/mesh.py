@@ -4,7 +4,7 @@ from __future__ import division
 
 from .._mesh import MeshBase
 
-from .pointvector import Point2D
+from .pointvector import Point2D, Vector2D
 from .line import LineSegment2D
 from .polygon import Polygon2D
 
@@ -168,7 +168,7 @@ class Mesh2D(MeshBase):
         # figure out which vertices lie inside the polygon
         # for tolerance reasons, we scale the polygon by a very small amount
         # this avoids the fringe cases noted in the Polygon2d.is_point_inside description
-        tol_pt = Point2D(0.0000001, 0.0000001)
+        tol_pt = Vector2D(0.0000001, 0.0000001)
         scaled_poly = Polygon2D(
             tuple(pt.scale(1.000001, _poly_min) - tol_pt for pt in polygon.vertices))
         _pattern = [scaled_poly.is_point_inside(_v) for _v in _verts]
