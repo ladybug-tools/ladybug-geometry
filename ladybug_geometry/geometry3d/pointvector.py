@@ -373,7 +373,7 @@ class Point3D(Vector3D):
             angle: An angle for rotation in radians.
             origin: A Point3D for the origin around which the point will be rotated.
         """
-        return Point3D._rotate(self - origin, axis, angle) + origin
+        return Vector3D._rotate(self - origin, axis, angle) + origin
 
     def rotate_xy(self, angle, origin):
         """Get a point rotated counterclockwise in the XY plane by a certain angle.
@@ -384,7 +384,7 @@ class Point3D(Vector3D):
         """
         trans_self = self - origin
         vec_2 = Vector2D._rotate(trans_self, angle)
-        return Point3D(vec_2.x, vec_2.y, trans_self.z) + origin
+        return Vector3D(vec_2.x, vec_2.y, trans_self.z) + origin
 
     def reflect(self, normal, origin):
         """Get a point reflected across a plane with the input normal vector and origin.
@@ -394,7 +394,7 @@ class Point3D(Vector3D):
                 which the point will be reflected. THIS VECTOR MUST BE NORMALIZED.
             origin: A Point3D representing the origin from which to reflect.
         """
-        return Point3D._reflect(self - origin, normal) + origin
+        return Vector3D._reflect(self - origin, normal) + origin
 
     def scale(self, factor, origin=None):
         """Scale a point by a factor from an origin point.
@@ -453,20 +453,20 @@ class Point3D(Vector3D):
     def __add__(self, other):
         # Point + Vector -> Point
         # Point + Point -> Vector
-        if isinstance(other, Vector3D):
-            return Point3D(self.x + other.x, self.y + other.y, self.z + other.z)
-        elif isinstance(other, Point3D):
+        if isinstance(other, Point3D):
             return Vector3D(self.x + other.x, self.y + other.y, self.z + other.z)
+        elif isinstance(other, Vector3D):
+            return Point3D(self.x + other.x, self.y + other.y, self.z + other.z)
         else:
             raise TypeError('Cannot add Point3D and {}'.format(type(other)))
 
     def __sub__(self, other):
         # Point - Vector -> Point
         # Point - Point -> Vector
-        if isinstance(other, Vector3D):
+        if isinstance(other, Point3D):
+            return Vector3D(self.x - other.x, self.y - other.y, self.z - other.z)
+        elif isinstance(other, Vector3D):
             return Point3D(self.x - other.x, self.y - other.y, self.z - other.z)
-        elif isinstance(other, Point3D):
-            Vector3D(self.x - other.x, self.y - other.y, self.z - other.z)
         else:
             raise TypeError('Cannot subtract Point3D and {}'.format(type(other)))
 

@@ -1709,7 +1709,7 @@ class Face3D(Base2DIn3D):
 
     def _diagonal_along_self(self, direction_vector, tolerance):
         """Get the diagonal oriented along this face and always starts on the left."""
-        tol_pt = Point3D(1.0e-7, 1.0e-7, 1.0e-7)  # closer to Python tolerance than input
+        tol_pt = Vector3D(1.0e-7, 1.0e-7, 1.0e-7)  # closer to Python tolerance than input
         diagonal = LineSegment3D.from_end_points(self.min + tol_pt, self.max - tol_pt)
         # invert the diagonal XY if it is not oriented with the face plane
         if self._plane.distance_to_point(diagonal.p) > tolerance:
