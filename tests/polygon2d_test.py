@@ -660,69 +660,19 @@ def test_polygon_is_equivalent():
     assert p1.is_equivalent(p2, tol)
 
 
-def test_fit_segment():
-    """ Test segment trim with polygon """
-
-    tol = 1e-2
-
-    # Construct a simple rectangle
-    poly = [[0, 0], [4, 0], [4, 6], [0, 6]]
-    poly = Polygon2D.from_array(poly)
-
-    # Segment to trim (one side)
-    seg = LineSegment2D.from_array([[1, 1], [6, 1]])
-    # Check seg
-    chk_trim = LineSegment2D.from_array([[0, 1], [4, 1]])
-    # Actual seg
-    trim = poly.fit_segment(seg)
-
-    # Check
-    for tpt, ctpt in zip(trim.endpoints, chk_trim.endpoints):
-        assert tpt.is_equivalent(ctpt, tol), (tpt, ctpt)
-
-    # Segment to trim (no side)
-    seg = LineSegment2D.from_array([[5, 1], [6, 1]])
-    # Check seg
-    chk_trim = LineSegment2D.from_array([[0, 1], [4, 1]])
-    # Actual seg
-    trim = poly.fit_segment(seg)
-
-    # Check
-    for tpt, ctpt in zip(trim.endpoints, chk_trim.endpoints):
-        assert tpt.is_equivalent(ctpt, tol), (tpt, ctpt)
-
-    # Segment to trim (both sides)
-    seg = LineSegment2D.from_array([[-6, 1], [8, 1]])
-    # Check seg
-    chk_trim = LineSegment2D.from_array([[0, 1], [4, 1]])
-    # Actual seg
-    trim = poly.fit_segment(seg)
-
-    # Check
-    for tpt, ctpt in zip(trim.endpoints, chk_trim.endpoints):
-        assert tpt.is_equivalent(ctpt, tol), (tpt, ctpt)
-
-
 def test_polygon_offset():
     """ Test the offset method """
-
-    tol = 1e-10
 
     # Construct a simple rectangle
     poly = [[0, 0], [4, 0], [4, 6], [0, 6]]
     poly = Polygon2D.from_array(poly)
 
     # Make solution polygon (list of polygons)
-    chk_off = [[1, 1], [3, 1], [3, 5], [1, 5]]
-    chk_off = [Polygon2D.from_array(chk_off)]
+    chk_off = Polygon2D.from_array([[0, 0], [4, 0], [3, 1], [1, 1]])
 
     # Run method
-    off = poly.offset(1, tol)
+    offset = poly.offset_polygon(1)
 
-    #assert off.is_equivalent(chk_off, tol), (off, chk_off)
+    assert offset[0].is_equivalent(chk_off, 1e-2)
 
 
-if __name__ == "__main__":
-
-    test_polygon_offset()
-    #test_fit_segment()

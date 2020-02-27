@@ -900,97 +900,7 @@ class Polygon2D(Base2DIn2D):
     def __repr__(self):
         return 'Polygon2D ({} vertices)'.format(len(self))
 
-    def fit_segment1(self, segment, dgl):
-        """ Extends or trims passed segment to fit within boundaries of
-        polygon.
-
-        Args:
-            segment: LineSegment2D to trim
-            other_segments: LineSegment2D to trim with
-
-        Returns:
-            Return segment
-        """
-        from pprint import pprint as pp
-        #pp(self.segments)
-        int_pts = []
-        #print('ext edge', segment)
-        nodes = dgl.ordered_nodes
-        ext_node = None
-        klst = []
-        for node in nodes:
-            if node.exterior and not ext_node:
-                ext_node = node.key
-            node2 = node.adj_lst[0]
-            trim_seg = LineSegment2D.from_end_points(node.pt, node2.pt)
-            int_pt = intersect_line2d_infinite(trim_seg, segment)
-            if int_pt:
-                # 3 if pts > 2:
-                # 4   # Sort distance and add adjacency
-                # Add node with new neighbor
-                intkey = dgl.add_node(int_pt, [node2.pt])
-                klst.append(intkey)
-                dgl.node(intkey).exterior = False
-                # Remove prev_node adj_lst
-                node.adj_lst = [dgl.node(intkey)]
-
-                #print(int_pt)
-                #print(trim_seg)
-                int_pts.append(int_pt)
-            #print('--')
-        #pp(int_pts[::-1])
-        if len(int_pts) > 2:
-            #pp(int_pts)
-            #print(segment)
-            #pp(self.segments)
-            # 3 if pts > 2:
-            # 4   # Sort distance and add adjacency
-            n = dgl.node(klst[0])
-            dlst = [(0, 0.0)]
-            for i, k in enumerate(klst[1:]):
-                next_n = dgl.node(k)
-                dlst.append(
-                    (i+1, LineSegment2D.from_end_points(n.pt, next_n.pt).length))
-            dlst = sorted(dlst, key=lambda t: t[1])
-
-            for i in range(len(dlst) - 1):
-                k1, k2 = dlst[i][0], dlst[i + 1][0]
-                n1 = dgl.node(klst[k1])
-                n2 = dgl.node(klst[k2])
-                # Add
-                k = dgl.add_node(n1, [n2])
-                dgl.node(k).exterior = False
-                k = dgl.add_node(n2, [n1])
-                dgl.node(k).exterior = False
-
-            #raise Exception('Too many intersections.')
-        elif len(int_pts) == 2:
-            # 5 else make each other adjacency
-            # 6 poly_node through skeleton polygons
-            k = dgl.add_node(int_pts[0], [int_pts[1]])
-            dgl.node(k).exterior = False
-            k = dgl.add_node(int_pts[1], [int_pts[0]])
-            dgl.node(k).exterior = False
-        else:
-            return None
-
-        # Check if there are no intersections, which can occur
-        # if an edge event occurs and the edge no longer exists.
-        #if len(int_pts) == 0:
-        #    return None
-        #new_poly = dgl.smallest_closed_cycles()
-        cycle = [dgl.node(ext_node)]
-        next_node = dgl.next_unidirect_node(dgl.node(ext_node))
-        new_poly = dgl.min_ccw_cycle(
-            dgl.node(ext_node), next_node, next_node.adj_lst, cycle)
-
-        #print(dgl)
-        #print('---')
-
-        return Polygon2D([np.pt for np in new_poly])
-        #return LineSegment2D.from_end_points(*int_pts[::-1])
-
-    def offset(self, distance, tol):
+    def offset_polygon(self, distance):
         """Computes the single or multiple polygons that is generated
         by offsetting the current polygon a given distance.
 
@@ -998,7 +908,6 @@ class Polygon2D(Base2DIn2D):
             distance: Distance to offset. Positive numbers will be
                 offset towards the center of the polygon and negative
                 numbers will be offset away from the center.
-            tol: A tolerance #TODO: needed?
 
         Returns:
             A list of Polygon2D offsets.
@@ -1008,22 +917,23 @@ class Polygon2D(Base2DIn2D):
 
         # Compute the straight skeleton of the polygon
         dg = polyskel._skeleton_as_directed_graph(self.to_array())
-        connected_poly_node_lst = dg.smallest_closed_cycles()
+        skel_poly_nodes_lst = dg.smallest_closed_cycles()
 
-        # Separate each skeleton polygon into own directed graph
-        poly_node_lst = []
-        for poly_node in connected_poly_node_lst:
-            pdg = PolygonDirectedGraph()
-            for i in range(len(poly_node)-1):
-                pdg.add_node(poly_node[i].pt, [poly_node[i + 1].pt],
-                             poly_node[i].exterior)
-            pdg.add_node(poly_node[-1].pt, [poly_node[0].pt], poly_node[-1].exterior)
-            poly_node_lst.append(pdg)
+        # Create new polygon geom and graph lists making sure to
+        # separate each skeleton sub-polygon into own directed graph
+        poly_geom_lst, poly_graph_lst = [], []
+        for skel_poly_nodes in skel_poly_nodes_lst:
+            poly_geom = Polygon2D([n.pt for n in skel_poly_nodes])
+            poly_graph = PolygonDirectedGraph.from_polygon(poly_geom)
+
+            # Transfer old exterior relationships
+            for cn, n in zip(skel_poly_nodes, poly_graph.ordered_nodes):
+                n.exterior = cn.exterior
+            poly_geom_lst.append(poly_geom)
+            poly_graph_lst.append(poly_graph)
 
         # Fit offset segment to skeleton polygon
-        for poly_nodes in poly_node_lst:
-            poly_geom = Polygon2D([n.pt for n in poly_nodes.ordered_nodes])
-
+        for poly_geom, poly_graph in zip(poly_geom_lst, poly_graph_lst):
             # Since straight skeleton loops through exterior edges first
             # we can get exterior edge as first item in segment list
             ext_seg = poly_geom.segments[0]
@@ -1032,16 +942,18 @@ class Polygon2D(Base2DIn2D):
             ext_seg_v = Vector3D(*ext_seg.v.to_array(), 0)
             normal = ext_seg_v.cross(Vector3D(0, 0, -1)).normalize() * distance
 
-            # Move segment by normal to get offset curve
+            # Move segment by normal to get offset segment
             offset_seg = ext_seg.move(normal)
 
-            # Intersect offset segment with other edges
-            fitted_line = poly_geom.fit_segment1(offset_seg, poly_nodes)
+            # Updpate graph by intersecting offset segment with other edges
+            poly_graph.graph_intersect(offset_seg)
 
-            #fitted_line = self.fit_segment2(offset_seg, bisect_left, bisect_right)
-            if fitted_line:
-                offset_polygons.append(fitted_line)
-            else:
-                offset_polygons.append(poly_geom)
+            # Get the minimum cycle
+            cycle = [poly_graph.root]
+            next_node = poly_graph.next_unidirect_node(poly_graph.root)
+            new_poly_nodes = poly_graph.min_ccw_cycle(poly_graph.root, next_node,
+                                                      next_node.adj_lst, cycle)
+
+            offset_polygons.append(Polygon2D([n.pt for n in new_poly_nodes]))
 
         return offset_polygons
