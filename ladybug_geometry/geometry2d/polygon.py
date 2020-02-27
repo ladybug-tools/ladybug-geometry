@@ -10,6 +10,8 @@ from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
 from ..geometry3d.pointvector import Vector3D
 from ._2d import Base2DIn2D
 
+from ladybug_geometry_polyskel.polygon_directed_graph import PolygonDirectedGraph
+from ladybug_geometry_polyskel import polyskel
 
 from collections import deque
 import math
@@ -898,84 +900,148 @@ class Polygon2D(Base2DIn2D):
     def __repr__(self):
         return 'Polygon2D ({} vertices)'.format(len(self))
 
+    def fit_segment1(self, segment, dgl):
+        """ Extends or trims passed segment to fit within boundaries of
+        polygon.
+
+        Args:
+            segment: LineSegment2D to trim
+            other_segments: LineSegment2D to trim with
+
+        Returns:
+            Return segment
+        """
+        from pprint import pprint as pp
+        #pp(self.segments)
+        int_pts = []
+        #print('ext edge', segment)
+        nodes = dgl.ordered_nodes
+        ext_node = None
+        klst = []
+        for node in nodes:
+            if node.exterior and not ext_node:
+                ext_node = node.key
+            node2 = node.adj_lst[0]
+            trim_seg = LineSegment2D.from_end_points(node.pt, node2.pt)
+            int_pt = intersect_line2d_infinite(trim_seg, segment)
+            if int_pt:
+                # 3 if pts > 2:
+                # 4   # Sort distance and add adjacency
+                # Add node with new neighbor
+                intkey = dgl.add_node(int_pt, [node2.pt])
+                klst.append(intkey)
+                dgl.node(intkey).exterior = False
+                # Remove prev_node adj_lst
+                node.adj_lst = [dgl.node(intkey)]
+
+                #print(int_pt)
+                #print(trim_seg)
+                int_pts.append(int_pt)
+            #print('--')
+        #pp(int_pts[::-1])
+        if len(int_pts) > 2:
+            #pp(int_pts)
+            #print(segment)
+            #pp(self.segments)
+            # 3 if pts > 2:
+            # 4   # Sort distance and add adjacency
+            n = dgl.node(klst[0])
+            dlst = [(0, 0.0)]
+            for i, k in enumerate(klst[1:]):
+                next_n = dgl.node(k)
+                dlst.append(
+                    (i+1, LineSegment2D.from_end_points(n.pt, next_n.pt).length))
+            dlst = sorted(dlst, key=lambda t: t[1])
+
+            for i in range(len(dlst) - 1):
+                k1, k2 = dlst[i][0], dlst[i + 1][0]
+                n1 = dgl.node(klst[k1])
+                n2 = dgl.node(klst[k2])
+                # Add
+                k = dgl.add_node(n1, [n2])
+                dgl.node(k).exterior = False
+                k = dgl.add_node(n2, [n1])
+                dgl.node(k).exterior = False
+
+            #raise Exception('Too many intersections.')
+        elif len(int_pts) == 2:
+            # 5 else make each other adjacency
+            # 6 poly_node through skeleton polygons
+            k = dgl.add_node(int_pts[0], [int_pts[1]])
+            dgl.node(k).exterior = False
+            k = dgl.add_node(int_pts[1], [int_pts[0]])
+            dgl.node(k).exterior = False
+        else:
+            return None
+
+        # Check if there are no intersections, which can occur
+        # if an edge event occurs and the edge no longer exists.
+        #if len(int_pts) == 0:
+        #    return None
+        #new_poly = dgl.smallest_closed_cycles()
+        cycle = [dgl.node(ext_node)]
+        next_node = dgl.next_unidirect_node(dgl.node(ext_node))
+        new_poly = dgl.min_ccw_cycle(
+            dgl.node(ext_node), next_node, next_node.adj_lst, cycle)
+
+        #print(dgl)
+        #print('---')
+
+        return Polygon2D([np.pt for np in new_poly])
+        #return LineSegment2D.from_end_points(*int_pts[::-1])
+
     def offset(self, distance, tol):
+        """Computes the single or multiple polygons that is generated
+        by offsetting the current polygon a given distance.
+
+        Args:
+            distance: Distance to offset. Positive numbers will be
+                offset towards the center of the polygon and negative
+                numbers will be offset away from the center.
+            tol: A tolerance #TODO: needed?
+
+        Returns:
+            A list of Polygon2D offsets.
         """
-        #TODO
-        """
-        line = LineSegment2D.from_array(((2,0), (2,2)))
-        # line2 = LineSegment2D.from_array((2,0), (2,2))
 
-        # Normal facing into polygon
-        line_v = Vector3D(*line.v.to_array(), 0)
-        down_v = Vector3D(0, 0, -1)
-        normal = line_v.cross(down_v).normalize() * distance
+        offset_polygons = []
 
-        # Move
-        mv_line = line.move(normal)
+        # Compute the straight skeleton of the polygon
+        dg = polyskel._skeleton_as_directed_graph(self.to_array())
+        connected_poly_node_lst = dg.smallest_closed_cycles()
 
-        print(mv_line.to_array())
-        print(normal)
-        return -1
+        # Separate each skeleton polygon into own directed graph
+        poly_node_lst = []
+        for poly_node in connected_poly_node_lst:
+            pdg = PolygonDirectedGraph()
+            for i in range(len(poly_node)-1):
+                pdg.add_node(poly_node[i].pt, [poly_node[i + 1].pt],
+                             poly_node[i].exterior)
+            pdg.add_node(poly_node[-1].pt, [poly_node[0].pt], poly_node[-1].exterior)
+            poly_node_lst.append(pdg)
 
-    def _repr_html_(self):
-        """SVG representation for iPython notebook
-        https://github.com/Toblerity/Shapely/blob/4ab9844b8ba0bcf9dc21724a974565e50215323f/shapely/geometry/base.py
-        """
-        svg_top = '<svg xmlns="http://www.w3.org/2000/svg" ' \
-            'xmlns:xlink="http://www.w3.org/1999/xlink" '
-        # Establish SVG canvas that will fit all the data + small space
-        xx = [x[0] for x in self.to_array()]
-        yy = [y[1] for y in self.to_array()]
-        xmin, ymin, xmax, ymax = min(xx), min(yy), max(xx), max(yy)
-        #if xmin == xmax and ymin == ymax:
-        #    # This is a point; buffer using an arbitrary size
-        #    xmin, ymin, xmax, ymax = self.buffer(1).bounds
-        #else:
-        if True:
-            # Expand bounds by a fraction of the data ranges
-            expand = 0.04  # or 4%, same as R plots
-            widest_part = max([xmax - xmin, ymax - ymin])
-            expand_amount = widest_part * expand
-            xmin -= expand_amount
-            ymin -= expand_amount
-            xmax += expand_amount
-            ymax += expand_amount
-        dx = xmax - xmin
-        dy = ymax - ymin
-        width = min([max([100., dx]), 300])
-        height = min([max([100., dy]), 300])
-        try:
-            scale_factor = max([dx, dy]) / max([width, height])
-        except ZeroDivisionError:
-            scale_factor = 1.
-        view_box = "{} {} {} {}".format(xmin, ymin, dx, dy)
-        transform = "matrix(1,0,0,-1,0,{})".format(ymax + ymin)
-        return svg_top + (
-            'width="{1}" height="{2}" viewBox="{0}" '
-            'preserveAspectRatio="xMinYMin meet">'
-            '<g transform="{3}">{4}</g></svg>'
-            ).format(view_box, width, height, transform,
-                        self.svg(scale_factor))
+        # Fit offset segment to skeleton polygon
+        for poly_nodes in poly_node_lst:
+            poly_geom = Polygon2D([n.pt for n in poly_nodes.ordered_nodes])
 
-    def svg(self, scale_factor=1., fill_color=None):
-        """Returns SVG path element for the Polygon geometry.
-        Parameters
-        ==========
-        scale_factor : float
-            Multiplication factor for the SVG stroke-width.  Default is 1.
-        fill_color : str, optional
-            Hex string for fill color. Default is to use "#66cc99" if
-            geometry is valid, and "#ff3333" if invalid.
-        """
-        if fill_color is None:
-            fill_color = "#66cc99" if self.is_valid else "#ff3333"
-        exterior_coords = [
-            ["{},{}".format(*c) for c in self.to_array()]]
-        interior_coords = []
-        path = " ".join([
-            "M {} L {} z".format(coords[0], " L ".join(coords[1:]))
-            for coords in exterior_coords + interior_coords])
-        return (
-            '<path fill-rule="evenodd" fill="{2}" stroke="#000000" '
-            'stroke-width="{0}" opacity="0.6" d="{1}" />'
-            ).format(2. * scale_factor, path, fill_color)
+            # Since straight skeleton loops through exterior edges first
+            # we can get exterior edge as first item in segment list
+            ext_seg = poly_geom.segments[0]
+
+            # Compute normal facing into polygon
+            ext_seg_v = Vector3D(*ext_seg.v.to_array(), 0)
+            normal = ext_seg_v.cross(Vector3D(0, 0, -1)).normalize() * distance
+
+            # Move segment by normal to get offset curve
+            offset_seg = ext_seg.move(normal)
+
+            # Intersect offset segment with other edges
+            fitted_line = poly_geom.fit_segment1(offset_seg, poly_nodes)
+
+            #fitted_line = self.fit_segment2(offset_seg, bisect_left, bisect_right)
+            if fitted_line:
+                offset_polygons.append(fitted_line)
+            else:
+                offset_polygons.append(poly_geom)
+
+        return offset_polygons

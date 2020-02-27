@@ -60,6 +60,11 @@ class LineSegment2D(Base1DIn2D):
         return Point2D(self.p.x + self.v.x, self.p.y + self.v.y)
 
     @property
+    def endpoints(self):
+        """ Tuple of endpoints """
+        return (self.p1, self.p2)
+
+    @property
     def midpoint(self):
         """Midpoint."""
         return self.point_at(0.5)
@@ -245,4 +250,3 @@ class LineSegment2D(Base1DIn2D):
     def __repr__(self):
         return 'LineSegment2D (<%.2f, %.2f> to <%.2f, %.2f>)' % \
             (self.p.x, self.p.y, self.p.x + self.v.x, self.p.y + self.v.y)
-
