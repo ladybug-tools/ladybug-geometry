@@ -668,11 +668,9 @@ def test_polygon_offset():
     poly = Polygon2D.from_array(poly)
 
     # Make solution polygon (list of polygons)
-    chk_off = Polygon2D.from_array([[0, 0], [4, 0], [3, 1], [1, 1]])
+    chk_off = Polygon2D.from_array([[1, 1], [3, 1], [3, 5], [1, 5]])
 
     # Run method
-    offset = poly.offset_polygon(1)
+    offset = poly.offset(1)
 
     assert offset[0].is_equivalent(chk_off, 1e-2)
-
-
