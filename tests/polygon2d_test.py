@@ -658,19 +658,3 @@ def test_polygon_is_equivalent():
     # Test equal condition different order 2
     p2 = Polygon2D.from_array([[0, 4], [0, 0], [6, 0], [7, 3]])
     assert p1.is_equivalent(p2, tol)
-
-
-def test_polygon_offset():
-    """ Test the offset method """
-
-    # Construct a simple rectangle
-    poly = [[0, 0], [4, 0], [4, 6], [0, 6]]
-    poly = Polygon2D.from_array(poly)
-
-    # Make solution polygon (list of polygons)
-    chk_off = Polygon2D.from_array([[1, 1], [3, 1], [3, 5], [1, 5]])
-
-    # Run method
-    offset = poly.offset(1)
-
-    assert offset[0].is_equivalent(chk_off, 1e-2)

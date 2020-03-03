@@ -7,11 +7,7 @@ from .line import LineSegment2D
 from .ray import Ray2D
 from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
     does_intersection_exist_line2d, closest_point2d_on_line2d
-from ..geometry3d.pointvector import Vector3D
 from ._2d import Base2DIn2D
-
-from ladybug_geometry_polyskel.polygon_directed_graph import PolygonDirectedGraph
-from ladybug_geometry_polyskel import polyskel
 
 from collections import deque
 import math
@@ -320,8 +316,8 @@ class Polygon2D(Base2DIn2D):
     def is_equivalent(self, other, tolerance):
         """ Boolean noting equivalence (based on point tolerance) between this polygon and
         another polygon. The order of the polygon vertices do not have to start from the
-        same vertex for equivalence to be true, but must be in the same counterclockwise or
-        clockwise order.
+        same vertex for equivalence to be true, but must be in the same counterclockwise
+        or clockwise order.
 
         Args:
             other: Polygon2D for comparison.
@@ -899,96 +895,3 @@ class Polygon2D(Base2DIn2D):
 
     def __repr__(self):
         return 'Polygon2D ({} vertices)'.format(len(self))
-
-    def perimeter_zones(self, distance, tol=1e-10):
-        """Splits the polygon into perimeter zones based on the polygon
-        straight skeleton.
-
-        Args:
-            distance: Distance to offset perimeter.
-            tol: Tolerance for point equivalence.
-        Returns:
-            A list of perimeter zones as Polygon2D objects.
-        """
-
-        perimeter_zones = []
-
-        # Compute the straight skeleton of the polygon and get exterior edges
-        g = polyskel._skeleton_as_directed_graph(self.to_array(), None, tol)
-        exterior_poly_lst = g.exterior_cycles
-
-        # TODO: For holes change this to loop through all exterior edges
-        exterior_poly = exterior_poly_lst[0]
-
-        # Fit offset segment to skeleton polygon
-        for exterior_node in exterior_poly:
-
-            next_node = exterior_node.adj_lst[0]
-            ext_seg = LineSegment2D.from_end_points(exterior_node.pt, next_node.pt)
-
-            # Compute normal facing into polygon
-            ext_arr = ext_seg.v.to_array()
-            ext_seg_v = Vector3D(ext_arr[0], ext_arr[1], 0)
-            normal = ext_seg_v.cross(Vector3D(0, 0, -1)).normalize() * distance
-
-            # Move segment by normal to get offset segment
-            offset_seg = ext_seg.move(normal)
-
-            # Make new graph
-            new_poly_nodes = PolygonDirectedGraph.min_ccw_cycle(exterior_node, next_node)
-            poly_graph = PolygonDirectedGraph.from_point_array(
-                [n.pt for n in new_poly_nodes])
-
-            # Update graph by intersecting offset segment with other edges
-            poly_graph.intersect_graph_with_segment(offset_seg)
-
-            # Get the minimum cycle. Since we start at the exterior edge, this will
-            # return the perimter offset.
-            next_node = poly_graph.root.adj_lst[0]
-            new_poly_nodes = poly_graph.min_ccw_cycle(poly_graph.root, next_node)
-
-            perimeter_zones.append(Polygon2D([n.pt for n in new_poly_nodes]))
-
-        return perimeter_zones
-
-    def zones(self, distance, tol=1e-10):
-        """Splits the polygon into perimeter and core zones based on the polygon
-        straight skeleton.
-
-        Args:
-            distance: Distance to offset perimeter.
-            tol: Tolerance for point equivalence.
-        Returns:
-            A list of perimeter zones, and list of core zones as Polygon2D objects.
-        """
-        perimeter_zones = self.perimeter_zones(distance, tol)
-
-        # Make a graph from the perimeter (offset) polygons
-        # so we infer the core polygons
-        g = PolygonDirectedGraph()
-        for poly in perimeter_zones:
-            pts = poly.vertices
-            for i in range(len(pts)-1):
-                g.add_node(pts[i], [pts[i + 1]])
-            g.add_node(pts[-1], [pts[0]])
-
-        # Reverse the node_loop since inner naked edges are in cw order
-        core_zones = [Polygon2D([node.pt for node in reversed(node_loop)])
-                      for node_loop in g.exterior_cycles[1:]]
-
-        return perimeter_zones, core_zones
-
-    def offset(self, distance, tol=1e-10):
-        """Offsets the polygon boundary by defined distance.
-
-        Args:
-            distance: Distance to offset. Only positive distance works in
-                current implementation.
-            tol: Tolerance for point equivalence.
-        Returns:
-            A list of offset contours as Polygon2D objects.
-        """
-
-        _, offsets = self.zones(distance, tol)
-
-        return offsets
