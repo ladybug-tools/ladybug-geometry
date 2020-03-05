@@ -47,6 +47,16 @@ class LineSegment3D(Base1DIn3D):
         """
         return cls(s, d * length / d.magnitude)
 
+    @classmethod
+    def from_array(cls, line_array):
+        """ Create a LineSegment3D from a nested array of two endpoint coordinates.
+
+        Args:
+            line_arry: Nested tuples ((pt1.x, pt1.y, pt.z), (pt2.x, pt2.y, pt.z)),
+                where pt1 and pt2 represent the endpoints of the line segment.
+        """
+        return LineSegment3D.from_end_points(*tuple(Point3D(*pt) for pt in line_array))
+
     @property
     def p1(self):
         """First point (same as p)."""
@@ -66,14 +76,6 @@ class LineSegment3D(Base1DIn3D):
     def length(self):
         """The length of the line segment."""
         return self.v.magnitude
-
-    def to_array(self):
-        """ A nested list representing the two line endpoint coordinates.
-            Returns:
-                Nested tuples ((pt1.x, pt1.y, pt1.z), (pt2.x, pt2.y, pt2.z)),
-                where pt1 and pt2 represent the endpoints of the line segment.
-        """
-        return (self.p1.to_array(), self.p2.to_array())
 
     def is_horizontal(self, tolerance):
         """Test whether this line segment is horizontal within a certain tolerance.
@@ -230,6 +232,10 @@ class LineSegment3D(Base1DIn3D):
         base = Base1DIn3D.to_dict(self)
         base['type'] = 'LineSegment3D'
         return base
+
+    def to_array(self):
+        """ A nested list representing the two line endpoint coordinates."""
+        return (self.p1.to_array(), self.p2.to_array())
 
     def _u_in(self, u):
         return u >= 0.0 and u <= 1.0

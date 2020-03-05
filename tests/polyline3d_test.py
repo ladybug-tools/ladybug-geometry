@@ -37,6 +37,8 @@ def test_polyline3d_init():
     for arr in p_array:
         assert isinstance(p_array, tuple)
         assert len(arr) == 3
+    pline_2 = Polyline3D.from_array(p_array)
+    assert pline == pline_2
 
 
 def test_equality():

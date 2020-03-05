@@ -58,6 +58,15 @@ class Polyline2D(Base2DIn2D):
         interp = data['interpolated'] if 'interpolated' in data else False
         return cls(tuple(Point2D.from_array(pt) for pt in data['vertices']), interp)
 
+    @classmethod
+    def from_array(cls, point_array):
+        """Create a Polyline2D from a nested array of vertex coordinates.
+
+        Args:
+            point_array: nested array of point arrays.
+        """
+        return Polyline2D(Point2D(*point) for point in point_array)
+
     @property
     def segments(self):
         """Tuple of all line segments in the polyline."""
@@ -109,25 +118,6 @@ class Polyline2D(Base2DIn2D):
                 are considered the same.
         """
         return self._vertices[0].is_equivalent(self._vertices[-1], tolerance)
-
-    def to_array(self):
-        """Get a list of lists whenre each sub-list represents a Point2D vetex."""
-        return tuple(pt.to_array() for pt in self.vertices)
-
-    def to_polygon(self, tolerance):
-        """Get a Polygon2D derived from this object.
-        
-        If the polyline is closed to within the tolerance, the segments of this
-        polyline and the resulting polygon will match. Otherwise, an extra
-        LineSegment2D will be added to connect the start and end of the polyline.
-
-        Args:
-            tolerance: The minimum differnce between vertices below which vertices
-                are considered the same.
-        """
-        if self.is_closed(tolerance):
-            return Polygon2D(self._vertices[:-1])
-        return Polygon2D(self._vertices)
 
     def remove_colinear_vertices(self, tolerance):
         """Get a version of this polyline without colinear or duplicate vertices.
@@ -247,6 +237,25 @@ class Polyline2D(Base2DIn2D):
         if self.interpolated:
             base['interpolated'] = self.interpolated
         return base
+
+    def to_array(self):
+        """Get a list of lists whenre each sub-list represents a Point2D vetex."""
+        return tuple(pt.to_array() for pt in self.vertices)
+
+    def to_polygon(self, tolerance):
+        """Get a Polygon2D derived from this object.
+        
+        If the polyline is closed to within the tolerance, the segments of this
+        polyline and the resulting polygon will match. Otherwise, an extra
+        LineSegment2D will be added to connect the start and end of the polyline.
+
+        Args:
+            tolerance: The minimum differnce between vertices below which vertices
+                are considered the same.
+        """
+        if self.is_closed(tolerance):
+            return Polygon2D(self._vertices[:-1])
+        return Polygon2D(self._vertices)
 
     @staticmethod
     def join_segments(segments, tolerance):

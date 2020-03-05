@@ -40,6 +40,8 @@ def test_polyline2d_init():
     for arr in p_array:
         assert isinstance(p_array, tuple)
         assert len(arr) == 2
+    pline_2 = Polyline2D.from_array(p_array)
+    assert pline == pline_2
 
 
 def test_equality():

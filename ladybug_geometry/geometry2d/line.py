@@ -53,9 +53,9 @@ class LineSegment2D(Base1DIn2D):
     def from_array(cls, line_array):
         """ Create a LineSegment2D from a nested array of two endpoint coordinates.
 
-            Args:
-                line_arry: Nested tuples ((pt1.x, pt1.y), (pt2.x, pt2.y)), where
-                    pt1 and pt2 represent the endpoints of the line segment.
+        Args:
+            line_arry: Nested tuples ((pt1.x, pt1.y), (pt2.x, pt2.y)), where
+                pt1 and pt2 represent the endpoints of the line segment.
         """
         return LineSegment2D.from_end_points(*tuple(Point2D(*pt) for pt in line_array))
 
@@ -83,14 +83,6 @@ class LineSegment2D(Base1DIn2D):
     def length(self):
         """The length of the line segment."""
         return self.v.magnitude
-
-    def to_array(self):
-        """ A nested list representing the two line endpoint coordinates.
-            Returns:
-                Nested tuples ((pt1.x, pt1.y), (pt2.x, pt2.y)), where
-                pt1 and pt2 represent the endpoints of the line segment.
-        """
-        return (self.p1.to_array(), self.p2.to_array())
 
     def flip(self):
         """Get a copy of this line segment that is flipped."""
@@ -225,6 +217,10 @@ class LineSegment2D(Base1DIn2D):
         base = Base1DIn2D.to_dict(self)
         base['type'] = 'LineSegment2D'
         return base
+
+    def to_array(self):
+        """ A nested list representing the two line endpoint coordinates."""
+        return (self.p1.to_array(), self.p2.to_array())
 
     def _u_in(self, u):
         return u >= 0.0 and u <= 1.0

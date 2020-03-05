@@ -23,6 +23,15 @@ class Ray2D(Base1DIn2D):
         """Initilize Ray2D."""
         Base1DIn2D.__init__(self, p, v)
 
+    @classmethod
+    def from_array(cls, ray_array):
+        """ Create a Ray2D from a nested array with a point and a vector.
+
+        Args:
+            ray_array: Nested tuples ((p.x, p.y), (v.x, v.y)).
+        """
+        return Ray2D(Point2D(*ray_array[0]), Vector2D(*ray_array[1]))
+
     def reverse(self):
         """Get a copy of this ray that is reversed."""
         return Ray2D(self.p, self.v.reverse())
@@ -69,6 +78,10 @@ class Ray2D(Base1DIn2D):
         base = Base1DIn2D.to_dict(self)
         base['type'] = 'Ray2D'
         return base
+
+    def to_array(self):
+        """A nested array representing the start point and vector."""
+        return (self.p.to_array(), self.v.to_array())
 
     def _u_in(self, u):
         return u >= 0.0
