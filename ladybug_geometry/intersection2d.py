@@ -57,10 +57,12 @@ def intersect_line2d(line_ray_a, line_ray_b):
 
 def intersect_line2d_infinite(line_ray_a, line_ray_b):
     """Get the intersection between a Ray2D/LineSegment2D and another extended infinitely.
+
     Args:
         line_ray_a: A LineSegment2D or Ray2D object.
         line_ray_b: ALineSegment2D or Ray2D that will be extended infinitely
             for intersection.
+
     Returns:
         Point2D of intersection if it exists. None if no intersection exists.
     """

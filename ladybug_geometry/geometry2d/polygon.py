@@ -314,14 +314,15 @@ class Polygon2D(Base2DIn2D):
         return not self.area == 0
 
     def is_equivalent(self, other, tolerance):
-        """ Boolean noting equivalence (based on point tolerance) between this polygon and
-        another polygon. The order of the polygon vertices do not have to start from the
+        """Boolean noting equivalence (within tolerance) between this polygon and another.
+
+        The order of the polygon vertices do not have to start from the
         same vertex for equivalence to be true, but must be in the same counterclockwise
         or clockwise order.
 
         Args:
             other: Polygon2D for comparison.
-            tolerance: float representing point tolerance.
+            tolerance: float representing point equivalence.
 
         Returns:
             True if equivalent else False
@@ -331,7 +332,7 @@ class Polygon2D(Base2DIn2D):
         if len(self.vertices) != len(other.vertices):
             return False
 
-        vertices = list(self.vertices)
+        vertices = self.vertices
 
         # Check order
         if not vertices[0].is_equivalent(other.vertices[0], tolerance):
@@ -345,7 +346,7 @@ class Polygon2D(Base2DIn2D):
             if self_idx is None:
                 return False
 
-            # Re-order polygon vertices to match othe
+            # Re-order polygon vertices to match other
             vertices = vertices[self_idx:] + vertices[:self_idx]
 
         is_equivalent = True
@@ -359,13 +360,10 @@ class Polygon2D(Base2DIn2D):
 
     @classmethod
     def from_array(cls, point_array):
-        """ Consumes nested list of nested list of points,
-        and returns Polygon2D.
+        """Creates a Polygon2D from a nested array of endpoint coordinates.
 
         Args:
             point_array: nested list of point lists
-        Returns:
-            Polygon2D
         """
         return Polygon2D(Point2D(*point) for point in point_array)
 
