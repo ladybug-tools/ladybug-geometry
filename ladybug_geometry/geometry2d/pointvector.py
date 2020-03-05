@@ -53,6 +53,10 @@ class Vector2D(object):
         """
         return cls(array[0], array[1])
 
+    def to_array(self):
+        """Get Vector2D/Point2D as a tuple of two numbers"""
+        return (self.x, self.y)
+
     @property
     def x(self):
         """Get the X coordinate."""
@@ -159,10 +163,6 @@ class Vector2D(object):
         return {'type': 'Vector2D',
                 'x': self.x,
                 'y': self.y}
-
-    def to_array(self):
-        """Get Vector2D/Point2D as a tuple of two numbers"""
-        return (self.x, self.y)
 
     def _cast_to_float(self, value):
         """Ensure that an input coordinate value is a float."""
@@ -426,3 +426,4 @@ class Point2D(Vector2D):
         """
         if isinstance(other, Vector2D):
             return self.x > other.x
+

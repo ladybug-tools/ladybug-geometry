@@ -313,9 +313,59 @@ class Polygon2D(Base2DIn2D):
         """
         return not self.area == 0
 
+    def is_equivalent(self, other, tolerance):
+        """Boolean noting equivalence (within tolerance) between this polygon and another.
+
+        The order of the polygon vertices do not have to start from the
+        same vertex for equivalence to be true, but must be in the same counterclockwise
+        or clockwise order.
+
+        Args:
+            other: Polygon2D for comparison.
+            tolerance: float representing point equivalence.
+
+        Returns:
+            True if equivalent else False
+        """
+
+        # Check number of points
+        if len(self.vertices) != len(other.vertices):
+            return False
+
+        vertices = self.vertices
+
+        # Check order
+        if not vertices[0].is_equivalent(other.vertices[0], tolerance):
+            self_idx = None
+            other_pt = other.vertices[0]
+            for i, pt in enumerate(self.vertices):
+                if pt.is_equivalent(other_pt, tolerance):
+                    self_idx = i
+                    break
+
+            if self_idx is None:
+                return False
+
+            # Re-order polygon vertices to match other
+            vertices = vertices[self_idx:] + vertices[:self_idx]
+
+        is_equivalent = True
+        for pt, other_pt in zip(vertices[1:], other.vertices[1:]):
+            is_equivalent = is_equivalent and pt.is_equivalent(other_pt, tolerance)
+        return is_equivalent
+
     def to_array(self):
         """Get a list of lists whenre each sub-list represents a Point2D vetex."""
         return tuple(pt.to_array() for pt in self.vertices)
+
+    @classmethod
+    def from_array(cls, point_array):
+        """Creates a Polygon2D from a nested array of endpoint coordinates.
+
+        Args:
+            point_array: nested list of point lists
+        """
+        return Polygon2D(Point2D(*point) for point in point_array)
 
     def remove_colinear_vertices(self, tolerance):
         """Get a version of this polygon without colinear or duplicate vertices.

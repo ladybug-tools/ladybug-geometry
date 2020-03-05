@@ -631,3 +631,30 @@ def test_intersect_polygon_segments_with_3_angled_rectangles():
 
     assert len(polygon1.segments) == 4  # No extra vertex added
     assert len(polygon2.segments) == 4  # No extra vertex added
+
+
+def test_polygon_is_equivalent():
+    """ Test if polygons are equivalent based on point equivalence"""
+
+    tol = 1e-10
+    p1 = Polygon2D.from_array([[0, 0], [6, 0], [7, 3], [0, 4]])
+
+    # Test no points are the same
+    p2 = Polygon2D.from_array([[0, 1], [6, 1], [7, 4]])
+    assert not p1.is_equivalent(p2, tol)
+
+    # Test when length is not same
+    p2 = Polygon2D.from_array([[0, 0], [6, 0], [7, 3]])
+    assert not p1.is_equivalent(p2, tol)
+
+    # Test equal condition same order
+    p2 = Polygon2D.from_array([[0, 0], [6, 0], [7, 3], [0, 4]])
+    assert p1.is_equivalent(p2, tol)
+
+    # Test equal condition different order 1
+    p2 = Polygon2D.from_array([[7, 3], [0, 4], [0, 0], [6, 0]])
+    assert p1.is_equivalent(p2, tol)
+
+    # Test equal condition different order 2
+    p2 = Polygon2D.from_array([[0, 4], [0, 0], [6, 0], [7, 3]])
+    assert p1.is_equivalent(p2, tol)
