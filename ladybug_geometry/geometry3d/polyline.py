@@ -55,6 +55,15 @@ class Polyline3D(Base2DIn3D):
         interp = data['interpolated'] if 'interpolated' in data else False
         return cls(tuple(Point3D.from_array(pt) for pt in data['vertices']), interp)
 
+    @classmethod
+    def from_array(cls, point_array):
+        """Create a Polyline3D from a nested array of vertex coordinates.
+
+        Args:
+            point_array: nested array of point arrays.
+        """
+        return Polyline3D(Point3D(*point) for point in point_array)
+
     @property
     def segments(self):
         """Tuple of all line segments in the polyline."""
@@ -89,10 +98,6 @@ class Polyline3D(Base2DIn3D):
                 are considered the same.
         """
         return self._vertices[0].is_equivalent(self._vertices[-1], tolerance)
-
-    def to_array(self):
-        """Get a list of lists whenre each sub-list represents a Point3D vetex."""
-        return tuple(pt.to_array() for pt in self.vertices)
 
     def remove_colinear_vertices(self, tolerance):
         """Get a version of this polyline without colinear or duplicate vertices.
@@ -233,6 +238,10 @@ class Polyline3D(Base2DIn3D):
         if self.interpolated:
             base['interpolated'] = self.interpolated
         return base
+
+    def to_array(self):
+        """Get a list of lists whenre each sub-list represents a Point3D vetex."""
+        return tuple(pt.to_array() for pt in self.vertices)
 
     @staticmethod
     def join_segments(segments, tolerance):

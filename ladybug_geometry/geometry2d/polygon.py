@@ -62,6 +62,15 @@ class Polygon2D(Base2DIn2D):
         return cls(tuple(Point2D.from_array(pt) for pt in data['vertices']))
 
     @classmethod
+    def from_array(cls, point_array):
+        """Create a Polygon2D from a nested array of vertex coordinates.
+
+        Args:
+            point_array: nested array of point arrays.
+        """
+        return Polygon2D(Point2D(*point) for point in point_array)
+
+    @classmethod
     def from_rectangle(cls, base_point, height_vector, base, height):
         """Initialize Polygon2D from rectangle parameters.
 
@@ -353,19 +362,6 @@ class Polygon2D(Base2DIn2D):
         for pt, other_pt in zip(vertices[1:], other.vertices[1:]):
             is_equivalent = is_equivalent and pt.is_equivalent(other_pt, tolerance)
         return is_equivalent
-
-    def to_array(self):
-        """Get a list of lists whenre each sub-list represents a Point2D vetex."""
-        return tuple(pt.to_array() for pt in self.vertices)
-
-    @classmethod
-    def from_array(cls, point_array):
-        """Creates a Polygon2D from a nested array of endpoint coordinates.
-
-        Args:
-            point_array: nested list of point lists
-        """
-        return Polygon2D(Point2D(*point) for point in point_array)
 
     def remove_colinear_vertices(self, tolerance):
         """Get a version of this polygon without colinear or duplicate vertices.
@@ -693,6 +689,10 @@ class Polygon2D(Base2DIn2D):
         """Get Polygon2D as a dictionary."""
         return {'type': 'Polygon2D',
                 'vertices': [pt.to_array() for pt in self.vertices]}
+
+    def to_array(self):
+        """Get a list of lists whenre each sub-list represents a Point2D vetex."""
+        return tuple(pt.to_array() for pt in self.vertices)
 
     @staticmethod
     def intersect_polygon_segments(polygon_list, tolerance):

@@ -341,3 +341,19 @@ def test_split_with_plane():
     assert len(seg.split_with_plane(plane_1)) == 2
     plane_2 = Plane(n=Vector3D(0, 1, 0), o=Point3D(2, 0, 2))
     assert len(seg.split_with_plane(plane_2)) == 1
+
+
+def test_to_from_array():
+    """Test to/from array method"""
+    test_line = LineSegment3D.from_end_points(Point3D(2, 0, 2), Point3D(2, 2, 2))
+    line_array = ((2, 0, 2), (2, 2, 2))
+
+    assert test_line == LineSegment3D.from_array(line_array)
+
+    line_array = ((2, 0, 2), (2, 2, 2))
+    test_line = LineSegment3D.from_end_points(Point3D(2, 0, 2), Point3D(2, 2, 2))
+
+    assert test_line.to_array() == line_array
+
+    test_line_2 = LineSegment3D.from_array(test_line.to_array())
+    assert test_line == test_line_2

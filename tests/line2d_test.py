@@ -292,19 +292,17 @@ def test_closest_points_between_line():
     assert seg_1.distance_to_line(seg_3) == pytest.approx(1.41421, rel=1e-3)
 
 
-def test_from_array():
-    """Test from array method"""
-
+def test_to_from_array():
+    """Test to/from array method"""
     test_line = LineSegment2D.from_end_points(Point2D(2, 0), Point2D(2, 2))
     line_array = ((2, 0), (2, 2))
 
     assert test_line == LineSegment2D.from_array(line_array)
 
-
-def test_to_array():
-    """Test to array method"""
-
     line_array = ((2, 0), (2, 2))
     test_line = LineSegment2D.from_end_points(Point2D(2, 0), Point2D(2, 2))
 
     assert test_line.to_array() == line_array
+
+    test_line_2 = LineSegment2D.from_array(test_line.to_array())
+    assert test_line == test_line_2

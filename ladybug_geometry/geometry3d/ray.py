@@ -22,6 +22,15 @@ class Ray3D(Base1DIn3D):
     def __init__(self, p, v):
         """Initilize Ray3D."""
         Base1DIn3D.__init__(self, p, v)
+    
+    @classmethod
+    def from_array(cls, ray_array):
+        """ Create a Ray3D from a nested array with a point and a vector.
+
+        Args:
+            ray_array: Nested tuples ((p.x, p.y), (v.x, v.y)).
+        """
+        return Ray3D(Point3D(*ray_array[0]), Vector3D(*ray_array[1]))
 
     def reverse(self):
         """Get a copy of this ray that is reversed."""
@@ -91,6 +100,10 @@ class Ray3D(Base1DIn3D):
         base = Base1DIn3D.to_dict(self)
         base['type'] = 'Ray3D'
         return base
+
+    def to_array(self):
+        """A nested array representing the start point and vector."""
+        return (self.p.to_array(), self.v.to_array())
 
     def _u_in(self, u):
         return u >= 0.0

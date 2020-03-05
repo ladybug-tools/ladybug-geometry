@@ -215,3 +215,19 @@ def test_distance_to_point():
     assert ray.distance_to_point(near_pt) == 2
     near_pt = Point3D(1, 5, 2)
     assert ray.distance_to_point(near_pt) == 1
+
+
+def test_to_from_array():
+    """Test to/from array method."""
+    test_ray = Ray3D(Point3D(2, 0, 2), Vector3D(2, 2, 2))
+    ray_array = ((2, 0, 2), (2, 2, 2))
+
+    assert test_ray == Ray3D.from_array(ray_array)
+
+    ray_array = ((2, 0, 2), (2, 2, 2))
+    test_ray = Ray3D(Point3D(2, 0, 2), Vector3D(2, 2, 2))
+
+    assert test_ray.to_array() == ray_array
+
+    test_ray_2 = Ray3D.from_array(test_ray.to_array())
+    assert test_ray == test_ray_2

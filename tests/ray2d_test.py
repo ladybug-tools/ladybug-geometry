@@ -204,3 +204,19 @@ def test_intersect_line_ray():
 
     assert ray_1.intersect_line_ray(ray_2) == Point2D(2, 3)
     assert ray_1.intersect_line_ray(ray_3) == Point2D(2, 2)
+
+
+def test_to_from_array():
+    """Test to/from array method."""
+    test_ray = Ray2D(Point2D(2, 0), Vector2D(2, 2))
+    ray_array = ((2, 0), (2, 2))
+
+    assert test_ray == Ray2D.from_array(ray_array)
+
+    ray_array = ((2, 0), (2, 2))
+    test_ray = Ray2D(Point2D(2, 0), Vector2D(2, 2))
+
+    assert test_ray.to_array() == ray_array
+
+    test_ray_2 = Ray2D.from_array(test_ray.to_array())
+    assert test_ray == test_ray_2
