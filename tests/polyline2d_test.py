@@ -61,7 +61,7 @@ def test_equality():
 
 
 def test_to_polygon():
-    """Test the equality of Polyline2D objects."""
+    """Test the to_polygon method."""
     pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
     pts_2 = pts_1 + (Point2D(0, 0),)
 
@@ -75,6 +75,16 @@ def test_to_polygon():
     assert isinstance(polygon_2, Polygon2D)
     assert len(polygon_1) == 4
     assert len(polygon_2) == 4
+
+
+def test_from_polygon():
+    """Test the from_polygon method."""
+    pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+    pgon = Polygon2D(pts_1)
+
+    pline = Polyline2D.from_polygon(pgon)
+    assert isinstance(pline, Polyline2D)
+    assert len(pline) == 5
 
 
 def test_polyline2d_to_from_dict():

@@ -1,6 +1,8 @@
 # coding=utf-8
 import pytest
 
+from ladybug_geometry.geometry2d.polyline import Polyline2D
+from ladybug_geometry.geometry2d.pointvector import Point2D
 from ladybug_geometry.geometry3d.polyline import Polyline3D
 from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
 from ladybug_geometry.geometry3d.line import LineSegment3D
@@ -55,6 +57,22 @@ def test_equality():
     assert hash(pline) == hash(pline_dup)
     assert pline != pline_alt
     assert hash(pline) != hash(pline_alt)
+
+
+def test_to_from_polygon():
+    """Test the from_polygon method."""
+    pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+    pline2d = Polyline2D(pts_1, interpolated=True)
+
+    pline = Polyline3D.from_polyline2d(pline2d)
+    assert isinstance(pline, Polyline3D)
+    assert len(pline) == 4
+    assert pline.interpolated
+
+    new_pline2d = pline.to_polyline2d()
+    assert isinstance(new_pline2d, Polyline2D)
+    assert len(new_pline2d) == 4
+    assert new_pline2d.interpolated
 
 
 def test_polyline3d_to_from_dict():

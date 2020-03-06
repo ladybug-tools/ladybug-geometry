@@ -63,9 +63,18 @@ class Polyline2D(Base2DIn2D):
         """Create a Polyline2D from a nested array of vertex coordinates.
 
         Args:
-            point_array: nested array of point arrays.
+            point_array: Nested array of point arrays.
         """
         return Polyline2D(Point2D(*point) for point in point_array)
+
+    @classmethod
+    def from_polygon(cls, polygon):
+        """Create a closed Polyline2D from a Polygon2D.
+
+        Args:
+            polygon: A Polygon2D object to be converted to a Polyline2D.
+        """
+        return Polyline2D(polygon.vertices + (polygon.vertices[0],))
 
     @property
     def segments(self):

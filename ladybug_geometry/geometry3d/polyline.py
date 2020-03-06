@@ -2,9 +2,13 @@
 """3D Polyline"""
 from __future__ import division
 
+from ..geometry2d.pointvector import Point2D
+from ..geometry2d.polyline import Polyline2D
+
 from ._2d import Base2DIn3D
 from .pointvector import Point3D
 from .line import LineSegment3D
+from .plane import Plane
 from ..intersection3d import intersect_line3d_plane
 from .._polyline import _group_vertices
 
@@ -63,6 +67,17 @@ class Polyline3D(Base2DIn3D):
             point_array: nested array of point arrays.
         """
         return Polyline3D(Point3D(*point) for point in point_array)
+
+    @classmethod
+    def from_polyline2d(cls, polyline2d, plane=Plane()):
+        """Create a closed Polyline3D from a Polyline2D and a plane.
+
+        Args:
+            polyline2d: A Polyline2D object to be converted to a Polyline3D.
+            plane: A Plane in which the Polyline2D sits.
+        """
+        return Polyline3D((plane.xy_to_xyz(pt) for pt in polyline2d.vertices),
+                           polyline2d.interpolated)
 
     @property
     def segments(self):
@@ -242,6 +257,10 @@ class Polyline3D(Base2DIn3D):
     def to_array(self):
         """Get a list of lists whenre each sub-list represents a Point3D vetex."""
         return tuple(pt.to_array() for pt in self.vertices)
+
+    def to_polyline2d(self):
+        """Get a Polyline2D in the XY plane derived from this 3D polyline."""
+        return Polyline2D((Point2D(pt.x, pt.y) for pt in self.vertices), self.interpolated)
 
     @staticmethod
     def join_segments(segments, tolerance):
