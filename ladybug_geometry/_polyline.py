@@ -22,7 +22,7 @@ def _group_vertices(segments, tolerance):
             base_seg = remain_segs[0]
             del remain_segs[0]
         elif len(remain_segs) == 1:  # lone last segment
-            grouped_verts.append([segments[0].p1, segments[0].p2])
+            grouped_verts.append([remain_segs[0].p1, remain_segs[0].p2])
             del remain_segs[0]
     return grouped_verts
 
