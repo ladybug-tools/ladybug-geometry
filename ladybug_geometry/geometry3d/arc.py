@@ -7,6 +7,7 @@ from .plane import Plane
 from ..geometry2d.pointvector import Point2D, Vector2D
 from ..geometry2d.ray import Ray2D
 from ..geometry2d.arc import Arc2D
+from .polyline import Polyline3D
 
 import math
 
@@ -323,14 +324,28 @@ class Arc3D(object):
                         for arc in _int_pt2d]
         return [self]
 
-    def duplicate(self):
-        """Get a copy of this object."""
-        return self.__copy__()
+    def to_polyline(self, divisions, interpolated=True):
+        """Get this Arc3D as an approximated Polyline3D.
+        
+        Args:
+            divisions: The number of segments into which the arc will be divided.
+            interpolated: Boolean to note whether the polyline should be interpolated
+                between the input vertices when it is translated to other interfaces.
+                This property has no effect on the geometric calculations performed
+                by this library and is only present in order to assist with
+                display/translation. (Default: True)
+        """
+        pts = self.subdivide_evenly(divisions)
+        return Polyline3D(pts, interpolated)
 
     def to_dict(self):
         """Get Arc3D as a dictionary."""
         return {'type': 'Arc3D', 'plane': self.plane.to_dict(),
                 'radius': self.radius, 'a1': self.a1, 'a2': self.a2}
+
+    def duplicate(self):
+        """Get a copy of this object."""
+        return self.__copy__()
 
     @staticmethod
     def _plane_from_vertices(pt1, pt2, pt3):
