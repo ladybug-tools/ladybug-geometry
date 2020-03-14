@@ -4,6 +4,7 @@ import pytest
 from ladybug_geometry.geometry3d.arc import Arc3D
 from ladybug_geometry.geometry3d.plane import Plane
 from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
+from ladybug_geometry.geometry3d.polyline import Polyline3D
 
 from ladybug_geometry.geometry2d.arc import Arc2D
 
@@ -288,6 +289,19 @@ def test_subdivide():
     assert len(divisions) == 10
     divisions = arc.subdivide_evenly(4)
     assert len(divisions) == 5
+
+
+def test_to_polyline():
+    """Test the Arc3D to_polyline methods."""
+    pt = Point3D(2, 0, 2)
+    arc = Arc3D(Plane(o=pt), 1, 1.5 * math.pi, 0.5 * math.pi)
+
+    pline = arc.to_polyline(4, True)
+    assert isinstance(pline, Polyline3D)
+    assert pline.vertices[0] == arc.p1
+    assert pline.vertices[-1] == arc.p2
+    assert len(pline.vertices) == 5
+    assert pline.interpolated
 
 
 def test_point_at_angle():

@@ -3,6 +3,7 @@
 from __future__ import division
 
 from .pointvector import Point2D, Vector2D
+from .polyline import Polyline2D
 from ..intersection2d import closest_point2d_on_arc2d, intersect_line2d_arc2d, \
     intersect_line2d_infinite_arc2d
 
@@ -368,14 +369,28 @@ class Arc2D(object):
                         Arc2D(self.c, self.r, am2, am1),
                         Arc2D(self.c, self.r, am1, self.a2)]
 
-    def duplicate(self):
-        """Get a copy of this object."""
-        return self.__copy__()
+    def to_polyline(self, divisions, interpolated=True):
+        """Get this Arc2D as an approximated Polyline2D.
+        
+        Args:
+            divisions: The number of segments into which the arc will be divided.
+            interpolated: Boolean to note whether the polyline should be interpolated
+                between the input vertices when it is translated to other interfaces.
+                This property has no effect on the geometric calculations performed
+                by this library and is only present in order to assist with
+                display/translation. (Default: True)
+        """
+        pts = self.subdivide_evenly(divisions)
+        return Polyline2D(pts, interpolated)
 
     def to_dict(self):
         """Get Arc2D as a dictionary."""
         return {'type': 'Arc2D', 'c': self.c.to_array(),
                 'r': self.r, 'a1': self.a1, 'a2': self.a2}
+
+    def duplicate(self):
+        """Get a copy of this object."""
+        return self.__copy__()
 
     def _pt_in(self, point):
         if self.is_circle:
