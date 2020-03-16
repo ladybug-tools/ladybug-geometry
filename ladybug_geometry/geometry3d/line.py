@@ -18,6 +18,7 @@ class LineSegment3D(Base1DIn3D):
         * v
         * p1
         * p2
+        * midpoint
         * length
     """
     __slots__ = ()

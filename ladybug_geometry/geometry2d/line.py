@@ -19,6 +19,7 @@ class LineSegment2D(Base1DIn2D):
         * v
         * p1
         * p2
+        * midpoint
         * length
     """
     __slots__ = ()
