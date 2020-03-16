@@ -135,6 +135,15 @@ def test_arc3_init_from_start_mid_end():
     with pytest.raises(Exception):
         arc = Arc3D.from_start_mid_end(p1, m, p2)
 
+def test_arc3_init_from_start_mid_end_flipped():
+    """Test the init of Arc3D objects from_start_mid_end using a flipped plane."""
+    p1 = Point3D(-91.47, 40.40, 0.76)
+    m = Point3D(0.06, 23.23, 97.27)
+    p2 = Point3D(91.49, 40.35, 0.99)
+    arc = Arc3D.from_start_mid_end(p1, m, p2)
+
+    assert arc.midpoint.z > 0
+
 
 def test_arc3_to_from_dict():
     """Test the initalization of Arc3D objects and basic properties."""

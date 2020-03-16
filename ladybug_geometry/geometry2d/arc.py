@@ -244,11 +244,10 @@ class Arc2D(object):
         interval = 1 / number
         parameter = interval
         sub_pts = [self.p1]
-        while parameter < 1:
+        while parameter <= 1:
             sub_pts.append(self.point_at(parameter))
             parameter += interval
-        sub_pts.append(self.p2)
-        return sub_pts
+        return sub_pts 
 
     def point_at(self, parameter):
         """Get a point at a given fraction along the arc.
