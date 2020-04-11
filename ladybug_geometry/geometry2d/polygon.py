@@ -538,7 +538,7 @@ class Polygon2D(Base2DIn2D):
         While this method covers most fringe cases, it will not test for whether
         a point lies perfectly on the edge of the polygon so it assesses whether
         a point lies inside the polygon up to Python floating point tolerance
-        (1e-16). If distinguishing edge conditions from inside/ outside is
+        (16 digits). If distinguishing edge conditions from inside/ outside is
         important, the `point_relationship` method should be used.
 
         Args:

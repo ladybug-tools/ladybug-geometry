@@ -52,7 +52,7 @@ class Plane(object):
             assert isinstance(x, Vector3D), \
                 "Expected Vector3D for plane X-axis. Got {}.".format(type(x))
             x = x.normalize()
-            assert abs(self._n.x * x.x + self._n.y * x.y + self._n.z * x.z) < 1e-9, \
+            assert abs(self._n.x * x.x + self._n.y * x.y + self._n.z * x.z) < 1e-6, \
                 'Plane X-axis and normal vector are not orthagonal. Got angle of {} ' \
                 'degrees between them.'.format(math.degrees(self._n.angle(x)))
             self._x = x

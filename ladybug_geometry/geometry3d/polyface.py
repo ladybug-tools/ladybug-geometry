@@ -740,6 +740,9 @@ class Polyface3D(Base2DIn3D):
                 (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)).normalize()
             move_vec = move_vec * (tolerance + 0.00001)
             point_on_face = face.boundary[0] + move_vec
+            vert2d = face.plane.xyz_to_xy(point_on_face)
+            if not face.polygon2d.is_point_inside(vert2d):  # check that it's on the face
+                point_on_face = face.boundary[0] - move_vec
             test_ray = Ray3D(point_on_face, face.normal)
 
             # if the ray intersects with an even number of other faces, it is correct

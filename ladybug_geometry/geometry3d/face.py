@@ -494,7 +494,7 @@ class Face3D(Base2DIn3D):
         This is useful for getting the vertices of several faces aligned with the
         same global geometry rules for export to engines like EnergyPlus.
         """
-        if self._plane.n.z == 1or self._plane.n.z == -1:  # no vertex is above another
+        if self._plane.n.z == 1 or self._plane.n.z == -1:  # no vertex is above another
             return self.vertices
         # get a 2d polygon in the face plane that has a positive Y axis.
         if self._plane.y.z < 0:
@@ -638,7 +638,7 @@ class Face3D(Base2DIn3D):
             angle_tolerance: The max angle in radians that the plane normals can
                 differ from one another in order for them to be considered coplanar.
         Returns:
-            True if it is a possibe sub-face. False if it is not a valid sub-face.
+            True if it can be a valid sub-face. False if it is not a valid sub-face.
         """
         # test whether the surface is coplanar
         if not self.plane.is_coplanar_tolerance(face.plane, tolerance, angle_tolerance):
@@ -657,6 +657,26 @@ class Face3D(Base2DIn3D):
                 if not hole_poly.is_polygon_outside(sub_poly):
                     return False
             return True
+
+    def is_point_on_face(self, point, tolerance):
+        """Check whether a given point is on this face.
+
+        This includes both a check to be sure that the point is in the plane of this
+        face and a chek to ensure that point lies in the boundary of the face.
+
+        Args:
+            face: Another face for which sub-face equivalency will be tested.
+            tolerance: The minimum difference between the coordinate values of two
+                vertices at which they can be considered equivalent.
+        Returns:
+            True if the point is on the face. False if it is not.
+        """
+        # test whether the point is in the plane of the face
+        if self.plane.distance_to_point(point) > tolerance:
+            return False
+        # if it is, convert the point into this face's plane
+        vert2d = self.plane.xyz_to_xy(point)
+        return self.polygon2d.is_point_inside(vert2d)
 
     def check_planar(self, tolerance, raise_exception=True):
         """Check that all of the face's vertices lie within the face's plane.
