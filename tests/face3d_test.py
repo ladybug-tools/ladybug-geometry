@@ -399,6 +399,24 @@ def test_is_sub_face():
     assert face.is_sub_face(sub_face_5, 0.0001, 0.0001) is False
 
 
+def test_is_point_on_face():
+    """Test the is_point_on_face method."""
+    bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
+    sub_pt_1 = Point3D(1, 1)
+    sub_pt_2 = Point3D(3, 2)
+    sub_pt_3 = Point3D(6, 2)
+    sub_pt_4 = Point3D(6, 6)
+    sub_pt_5 = Point3D(2, 0, 2)
+    plane_1 = Plane(Vector3D(0, 0, 1))
+    face = Face3D(bound_pts, plane_1)
+
+    assert face.is_point_on_face(sub_pt_1, 0.0001) is True
+    assert face.is_point_on_face(sub_pt_2, 0.0001) is True
+    assert face.is_point_on_face(sub_pt_3, 0.0001) is False
+    assert face.is_point_on_face(sub_pt_4, 0.0001) is False
+    assert face.is_point_on_face(sub_pt_5, 0.0001) is False
+
+
 def test_clockwise():
     """Test the clockwise property."""
     plane_1 = Plane(Vector3D(0, 0, 1))
