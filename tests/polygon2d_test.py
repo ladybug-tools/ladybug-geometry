@@ -546,6 +546,35 @@ def test_intersect_segments():
     assert polygon1.segments[1].p1 == Point2D(1, 2)
 
 
+def test_intersect_segments_multiple_intersections():
+    """Tests that polygons having multiple intersections are ordered correctly."""
+    pts1 = (Point2D(0, 0), Point2D(5, 0), Point2D(5, 5), Point2D(0, 5))
+    pts2 = (Point2D(6, 4), Point2D(5, 4), Point2D(5, 3), Point2D(6, 3))
+    pts3 = (Point2D(5, 3), Point2D(6, 3), Point2D(6, 4), Point2D(5, 4))
+    pts4 = (Point2D(7, 4), Point2D(5, 4), Point2D(5, 3), Point2D(6, 3),
+            Point2D(6, 2), Point2D(5, 2), Point2D(5, 1), Point2D(7, 1))
+    pts5 = (Point2D(5, 3), Point2D(6, 3), Point2D(6, 2), Point2D(5, 2),
+            Point2D(5, 1), Point2D(7, 1), Point2D(7, 4), Point2D(5, 4))
+
+    poly1 = Polygon2D(pts1)
+    poly2 = Polygon2D(pts2)
+    poly3 = Polygon2D(pts3)
+    poly4 = Polygon2D(pts4)
+    poly5 = Polygon2D(pts5)
+
+    int_polys1 = Polygon2D.intersect_segments(poly1, poly2, 0.01)
+    int_polys2 = Polygon2D.intersect_segments(poly1, poly3, 0.01)
+    int_polys3 = Polygon2D.intersect_segments(poly1, poly4, 0.01)
+    int_polys4 = Polygon2D.intersect_segments(poly1, poly4, 0.01)
+
+    assert int_polys1[0].vertices == int_polys2[0].vertices == \
+        (Point2D(0, 0), Point2D(5, 0), Point2D(5, 3), Point2D(5, 4),
+         Point2D(5, 5), Point2D(0, 5))
+    assert int_polys3[0].vertices == int_polys4[0].vertices == \
+        (Point2D(0, 0), Point2D(5, 0), Point2D(5, 1), Point2D(5, 2),
+         Point2D(5, 3), Point2D(5, 4), Point2D(5, 5), Point2D(0, 5))
+
+
 def test_intersect_segments_zero_tolerance():
     """Tests that the default tolerance of 0 does not update nearby polygons."""
     pts0 = (Point2D(1, 0), Point2D(4, 0), Point2D(4, 1.99), Point2D(1, 1.99))

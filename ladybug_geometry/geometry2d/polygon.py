@@ -744,11 +744,11 @@ class Polygon2D(Base2DIn2D):
         polygon1_updates = []
         polygon2_updates = []
 
-        # Bounding rectangle check
+        # bounding rectangle check
         if not Polygon2D.overlapping_bounding_rect(polygon1, polygon2, tolerance):
             return polygon1, polygon2  # no overlap
 
-        # Test if each point of polygon2 is within the tolerance distance of any segment
+        # test if each point of polygon2 is within the tolerance distance of any segment
         # of polygon1.  If so, add the closest point on the segment to the polygon1
         # update list. And vice versa (testing polygon2 against polygon1).
         for i1, seg1 in enumerate(polygon1.segments):
@@ -757,24 +757,18 @@ class Polygon2D(Base2DIn2D):
                 x = closest_point2d_on_line2d(seg2.p1, seg1)
                 if all(p.distance_to_point(x) > tolerance for p in polygon1.vertices) \
                         and x.distance_to_point(seg2.p1) <= tolerance:
-                    polygon1_updates.append([i1, x])
+                    polygon1_updates.append((i1, x))
                 # Test polygon2 against polygon1
                 y = closest_point2d_on_line2d(seg1.p1, seg2)
                 if all(p.distance_to_point(y) > tolerance for p in polygon2.vertices) \
                         and y.distance_to_point(seg1.p1) <= tolerance:
-                    polygon2_updates.append([i2, y])
+                    polygon2_updates.append((i2, y))
 
-        # Apply any updates to polygon1
-        poly_points = list(polygon1.vertices)
-        for update in polygon1_updates[::-1]:  # Traverse backwards to preserve order
-            poly_points.insert(update[0] + 1, update[1])
-        polygon1 = Polygon2D(poly_points)
+        # apply any updates to polygon1
+        polygon1 = Polygon2D._insert_updates_in_order(polygon1, polygon1_updates)
 
         # Apply any updates to polygon2
-        poly_points = list(polygon2.vertices)
-        for update in polygon2_updates[::-1]:  # Traverse backwards to preserve order
-            poly_points.insert(update[0] + 1, update[1])
-        polygon2 = Polygon2D(poly_points)
+        polygon2 = Polygon2D._insert_updates_in_order(polygon2, polygon2_updates)
 
         return polygon1, polygon2
 
@@ -818,6 +812,39 @@ class Polygon2D(Base2DIn2D):
         new_polygon._is_convex = self._is_convex
         new_polygon._is_self_intersecting = self._is_self_intersecting
         new_polygon._is_clockwise = self._is_clockwise
+
+    @staticmethod
+    def _insert_updates_in_order(polygon, polygon_updates):
+        """Insert updates from the intersect_segments method into a polygon.
+
+        This method ensures that multiple updates to a single segment are inserted
+        in the correct order over the polygon.
+
+        Args:
+            polygon: A Polygon2D to be updated with intersection points
+            polygon_updates: A list of tuples where each tuple has two values. The
+                first is the index of the segment to be updated and the second is
+                the point to insert.
+        """
+        poly_points = list(polygon.vertices)
+        last_i = -1
+        colinear_count = 0
+        for update in polygon_updates[::-1]:  # traverse backwards to preserve order
+            new_i = update[0] + 1
+            if new_i == last_i:  # check order of new intersections on the same segment
+                colinear_count += 1
+                p1 = poly_points[update[0]]
+                for i, pt in enumerate(poly_points[new_i:new_i + colinear_count]):
+                    if p1.distance_to_point(pt) > p1.distance_to_point(update[1]):
+                        poly_points.insert(new_i + i, update[1])
+                        break
+                else:
+                    poly_points.insert(new_i + colinear_count, update[1])
+            else:
+                colinear_count = 0
+                poly_points.insert(new_i, update[1])
+            last_i = new_i
+        return Polygon2D(poly_points)
 
     @staticmethod
     def _segments_from_vertices(vertices):
