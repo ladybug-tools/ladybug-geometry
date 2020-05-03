@@ -645,18 +645,7 @@ class Face3D(Base2DIn3D):
             return False
 
         # if it is, convert sub-face to a polygon in this face's plane
-        verts2d = tuple(self.plane.xyz_to_xy(_v) for _v in face.vertices)
-        sub_poly = Polygon2D(verts2d)
-
-        if not self.has_holes:
-            return self.polygon2d.is_polygon_inside(sub_poly)
-        else:
-            if not self.boundary_polygon2d.is_polygon_inside(sub_poly):
-                return False
-            for hole_poly in self.hole_polygon2d:
-                if not hole_poly.is_polygon_outside(sub_poly):
-                    return False
-            return True
+        return self._is_sub_face(face)
 
     def is_point_on_face(self, point, tolerance):
         """Check whether a given point is on this face.
@@ -890,8 +879,8 @@ class Face3D(Base2DIn3D):
             return _plane_int
         return None
 
-    def get_mesh_grid(self, x_dim, y_dim=None, offset=None, flip=False,
-                      generate_centroids=True):
+    def mesh_grid(self, x_dim, y_dim=None, offset=None, flip=False,
+                  generate_centroids=True):
         """Get a gridded Mesh3D over this face.
 
         This method generates a mesh grid over the domain of the face
@@ -1107,7 +1096,8 @@ class Face3D(Base2DIn3D):
     def sub_faces_by_ratio(self, ratio):
         """Get a list of faces with a combined area equal to the ratio times this face area.
 
-        All sub faces will lie inside the boundaries of this face.
+        All sub faces will lie inside the boundaries of this face and will have
+        the same normal as this face.
 
         Args:
             ratio: A number between 0 and 1 for the ratio between the area of
@@ -1127,6 +1117,54 @@ class Face3D(Base2DIn3D):
                 _scaled_verts.append(
                     [pt.scale(scale_factor, _tri_mesh.face_centroids[i]) for pt in _tri])
             return [Face3D(_t, self.plane) for _t in _scaled_verts]
+
+    def sub_faces_by_ratio_gridded(self, ratio, x_dim, y_dim=None):
+        """Get a list of faces with a combined area equal to the ratio times this face area.
+
+        All sub faces will lie inside the boundaries of this face and have the same
+        normal as this face.
+        
+        Sub faces will be arranged in a grid derived from this face's plane property.
+        Because the x_dim and y_dim refer to dimensions within the X and Y
+        coordinate system of this faces's plane, rotating this plane will
+        result in rotated grid cells.
+
+        If the x_dim and/or y_dim are too large for this face, this method will
+        return essentially the same result as the sub_faces_by_ratio method.
+
+        Args:
+            ratio: A number between 0 and 1 for the ratio between the area of
+                the sub faces and the area of this face.
+            x_dim: The x dimension of the grid cells as a number.
+            y_dim: The y dimension of the grid cells as a number. Default is None,
+                which will assume the same cell dimension for y as is set for x.
+
+        Returns:
+            A list of Face3D objects for sub faces.
+        """
+        try:  # get the gridded mesh derived from this face
+            grid_mesh = self.mesh_grid(x_dim, y_dim)
+        except AssertionError:  # there are no faces; just return sub_faces_by_ratio
+            return self.sub_faces_by_ratio(ratio)
+
+        # compute the area that each of the mesh faces need to be scaled to
+        _verts, _faces = grid_mesh.vertices,  grid_mesh.faces
+        _x_dim = _verts[_faces[0][0]].distance_to_point(_verts[_faces[0][1]])
+        _y_dim = _verts[_faces[0][1]].distance_to_point(_verts[_faces[0][2]])
+        fac = (self.area * ratio) / (_x_dim * _y_dim * len(_faces))
+
+        # if the factor is greater than 1, sub-faces will be overlapping
+        if fac >= 1:
+            return self.sub_faces_by_ratio(ratio)
+        s_fac = fac ** 0.5
+
+        # generate the Face3D objects while scaling them to the correct size
+        sub_faces = []
+        for face, centr in zip(_faces, grid_mesh.face_centroids):
+            _f = Face3D(tuple(_verts[i].scale(s_fac, centr) for i in face), self.plane)
+            if self._is_sub_face(_f):  # catch edge cases
+                sub_faces.append(_f)
+        return sub_faces
 
     def sub_faces_by_ratio_rectangle(self, ratio, tolerance):
         """Get a list of faces with a combined area equal to the ratio times this face area.
@@ -1711,6 +1749,25 @@ class Face3D(Base2DIn3D):
             if abs(_a) >= tolerance:
                 new_vertices.append(pts_3d[i - 1])
         return new_vertices
+
+    def _is_sub_face(self, face):
+        """Check if a face is a sub-face of this face, bypassing coplanar check.
+
+        Args:
+            face: Another face for which sub-face equivalency will be tested.
+        """
+        verts2d = tuple(self.plane.xyz_to_xy(_v) for _v in face.vertices)
+        sub_poly = Polygon2D(verts2d)
+
+        if not self.has_holes:
+            return self.polygon2d.is_polygon_inside(sub_poly)
+        else:
+            if not self.boundary_polygon2d.is_polygon_inside(sub_poly):
+                return False
+            for hole_poly in self.hole_polygon2d:
+                if not hole_poly.is_polygon_outside(sub_poly):
+                    return False
+            return True
 
     def _vertices_between_points(self, start_pt, end_pt, tolerance):
         """Get the vertices between a start and end point.

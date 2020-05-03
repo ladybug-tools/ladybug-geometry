@@ -320,7 +320,7 @@ def test_mesh2d_init_from_grid():
 
 
 def test_triangualted():
-    """Test the Mesh2D triangualted method."""
+    """Test the Mesh2D triangulated method."""
     pts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0), Point2D(4, 0))
     mesh = Mesh2D(pts, [(0, 1, 2, 3), (2, 3, 4)], ['red', 'green'])
 

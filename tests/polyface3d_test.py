@@ -501,14 +501,14 @@ def test_min_max_center():
 def test_floor_mesh_grid():
     """Test the generation of a mesh grid from the floor of a box."""
     polyface = Polyface3D.from_box(5, 10, 3)
-    floor_grid = polyface.faces[0].get_mesh_grid(1, 1, 1, True)
+    floor_grid = polyface.faces[0].mesh_grid(1, 1, 1, True)
     assert len(floor_grid.faces) == 50
 
     angle = -1 * math.radians(45)
     x_axis = Vector3D(1, 0, 0).rotate_xy(angle)
     base_plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 0), x_axis)
     polyface = Polyface3D.from_box(5, 10, 3, base_plane)
-    floor_grid = polyface.faces[0].get_mesh_grid(1, 1, 1, True)
+    floor_grid = polyface.faces[0].mesh_grid(1, 1, 1, True)
     assert len(floor_grid.faces) == 50
 
 
