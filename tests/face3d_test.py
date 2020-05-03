@@ -916,12 +916,12 @@ def test_project_point():
     assert face.project_point(pt_4) is None
 
 
-def test_get_mesh_grid():
-    """Test the Face3D get_mesh_grid method."""
+def test_mesh_grid():
+    """Test the Face3D mesh_grid method."""
     pts = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
     plane = Plane(Vector3D(0, 0, 1))
     face = Face3D(pts, plane)
-    mesh = face.get_mesh_grid(0.5)
+    mesh = face.mesh_grid(0.5)
 
     assert len(mesh.vertices) == 25
     assert len(mesh.faces) == 16
@@ -939,8 +939,8 @@ def test_get_mesh_grid():
     assert mesh.face_areas[0] == 0.25
     assert len(mesh.face_centroids) == 16
 
-    mesh_2 = face.get_mesh_grid(0.5, 0.5, 1, False)
-    mesh_3 = face.get_mesh_grid(0.5, 0.5, 1, True)
+    mesh_2 = face.mesh_grid(0.5, 0.5, 1, False)
+    mesh_3 = face.mesh_grid(0.5, 0.5, 1, True)
 
     assert mesh_2.min.z == pytest.approx(1, rel=1e-2)
     assert mesh_2.max.z == pytest.approx(1, rel=1e-2)
@@ -1098,6 +1098,20 @@ def test_extract_rectangle_complex():
     assert f1_result[1] == LineSegment3D.from_end_points(Point3D(-1, -1, 3), Point3D(-10, -1, 3))
     assert len(f1_result[2]) == 1
     assert len(f1_result[2][0].vertices) == 4
+
+
+def test_sub_faces_by_ratio_gridded():
+    """Test the Face3D sub_faces_by_ratio_gridded method."""
+    pts_1 = (Point3D(0, 0, 0), Point3D(12, 0, 0), Point3D(12, 0, 12), Point3D(0, 0, 6))
+    face_1 = Face3D(pts_1)
+
+    sub_faces = face_1.sub_faces_by_ratio_gridded(0.4, 2, 2)
+    assert len(sub_faces) == 24
+    assert sum([face.area for face in sub_faces]) == pytest.approx(face_1.area * 0.4, rel=1e-3)
+
+    sub_faces = face_1.sub_faces_by_ratio_gridded(0.4, 12, 12)
+    assert len(sub_faces) == 1
+    assert sum([face.area for face in sub_faces]) == pytest.approx(face_1.area * 0.4, rel=1e-3)
 
 
 def test_sub_faces_by_ratio_rectangle():
