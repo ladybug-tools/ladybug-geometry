@@ -42,7 +42,7 @@ class Mesh3D(MeshBase):
     __slots__ = ('_min', '_max', '_center', '_face_normals', '_vertex_normals')
 
     def __init__(self, vertices, faces, colors=None):
-        """Initilize Mesh3D."""
+        """Initialize Mesh3D."""
         self._vertices = self._check_vertices_input(vertices)
         self._faces = self._check_faces_input(faces)
 
@@ -231,7 +231,7 @@ class Mesh3D(MeshBase):
         This is faster than the Mesh3D.remove_faces method but will likely result
         a lower-quality mesh where several vertices exist in the mesh that are not
         referenced by any face. This may be preferred if pure speed of removing
-        faces is a priorty over smallest size of the mesh in memory.
+        faces is a priority over smallest size of the mesh in memory.
 
         Args:
             pattern: A list of boolean values denoting whether a face should

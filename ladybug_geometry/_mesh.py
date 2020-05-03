@@ -31,7 +31,7 @@ class MeshBase(object):
                  '_area', '_face_areas', '_face_centroids', '_vertex_connected_faces')
 
     def __init__(self, vertices, faces, colors=None):
-        """Initilize MeshBase."""
+        """Initialize MeshBase."""
         self._vertices = vertices
         self._faces = self._check_faces_input(faces)
         self._is_color_by_face = False  # default if colors is None

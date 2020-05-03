@@ -36,7 +36,7 @@ class Polygon2D(Base2DIn2D):
                  '_is_clockwise', '_is_convex', '_is_self_intersecting')
 
     def __init__(self, vertices):
-        """Initilize Polygon2D."""
+        """Initialize Polygon2D."""
         Base2DIn2D.__init__(self, vertices)
         self._segments = None
         self._perimeter = None
@@ -107,7 +107,7 @@ class Polygon2D(Base2DIn2D):
 
         Args:
             number_of_sides: An integer for the number of sides on the regular
-                polgygon. This number must be greater than 2.
+                polygon. This number must be greater than 2.
             radius: A number indicating the distance from the polygon's center
                 where the vertices of the polygon will lie.
                 The default is set to 1.
@@ -459,7 +459,7 @@ class Polygon2D(Base2DIn2D):
 
         Args:
             ray: A Ray2D or to intersect. This will be extended in both
-                directions infinetly for the intersection.
+                directions infinitely for the intersection.
 
         Returns:
             A list with Point2D objects for the intersections.
@@ -481,7 +481,7 @@ class Polygon2D(Base2DIn2D):
 
         Args:
             point: A Point2D for which the relationship to the polygon will be tested.
-            tolerance: The minimum distance from the edge at wich a point is
+            tolerance: The minimum distance from the edge at which a point is
                 considered to lie on the edge.
 
         Returns:
@@ -504,7 +504,7 @@ class Polygon2D(Base2DIn2D):
 
         Args:
             point: A Point2D for which the edge relationship will be tested.
-            tolerance: The minimum distance from the edge at wich a point is
+            tolerance: The minimum distance from the edge at which a point is
                 considered to lie on the edge.
 
         Returns:
@@ -523,7 +523,7 @@ class Polygon2D(Base2DIn2D):
         This method uses the same calculation as the the `is_point_inside` method
         but it includes additional checks for the fringe cases noted in the
         `is_point_inside` description. Using this method means that it will always
-        yeild the right result for all convex polygons and concave polygons with
+        yield the right result for all convex polygons and concave polygons with
         one concave turn (provided that they do not have colinear vertices).
         This is suitable for nearly all practical purposes and the only cases
         that could yield an incorrect result are when a point is co-linear with
@@ -691,7 +691,7 @@ class Polygon2D(Base2DIn2D):
                 'vertices': [pt.to_array() for pt in self.vertices]}
 
     def to_array(self):
-        """Get a list of lists whenre each sub-list represents a Point2D vetex."""
+        """Get a list of lists where each sub-list represents a Point2D vertex."""
         return tuple(pt.to_array() for pt in self.vertices)
 
     @staticmethod

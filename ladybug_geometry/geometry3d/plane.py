@@ -32,7 +32,7 @@ class Plane(object):
     __slots__ = ('_n', '_o', '_k', '_x', '_y')
 
     def __init__(self, n=Vector3D(0, 0, 1), o=Point3D(0, 0, 0), x=None):
-        """Initilize Plane."""
+        """Initialize Plane."""
         assert isinstance(n, Vector3D), \
             "Expected Vector3D for plane normal. Got {}.".format(type(n))
         assert isinstance(o, Point3D), \
@@ -204,7 +204,7 @@ class Plane(object):
         """Get a Point3D from a Point2D in the coordinate system of this plane."""
         # This method returns the same result as the following code:
         # self.o + (self.x * point.x) + (self.y * point.y)
-        # It has been wirtten explicitly to cut out the isinstance() checks for speed
+        # It has been written explicitly to cut out the isinstance() checks for speed
         _u = (self.x.x * point.x, self.x.y * point.x, self.x.z * point.x)
         _v = (self.y.x * point.y, self.y.y * point.y, self.y.z * point.y)
         return Point3D(
@@ -333,7 +333,7 @@ class Plane(object):
         """Test if another Plane object is perfectly coplanar with this Plane.
 
         Args:
-            plane: A Plane object for which coplanartiy will be tested.
+            plane: A Plane object for which co-planarity will be tested.
 
         Returns:
             True if plane is coplanar. False if it is not coplanar.
@@ -348,7 +348,7 @@ class Plane(object):
         """Test if another Plane object is coplanar within a certain tolerance.
 
         Args:
-            plane: A Plane object for which coplanartiy will be tested.
+            plane: A Plane object for which co-planarity will be tested.
             tolerance: The distance between the two planes at which point they can
                 be considered coplanar.
             angle_tolerance: The angle in radians that the plane normals can

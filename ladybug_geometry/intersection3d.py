@@ -61,7 +61,7 @@ def closest_point3d_on_line3d(point, line_ray):
 
     Args:
         point: A Point3D object.
-        line_ray: A LineSegment3D or Ray3D object along wich the closest point
+        line_ray: A LineSegment3D or Ray3D object along which the closest point
             will be determined.
 
     Returns:
@@ -84,7 +84,7 @@ def closest_point3d_on_line3d_infinite(point, line_ray):
 
     Args:
         point: A Point3D object.
-        line_ray: A LineSegment3D or Ray3D object along wich the closest point
+        line_ray: A LineSegment3D or Ray3D object along which the closest point
             will be determined.
 
     Returns:
@@ -119,7 +119,7 @@ def closest_point3d_between_line3d_plane(line_ray, plane):
     """Get the two closest Point3D between a LineSegment3D/Ray3D and a Plane.
 
     Args:
-        line_ray: A LineSegment3D or Ray3D object along wich the closest point
+        line_ray: A LineSegment3D or Ray3D object along which the closest point
             will be determined.
         plane: A Plane object on which a closest point will be determined.
 
@@ -153,7 +153,7 @@ def intersect_line3d_sphere(line_ray, sphere):
 
     Returns:
         Two Point3D objects if a full intersection exists.
-        A Point3D if a point of tangentcy exists.
+        A Point3D if a point of tangency exists.
         Will be None if no intersection exists.
 
     """
@@ -196,10 +196,10 @@ def intersect_plane_sphere(plane, sphere):
         If a full intersection exists
 
         1) A Point3D that represents the center of the intersection circle.
-        2) A Vector3D that represents the normal of the intersection cirlce.
+        2) A Vector3D that represents the normal of the intersection circle.
         3) A number that represents the radius of the intersection circle.
 
-        A Point3D Object if a point of tangentcy exists.
+        A Point3D Object if a point of tangency exists.
         None if no intersection exists.
     """
     r = sphere.radius

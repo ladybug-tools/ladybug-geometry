@@ -29,13 +29,13 @@ class Polyface3D(Base2DIn3D):
         edge_information: Optional edge information, which will speed up the
             creation of the Polyface object if it is available but should be left
             as None if it is unknown. If None, edge_information will be computed
-            from the vertices and face_indices inuputs. Edge information
+            from the vertices and face_indices inputs. Edge information
             should be formatted as a dictionary with two keys as follows:
 
             *   'edge_indices':
                 An array objects that each contain two integers.
                 These integers correspond to indices within the vertices list and
-                each tuple represents a line sengment for an edge of the polyface.
+                each tuple represents a line segment for an edge of the polyface.
             *   'edge_types':
                 An array of integers for each edge that parallels the edge_indices
                 list. An integer of 0 denotes a naked edge, an integer of 1
@@ -64,7 +64,7 @@ class Polyface3D(Base2DIn3D):
                  '_area', '_volume', '_is_solid')
 
     def __init__(self, vertices, face_indices, edge_information=None):
-        """Initilize Polyface3D."""
+        """Initialize Polyface3D."""
         # assign input properties
         Base2DIn3D.__init__(self, vertices)
         self._face_indices = tuple(tuple(tuple(loop) for loop in face)
@@ -135,7 +135,7 @@ class Polyface3D(Base2DIn3D):
 
     @classmethod
     def from_faces(cls, faces, tolerance=0):
-        """Initilize Polyface3D from a list of Face3D objects.
+        """Initialize Polyface3D from a list of Face3D objects.
 
         Note that the Polyface3D.faces property of the resulting polyface will
         have an order of faces that matches the order input to this classmethod.
@@ -170,7 +170,7 @@ class Polyface3D(Base2DIn3D):
 
     @classmethod
     def from_box(cls, width, depth, height, base_plane=None):
-        """Initilize Polyface3D from parameters describing a box.
+        """Initialize Polyface3D from parameters describing a box.
 
         Initializing a polyface this way has the added benefit of having its
         faces property quickly calculated.
@@ -213,7 +213,7 @@ class Polyface3D(Base2DIn3D):
 
     @classmethod
     def from_offset_face(cls, face, offset):
-        """Initilize a solid Polyface3D from a Face3D offset along its normal.
+        """Initialize a solid Polyface3D from a Face3D offset along its normal.
 
         The resulting polyface will always be offset in the direction of
         the face normal.

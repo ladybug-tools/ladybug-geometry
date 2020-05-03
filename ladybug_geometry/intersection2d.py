@@ -41,13 +41,13 @@ def intersect_line2d(line_ray_a, line_ray_b):
 
     # Calculate scaling parameter for line_ray_b
     ua = (line_ray_b.v.x * dy - line_ray_b.v.y * dx) / d
-    # Checks the bounds of ua to ensure it obeys ray/line behaviour
+    # Checks the bounds of ua to ensure it obeys ray/line behavior
     if not line_ray_a._u_in(ua):
         return None
 
     # Calculate scaling parameter for line_ray_b
     ub = (line_ray_a.v.x * dy - line_ray_a.v.y * dx) / d
-    # Checks the bounds of ub to ensure it obeys ray/line behaviour
+    # Checks the bounds of ub to ensure it obeys ray/line behavior
     if not line_ray_b._u_in(ub):
         return None
 

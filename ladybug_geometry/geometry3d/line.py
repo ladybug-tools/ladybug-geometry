@@ -24,7 +24,7 @@ class LineSegment3D(Base1DIn3D):
     __slots__ = ()
 
     def __init__(self, p, v):
-        """Initilize LineSegment3D."""
+        """Initialize LineSegment3D."""
         Base1DIn3D.__init__(self, p, v)
 
     @classmethod
@@ -53,7 +53,7 @@ class LineSegment3D(Base1DIn3D):
         """ Create a LineSegment3D from a nested array of two endpoint coordinates.
 
         Args:
-            line_arry: Nested tuples ((pt1.x, pt1.y, pt.z), (pt2.x, pt2.y, pt.z)),
+            line_array: Nested tuples ((pt1.x, pt1.y, pt.z), (pt2.x, pt2.y, pt.z)),
                 where pt1 and pt2 represent the endpoints of the line segment.
         """
         return LineSegment3D.from_end_points(*tuple(Point3D(*pt) for pt in line_array))
@@ -158,8 +158,8 @@ class LineSegment3D(Base1DIn3D):
 
         Args:
             distances: A list of distances along the line at which to subdivide it.
-                This can also be a single number that will be repeated unitl the end of
-                the line.
+                This can also be a single number that will be repeated until the
+                end of the line.
         """
         if isinstance(distances, (float, int)):
             distances = [distances]

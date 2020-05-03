@@ -41,7 +41,7 @@ class Mesh2D(MeshBase):
     __slots__ = ('_min', '_max', '_center', '_centroid')
 
     def __init__(self, vertices, faces, colors=None):
-        """Initilize Mesh2D."""
+        """Initialize Mesh2D."""
         self._vertices = self._check_vertices_input(vertices)
         self._faces = self._check_faces_input(faces)
         self._is_color_by_face = False  # default if colors is None
@@ -107,10 +107,10 @@ class Mesh2D(MeshBase):
         Args:
             polygon: A Polygon2D.
             purge: A boolean to indicate if duplicate vertices should be shared between
-                faces. This has no bearing on the triagnulation of convex polygons
+                faces. This has no bearing on the triangulation of convex polygons
                 and only affects concave polygons with more than 4 sides.
                 Default is True to purge duplicate vertices, which can be slow
-                for convace polygons composed of a large number of triangles but
+                for concave polygons composed of a large number of triangles but
                 ultimately results in a higher-quality mesh. Default is True.
         """
         assert isinstance(polygon, Polygon2D), 'polygon must be a Polygon2D to use ' \
@@ -347,7 +347,7 @@ class Mesh2D(MeshBase):
         This is faster than the Mesh2D.remove_faces method but will likely result
         a lower-quality mesh where several vertices exist in the mesh that are not
         referenced by any face. This may be preferred if pure speed of removing
-        faces is a priorty over smallest size of the mesh in memory.
+        faces is a priority over smallest size of the mesh in memory.
 
         Args:
             pattern: A list of boolean values denoting whether a face should

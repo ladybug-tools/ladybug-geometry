@@ -32,7 +32,7 @@ class Sphere(object):
     __slots__ = ('_center', '_radius')
 
     def __init__(self, center, radius):
-        """Initilize Sphere."""
+        """Initialize Sphere."""
         assert isinstance(center, Point3D), \
             "Expected Point3D. Got {}.".format(type(center))
         assert radius > 0, 'Sphere radius must be greater than 0. Got {}.'.format(radius)
@@ -102,7 +102,7 @@ class Sphere(object):
         """Get a sphere that has been moved along a vector.
 
         Args:
-            moving_vec: A Vector3D with the direction and distance to move the shere.
+            moving_vec: A Vector3D with the direction and distance to move the sphere.
         """
         return Sphere(self.center.move(moving_vec), self.radius)
 

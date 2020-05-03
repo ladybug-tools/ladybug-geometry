@@ -34,8 +34,7 @@ class Arc2D(object):
     __slots__ = ('_c', '_r', '_a1', '_a2', '_cos_a1', '_sin_a1', '_cos_a2', '_sin_a2')
 
     def __init__(self, c, r, a1=0, a2=2*math.pi):
-        """Initilize Arc2D.
-        """
+        """Initialize Arc2D."""
         assert isinstance(c, Point2D), "Expected Point2D. Got {}.".format(type(c))
         assert r > 0, 'Arc radius must be greater than 0. Got {}.'.format(r)
         assert 0 <= a1 <= 2 * math.pi, 'Arc start angle must be between 0 and 2*pi. ' \
@@ -218,8 +217,8 @@ class Arc2D(object):
 
         Args:
             distances: A list of distances along the arc at which to subdivide it.
-                This can also be a single number that will be repeated unitl the end of
-                the arc.
+                This can also be a single number that will be repeated until the
+                end of the arc.
         """
         if isinstance(distances, (float, int)):
             distances = [distances]

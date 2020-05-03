@@ -82,7 +82,7 @@ class Face3D(Base2DIn3D):
                  '_is_convex', '_is_self_intersecting')
 
     def __init__(self, boundary, plane=None, holes=None, enforce_right_hand=True):
-        """Initilize Face3D."""
+        """Initialize Face3D."""
         # process the boundary and plane inputs
         self._boundary = self._check_vertices_input(boundary)
         if plane is not None:
@@ -232,7 +232,7 @@ class Face3D(Base2DIn3D):
 
         Args:
             side_count: An integer for the number of sides on the regular
-                polgygon. This number must be greater than 2.
+                polygon. This number must be greater than 2.
             radius: A number indicating the distance from the polygon's center
                 where the vertices of the polygon will lie.
                 The default is set to 1.
@@ -313,14 +313,14 @@ class Face3D(Base2DIn3D):
 
     @property
     def triangulated_mesh2d(self):
-        """A triagulated Mesh2D in the 2D space of the face's plane."""
+        """A triangulated Mesh2D in the 2D space of the face's plane."""
         if self._mesh2d is None:
             self._mesh2d = Mesh2D.from_polygon_triangulated(self.polygon2d)
         return self._mesh2d
 
     @property
     def triangulated_mesh3d(self):
-        """A triagulated Mesh3D of this face."""
+        """A triangulated Mesh3D of this face."""
         if self._mesh3d is None:
             _vert3d = tuple(self._plane.xy_to_xyz(_v) for _v in
                             self.triangulated_mesh2d.vertices)
@@ -539,7 +539,7 @@ class Face3D(Base2DIn3D):
     def is_geometrically_equivalent(self, face, tolerance):
         """Check whether a given face is geometrically equivalent to this Face.
 
-        Geometrical equivalence is definied as being coplananar with this face,
+        Geometrical equivalence is defined as being coplanar with this face,
         having the same number of vertices, and having each vertex map-able between
         the faces. Clockwise relationships do not have to match nor does the normal
         direction of the face.  However, all other properties must be matching to
@@ -589,7 +589,7 @@ class Face3D(Base2DIn3D):
     def is_centered_adjacent(self, face, tolerance):
         """Check whether a given face is centered adjacent with this Face.
 
-        Centered adjacency is definied as sharing the same center point as this face,
+        Centered adjacency is defined as sharing the same center point as this face,
         sharing the same area, and being next to one another to within the tolerance.
 
         This is useful for identifying matching surfaces when you want to quickly
@@ -662,7 +662,7 @@ class Face3D(Base2DIn3D):
         """Check whether a given point is on this face.
 
         This includes both a check to be sure that the point is in the plane of this
-        face and a chek to ensure that point lies in the boundary of the face.
+        face and a check to ensure that point lies in the boundary of the face.
 
         Args:
             face: Another face for which sub-face equivalency will be tested.
@@ -685,7 +685,7 @@ class Face3D(Base2DIn3D):
         it is assumed that there is likely a check for planarity before the face
         is created (ie. in CAD software where the face likely originates from).
         This method is intended for quality control checking when the origin of
-        face geometry is unkown or is known to come from a place where no
+        face geometry is unknown or is known to come from a place where no
         planarity check was performed.
 
         Args:
@@ -1208,9 +1208,9 @@ class Face3D(Base2DIn3D):
     
     def sub_faces_by_dimension_rectangle(self, sub_rect_height, sub_rect_width,
                                          sill_height, horizontal_separation, tolerance):
-        """Get a list of rectangualr faces within this Face3D.
+        """Get a list of rectangular faces within this Face3D.
 
-        Note that this method will only yeild results if there is a rectangle to
+        Note that this method will only yield results if there is a rectangle to
         be extracted from this Face3D's geometry.
 
         Args:
@@ -1451,7 +1451,7 @@ class Face3D(Base2DIn3D):
                     final_faces.append(Face3D(
                         (seg.p1, seg.p2, seg.p2 + h_vec, seg.p1 + h_vec), base_plane))
         else:
-            # make a single sub-rectangle at an apporporate sill height
+            # make a single sub-rectangle at an appropriate sill height
             max_sill_h = parent_height * 0.99 - (target_area / (parent_base * 0.98))
             sill_vec = base_plane.y * sill_height if sill_height < max_sill_h \
                 else base_plane.y * max_sill_h
@@ -1526,7 +1526,7 @@ class Face3D(Base2DIn3D):
         if sub_rect_width >= horizontal_separation:
             horizontal_separation = sub_rect_width * 1.02
         
-        # determine if the parameters should yeild multiple sub-windows or just one
+        # determine if the parameters should yield multiple sub-windows or just one
         max_width_break_up = parent_base / 2
         num_div = round(parent_base / horizontal_separation) if \
             parent_base > horizontal_separation / 2 else 1
@@ -1701,7 +1701,7 @@ class Face3D(Base2DIn3D):
     def _remove_colinear(self, pts_3d, pts_2d, tolerance):
         """Remove colinear vertices from a list of Point2D.
 
-        This method determines colinearity by checking whether the area of the
+        This method determines co-linearity by checking whether the area of the
         triangle formed by 3 vertices is less than the tolerance.
         """
         new_vertices = []
@@ -1736,7 +1736,7 @@ class Face3D(Base2DIn3D):
             start = Point3D(diagonal.p1.x, diagonal.p2.y, diagonal.p1.z)
             end = Point3D(diagonal.p2.x, diagonal.p1.y, diagonal.p2.z)
             diagonal = LineSegment3D.from_end_points(start, end)
-        # flip if there's a horixzontal direction_vector to ensure always starts on left
+        # flip if there's a horizontal direction_vector to ensure always starts on left
         if direction_vector.x != 0 and self.normal.y > 0:
             diagonal = diagonal.flip()
         return diagonal

@@ -25,7 +25,7 @@ class LineSegment2D(Base1DIn2D):
     __slots__ = ()
 
     def __init__(self, p, v):
-        """Initilize LineSegment2D."""
+        """Initialize LineSegment2D."""
         Base1DIn2D.__init__(self, p, v)
 
     @classmethod
@@ -55,7 +55,7 @@ class LineSegment2D(Base1DIn2D):
         """ Create a LineSegment2D from a nested array of two endpoint coordinates.
 
         Args:
-            line_arry: Nested tuples ((pt1.x, pt1.y), (pt2.x, pt2.y)), where
+            line_array: Nested tuples ((pt1.x, pt1.y), (pt2.x, pt2.y)), where
                 pt1 and pt2 represent the endpoints of the line segment.
         """
         return LineSegment2D.from_end_points(*tuple(Point2D(*pt) for pt in line_array))
@@ -132,8 +132,8 @@ class LineSegment2D(Base1DIn2D):
 
         Args:
             distances: A list of distances along the line at which to subdivide it.
-                This can also be a single number that will be repeated unitl the end of
-                the line.
+                This can also be a single number that will be repeated until the
+                end of the line.
         """
         if isinstance(distances, (float, int)):
             distances = [distances]
