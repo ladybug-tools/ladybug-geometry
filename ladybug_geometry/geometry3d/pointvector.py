@@ -413,7 +413,7 @@ class Point3D(Vector3D):
         """Get a point projected a point3d into a plane with a given normal and origin.
 
         Args:
-            normal: A Vector3D representing the normal vector of the plane into wich
+            normal: A Vector3D representing the normal vector of the plane into which
                 the plane will be projected. THIS VECTOR MUST BE NORMALIZED.
             origin: A Point3D representing the origin the plane into which the
                 point will be projected.

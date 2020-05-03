@@ -36,7 +36,7 @@ class Polyline3D(Base2DIn3D):
     __slots__ = ('_interpolated', '_segments', '_length')
 
     def __init__(self, vertices, interpolated=False):
-        """Initilize Polyline3D."""
+        """Initialize Polyline3D."""
         Base2DIn3D.__init__(self, vertices)
         self._interpolated = interpolated
         self._segments = None
@@ -109,7 +109,7 @@ class Polyline3D(Base2DIn3D):
         """Test whether this polyline is closed to within the tolerance.
 
         Args:
-            tolerance: The minimum differnce between vertices below which vertices
+            tolerance: The minimum difference between vertices below which vertices
                 are considered the same.
         """
         return self._vertices[0].is_equivalent(self._vertices[-1], tolerance)
@@ -255,7 +255,7 @@ class Polyline3D(Base2DIn3D):
         return base
 
     def to_array(self):
-        """Get a list of lists whenre each sub-list represents a Point3D vetex."""
+        """Get a list of lists where each sub-list represents a Point3D vertex."""
         return tuple(pt.to_array() for pt in self.vertices)
 
     def to_polyline2d(self):

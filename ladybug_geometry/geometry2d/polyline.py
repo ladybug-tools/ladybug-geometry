@@ -34,7 +34,7 @@ class Polyline2D(Base2DIn2D):
     __slots__ = ('_interpolated', '_segments', '_length', '_is_self_intersecting')
 
     def __init__(self, vertices, interpolated=False):
-        """Initilize Polyline2D."""
+        """Initialize Polyline2D."""
         Base2DIn2D.__init__(self, vertices)
         self._interpolated = interpolated
         self._segments = None
@@ -123,7 +123,7 @@ class Polyline2D(Base2DIn2D):
         """Test whether this polyline is closed to within the tolerance.
 
         Args:
-            tolerance: The minimum differnce between vertices below which vertices
+            tolerance: The minimum difference between vertices below which vertices
                 are considered the same.
         """
         return self._vertices[0].is_equivalent(self._vertices[-1], tolerance)
@@ -226,7 +226,7 @@ class Polyline2D(Base2DIn2D):
 
         Args:
             ray: A Ray2D or to intersect. This will be extended in both
-                directions infinetly for the intersection.
+                directions infinitely for the intersection.
 
         Returns:
             A list with Point2D objects for the intersections.
@@ -248,7 +248,7 @@ class Polyline2D(Base2DIn2D):
         return base
 
     def to_array(self):
-        """Get a list of lists whenre each sub-list represents a Point2D vetex."""
+        """Get a list of lists where each sub-list represents a Point2D vertex."""
         return tuple(pt.to_array() for pt in self.vertices)
 
     def to_polygon(self, tolerance):
@@ -259,7 +259,7 @@ class Polyline2D(Base2DIn2D):
         LineSegment2D will be added to connect the start and end of the polyline.
 
         Args:
-            tolerance: The minimum differnce between vertices below which vertices
+            tolerance: The minimum difference between vertices below which vertices
                 are considered the same.
         """
         if self.is_closed(tolerance):

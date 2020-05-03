@@ -39,7 +39,7 @@ class Arc3D(object):
     __slots__ = ('_plane', '_arc2d')
 
     def __init__(self, plane, radius, a1=0, a2=2*math.pi):
-        """Initilize Arc3D."""
+        """Initialize Arc3D."""
         assert isinstance(plane, Plane), "Expected Plane. Got {}.".format(type(plane))
         self._plane = plane
         self._arc2d = Arc2D(Point2D(0, 0), radius, a1, a2)
@@ -215,8 +215,8 @@ class Arc3D(object):
 
         Args:
             distances: A list of distances along the arc at which to subdivide it.
-                This can also be a single number that will be repeated unitl the end of
-                the arc.
+                This can also be a single number that will be repeated until the
+                end of the arc.
         """
         return [self.plane.xy_to_xyz(pt) for pt in self.arc2d.subdivide(distances)]
 

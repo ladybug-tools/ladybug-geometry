@@ -20,7 +20,7 @@ class Ray2D(Base1DIn2D):
     __slots__ = ()
 
     def __init__(self, p, v):
-        """Initilize Ray2D."""
+        """Initialize Ray2D."""
         Base1DIn2D.__init__(self, p, v)
 
     @classmethod

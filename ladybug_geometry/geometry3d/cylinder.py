@@ -29,7 +29,7 @@ class Cylinder(object):
     __slots__ = ('_center', '_axis', '_radius')
 
     def __init__(self, center, axis, radius):
-        """Initilize Cylinder."""
+        """Initialize Cylinder."""
         assert isinstance(center, Point3D), \
             "Expected Point3D. Got {}.".format(type(center))
         assert isinstance(axis, Vector3D), \
@@ -91,7 +91,7 @@ class Cylinder(object):
 
     @property
     def center_end(self):
-        """Center of oposite end of Cylinder."""
+        """Center of the opposite end of Cylinder."""
         return self.center + self.axis
 
     @property

@@ -21,7 +21,7 @@ class Base1DIn3D(object):
     __slots__ = ('_p', '_v')
 
     def __init__(self, p, v):
-        """Initilize Base1DIn3D."""
+        """Initialize Base1DIn3D."""
         assert isinstance(p, Point3D), "Expected Point3D. Got {}.".format(type(p))
         assert isinstance(v, Vector3D), "Expected Vector3D. Got {}.".format(type(v))
         self._p = p
@@ -58,7 +58,7 @@ class Base1DIn3D(object):
         """Test whether this object is parallel to another LineSegment3D or Ray3D.
 
         Args:
-            line_ray: Another LineSegment3D or Ray3D for which parallelization
+            line_ray: Another LineSegment3D or Ray3D for which parallel-ization
                 with this objects will be tested.
             angle_tolerance: The max angle in radians that the direction between
                 this object and another can vary for them to be considered
@@ -74,10 +74,10 @@ class Base1DIn3D(object):
         """Test whether this object is colinear to another LineSegment3D or Ray3D.
 
         Args:
-            line_ray: Another LineSegment3D or Ray3D for which colinearity
+            line_ray: Another LineSegment3D or Ray3D for which co-linearity
                 with this object will be tested.
             tolerance: The maximum distance between the line_ray and the infinite
-                extension of this object for them to be cinsidered colinear.
+                extension of this object for them to be considered colinear.
             angle_tolerance: The max angle in radians that the direction between
                 this object and another can vary for them to be considered
                 parallel.
