@@ -520,3 +520,20 @@ def test_reflect():
     assert mesh.area == test_2.area
     assert len(mesh.vertices) == len(test_2.vertices)
     assert len(mesh.faces) == len(test_2.faces)
+
+
+def test_join_meshes():
+    """Test the join_meshes method."""
+    pts1 = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0))
+    pts2 = (Point2D(2, 2), Point2D(2, 4), Point2D(4, 4), Point2D(4, 2))
+    mesh1 = Mesh2D(pts1, [(0, 1, 2, 3)])
+    mesh2 = Mesh2D(pts2, [(0, 1, 2, 3)])
+    mesh1.face_centroids
+    mesh2.face_centroids
+
+    joined_mesh = Mesh2D.join_meshes([mesh1, mesh2])
+
+    assert isinstance(joined_mesh, Mesh2D)
+    assert len(joined_mesh.faces) == 2
+    assert len(joined_mesh.vertices) == 8
+    assert joined_mesh._face_centroids is not None

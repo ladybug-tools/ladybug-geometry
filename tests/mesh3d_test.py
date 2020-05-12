@@ -430,3 +430,23 @@ def test_height_field_mesh_faces():
     assert new_mesh[2].z == 1.5
     assert new_mesh[3].z == 1.5
     assert new_mesh[4].z == 2
+
+
+def test_join_meshes():
+    """Test the join_meshes method."""
+    pts1 = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
+    pts2 = (Point3D(2, 2, 2), Point3D(2, 4, 2), Point3D(4, 4, 2), Point3D(4, 2, 2))
+    mesh1 = Mesh3D(pts1, [(0, 1, 2, 3)])
+    mesh2 = Mesh3D(pts2, [(0, 1, 2, 3)])
+    mesh1.face_centroids
+    mesh2.face_centroids
+    mesh1.face_normals
+    mesh2.face_normals
+
+    joined_mesh = Mesh3D.join_meshes([mesh1, mesh2])
+
+    assert isinstance(joined_mesh, Mesh3D)
+    assert len(joined_mesh.faces) == 2
+    assert len(joined_mesh.vertices) == 8
+    assert joined_mesh._face_centroids is not None
+    assert joined_mesh._face_normals is not None
