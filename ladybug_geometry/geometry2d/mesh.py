@@ -400,6 +400,43 @@ class Mesh2D(MeshBase):
                 'vertices': [pt.to_array() for pt in self.vertices],
                 'faces': self.faces, 'colors': colors}
 
+    @staticmethod
+    def join_meshes(meshes):
+        """Join an array of Mesh2Ds into a single Mesh2D.
+
+        Args:
+            meshes: An array of meshes to be joined into one.
+
+        Returns:
+            A single Mesh2D object derived from the input meshes.
+        """
+        # set up empty lists of objects to be filled
+        verts = []
+        faces = []
+        colors = []
+
+        # loop through all of the meshes and get new faces
+        total_v_i = 0
+        for mesh in meshes:
+            verts.extend(mesh._vertices)
+            for fc in mesh._faces:
+                faces.append(tuple(v_i + total_v_i for v_i in fc))
+            if mesh._colors:
+                colors.extend(mesh._colors)
+
+        # create the new mesh
+        if len(colors) != 0:
+            new_mesh = Mesh2D(verts, faces, colors)
+        else:
+            new_mesh = Mesh2D(verts, faces)
+
+        # attempt to transfer the centroids and normals
+        if all(msh._face_centroids is not None for msh in meshes):
+            new_mesh._face_centroids = tuple(pt for msh in meshes for pt in msh)
+        if all(msh._face_areas is not None for msh in meshes):
+            new_mesh._face_areas = tuple(a for msh in meshes for a in msh.face_areas)
+        return new_mesh
+
     def _calculate_min_max(self):
         """Calculate maximum and minimum Point2D for this object."""
         min_pt = [self.vertices[0].x, self.vertices[0].y]
