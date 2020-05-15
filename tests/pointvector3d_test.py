@@ -7,7 +7,7 @@ import math
 
 
 def test_vector3_init():
-    """Test the initalization of Vector3D objects and basic properties."""
+    """Test the initialization of Vector3D objects and basic properties."""
     vec = Vector3D(0, 2, 0)
     str(vec)  # test the string representation of the vector
 
@@ -19,7 +19,7 @@ def test_vector3_init():
     assert vec[2] == 0
     assert vec.magnitude == 2
     assert vec.magnitude_squared == 4
-    assert not vec.is_zero()
+    assert not vec.is_zero(0.0000001)
 
     assert len(vec) == 3
     pt_tuple = tuple(i for i in vec)
@@ -46,7 +46,7 @@ def test_equality():
 
 
 def test_vector3_to_from_dict():
-    """Test the initalization of Vector3D objects and basic properties."""
+    """Test the initialization of Vector3D objects and basic properties."""
     vec = Vector3D(0, 2, 0)
     vec_dict = vec.to_dict()
     new_vec = Vector3D.from_dict(vec_dict)
@@ -61,10 +61,10 @@ def test_vector3_to_from_dict():
 
 
 def test_zero_magnitude_vector():
-    """Test properties with a zero magnitude vecotr."""
+    """Test properties with a zero magnitude vector."""
     vec = Vector3D(0, 0, 0)
 
-    assert vec.is_zero()
+    assert vec.is_zero(0.0000001)
     assert vec.magnitude == 0
     assert vec.normalize() == vec
 

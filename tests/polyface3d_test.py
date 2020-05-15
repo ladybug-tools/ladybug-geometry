@@ -12,7 +12,7 @@ import math
 
 
 def test_polyface3d_init_solid():
-    """Test the initalization of Poyface3D and basic properties of solid objects."""
+    """Test the initialization of Polyface3D and basic properties of solid objects."""
     pts = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0),
            Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2)]
     face_indices = [[(0, 1, 2, 3)], [(0, 4, 5, 1)], [(0, 3, 7, 4)],
@@ -63,7 +63,7 @@ def test_equality():
 
 
 def test_polyface3d_init_open():
-    """Test the initalization of Poyface3D and basic properties of open objects."""
+    """Test the initialization of Polyface3D and basic properties of open objects."""
     pts = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0),
            Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2)]
     face_indices = [[(0, 1, 2, 3)], [(0, 4, 5, 1)], [(0, 3, 7, 4)],
@@ -88,7 +88,7 @@ def test_polyface3d_init_open():
 
 
 def test_polyface3d_init_from_faces_solid():
-    """Test the initalization of Poyface3D from_faces with a solid."""
+    """Test the initialization of Polyface3D from_faces with a solid."""
     pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
     pts_2 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(0, 2, 0)]
     pts_3 = [Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(0, 0, 2)]
@@ -102,7 +102,7 @@ def test_polyface3d_init_from_faces_solid():
     face_5 = Face3D(pts_5)
     face_6 = Face3D(pts_6)
     polyface = Polyface3D.from_faces(
-        [face_1, face_2, face_3, face_4, face_5, face_6])
+        [face_1, face_2, face_3, face_4, face_5, face_6], 0.01)
 
     assert len(polyface.vertices) == 8
     assert len(polyface.face_indices) == 6
@@ -128,7 +128,7 @@ def test_polyface3d_init_from_faces_solid():
 
 
 def test_polyface3d_init_from_faces_open():
-    """Test the initalization of Poyface3D from_faces with an open object."""
+    """Test the initialization of Polyface3D from_faces with an open object."""
     pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
     pts_2 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(0, 2, 0)]
     pts_3 = [Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(0, 0, 2)]
@@ -139,7 +139,7 @@ def test_polyface3d_init_from_faces_open():
     face_3 = Face3D(pts_3)
     face_4 = Face3D(pts_4)
     face_5 = Face3D(pts_5)
-    polyface = Polyface3D.from_faces([face_1, face_2, face_3, face_4, face_5])
+    polyface = Polyface3D.from_faces([face_1, face_2, face_3, face_4, face_5], 0.01)
 
     assert len(polyface.vertices) == 8
     assert len(polyface.face_indices) == 5
@@ -159,7 +159,7 @@ def test_polyface3d_init_from_faces_open():
 
 
 def test_polyface3d_init_from_faces_coplanar():
-    """Test the initalization of Poyface3D from_faces with two coplanar faces."""
+    """Test the initialization of Polyface3D from_faces with two coplanar faces."""
     # this is an important case that must be solved
     # can be done by iterating through naked edges and finding colinear ones
     pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
@@ -177,9 +177,9 @@ def test_polyface3d_init_from_faces_coplanar():
     face_6 = Face3D(pts_6)
     face_7 = Face3D(pts_7)
     polyface = Polyface3D.from_faces(
-        [face_1, face_2, face_3, face_4, face_5, face_6, face_7])
+        [face_1, face_2, face_3, face_4, face_5, face_6, face_7], 0.01)
     polyface_2 = Polyface3D.from_faces(
-        [face_1, face_2, face_3, face_4, face_5, face_7])
+        [face_1, face_2, face_3, face_4, face_5, face_7], 0.01)
 
     assert not polyface.is_solid
     assert len(polyface.naked_edges) != 0
@@ -195,7 +195,7 @@ def test_polyface3d_init_from_faces_coplanar():
 
 
 def test_polyface3d_init_from_faces_coplanar_3face():
-    """Test the initalization of Poyface3D from_faces with three coplanar faces."""
+    """Test the initialization of Polyface3D from_faces with three coplanar faces."""
     # this is an important case that must be solved
     # can be done by iterating through naked edges and finding colinear ones
     pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
@@ -215,9 +215,9 @@ def test_polyface3d_init_from_faces_coplanar_3face():
     face_7 = Face3D(pts_7)
     face_8 = Face3D(pts_8)
     polyface = Polyface3D.from_faces(
-        [face_1, face_2, face_3, face_4, face_5, face_6, face_7, face_8])
+        [face_1, face_2, face_3, face_4, face_5, face_6, face_7, face_8], 0.01)
     polyface_2 = Polyface3D.from_faces(
-        [face_1, face_2, face_3, face_4, face_5, face_6, face_8])
+        [face_1, face_2, face_3, face_4, face_5, face_6, face_8], 0.01)
 
     assert not polyface.is_solid
     assert len(polyface.naked_edges) != 0
@@ -233,7 +233,7 @@ def test_polyface3d_init_from_faces_coplanar_3face():
 
 
 def test_polyface3d_init_from_faces_tolerance():
-    """Test the initalization of Poyface3D from_faces with a tolerance."""
+    """Test the initialization of Polyface3D from_faces with a tolerance."""
     pts_1 = [Point3D(0, 0, 0), Point3D(0, 2, 0), Point3D(2, 2, 0), Point3D(2, 0, 0)]
     pts_2 = [Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(0, 2, 0)]
     pts_3 = [Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(0, 0, 2)]
@@ -261,7 +261,7 @@ def test_polyface3d_init_from_faces_tolerance():
 
 
 def test_polyface3d_init_from_box():
-    """Test the initalization of Poyface3D from_box."""
+    """Test the initialization of Polyface3D from_box."""
     polyface = Polyface3D.from_box(2, 4, 2)
 
     assert len(polyface.vertices) == 8
@@ -278,7 +278,7 @@ def test_polyface3d_init_from_box():
 
 
 def test_polyface3d_init_from_offset_face():
-    """Test the initalization of Poyface3D from_offset_face."""
+    """Test the initialization of Polyface3D from_offset_face."""
     face = Face3D.from_rectangle(2, 2)
     polyface = Polyface3D.from_offset_face(face, 2)
 
@@ -306,7 +306,7 @@ def test_polyface3d_init_from_offset_face():
 
 
 def test_polyface3d_init_from_offset_face_hexagon():
-    """Test the initalization of Poyface3D from_offset_face."""
+    """Test the initialization of Polyface3D from_offset_face."""
     face = Face3D.from_regular_polygon(6, 2)
     polyface = Polyface3D.from_offset_face(face, 2)
 
@@ -329,7 +329,7 @@ def test_polyface3d_init_from_offset_face_hexagon():
 
 
 def test_polyface3d_init_from_offset_face_hole():
-    """Test the initalization of Poyface3D from_offset_face for a face witha hole."""
+    """Test the initialization of Polyface3D from_offset_face for a face witha hole."""
     bound_pts = [Point3D(0, 0), Point3D(3, 0), Point3D(3, 3), Point3D(0, 3)]
     hole_pts = [Point3D(1, 1), Point3D(2, 1), Point3D(2, 2), Point3D(1, 2)]
     face = Face3D(bound_pts, None, [hole_pts])
@@ -426,7 +426,7 @@ def test_polyface3d_to_from_dict_with_overlap():
     face_6 = Face3D(pts_6)
     face_7 = Face3D(pts_7)
     polyface = Polyface3D.from_faces(
-        [face_1, face_2, face_3, face_4, face_5, face_6, face_7])
+        [face_1, face_2, face_3, face_4, face_5, face_6, face_7], 0.01)
     new_polyface = polyface.merge_overlapping_edges(0.0001, 0.0001)
     assert new_polyface.is_solid
     assert len(new_polyface.naked_edges) == 0
@@ -474,7 +474,7 @@ def test_is_solid_with_hole():
     face_12 = Face3D(pts_12)
     polyface = Polyface3D.from_faces([face_1, face_2, face_3, face_4, face_5,
                                       face_6, face_7, face_8, face_9, face_10,
-                                      face_11, face_12])
+                                      face_11, face_12], 0.01)
     assert len(polyface.faces) + len(polyface.vertices) - len(polyface.edges) != 2
     assert polyface.area == pytest.approx(65.941125, rel=1e-3)
     assert polyface.volume == pytest.approx(13.333333, rel=1e-3)

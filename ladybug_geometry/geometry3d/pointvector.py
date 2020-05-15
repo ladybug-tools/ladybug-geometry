@@ -84,7 +84,7 @@ class Vector3D(object):
         """Get the magnitude squared of the vector."""
         return self.x ** 2 + self.y ** 2 + self.z ** 2
 
-    def is_zero(self, tolerance=0):
+    def is_zero(self, tolerance):
         """Boolean to note whether the vector is within a given zero tolerance.
 
         Args:

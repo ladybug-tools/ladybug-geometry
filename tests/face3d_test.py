@@ -12,7 +12,7 @@ import math
 
 
 def test_face3d_init():
-    """Test the initalization of Face3D objects and basic properties."""
+    """Test the initialization of Face3D objects and basic properties."""
     pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
     plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
     face = Face3D(pts, plane)
@@ -82,7 +82,7 @@ def test_face3d_to_from_dict():
 
 
 def test_face3d_init_from_vertices():
-    """Test the initalization of Face3D objects without a plane."""
+    """Test the initialization of Face3D objects without a plane."""
     pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
     face = Face3D(pts)
 
@@ -114,12 +114,12 @@ def test_face3d_init_from_vertices():
 
 
 def test_face3d_init_from_vertices_colinear():
-    """Test the initalization of Face3D objects with colinear vertices."""
+    """Test the initialization of Face3D objects with colinear vertices."""
     pts = (Point3D(0, 0, 2), Point3D(0, 1, 2), Point3D(0, 2, 2), Point3D(2, 2, 2),
            Point3D(2, 0, 2))
     face = Face3D(pts)
 
-    assert not face.normal.is_zero()
+    assert not face.normal.is_zero(0.000001)
     assert face.plane.n == Vector3D(0, 0, -1)
     assert face.plane.n == face.normal
     assert face.plane.o == Point3D(0, 0, 2)
@@ -224,7 +224,7 @@ def test_face3d_init_from_regular_polygon():
 
 
 def test_face3d_init_from_shape_with_hole():
-    """Test the initalization of Face3D from_shape_with_holes with one hole."""
+    """Test the initialization of Face3D from_shape_with_holes with one hole."""
     bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
     hole_pts = [Point3D(1, 1), Point3D(3, 1), Point3D(3, 3), Point3D(1, 3)]
     face = Face3D(bound_pts, None, [hole_pts])
@@ -956,22 +956,22 @@ def test_countour_by_number():
     face_1 = Face3D(pts_1, plane)
     face_2 = Face3D(pts_2, plane)
 
-    contours = face_1.countour_by_number(4)
+    contours = face_1.countour_by_number(4, Vector2D(0, 1), False, 0.01)
     assert len(contours) == 4
     assert contours[0].p2.z == pytest.approx(2, rel=1e-3)
     assert contours[-1].p2.z == pytest.approx(0.5, rel=1e-3)
 
-    contours = face_1.countour_by_number(4, Vector2D(1))
+    contours = face_1.countour_by_number(4, Vector2D(1), False, 0.01)
     assert len(contours) == 4
     assert contours[-1].p2.x == pytest.approx(1.5, rel=1e-3)
 
-    contours = face_1.countour_by_number(4, Vector2D(1), True)
+    contours = face_1.countour_by_number(4, Vector2D(1), True, 0.01)
     assert len(contours) == 4
     assert contours[-1].p2.x == pytest.approx(0.5, rel=1e-3)
 
-    contours = face_2.countour_by_number(4)
+    contours = face_2.countour_by_number(4, Vector2D(0, 1), False, 0.01)
     assert len(contours) == 4
-    contours = face_2.countour_by_number(8, Vector2D(1))
+    contours = face_2.countour_by_number(8, Vector2D(1), False, 0.01)
     assert len(contours) == 8
 
 
@@ -983,22 +983,22 @@ def test_countour_by_distance_between():
     face_1 = Face3D(pts_1, plane)
     face_2 = Face3D(pts_2, plane)
 
-    contours = face_1.countour_by_distance_between(0.5)
+    contours = face_1.countour_by_distance_between(0.5, Vector2D(0, 1), False, 0.01)
     assert len(contours) == 4
     assert contours[0].p2.z == pytest.approx(2, rel=1e-3)
     assert contours[-1].p2.z == pytest.approx(0.5, rel=1e-3)
 
-    contours = face_1.countour_by_distance_between(0.5, Vector2D(1))
+    contours = face_1.countour_by_distance_between(0.5, Vector2D(1), False, 0.01)
     assert len(contours) == 4
     assert contours[-1].p2.x == pytest.approx(1.5, rel=1e-3)
 
-    contours = face_1.countour_by_distance_between(0.5, Vector2D(1), True)
+    contours = face_1.countour_by_distance_between(0.5, Vector2D(1), True, 0.01)
     assert len(contours) == 4
     assert contours[-1].p2.x == pytest.approx(0.5, rel=1e-3)
 
-    contours = face_2.countour_by_distance_between(0.5)
+    contours = face_2.countour_by_distance_between(0.5, Vector2D(0, 1), False, 0.01)
     assert len(contours) == 4
-    contours = face_2.countour_by_distance_between(0.5, Vector2D(1))
+    contours = face_2.countour_by_distance_between(0.5, Vector2D(1), False, 0.01)
     assert len(contours) == 8
 
 
@@ -1008,13 +1008,14 @@ def test_countour_fins_by_number():
     plane = Plane(Vector3D(0, 1, 0))
     face_1 = Face3D(pts_1, plane)
 
-    fins = face_1.countour_fins_by_number(4, 0.5, 0.5)
+    fins = face_1.countour_fins_by_number(4, 0.5, 0.5, 0, Vector2D(0, 1), False, 0.01)
     assert len(fins) == 4
 
-    fins = face_1.countour_fins_by_number(4, 0.5, 0.5, contour_vector=Vector2D(1))
+    fins = face_1.countour_fins_by_number(4, 0.5, 0.5, 0, Vector2D(1), False, 0.01)
     assert len(fins) == 4
 
-    fins = face_1.countour_fins_by_number(4, 0.5, 0.5, math.pi/4)
+    fins = face_1.countour_fins_by_number(
+        4, 0.5, 0.5, math.pi/4, Vector2D(0, 1), False, 0.01)
     assert len(fins) == 4
 
 
@@ -1026,15 +1027,16 @@ def test_countour_fins_by_distance_between():
     face_1 = Face3D(pts_1, plane)
     face_2 = Face3D(pts_2, plane)
 
-    fins = face_1.countour_fins_by_distance_between(0.5, 0.5, 0.5)
+    fins = face_1.countour_fins_by_distance_between(
+        0.5, 0.5, 0.5, 0, Vector2D(0, 1), False, 0.01)
     assert len(fins) == 4
 
-    fins = face_1.countour_fins_by_distance_between(0.25, 0.5, 0.5,
-                                                    contour_vector=Vector2D(1))
+    fins = face_1.countour_fins_by_distance_between(
+        0.25, 0.5, 0.5,0, Vector2D(1), False, 0.01)
     assert len(fins) == 8
 
-    fins = face_2.countour_fins_by_distance_between(0.5, 0.5, 0.5,
-                                                    contour_vector=Vector2D(1))
+    fins = face_2.countour_fins_by_distance_between(
+        0.5, 0.5, 0.5, 0, Vector2D(1), False, 0.01)
     assert len(fins) == 8
 
 

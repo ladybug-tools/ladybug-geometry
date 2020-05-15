@@ -134,7 +134,7 @@ class Polyface3D(Base2DIn3D):
                    data['face_indices'], edge_information)
 
     @classmethod
-    def from_faces(cls, faces, tolerance=0):
+    def from_faces(cls, faces, tolerance):
         """Initialize Polyface3D from a list of Face3D objects.
 
         Note that the Polyface3D.faces property of the resulting polyface will
@@ -143,7 +143,7 @@ class Polyface3D(Base2DIn3D):
         Args:
             faces: A list of Face3D objects representing the boundary of this Polyface.
             tolerance: The maximum difference between x, y, and z values at which
-                the vertex of two adjacent faces is considered the same. Default: 0.
+                the vertex of two adjacent faces is considered the same.
         """
         # extract unique vertices from the faces
         vertices = []  # collection of vertices as point objects
@@ -303,7 +303,7 @@ class Polyface3D(Base2DIn3D):
                     holes = tuple(tuple(self.vertices[i] for i in f) for f in face[1:])
                     faces.append(Face3D(boundary=boundary, holes=holes))
             if self._is_solid:
-                self._faces = Polyface3D.get_outward_faces(faces)
+                self._faces = Polyface3D.get_outward_faces(faces, 0)
             else:
                 self._faces = tuple(faces)
         return self._faces
@@ -711,8 +711,8 @@ class Polyface3D(Base2DIn3D):
         return True  # overlap exists
 
     @staticmethod
-    def get_outward_faces(faces, tolerance=0):
-        """Get faces that are all pointing outward from a list of faces together forming a solid.
+    def get_outward_faces(faces, tolerance):
+        """Turn a list of faces forming a solid into one where they all point outward.
 
         Note that, if the input faces do not form a closed solid, there may be some
         output faces that are not pointing outward.  However, if the gaps in the
