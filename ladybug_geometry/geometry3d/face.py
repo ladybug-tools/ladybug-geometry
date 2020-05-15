@@ -946,8 +946,7 @@ class Face3D(Base2DIn3D):
 
         return grid_mesh3d
 
-    def countour_by_number(self, contour_count, direction_vector=Vector2D(0, 1),
-                           flip_side=False, tolerance=0):
+    def countour_by_number(self, contour_count, direction_vector, flip_side, tolerance):
         """Generate a list of LineSegment3D objects contouring the face.
 
         Args:
@@ -957,13 +956,14 @@ class Face3D(Base2DIn3D):
                 are generated. This 2D vector will be interpreted into a 3D vector
                 within the plane of this Face. (0, 1) will usually generate
                 horizontal contours in 3D space, (1, 0) will generate vertical
-                contours, and (1, 1) will generate diagonal contours. Default: (0, 1).
+                contours, and (1, 1) will generate diagonal contours. Recommended
+                value is Vactor2D(0, 1).
             flip_side: Boolean to note whether the side the contours start from
-                should be flipped. Default is False to have contours on top or right.
+                should be flipped. Recommended value is False to have contours
+                on top or right.
                 Setting to True will start contours on the bottom or left.
             tolerance: An optional value to remove any contours with a length less
-                than the tolerance. Default is 0, which will include all contours
-                no matter how small.
+                than the tolerance.
         """
         # interpret the 2D direction_vector into one that exists in 3D space
         ref_plane = Plane(self._plane.n, Point3D(0, 0, 0), self._plane.x)
@@ -988,8 +988,8 @@ class Face3D(Base2DIn3D):
             contours = [l_seg for l_seg in contours if l_seg.length >= tolerance]
         return contours
 
-    def countour_by_distance_between(self, distance, direction_vector=Vector2D(0, 1),
-                                     flip_side=False, tolerance=0):
+    def countour_by_distance_between(self, distance, direction_vector, flip_side,
+                                     tolerance):
         """Generate a list of LineSegment3D objects contouring the face.
 
         Args:
@@ -998,13 +998,14 @@ class Face3D(Base2DIn3D):
                 are generated. This 2D vector will be interpreted into a 3D vector
                 within the plane of this Face. (0, 1) will usually generate
                 horizontal contours in 3D space, (1, 0) will generate vertical
-                contours, and (1, 1) will generate diagonal contours. Default: (0, 1).
+                contours, and (1, 1) will generate diagonal contours. Recommended
+                value is Vector2D(0, 1).
             flip_side: Boolean to note whether the side the contours start from
-                should be flipped. Default is False to have contours on top or right.
-                Setting to True will start contours on the bottom or left.
+                should be flipped. Recommended value is is False to have contours
+                start on top or right. Setting to True will start contours on
+                the bottom or left.
             tolerance: An optional value to remove any contours with a length less
-                than the tolerance. Default is 0, which will include all contours
-                no matter how small.
+                than the tolerance.
         """
         # interpret the 2D direction_vector into one that exists in 3D space
         ref_plane = Plane(self._plane.n, Point3D(0, 0, 0), self._plane.x)
@@ -1035,58 +1036,58 @@ class Face3D(Base2DIn3D):
             contours = [l_seg for l_seg in contours if l_seg.length >= tolerance]
         return contours
 
-    def countour_fins_by_number(self, fin_count, depth, offset=0, angle=0,
-                                contour_vector=Vector2D(0, 1), flip_side=False,
-                                tolerance=0):
+    def countour_fins_by_number(self, fin_count, depth, offset, angle,
+                                contour_vector, flip_side, tolerance):
         """Generate a list of Fac3D objects over this face (like louvers or fins).
 
         Args:
             fin_count: A positive integer for the number of fins to generate.
             depth: A number for the depth to extrude the fins.
             offset: A number for the distance to offset fins from this face.
-                Default is 0 for no offset.
+                Recommended value is 0 for no offset.
             angle: A number for the for an angle to rotate the fins in radians.
-                Default is 0 for no rotation.
+                Recommended value is 0 for no rotation.
             contour_vector: A Vector2D for the direction along which contours
                 are generated. This 2D vector will be interpreted into a 3D vector
                 within the plane of this Face. (0, 1) will usually generate
                 horizontal contours in 3D space, (1, 0) will generate vertical
-                contours, and (1, 1) will generate diagonal contours. Default: (0, 1).
+                contours, and (1, 1) will generate diagonal contours. Recommended
+                value is Vector2D(0, 1).
             flip_side: Boolean to note whether the side the fins start from
-                should be flipped. Default is False to have contours on top or right.
-                Setting to True will start contours on the bottom or left.
+                should be flipped. Recommended value is False to have contours
+                start on top or right. Setting to True will start contours on
+                the bottom or left.
             tolerance: An optional value to remove any contours with a length less
-                than the tolerance. Default is 0, which will include all contour fins
-                no matter how small.
+                than the tolerance.
         """
         extru_vec = self._get_fin_extrusion_vector(depth, angle, contour_vector)
         contours = self.countour_by_number(
             fin_count, contour_vector, flip_side, tolerance)
         return self._get_extrusion_fins(contours, extru_vec, offset)
 
-    def countour_fins_by_distance_between(self, distance, depth, offset=0, angle=0,
-                                          contour_vector=Vector2D(0, 1),
-                                          flip_side=False, tolerance=0):
+    def countour_fins_by_distance_between(self, distance, depth, offset, angle,
+                                          contour_vector, flip_side, tolerance):
         """Generate a list of Fac3D objects over this face (like louvers or fins).
 
         Args:
             distance: A number for the approximate distance between each contour.
             depth: A number for the depth to extrude the fins.
             offset: A number for the distance to offset fins from this face.
-                Default is 0 for no offset.
+                Recommended value is 0 for no offset.
             angle: A number for the for an angle to rotate the fins in radians.
-                Default is 0 for no rotation.
+                Recommended value is 0 for no rotation.
             contour_vector: A Vector2D for the direction along which contours
                 are generated. This 2D vector will be interpreted into a 3D vector
                 within the plane of this Face. (0, 1) will usually generate
                 horizontal contours in 3D space, (1, 0) will generate vertical
-                contours, and (1, 1) will generate diagonal contours. Default: (0, 1).
+                contours, and (1, 1) will generate diagonal contours. Recommended
+                value is Vector2D(0, 1).
             flip_side: Boolean to note whether the side the fins start from
-                should be flipped. Default is False to have contours on top or right.
-                Setting to True will start contours on the bottom or left.
+                should be flipped. Recommended value is False to have contours
+                start on top or right. Setting to True will start contours on
+                the bottom or left.
             tolerance: An optional value to remove any contours with a length less
-                than the tolerance. Default is 0, which will include all contour fins
-                no matter how small.
+                than the tolerance.
         """
         extru_vec = self._get_fin_extrusion_vector(depth, angle, contour_vector)
         contours = self.countour_by_distance_between(

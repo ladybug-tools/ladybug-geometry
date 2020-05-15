@@ -7,7 +7,7 @@ import math
 
 
 def test_vector2_init():
-    """Test the initalization of Vector2D objects and basic properties."""
+    """Test the initialization of Vector2D objects and basic properties."""
     vec = Vector2D(0, 2)
     str(vec)  # test the string representation of the vector
 
@@ -17,7 +17,7 @@ def test_vector2_init():
     assert vec[1] == 2
     assert vec.magnitude == 2
     assert vec.magnitude_squared == 4
-    assert not vec.is_zero()
+    assert not vec.is_zero(0.0000001)
 
     assert len(vec) == 2
     pt_tuple = tuple(i for i in vec)
@@ -30,16 +30,16 @@ def test_vector2_init():
 
 
 def test_zero_magnitude_vector():
-    """Test properties with a zero magnitude vecotr."""
+    """Test properties with a zero magnitude vector."""
     vec = Vector2D(0, 0)
 
-    assert vec.is_zero()
+    assert vec.is_zero(0.0000001)
     assert vec.magnitude == 0
     assert vec.normalize() == vec
 
 
 def test_vector2_to_from_dict():
-    """Test the initalization of Vector2D objects and basic properties."""
+    """Test the initialization of Vector2D objects and basic properties."""
     vec = Vector2D(0, 2)
     vec_dict = vec.to_dict()
     new_vec = Vector2D.from_dict(vec_dict)
