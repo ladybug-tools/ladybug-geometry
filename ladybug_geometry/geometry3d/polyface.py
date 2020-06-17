@@ -303,7 +303,7 @@ class Polyface3D(Base2DIn3D):
                     holes = tuple(tuple(self.vertices[i] for i in f) for f in face[1:])
                     faces.append(Face3D(boundary=boundary, holes=holes))
             if self._is_solid:
-                self._faces = Polyface3D.get_outward_faces(faces, 0)
+                self._faces = Polyface3D.get_outward_faces(faces, 0.01)
             else:
                 self._faces = tuple(faces)
         return self._faces
@@ -314,7 +314,7 @@ class Polyface3D(Base2DIn3D):
         if self._edges is None:
             self._edges = tuple(LineSegment3D.from_end_points(
                 self.vertices[seg[0]], self.vertices[seg[1]])
-                                for seg in self._edge_indices)
+                for seg in self._edge_indices)
         return self._edges
 
     @property
