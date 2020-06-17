@@ -9,6 +9,7 @@ from ladybug_geometry.geometry3d.ray import Ray3D
 from ladybug_geometry.geometry3d.face import Face3D
 
 import math
+import json
 
 
 def test_face3d_init():
@@ -126,7 +127,7 @@ def test_face3d_init_from_vertices_colinear():
 
 
 def test_face3d_init_from_extrusion():
-    """Test the initalization of Face3D from_extrusion."""
+    """Test the initialization of Face3D from_extrusion."""
     line_seg = LineSegment3D(Point3D(0, 0, 0), Vector3D(2, 0, 0))
     extru_vec = Vector3D(0, 0, 2)
     face = Face3D.from_extrusion(line_seg, extru_vec)
@@ -158,7 +159,7 @@ def test_face3d_init_from_extrusion():
 
 
 def test_face3d_init_from_rectangle():
-    """Test the initalization of Face3D from_rectangle."""
+    """Test the initialization of Face3D from_rectangle."""
     plane = Plane(Vector3D(0, 0, 1), Point3D(2, 2, 2))
     face = Face3D.from_rectangle(2, 2, plane)
 
@@ -188,7 +189,7 @@ def test_face3d_init_from_rectangle():
 
 
 def test_face3d_init_from_regular_polygon():
-    """Test the initalization of Face3D from_regular_polygon."""
+    """Test the initialization of Face3D from_regular_polygon."""
     plane = Plane(Vector3D(0, 0, 1), Point3D(2, 2, 2))
     face = Face3D.from_regular_polygon(8, 2, plane)
 
@@ -257,7 +258,7 @@ def test_face3d_init_from_shape_with_hole():
 
 
 def test_face3d_init_from_shape_with_holes():
-    """Test the initalization of Face3D from_shape_with_holes."""
+    """Test the initialization of Face3D from_shape_with_holes."""
     bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
     hole_pts_1 = [Point3D(1, 1), Point3D(1.5, 1), Point3D(1.5, 1.5), Point3D(1, 1.5)]
     hole_pts_2 = [Point3D(2, 2), Point3D(3, 2), Point3D(3, 3), Point3D(2, 3)]
@@ -288,7 +289,7 @@ def test_face3d_init_from_shape_with_holes():
 
 
 def test_face3d_init_from_punched_geometry():
-    """Test the initalization of Face3D from_shape_with_holes."""
+    """Test the initialization of Face3D from_shape_with_holes."""
     bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
     hole_pts_1 = [Point3D(1, 1), Point3D(1.5, 1), Point3D(1.5, 1.5), Point3D(1, 1.5)]
     hole_pts_2 = [Point3D(2, 2), Point3D(3, 2), Point3D(3, 3), Point3D(2, 3)]
@@ -319,6 +320,16 @@ def test_face3d_init_from_punched_geometry():
     assert face.is_clockwise is False
     assert face.is_convex is False
     assert face.is_self_intersecting is False
+
+
+def test_face3d_init_h_shape():
+    """Test the initialization of Face3D that is H-shaped."""
+    geo_file = './tests/json/h_shaped_face.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    floor_geo = Face3D.from_dict(geo_dict)
+
+    assert floor_geo.normal.z == pytest.approx(-1, rel=1e-3)
 
 
 def test_is_geometrically_equivalent():
@@ -759,7 +770,7 @@ def test_rotate():
     assert face.area == test_1.area
     assert len(face.vertices) == len(test_1.vertices)
 
-    test_2 = face.rotate(axis, math.pi/2, origin)
+    test_2 = face.rotate(axis, math.pi / 2, origin)
     assert test_2[0].x == pytest.approx(0, rel=1e-3)
     assert test_2[0].y == pytest.approx(-2, rel=1e-3)
     assert test_2[0].z == pytest.approx(0, rel=1e-3)

@@ -790,7 +790,7 @@ class Face3D(Base2DIn3D):
         """
         _verts = self._reflect(self.vertices, normal, origin)
         _new_face = self._face_transform_reflect(
-                _verts, self.plane.reflect(normal, origin))
+            _verts, self.plane.reflect(normal, origin))
         if self._holes is not None:
             _new_face._boundary = self._reflect(self._boundary, normal, origin)
             _new_face._holes = tuple(self._reflect(hole, normal, origin)
@@ -1124,7 +1124,7 @@ class Face3D(Base2DIn3D):
 
         All sub faces will lie inside the boundaries of this face and have the same
         normal as this face.
-        
+
         Sub faces will be arranged in a grid derived from this face's plane property.
         Because the x_dim and y_dim refer to dimensions within the X and Y
         coordinate system of this faces's plane, rotating this plane will
@@ -1149,7 +1149,7 @@ class Face3D(Base2DIn3D):
             return self.sub_faces_by_ratio(ratio)
 
         # compute the area that each of the mesh faces need to be scaled to
-        _verts, _faces = grid_mesh.vertices,  grid_mesh.faces
+        _verts, _faces = grid_mesh.vertices, grid_mesh.faces
         _x_dim = _verts[_faces[0][0]].distance_to_point(_verts[_faces[0][1]])
         _y_dim = _verts[_faces[0][1]].distance_to_point(_verts[_faces[0][2]])
         fac = (self.area * ratio) / (_x_dim * _y_dim * len(_faces))
@@ -1244,7 +1244,7 @@ class Face3D(Base2DIn3D):
         for face in other_faces:
             sub_faces.extend(face.sub_faces_by_ratio(ratio))
         return sub_faces
-    
+
     def sub_faces_by_dimension_rectangle(self, sub_rect_height, sub_rect_width,
                                          sill_height, horizontal_separation, tolerance):
         """Get a list of rectangular faces within this Face3D.
@@ -1430,7 +1430,7 @@ class Face3D(Base2DIn3D):
                 The origin of this plane will be the lower left corner of the
                 rectangle and the X and Y axes will form the sides.
                 Default is the world XY plane.
-        
+
         Returns:
             A list of Face3D objects for sub faces.
         """
@@ -1519,7 +1519,7 @@ class Face3D(Base2DIn3D):
                 final_faces = [Face3D((seg.p1, seg.p2, seg.p2 + h_vec, seg.p1 + h_vec),
                                       base_plane)]
         return final_faces
-    
+
     @staticmethod
     def sub_rects_from_rect_dimensions(
             base_plane, parent_base, parent_height, sub_rect_height, sub_rect_width,
@@ -1527,7 +1527,7 @@ class Face3D(Base2DIn3D):
         """Get a list of rectangular Face3D objects from dimensions and parameters.
 
         All of the resulting Face3D objects lie within a parent rectangle defined
-        by the parent_base, parent_height, and base_plane. 
+        by the parent_base, parent_height, and base_plane.
 
         Args:
             base_plane: A Plane object in which the rectangle exists.
@@ -1560,11 +1560,11 @@ class Face3D(Base2DIn3D):
         # adjust sill_hgt if sum of it and sub_rect_height > parent_height
         if sub_rect_height + sill_hgt >= parent_height:
             sill_hgt = parent_height - sub_rect_height - (parent_height * 0.01)
-        
+
         # ensure that the horizontal_separation is always greater than sub_rect_width
         if sub_rect_width >= horizontal_separation:
             horizontal_separation = sub_rect_width * 1.02
-        
+
         # determine if the parameters should yield multiple sub-windows or just one
         max_width_break_up = parent_base / 2
         num_div = round(parent_base / horizontal_separation) if \
@@ -1572,7 +1572,7 @@ class Face3D(Base2DIn3D):
         # properties used throughout the computation of sub-rectangles
         sill_vec = base_plane.y * sill_hgt
         bottom_seg = LineSegment3D.from_sdl(base_plane.o, base_plane.x, parent_base)
-        
+
         if sub_rect_width < max_width_break_up:
             # determine the number of times that the rectangle should be subdivided
             div_dist = parent_base / 2 if num_div == 1 else horizontal_separation
@@ -1590,16 +1590,16 @@ class Face3D(Base2DIn3D):
 
             # divide up the rectangle into points on the bottom
             btm_div_segs = tuple(LineSegment3D.from_end_points(pt, btm_div_pts[i + 1])
-                                for i, pt in enumerate(btm_div_pts[:-1]))
+                                 for i, pt in enumerate(btm_div_pts[:-1]))
             # scale the line segments along their center points
             line_cent_pt = tuple(line.point_at(0.5) for line in btm_div_segs)
             scale_factor = sub_rect_width / div_dist
             btm_div_segs = tuple(line.scale(scale_factor, mid_pt)
-                                for line, mid_pt in zip(btm_div_segs, line_cent_pt))
+                                 for line, mid_pt in zip(btm_div_segs, line_cent_pt))
             # generate the vertices by 'extruding' along window height vector
             h_vec = base_plane.y * sub_rect_height
             final_faces = [Face3D((line.p2, line.p1, line.p1 + h_vec, line.p2 + h_vec),
-                                base_plane) for line in btm_div_segs]
+                                  base_plane) for line in btm_div_segs]
         else:  # make a single sub-rectangle at an appropriate sill height
             if sub_rect_width >= parent_base:
                 sub_rect_width = parent_base * 0.98
@@ -1609,7 +1609,7 @@ class Face3D(Base2DIn3D):
             # generate the vertices by 'extruding' along window height vector
             h_vec = base_plane.y * sub_rect_height
             final_faces = [Face3D((seg.p2, seg.p1, seg.p1 + h_vec, seg.p2 + h_vec),
-                                base_plane)]
+                                  base_plane)]
         return final_faces
 
     def to_dict(self, include_plane=True, enforce_upper_left=False):
@@ -1881,35 +1881,47 @@ class Face3D(Base2DIn3D):
         return (close_pt_1, close_pt_2, close_pt_3, close_pt_4), other_faces
 
     @staticmethod
-    def _plane_from_vertices(vertices):
-        """Get a plane from a list of non-colinear vertices.
+    def _plane_from_vertices(verts):
+        """Get a plane from a list of vertices.
 
         Args:
-            vertices: The vertices to be used to extract the normal.
+            verts: The vertices to be used to extract the normal.
         """
         try:
-            normal = [0, 0, 0]
+            x1, y1, z1 = Face3D._normal_from_3pts(verts[-2], verts[-1], verts[0])
+            x2, y2, z2 = Face3D._normal_from_3pts(verts[-1], verts[0], verts[1])
+            normal = [x1 + x2, y1 + y2, z1 + z2]
             # walk around the whole shape to avoid colinear vertices
-            for i in range(len(vertices) - 2):
-                x, y, z = Face3D._normal_from_3pts(*vertices[i:i + 3])
+            for i in range(len(verts) - 2):
+                x, y, z = Face3D._normal_from_3pts(*verts[i:i + 3])
                 normal[0] += x
                 normal[1] += y
                 normal[2] += z
         except Exception as e:
             raise ValueError('Incorrect vertices input for Face3D:\n\t{}'.format(e))
-        return Plane(Vector3D(normal[0], normal[1], normal[2]), vertices[0])
+        return Plane(Vector3D(normal[0], normal[1], normal[2]), verts[0])
 
     @staticmethod
     def _normal_from_3pts(pt1, pt2, pt3):
         """Get a tuple representing a normal vector from 3 vertices.
 
         The vector will have a magnitude of 0 if vertices are colinear.
-        This method effectively performs the cross product of two vectors but
+        This method effectively performs the cross product of two unit vectors but
         the ladybug_geometry objects are not used in order to remove assertions
         and increase speed.
         """
+        # get two vectors for the two edges the 3 points form
         v1 = (pt2.x - pt1.x, pt2.y - pt1.y, pt2.z - pt1.z)
         v2 = (pt3.x - pt1.x, pt3.y - pt1.y, pt3.z - pt1.z)
+        # normalize the vectors to make them unit vectors
+        d1 = math.sqrt(v1[0] ** 2 + v1[1] ** 2 + v1[2] ** 2)
+        d2 = math.sqrt(v2[0] ** 2 + v2[1] ** 2 + v2[2] ** 2)
+        try:
+            v1 = (v1[0] / d1, v1[1] / d1, v1[2] / d1)
+            v2 = (v2[0] / d2, v2[1] / d2, v2[2] / d2)
+        except ZeroDivisionError:  # duplicate vertices in triplet
+            return (0, 0, 0)
+        # return the cross product
         return (v1[1] * v2[2] - v1[2] * v2[1],
                 -v1[0] * v2[2] + v1[2] * v2[0],
                 v1[0] * v2[1] - v1[1] * v2[0])
@@ -1936,7 +1948,7 @@ class Face3D(Base2DIn3D):
         _new_face._mesh2d = self._mesh2d
         _new_face._mesh3d = self._mesh3d
         return _new_face
-    
+
     def __key(self):
         """A tuple based on the object properties, useful for hashing."""
         return tuple(hash(pt) for pt in self._vertices) + (hash(self._plane),)

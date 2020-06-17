@@ -208,7 +208,7 @@ class Vector3D(object):
 
     def __copy__(self):
         return self.__class__(self.x, self.y, self.z)
-    
+
     def __key(self):
         """A tuple based on the object properties, useful for hashing."""
         return (self.x, self.y, self.z)
