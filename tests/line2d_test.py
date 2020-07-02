@@ -102,6 +102,33 @@ def test_equality():
     assert hash(seg) != hash(seg_alt)
 
 
+def test_equivalent():
+    """Testing the equivalence of LineSegment2D objects."""
+    seg1 = LineSegment2D(
+        Point2D(0.5, 0.5), Vector2D(1.5, 2.5))
+    # LineSegment2D (<0.50, 0.50> to <2.00, 3.00>)
+
+    # Test equal seg1, same order
+    seg2 = LineSegment2D(
+        Point2D(0.5, 0.5), Vector2D(1.5, 2.5))
+    assert seg1.is_equivalent(seg2, 1e-10)
+
+    # Test equal, diff order
+    seg2 = LineSegment2D(
+        Point2D(2.00, 3.00), Vector2D(-1.5, -2.5))
+    assert seg1.is_equivalent(seg2, 1e-10)
+
+    # Test not equal first point
+    seg2 = LineSegment2D(
+        Point2D(2.001, 3.00), Vector2D(-1.5, -2.5))
+    assert not seg1.is_equivalent(seg2, 1e-10)
+
+     # Test not equal second point
+    seg2 = LineSegment2D(
+        Point2D(0.5001, 0.5), Vector2D(1.5, 2.5))
+    assert not seg1.is_equivalent(seg2, 1e-10)
+
+
 def test_move():
     """Test the LineSegement2D move method."""
     pt = Point2D(2, 0)

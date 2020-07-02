@@ -85,6 +85,23 @@ class LineSegment2D(Base1DIn2D):
         """The length of the line segment."""
         return self.v.magnitude
 
+    def is_equivalent(self, other, tolerance):
+        """Boolean noting equivalence (within tolerance) between this line and another.
+
+        The order of the line points do not matter for equivalence to be true.
+
+        Args:
+            other: LineSegment2D for comparison.
+            tolerance: float representing point equivalence.
+
+        Returns:
+            True if equivalent else False
+        """
+        return (self.p1.is_equivalent(other.p1, tolerance) and
+                self.p2.is_equivalent(other.p2, tolerance)) or \
+               (self.p1.is_equivalent(other.p2, tolerance) and
+                self.p2.is_equivalent(other.p1, tolerance))
+
     def flip(self):
         """Get a copy of this line segment that is flipped."""
         return LineSegment2D(self.p2, self.v.reverse())
