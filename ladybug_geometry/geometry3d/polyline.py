@@ -77,7 +77,7 @@ class Polyline3D(Base2DIn3D):
             plane: A Plane in which the Polyline2D sits.
         """
         return Polyline3D((plane.xy_to_xyz(pt) for pt in polyline2d.vertices),
-                           polyline2d.interpolated)
+                          polyline2d.interpolated)
 
     @property
     def segments(self):

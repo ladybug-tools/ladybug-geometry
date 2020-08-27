@@ -2,7 +2,7 @@
 """3D Line Segment"""
 from __future__ import division
 
-from .pointvector import Point3D, Vector3D
+from .pointvector import Point3D
 from ._1d import Base1DIn3D
 
 
@@ -243,7 +243,7 @@ class LineSegment3D(Base1DIn3D):
 
     def __abs__(self):
         return abs(self.v)
-    
+
     def __copy__(self):
         return LineSegment3D(self.p, self.v)
 

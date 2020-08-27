@@ -11,7 +11,7 @@ import math
 
 
 def test_mesh3d_init():
-    """Test the initalization of Mesh3D objects and basic properties."""
+    """Test the initialization of Mesh3D objects and basic properties."""
     pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
     mesh = Mesh3D(pts, [(0, 1, 2, 3)])
     str(mesh)  # test the string representation of the object
@@ -78,7 +78,7 @@ def test_face_normals():
 
 
 def test_mesh3d_incorrect():
-    """Test the initalization of Mesh3D objects with incorrect values."""
+    """Test the initialization of Mesh3D objects with incorrect values."""
     pts = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0), Point3D(4, 0))
     with pytest.raises(AssertionError):
         Mesh3D(pts, [(0, 1, 2, 3, 5)])  # too many vertices in a face
@@ -93,7 +93,7 @@ def test_mesh3d_incorrect():
 
 
 def test_mesh3d_init_two_faces():
-    """Test the initalization of Mesh3D objects with two faces."""
+    """Test the initialization of Mesh3D objects with two faces."""
     pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2),
            Point3D(2, 0, 2), Point3D(4, 0, 2))
     mesh = Mesh3D(pts, [(0, 1, 2, 3), (2, 3, 4)])
@@ -124,7 +124,7 @@ def test_mesh3d_init_two_faces():
 
 
 def test_mesh3d_init_from_face_vertices():
-    """Test the initalization of Mesh3D from_face_vertices."""
+    """Test the initialization of Mesh3D from_face_vertices."""
     face_1 = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
     face_2 = (Point3D(2, 2, 2), Point3D(2, 0, 2), Point3D(4, 0, 2))
     mesh_1 = Mesh3D.from_face_vertices([face_1, face_2])
@@ -153,7 +153,7 @@ def test_mesh3d_init_from_face_vertices():
 
 
 def test_mesh3d_from_mesh2d():
-    """Test the initalization of Mesh3D objects from_mesh2d."""
+    """Test the initialization of Mesh3D objects from_mesh2d."""
     pts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0))
     mesh_2d = Mesh2D(pts, [(0, 1, 2, 3)])
     plane = Plane(Vector3D(1, 0, 0), Point3D(0, 0, 0))

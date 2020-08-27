@@ -209,10 +209,10 @@ class Plane(object):
         _v = (self.y.x * point.y, self.y.y * point.y, self.y.z * point.y)
         return Point3D(
             self.o.x + _u[0] + _v[0], self.o.y + _u[1] + _v[1], self.o.z + _u[2] + _v[2])
-    
+
     def is_point_above(self, point):
         """Test if a given point is above or below this plane.
-        
+
         Above is defined as being on the side of the plane that the plane normal
         is pointing towards.
 
