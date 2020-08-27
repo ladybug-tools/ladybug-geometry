@@ -38,7 +38,7 @@ class Arc3D(object):
     """
     __slots__ = ('_plane', '_arc2d')
 
-    def __init__(self, plane, radius, a1=0, a2=2*math.pi):
+    def __init__(self, plane, radius, a1=0, a2=2 * math.pi):
         """Initialize Arc3D."""
         assert isinstance(plane, Plane), "Expected Plane. Got {}.".format(type(plane))
         self._plane = plane
@@ -326,7 +326,7 @@ class Arc3D(object):
 
     def to_polyline(self, divisions, interpolated=True):
         """Get this Arc3D as an approximated Polyline3D.
-        
+
         Args:
             divisions: The number of segments into which the arc will be divided.
             interpolated: Boolean to note whether the polyline should be interpolated

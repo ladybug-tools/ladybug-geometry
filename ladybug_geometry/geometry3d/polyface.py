@@ -805,7 +805,7 @@ class Polyface3D(Base2DIn3D):
         _new_poly = Polyface3D(self.vertices, self.face_indices, self.edge_information)
         _new_poly._faces = self._faces
         return _new_poly
-    
+
     def __key(self):
         """A tuple based on the object properties, useful for hashing."""
         return tuple(hash(pt) for pt in self._vertices) + \

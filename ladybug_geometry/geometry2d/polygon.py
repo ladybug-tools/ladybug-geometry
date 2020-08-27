@@ -826,7 +826,8 @@ class Polygon2D(Base2DIn2D):
                 first is the index of the segment to be updated and the second is
                 the point to insert.
         """
-        poly_points = list(polygon.vertices)
+        polygon_updates.sort(key=lambda x: x[0])  # sort updates by order of insertion
+        poly_points = list(polygon.vertices)  # convert tuple to mutable list
         last_i = -1
         colinear_count = 0
         for update in polygon_updates[::-1]:  # traverse backwards to preserve order

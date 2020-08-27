@@ -3,13 +3,13 @@
 
 def _group_vertices(segments, tolerance):
     """Get lists of joined polyline vertices from segments.
-    
+
     Args:
         segments: An array of LineSegment objects.
         tolerance: The minimum difference in X, Y, and Z values at which Points
             are considred equivalent. Segments with points that match within the
             tolerance will be joined.
-    
+
     Returns:
         A list of lists vertices that represent joined polylines.
     """
@@ -29,14 +29,14 @@ def _group_vertices(segments, tolerance):
 
 def _build_polyline(base_seg, other_segs, tol):
     """Attempt to build a list of polyline vertices from a base segment.
-    
+
     Args:
         base_seg: A LineSegment to serve as the base of the Polyline.
         other_segs: A list of other LineSegment objects to attempt to
             connect to the base_seg. This method will delete any segments
-            that are successfully connected to the output from this list. 
+            that are successfully connected to the output from this list.
         tol: The tolerance to be used for connecting the line.
-    
+
     Returns:
         A list of vertices that represent the longest Polyline to which the
         base_seg can be a part of given the other_segs as connections.

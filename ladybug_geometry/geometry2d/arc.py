@@ -33,7 +33,7 @@ class Arc2D(object):
     """
     __slots__ = ('_c', '_r', '_a1', '_a2', '_cos_a1', '_sin_a1', '_cos_a2', '_sin_a2')
 
-    def __init__(self, c, r, a1=0, a2=2*math.pi):
+    def __init__(self, c, r, a1=0, a2=2 * math.pi):
         """Initialize Arc2D."""
         assert isinstance(c, Point2D), "Expected Point2D. Got {}.".format(type(c))
         assert r > 0, 'Arc radius must be greater than 0. Got {}.'.format(r)
@@ -246,7 +246,7 @@ class Arc2D(object):
         while parameter <= 1:
             sub_pts.append(self.point_at(parameter))
             parameter += interval
-        return sub_pts 
+        return sub_pts
 
     def point_at(self, parameter):
         """Get a point at a given fraction along the arc.
@@ -369,7 +369,7 @@ class Arc2D(object):
 
     def to_polyline(self, divisions, interpolated=True):
         """Get this Arc2D as an approximated Polyline2D.
-        
+
         Args:
             divisions: The number of segments into which the arc will be divided.
             interpolated: Boolean to note whether the polyline should be interpolated

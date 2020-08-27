@@ -426,4 +426,3 @@ class Point2D(Vector2D):
         """
         if isinstance(other, Vector2D):
             return self.x > other.x
-

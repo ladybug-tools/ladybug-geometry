@@ -22,7 +22,7 @@ class Ray3D(Base1DIn3D):
     def __init__(self, p, v):
         """Initialize Ray3D."""
         Base1DIn3D.__init__(self, p, v)
-    
+
     @classmethod
     def from_array(cls, ray_array):
         """ Create a Ray3D from a nested array with a point and a vector.
@@ -107,7 +107,7 @@ class Ray3D(Base1DIn3D):
 
     def _u_in(self, u):
         return u >= 0.0
-    
+
     def __copy__(self):
         return Ray3D(self.p, self.v)
 

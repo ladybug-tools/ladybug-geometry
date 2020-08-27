@@ -253,7 +253,7 @@ class Polyline2D(Base2DIn2D):
 
     def to_polygon(self, tolerance):
         """Get a Polygon2D derived from this object.
-        
+
         If the polyline is closed to within the tolerance, the segments of this
         polyline and the resulting polygon will match. Otherwise, an extra
         LineSegment2D will be added to connect the start and end of the polyline.

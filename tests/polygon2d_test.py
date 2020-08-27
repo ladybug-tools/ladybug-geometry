@@ -10,7 +10,7 @@ import math
 
 
 def test_polygon2d_init():
-    """Test the initalization of Polygon2D objects and basic properties."""
+    """Test the initialization of Polygon2D objects and basic properties."""
     pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
     polygon = Polygon2D(pts)
 
@@ -71,7 +71,7 @@ def test_polygon2d_to_from_dict():
 
 
 def test_polygon2d_init_from_rectangle():
-    """Test the initalization of Polygon2D from_rectangle."""
+    """Test the initialization of Polygon2D from_rectangle."""
     polygon = Polygon2D.from_rectangle(Point2D(0, 0), Vector2D(0, 1), 2, 2)
 
     assert isinstance(polygon.vertices, tuple)
@@ -93,7 +93,7 @@ def test_polygon2d_init_from_rectangle():
 
 
 def test_polygon2d_init_from_regular_polygon():
-    """Test the initalization of Polygon2D from_regular_polygon."""
+    """Test the initialization of Polygon2D from_regular_polygon."""
     polygon = Polygon2D.from_regular_polygon(8, 2, Point2D(0, 1))
 
     assert isinstance(polygon.vertices, tuple)
@@ -121,7 +121,7 @@ def test_polygon2d_init_from_regular_polygon():
 
 
 def test_polygon2d_init_from_shape_with_hole():
-    """Test the initalization of Polygon2D from_shape_with_hole."""
+    """Test the initialization of Polygon2D from_shape_with_hole."""
     bound_pts = [Point2D(0, 0), Point2D(4, 0), Point2D(4, 4), Point2D(0, 4)]
     hole_pts = [Point2D(1, 1), Point2D(3, 1), Point2D(3, 3), Point2D(1, 3)]
     polygon = Polygon2D.from_shape_with_hole(bound_pts, hole_pts)
@@ -144,7 +144,7 @@ def test_polygon2d_init_from_shape_with_hole():
 
 
 def test_polygon2d_init_from_shape_with_holes():
-    """Test the initalization of Polygon2D from_shape_with_holes."""
+    """Test the initialization of Polygon2D from_shape_with_holes."""
     bound_pts = [Point2D(0, 0), Point2D(4, 0), Point2D(4, 4), Point2D(0, 4)]
     hole_pts_1 = [Point2D(1, 1), Point2D(1.5, 1), Point2D(1.5, 1.5), Point2D(1, 1.5)]
     hole_pts_2 = [Point2D(2, 2), Point2D(3, 2), Point2D(3, 3), Point2D(2, 3)]
@@ -359,7 +359,7 @@ def test_rotate():
     assert polygon.is_convex is test_1.is_convex
     assert polygon.is_self_intersecting is test_1.is_self_intersecting
 
-    test_2 = polygon.rotate(math.pi/2, origin_1)
+    test_2 = polygon.rotate(math.pi / 2, origin_1)
     assert test_2[0].x == pytest.approx(1, rel=1e-3)
     assert test_2[0].y == pytest.approx(1, rel=1e-3)
     assert test_2[2].x == pytest.approx(0, rel=1e-3)
@@ -553,14 +553,11 @@ def test_intersect_segments_multiple_intersections():
     pts3 = (Point2D(5, 3), Point2D(6, 3), Point2D(6, 4), Point2D(5, 4))
     pts4 = (Point2D(7, 4), Point2D(5, 4), Point2D(5, 3), Point2D(6, 3),
             Point2D(6, 2), Point2D(5, 2), Point2D(5, 1), Point2D(7, 1))
-    pts5 = (Point2D(5, 3), Point2D(6, 3), Point2D(6, 2), Point2D(5, 2),
-            Point2D(5, 1), Point2D(7, 1), Point2D(7, 4), Point2D(5, 4))
 
     poly1 = Polygon2D(pts1)
     poly2 = Polygon2D(pts2)
     poly3 = Polygon2D(pts3)
     poly4 = Polygon2D(pts4)
-    poly5 = Polygon2D(pts5)
 
     int_polys1 = Polygon2D.intersect_segments(poly1, poly2, 0.01)
     int_polys2 = Polygon2D.intersect_segments(poly1, poly3, 0.01)
@@ -639,16 +636,20 @@ def test_intersect_polygon_segments_with_3_rectangles():
 
 
 def test_intersect_polygon_segments_with_3_angled_rectangles():
-    """Tests that a vertex shared by 2 polygons is added only once to a 3rd polygon which is colinear within tolerance.
-       The polygons are rotated 45 degrees counter-clockwise to introduce floating-point closeness considerations."""
+    """Tests that a vertex shared by 2 polygons is added only once to a 3rd polygon
+
+    Make sure the addedvertex is which is colinear within tolerance.
+    The polygons are rotated 45 degrees counter-clockwise to introduce floating-point
+    closeness considerations.
+    """
     r2 = math.sqrt(2.0)
     tolerance = 0.02
     expected_point = Point2D(r2, 0)
-    pts0 = (Point2D(0, 0), Point2D(0.5*r2*0.99, -0.5*r2*0.99), Point2D(1.5*r2*0.99, 0.5*r2*0.99), Point2D(r2, r2))
+    pts0 = (Point2D(0, 0), Point2D(0.5 * r2 * 0.99, -0.5 * r2 * 0.99), Point2D(1.5 * r2 * 0.99, 0.5 * r2 * 0.99), Point2D(r2, r2))
     polygon0 = Polygon2D(pts0)
-    pts1 = (Point2D(0.5*r2, -0.5*r2), Point2D(r2, -r2), Point2D(1.5*r2, -0.5*r2), expected_point)
+    pts1 = (Point2D(0.5 * r2, -0.5 * r2), Point2D(r2, -r2), Point2D(1.5 * r2, -0.5 * r2), expected_point)
     polygon1 = Polygon2D(pts1)
-    pts2 = (expected_point, Point2D(1.5*r2, -0.5*r2), Point2D(2*r2, 0), Point2D(1.5*r2, 0.5*r2))
+    pts2 = (expected_point, Point2D(1.5 * r2, -0.5 * r2), Point2D(2 * r2, 0), Point2D(1.5 * r2, 0.5 * r2))
     polygon2 = Polygon2D(pts2)
 
     polygons = Polygon2D.intersect_polygon_segments([polygon0, polygon1, polygon2], tolerance)
@@ -660,6 +661,33 @@ def test_intersect_polygon_segments_with_3_angled_rectangles():
 
     assert len(polygon1.segments) == 4  # No extra vertex added
     assert len(polygon2.segments) == 4  # No extra vertex added
+
+
+def test_intersect_polygon_segments_abraham_bug():
+    """"Test the polygon intersection with the bug found by Abraham."""
+    pts1 = [Point2D(-154.33, -272.63), Point2D(-155.30, -276.70), Point2D(-151.23, -277.68),
+            Point2D(-150.26, -273.61), Point2D(-146.19, -274.58), Point2D(-145.22, -270.51),
+            Point2D(-149.29, -269.54), Point2D(-148.31, -265.47), Point2D(-152.38, -264.50),
+            Point2D(-153.35, -268.57), Point2D(-157.42, -267.59), Point2D(-158.39, -271.66)]
+    pts2 = [Point2D(-161.49, -266.62), Point2D(-153.35, -268.57), Point2D(-151.41, -260.43),
+            Point2D(-159.54, -258.49)]
+    pts3 = [Point2D(-164.41, -278.82), Point2D(-156.27, -280.77), Point2D(-154.33, -272.63),
+            Point2D(-162.46, -270.69)]
+    pts4 = [Point2D(-149.29, -269.54), Point2D(-141.15, -271.49), Point2D(-139.20, -263.35),
+            Point2D(-147.34, -261.41)]
+    pts5 = [Point2D(-152.21, -281.74), Point2D(-144.07, -283.69), Point2D(-142.12, -275.55),
+            Point2D(-150.26, -273.61)]
+
+    polygon1 = Polygon2D(pts1)
+    polygon2 = Polygon2D(pts2)
+    polygon3 = Polygon2D(pts3)
+    polygon4 = Polygon2D(pts4)
+    polygon5 = Polygon2D(pts5)
+    polygons = [polygon1, polygon2, polygon3, polygon4, polygon5]
+
+    new_polygons = Polygon2D.intersect_polygon_segments(polygons, 0.01)
+    for polygon in new_polygons:
+        assert not polygon.is_self_intersecting
 
 
 def test_polygon_is_equivalent():

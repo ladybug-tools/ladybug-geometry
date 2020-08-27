@@ -112,7 +112,7 @@ class Base2DIn3D(object):
 
     def __eq__(self, other):
         return isinstance(other, Base2DIn3D) and self.__key() == other.__key()
-    
+
     def __ne__(self, other):
         return not self.__eq__(other)
 
