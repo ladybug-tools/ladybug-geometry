@@ -251,9 +251,9 @@ def test_polyface3d_init_from_faces_tolerance():
     polyface_1 = Polyface3D.from_faces(
         [face_1, face_2, face_3, face_4, face_5, face_6], 0.001)
     polyface_2 = Polyface3D.from_faces(
-        [face_1, face_2, face_3, face_4, face_5, face_7],  0.001)
+        [face_1, face_2, face_3, face_4, face_5, face_7], 0.001)
     polyface_3 = Polyface3D.from_faces(
-        [face_1, face_2, face_3, face_4, face_5, face_7],  0.000001)
+        [face_1, face_2, face_3, face_4, face_5, face_7], 0.000001)
 
     assert polyface_1.is_solid
     assert polyface_2.is_solid
@@ -329,7 +329,7 @@ def test_polyface3d_init_from_offset_face_hexagon():
 
 
 def test_polyface3d_init_from_offset_face_hole():
-    """Test the initialization of Polyface3D from_offset_face for a face witha hole."""
+    """Test the initialization of Polyface3D from_offset_face for a face with a hole."""
     bound_pts = [Point3D(0, 0), Point3D(3, 0), Point3D(3, 3), Point3D(0, 3)]
     hole_pts = [Point3D(1, 1), Point3D(2, 1), Point3D(2, 2), Point3D(1, 2)]
     face = Face3D(bound_pts, None, [hole_pts])
@@ -595,7 +595,7 @@ def test_rotate():
     assert polyface.volume == test_1.volume
     assert len(polyface.vertices) == len(test_1.vertices)
 
-    test_2 = polyface.rotate(axis, math.pi/2, origin)
+    test_2 = polyface.rotate(axis, math.pi / 2, origin)
     assert test_2[0].x == pytest.approx(0, rel=1e-3)
     assert test_2[0].y == pytest.approx(-2, rel=1e-3)
     assert test_2[0].z == pytest.approx(0, rel=1e-3)
@@ -620,7 +620,7 @@ def test_rotate_xy():
     assert test_1[2].y == pytest.approx(0, rel=1e-3)
     assert test_1[2].z == pytest.approx(2, rel=1e-3)
 
-    test_2 = polyface.rotate_xy(math.pi/2, origin_1)
+    test_2 = polyface.rotate_xy(math.pi / 2, origin_1)
     assert test_2[0].x == pytest.approx(1, rel=1e-3)
     assert test_2[0].y == pytest.approx(1, rel=1e-3)
     assert test_1[0].z == pytest.approx(2, rel=1e-3)
