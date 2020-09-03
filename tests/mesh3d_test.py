@@ -8,6 +8,8 @@ from ladybug_geometry.geometry2d.mesh import Mesh2D
 from ladybug_geometry.geometry2d.pointvector import Point2D
 
 import math
+import json
+import os
 
 
 def test_mesh3d_init():
@@ -63,6 +65,22 @@ def test_mesh3d_to_from_dict():
     new_mesh = Mesh3D.from_dict(mesh_dict)
     assert isinstance(new_mesh, Mesh3D)
     assert new_mesh.to_dict() == mesh_dict
+
+
+def test_mesh3d_to_from_json():
+    """Test the to/from dict with JSON serialization of Mesh3D objects."""
+    pts = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 2), Point3D(2, 0))
+    mesh = Mesh3D(pts, [(0, 1, 2, 3)])
+    mesh_dict = mesh.to_dict()
+    geo_file = './tests/json/json_mesh.json'
+    with open(geo_file, 'w') as fp:
+        json.dump(mesh_dict, fp)
+    with open(geo_file, 'r') as fp:
+        new_mesh_dict = json.load(fp)
+    new_mesh = Mesh3D.from_dict(new_mesh_dict)
+    assert isinstance(new_mesh, Mesh3D)
+    assert new_mesh.to_dict() == mesh_dict
+    os.remove(geo_file)
 
 
 def test_face_normals():
