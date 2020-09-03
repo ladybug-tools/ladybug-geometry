@@ -80,8 +80,8 @@ class Mesh2D(MeshBase):
                 raise ImportError('Colors are specified in input Mesh2D dictionary '
                                   'but failed to import ladybug.color')
             colors = tuple(Color.from_dict(col) for col in data['colors'])
-        return cls(tuple(Point2D.from_array(pt) for pt in data['vertices']),
-                   data['faces'], colors)
+        fcs = tuple(tuple(f) for f in data['faces'])  # cast to immutable type
+        return cls(tuple(Point2D.from_array(pt) for pt in data['vertices']), fcs, colors)
 
     @classmethod
     def from_face_vertices(cls, faces, purge=True):
