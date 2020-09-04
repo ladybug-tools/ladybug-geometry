@@ -75,7 +75,7 @@ class Mesh3D(MeshBase):
             }
         """
         colors = None
-        if 'colors' in data and data['colors'] is not None:
+        if 'colors' in data and data['colors'] is not None and len(data['colors']) != 0:
             try:
                 from ladybug.color import Color
             except ImportError:
