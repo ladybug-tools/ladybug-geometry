@@ -39,6 +39,9 @@ def test_mesh2d_init():
     for vf in mesh.vertex_connected_faces:
         assert len(vf) == 1
 
+    mesh.colors = []
+    assert mesh.colors is None
+
 
 def test_equality():
     """Test the equality of Polygon2D objects."""

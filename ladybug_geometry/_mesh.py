@@ -62,16 +62,18 @@ class MeshBase(object):
         if col is not None:
             assert isinstance(col, (list, tuple)), \
                 'colors should be a list or tuple. Got {}'.format(type(col))
+            if isinstance(col, list):
+                col = tuple(col)
             if len(col) == len(self.faces):
                 self._is_color_by_face = True
             elif len(col) == len(self.vertices):
                 self._is_color_by_face = False
+            elif len(col) == 0:
+                col = None
             else:
                 raise ValueError('Number of colors ({}) does not match the number of'
                                  ' mesh faces ({}) nor the number of vertices ({}).'
                                  .format(len(col), len(self.faces), len(self.vertices)))
-            if isinstance(col, list):
-                col = tuple(col)
         self._colors = col
 
     @property
