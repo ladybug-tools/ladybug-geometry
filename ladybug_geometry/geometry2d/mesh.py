@@ -421,6 +421,7 @@ class Mesh2D(MeshBase):
             verts.extend(mesh._vertices)
             for fc in mesh._faces:
                 faces.append(tuple(v_i + total_v_i for v_i in fc))
+            total_v_i += len(mesh._vertices)
             if mesh._colors:
                 colors.extend(mesh._colors)
 

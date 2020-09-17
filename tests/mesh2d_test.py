@@ -9,7 +9,7 @@ import math
 
 
 def test_mesh2d_init():
-    """Test the initalization of Mesh2D objects and basic properties."""
+    """Test the initialization of Mesh2D objects and basic properties."""
     pts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0))
     mesh = Mesh2D(pts, [(0, 1, 2, 3)])
     str(mesh)  # test the string representation of the object
@@ -70,7 +70,7 @@ def test_mesh2d_to_from_dict():
 
 
 def test_mesh2d_incorrect():
-    """Test the initalization of Mesh2D objects with incorrect values."""
+    """Test the initialization of Mesh2D objects with incorrect values."""
     pts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0), Point2D(4, 0))
     with pytest.raises(AssertionError):
         Mesh2D(pts, [(0, 1, 2, 3, 5)])  # too many vertices in a face
@@ -85,7 +85,7 @@ def test_mesh2d_incorrect():
 
 
 def test_mesh2d_init_concave():
-    """Test the initalization of Mesh2D objects with a concave quad face."""
+    """Test the initialization of Mesh2D objects with a concave quad face."""
     pts = (Point2D(0, 0), Point2D(0, 2), Point2D(1, 1), Point2D(2, 0))
     mesh = Mesh2D(pts, [(0, 1, 2, 3)])
 
@@ -114,7 +114,7 @@ def test_mesh2d_init_concave():
 
 
 def test_mesh2d_init_two_faces():
-    """Test the initalization of Mesh2D objects with two faces."""
+    """Test the initialization of Mesh2D objects with two faces."""
     pts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0), Point2D(4, 0))
     mesh = Mesh2D(pts, [(0, 1, 2, 3), (2, 3, 4)])
 
@@ -146,7 +146,7 @@ def test_mesh2d_init_two_faces():
 
 
 def test_mesh2d_init_from_face_vertices():
-    """Test the initalization of Mesh2D from_face_vertices."""
+    """Test the initialization of Mesh2D from_face_vertices."""
     face_1 = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0))
     face_2 = (Point2D(2, 2), Point2D(2, 0), Point2D(4, 0))
     mesh_1 = Mesh2D.from_face_vertices([face_1, face_2])
@@ -176,7 +176,7 @@ def test_mesh2d_init_from_face_vertices():
 
 
 def test_mesh2d_init_from_polygon_triangulated():
-    """Test the initalization of Mesh2D from_polygon_triangulated."""
+    """Test the initialization of Mesh2D from_polygon_triangulated."""
     verts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(4, 0))
     polygon = Polygon2D(verts)
     mesh = Mesh2D.from_polygon_triangulated(polygon)
@@ -241,7 +241,7 @@ def test_mesh2d_init_from_polygon_triangulated_concave():
 
 
 def test_mesh2d_init_from_polygon_triangulated_incorrect():
-    """Test the initalization of Mesh2D from_polygon_triangulated."""
+    """Test the initialization of Mesh2D from_polygon_triangulated."""
     verts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 1), Point2D(1, 1),
              Point2D(1, 2), Point2D(2, 0))
     polygon = Polygon2D(verts)
@@ -250,7 +250,7 @@ def test_mesh2d_init_from_polygon_triangulated_incorrect():
 
 
 def test_mesh2d_init_from_polygon_grid():
-    """Test the initalization of Mesh2D from_polygon_grid."""
+    """Test the initialization of Mesh2D from_polygon_grid."""
     verts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0))
     polygon = Polygon2D(verts)
     mesh = Mesh2D.from_polygon_grid(polygon, 0.5, 0.5)
@@ -276,7 +276,7 @@ def test_mesh2d_init_from_polygon_grid():
 
 
 def test_mesh2d_init_from_polygon_grid_concave():
-    """Test the initalization of Mesh2D from_polygon_grid."""
+    """Test the initialization of Mesh2D from_polygon_grid."""
     verts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 1), Point2D(1, 1),
              Point2D(1, 2), Point2D(0, 2))
     polygon = Polygon2D(verts)
@@ -303,7 +303,7 @@ def test_mesh2d_init_from_polygon_grid_concave():
 
 
 def test_mesh2d_init_from_grid():
-    """Test the initalization of Mesh2D from_grid."""
+    """Test the initialization of Mesh2D from_grid."""
     mesh = Mesh2D.from_grid(Point2D(1, 1), 8, 2, 0.25, 1)
 
     assert len(mesh.vertices) == 27
@@ -322,7 +322,7 @@ def test_mesh2d_init_from_grid():
     assert mesh.colors is None
 
 
-def test_triangualted():
+def test_triangulated():
     """Test the Mesh2D triangulated method."""
     pts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0), Point2D(4, 0))
     mesh = Mesh2D(pts, [(0, 1, 2, 3), (2, 3, 4)], ['red', 'green'])
@@ -478,7 +478,7 @@ def test_rotate():
     assert len(mesh.vertices) == len(test_1.vertices)
     assert len(mesh.faces) == len(test_1.faces)
 
-    test_2 = mesh.rotate(math.pi/2, origin_1)
+    test_2 = mesh.rotate(math.pi / 2, origin_1)
     assert test_2[0].x == pytest.approx(2, rel=1e-3)
     assert test_2[0].y == pytest.approx(0, rel=1e-3)
     assert test_2[2].x == pytest.approx(0, rel=1e-3)
