@@ -341,7 +341,7 @@ def test_rotate():
     assert len(mesh.vertices) == len(test_1.vertices)
     assert len(mesh.faces) == len(test_1.faces)
 
-    test_2 = mesh.rotate(axis, math.pi/2, origin)
+    test_2 = mesh.rotate(axis, math.pi / 2, origin)
     assert test_2[0].x == pytest.approx(0, rel=1e-3)
     assert test_2[0].y == pytest.approx(-2, rel=1e-3)
     assert test_2[0].z == pytest.approx(0, rel=1e-3)
@@ -367,7 +367,7 @@ def test_rotate_xy():
     assert test_1[2].y == pytest.approx(0, rel=1e-3)
     assert test_1[2].z == pytest.approx(2, rel=1e-3)
 
-    test_2 = mesh.rotate_xy(math.pi/2, origin_1)
+    test_2 = mesh.rotate_xy(math.pi / 2, origin_1)
     assert test_2[0].x == pytest.approx(1, rel=1e-3)
     assert test_2[0].y == pytest.approx(1, rel=1e-3)
     assert test_1[0].z == pytest.approx(2, rel=1e-3)
