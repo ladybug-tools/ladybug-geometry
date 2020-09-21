@@ -303,7 +303,7 @@ class MeshBase(object):
         if self._face_areas is not None:
             new_mesh._face_areas = tuple(a * factor for a in self._face_areas)
         if self._area is not None:
-            new_mesh._area = tuple(a * factor for a in self._area)
+            new_mesh._area = self._area * factor
 
     @staticmethod
     def _interpret_input_from_face_vertices(faces, purge):
