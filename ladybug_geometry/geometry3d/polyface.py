@@ -9,6 +9,7 @@ from .plane import Plane
 from .face import Face3D
 from ._2d import Base2DIn3D
 
+import math
 try:
     from itertools import izip as zip  # python 2
 except ImportError:
@@ -736,8 +737,11 @@ class Polyface3D(Base2DIn3D):
             # construct a ray with the face normal and a point on the face
             v1 = face.boundary[-1] - face.boundary[0]
             v2 = face.boundary[1] - face.boundary[0]
-            move_vec = Vector3D(
-                (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)).normalize()
+            if v1.angle(v2) == math.pi:  # colinear vertices; prevent averaging to zero
+                move_vec = v1.rotate(face.normal, math.pi / 2).normalize()
+            else:  # average the two edge vectors together
+                move_vec = Vector3D(
+                    (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)).normalize()
             move_vec = move_vec * (tolerance + 0.00001)
             point_on_face = face.boundary[0] + move_vec
             vert2d = face.plane.xyz_to_xy(point_on_face)
