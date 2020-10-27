@@ -1,10 +1,18 @@
-.. Ladybug Geometry documentation master file, created by
-   sphinx-quickstart on Wed Mar 13 20:09:41 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to Ladybug Geometry's documentation!
 ============================================
+
+.. image:: http://www.ladybug.tools/assets/img/ladybug.png
+
+Ladybug geometry is a Python library that houses geometry objects used throughout the
+Ladybug Tools core libraries.
+
+Installation
+============
+
+``pip install -U ladybug-geometry``
+
+Documentation
+=============
 
 .. toctree::
    :maxdepth: 2
