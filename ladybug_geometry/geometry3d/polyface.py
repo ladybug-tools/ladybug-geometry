@@ -462,11 +462,15 @@ class Polyface3D(Base2DIn3D):
             for edge, ind, nei, i in zip(
                     naked_edges[1:], naked_edge_ind[1:], naked_edge_i[1:],
                     xrange(1, len(naked_edges))):
-                if edge.is_colinear(naked_edges[0], tolerance, angle_tolerance):
+                try:
+                    if edge.is_colinear(naked_edges[0], tolerance, angle_tolerance):
+                        coll_edges.extend(ind)
+                        coll_i.append(nei)
+                    else:
+                        kept_i.append(i)
+                except ZeroDivisionError:  # duplicate vertices resulted in 0 length edge
                     coll_edges.extend(ind)
                     coll_i.append(nei)
-                else:
-                    kept_i.append(i)
 
             # determine if  colinear edges create a full double line along the edge
             if len(coll_edges) == 1:
@@ -735,13 +739,11 @@ class Polyface3D(Base2DIn3D):
         outward_faces = []
         for i, face in enumerate(faces):
             # construct a ray with the face normal and a point on the face
-            v1 = face.boundary[-1] - face.boundary[0]
-            v2 = face.boundary[1] - face.boundary[0]
-            if v1.angle(v2) == math.pi:  # colinear vertices; prevent averaging to zero
-                move_vec = v1.rotate(face.normal, math.pi / 2).normalize()
-            else:  # average the two edge vectors together
-                move_vec = Vector3D(
-                    (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)).normalize()
+            try:
+                move_vec = Polyface3D._inward_pointing_vec(face)
+            except ZeroDivisionError:  # face has duplicated start vertices; remove them
+                face = face.remove_colinear_vertices(tolerance)
+                move_vec = Polyface3D._inward_pointing_vec(face)
             move_vec = move_vec * (tolerance + 0.00001)
             point_on_face = face.boundary[0] + move_vec
             vert2d = face.plane.xyz_to_xy(point_on_face)
@@ -804,6 +806,17 @@ class Polyface3D(Base2DIn3D):
         edge_indices = edge_i1 + [(st_i + len_faces - 1, st_i)] + edge_i2 + edge_i3 + \
             [(st_i + len_faces * 2 - 1, st_i + len_faces)]
         return verts, faces_ind, edge_indices
+
+    @staticmethod
+    def _inward_pointing_vec(face):
+        """Get a unit vector pointing inward from the first vertex of a Face3D."""
+        v1 = face.boundary[-1] - face.boundary[0]
+        v2 = face.boundary[1] - face.boundary[0]
+        if v1.angle(v2) == math.pi:  # colinear vertices; prevent averaging to zero
+            return v1.rotate(face.normal, math.pi / 2).normalize()
+        else:  # average the two edge vectors together
+            avg_coords = (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)
+            return Vector3D(*avg_coords).normalize()
 
     def __copy__(self):
         _new_poly = Polyface3D(self.vertices, self.face_indices, self.edge_information)
