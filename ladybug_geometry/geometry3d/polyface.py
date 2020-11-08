@@ -247,7 +247,7 @@ class Polyface3D(Base2DIn3D):
                 verts.extend(verts_2)
                 face_ind_extru.extend(face_ind_extru_2)
                 edge_indices.extend(edge_indices_2)
-                _st_i += len(hole_verts)
+                _st_i += len(hole_verts * 2)
         face_ind_extru = [[fc] for fc in face_ind_extru]
         # compute the final faces (accounting for top and bottom)
         if not face.has_holes:
@@ -792,6 +792,7 @@ class Polyface3D(Base2DIn3D):
 
     @staticmethod
     def _verts_faces_edges_from_boundary(cclock_verts, extru_vec, st_i=0):
+        """Get vertices and face indices for a given Face3D loop (boundary or hole)."""
         verts = list(cclock_verts) + [pt.move(extru_vec) for pt in cclock_verts]
         len_faces = len(cclock_verts)
         faces_ind = []
