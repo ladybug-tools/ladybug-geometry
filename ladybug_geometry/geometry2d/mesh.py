@@ -268,6 +268,7 @@ class Mesh2D(MeshBase):
                 _new_faces.append(face)
             else:
                 _triangles = Mesh2D._quad_to_triangles([self._vertices[i] for i in face])
+                _triangles = [tuple(face[vertex_idx] for vertex_idx in new_face) for new_face in _triangles]
                 _new_faces.extend(_triangles)
         _new_faces = tuple(_new_faces)
 
