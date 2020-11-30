@@ -9,7 +9,7 @@ import math
 
 
 def test_linesegment3d_init():
-    """Test the initalization of LineSegment3D objects and basic properties."""
+    """Test the initialization of LineSegment3D objects and basic properties."""
     pt = Point3D(2, 0, 2)
     vec = Vector3D(0, 2, 0)
     seg = LineSegment3D(pt, vec)
@@ -23,6 +23,7 @@ def test_linesegment3d_init():
     assert seg.point_at(0.25) == Point3D(2, 0.5, 2)
     assert seg.point_at_length(1) == Point3D(2, 1, 2)
     assert seg.length == 2
+    assert len(seg.vertices) == 2
 
     flip_seg = seg.flip()
     assert flip_seg.p == Point3D(2, 2, 2)

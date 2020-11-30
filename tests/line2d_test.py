@@ -8,7 +8,7 @@ import math
 
 
 def test_linesegment2_init():
-    """Test the initalization of LineSegment2D objects and basic properties."""
+    """Test the initialization of LineSegment2D objects and basic properties."""
     pt = Point2D(2, 0)
     vec = Vector2D(0, 2)
     seg = LineSegment2D(pt, vec)
@@ -22,6 +22,7 @@ def test_linesegment2_init():
     assert seg.point_at(0.25) == Point2D(2, 0.5)
     assert seg.point_at_length(1) == Point2D(2, 1)
     assert seg.length == 2
+    assert len(seg.vertices) == 2
 
     flip_seg = seg.flip()
     assert flip_seg.p == Point2D(2, 2)

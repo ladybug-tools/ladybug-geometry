@@ -20,6 +20,7 @@ class LineSegment3D(Base1DIn3D):
         * p2
         * midpoint
         * length
+        * vertices
     """
     __slots__ = ()
 
@@ -77,6 +78,11 @@ class LineSegment3D(Base1DIn3D):
     def length(self):
         """The length of the line segment."""
         return self.v.magnitude
+
+    @property
+    def vertices(self):
+        """Tuple of both vertices in this object."""
+        return (self.p1, self.p2)
 
     def is_horizontal(self, tolerance):
         """Test whether this line segment is horizontal within a certain tolerance.
