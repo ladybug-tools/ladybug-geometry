@@ -21,6 +21,7 @@ class LineSegment2D(Base1DIn2D):
         * p2
         * midpoint
         * length
+        * vertices
     """
     __slots__ = ()
 
@@ -84,6 +85,11 @@ class LineSegment2D(Base1DIn2D):
     def length(self):
         """The length of the line segment."""
         return self.v.magnitude
+
+    @property
+    def vertices(self):
+        """Tuple of both vertices in this object."""
+        return (self.p1, self.p2)
 
     def is_equivalent(self, other, tolerance):
         """Boolean noting equivalence (within tolerance) between this line and another.
