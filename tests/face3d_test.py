@@ -603,7 +603,7 @@ def test_remove_colinear_vertices():
 
 
 def test_triangulated_mesh_and_centroid():
-    """Test the duplicate method of Face3D."""
+    """Test the triangulation properties of Face3D."""
     pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
     plane_1 = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
     face_1 = Face3D(pts_1, plane_1)
@@ -632,6 +632,18 @@ def test_triangulated_mesh_and_centroid():
     assert face_2.centroid.x == pytest.approx(1.73, rel=1e-2)
     assert face_2.centroid.y == pytest.approx(0.2667, rel=1e-2)
     assert face_2.centroid.z == 0
+
+
+def test_triangulated_mesh_with_holes():
+    """Test the triangulation properties of a Face3D with holes."""
+    geo_file = './tests/json/face_with_holes.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    face_geo = Face3D.from_dict(geo_dict)
+
+    assert len(face_geo.triangulated_mesh3d.vertices) == 12
+    assert len(face_geo.triangulated_mesh3d.faces) == 14
+    assert face_geo.triangulated_mesh3d.area == pytest.approx(face_geo.area, rel=1e-3)
 
 
 def test_check_planar():
