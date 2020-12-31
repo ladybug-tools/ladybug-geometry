@@ -515,8 +515,11 @@ class Mesh2D(MeshBase):
         """
         for i in xrange(0, len(polygon) - 1):
             diagonal = LineSegment2D.from_end_points(polygon[i - 1], polygon[i + 1])
-            if polygon.is_point_inside(diagonal.midpoint):
-                if len(polygon.intersect_line_ray(diagonal)) < 5:
+            mid_pt = diagonal.midpoint
+            if polygon.is_point_inside(mid_pt):
+                # scale diagonal to avoid intersecting the polygon endpoints
+                diagonal = diagonal.scale(0.999999, mid_pt)
+                if len(polygon.intersect_line_ray(diagonal)) == 0:
                     ear = (polygon[i - 1], polygon[i], polygon[i + 1])  # found an ear!
                     break
         try:
