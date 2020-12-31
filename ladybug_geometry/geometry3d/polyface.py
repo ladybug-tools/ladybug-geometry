@@ -739,16 +739,7 @@ class Polyface3D(Base2DIn3D):
         outward_faces = []
         for i, face in enumerate(faces):
             # construct a ray with the face normal and a point on the face
-            try:
-                move_vec = Polyface3D._inward_pointing_vec(face)
-            except ZeroDivisionError:  # face has duplicated start vertices; remove them
-                face = face.remove_colinear_vertices(tolerance)
-                move_vec = Polyface3D._inward_pointing_vec(face)
-            move_vec = move_vec * (tolerance + 0.00001)
-            point_on_face = face.boundary[0] + move_vec
-            vert2d = face.plane.xyz_to_xy(point_on_face)
-            if not face.polygon2d.is_point_inside(vert2d):  # check that it's on the face
-                point_on_face = face.boundary[0] - move_vec
+            point_on_face = face._point_on_face(tolerance)
             test_ray = Ray3D(point_on_face, face.normal)
 
             # if the ray intersects with an even number of other faces, it is correct
@@ -807,17 +798,6 @@ class Polyface3D(Base2DIn3D):
         edge_indices = edge_i1 + [(st_i + len_faces - 1, st_i)] + edge_i2 + edge_i3 + \
             [(st_i + len_faces * 2 - 1, st_i + len_faces)]
         return verts, faces_ind, edge_indices
-
-    @staticmethod
-    def _inward_pointing_vec(face):
-        """Get a unit vector pointing inward from the first vertex of a Face3D."""
-        v1 = face.boundary[-1] - face.boundary[0]
-        v2 = face.boundary[1] - face.boundary[0]
-        if v1.angle(v2) == math.pi:  # colinear vertices; prevent averaging to zero
-            return v1.rotate(face.normal, math.pi / 2).normalize()
-        else:  # average the two edge vectors together
-            avg_coords = (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)
-            return Vector3D(*avg_coords).normalize()
 
     def __copy__(self):
         _new_poly = Polyface3D(self.vertices, self.face_indices, self.edge_information)

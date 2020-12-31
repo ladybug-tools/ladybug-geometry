@@ -589,14 +589,12 @@ class Face3D(Base2DIn3D):
     def is_centered_adjacent(self, face, tolerance):
         """Check whether a given face is centered adjacent with this Face.
 
-        Centered adjacency is defined as sharing the same center point as this face,
-        sharing the same area, and being next to one another to within the tolerance.
+        Centered adjacency is defined as sharing the same center point as this face
+        and being next to one another to within the tolerance.
 
-        This is useful for identifying matching surfaces when you want to quickly
+        This is useful for identifying matching faces when you want to quickly
         solve for adjacency and you are not concerned about false positives in cases
-        where one face does not perfectly match the other in terms of vertices.
-        This means it is good enough for cases where users know how to set up their
-        model correctly.
+        where one face does not perfectly match the other in terms of vertex ordering.
 
         Args:
             face: Another face for which centered adjacency will be tested.
@@ -607,15 +605,9 @@ class Face3D(Base2DIn3D):
         """
         if not self.center.is_equivalent(face.center, tolerance):  # center check
             return False
-        if not abs(self.area - face.area) <= tolerance:  # area check
-            return False
         # construct a ray using this face's normal and a point just behind this face
-        v1 = self.boundary[-1] - self.boundary[0]
-        v2 = self.boundary[1] - self.boundary[0]
-        move_vec = Vector3D(  # vector moving from the edge towards the center of Face
-            (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)).normalize()
-        move_vec = move_vec * (tolerance + 0.00001)
-        point_on_face = self.boundary[0] + move_vec - (self.normal * tolerance)
+        point_on_face = self._point_on_face(tolerance)
+        point_on_face = point_on_face - (self.normal * tolerance)  # move below
         test_ray = Ray3D(point_on_face, self.normal)
         # shoot ray from this face to the other to verify adjacency
         if face.intersect_line_ray(test_ray):
@@ -1879,6 +1871,32 @@ class Face3D(Base2DIn3D):
 
         # return the rectangle edges and the extra faces
         return (close_pt_1, close_pt_2, close_pt_3, close_pt_4), other_faces
+
+    def _point_on_face(self, tolerance):
+        """Get a point that is always reliably on this face."""
+        try:
+            move_vec = self._inward_pointing_vec(self)
+        except ZeroDivisionError:  # face has duplicated start vertices; remove them
+            face = self.remove_colinear_vertices(tolerance)
+            move_vec = Polyface3D._inward_pointing_vec(face)
+
+        move_vec = move_vec * (tolerance + 0.00001)
+        point_on_face = self.boundary[0] + move_vec
+        vert2d = self.plane.xyz_to_xy(point_on_face)
+        if not self.polygon2d.is_point_inside(vert2d):
+            point_on_face = self.boundary[0] - move_vec
+        return point_on_face
+
+    @staticmethod
+    def _inward_pointing_vec(face):
+        """Get a unit vector pointing inward/outward from the first vertex of a face."""
+        v1 = face.boundary[-1] - face.boundary[0]
+        v2 = face.boundary[1] - face.boundary[0]
+        if v1.angle(v2) == math.pi:  # colinear vertices; prevent averaging to zero
+            return v1.rotate(face.normal, math.pi / 2).normalize()
+        else:  # average the two edge vectors together
+            avg_coords = (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)
+            return Vector3D(*avg_coords).normalize()
 
     @staticmethod
     def _plane_from_vertices(verts):
