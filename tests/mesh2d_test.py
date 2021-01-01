@@ -245,7 +245,7 @@ def test_mesh2d_init_from_polygon_triangulated_incorrect():
     verts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 1), Point2D(1, 1),
              Point2D(1, 2), Point2D(2, 0))
     polygon = Polygon2D(verts)
-    with pytest.raises(ValueError):
+    with pytest.raises(AssertionError):
         Mesh2D.from_polygon_triangulated(polygon)
 
 

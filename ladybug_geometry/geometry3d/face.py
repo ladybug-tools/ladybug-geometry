@@ -657,7 +657,7 @@ class Face3D(Base2DIn3D):
             return False
         # if it is, convert the point into this face's plane
         vert2d = self.plane.xyz_to_xy(point)
-        return self.polygon2d.is_point_inside(vert2d)
+        return self.polygon2d.is_point_inside(vert2d, Vector2D(1, 0.00001))
 
     def check_planar(self, tolerance, raise_exception=True):
         """Check that all of the face's vertices lie within the face's plane.
@@ -701,16 +701,17 @@ class Face3D(Base2DIn3D):
         """
         if len(self.vertices) == 3:
             return self
-        new_vertices = self._remove_colinear(
+        if not self.has_holes:  # we only need to evaluate one list of vertices
+            new_vertices = self._remove_colinear(
             self._vertices, self.polygon2d, tolerance)
-        _new_face = Face3D(new_vertices, self.plane, enforce_right_hand=False)
-        if not self.has_holes:
+            _new_face = Face3D(new_vertices, self.plane, enforce_right_hand=False)
             return _new_face
-        _new_face._boundary = self._remove_colinear(
+        # the face has holes
+        _boundary = self._remove_colinear(
             self._boundary, self.boundary_polygon2d, tolerance)
-        _new_face._holes = \
-            tuple(self._remove_colinear(hole, self.hole_polygon2d[i], tolerance)
-                  for i, hole in enumerate(self._holes))
+        _holes = tuple(self._remove_colinear(hole, self.hole_polygon2d[i], tolerance)
+                       for i, hole in enumerate(self._holes))
+        _new_face = Face3D(_boundary, self.plane, _holes, enforce_right_hand=False)
         return _new_face
 
     def flip(self):
@@ -818,7 +819,7 @@ class Face3D(Base2DIn3D):
         _plane_int = self._plane.intersect_line_ray(line_ray)
         if _plane_int is not None:
             _int2d = self._plane.xyz_to_xy(_plane_int)
-            if self.polygon2d.is_point_inside_bound_rect(_int2d):
+            if self.polygon2d.is_point_inside_bound_rect(_int2d, Vector2D(1, 0.00001)):
                 return _plane_int
         return None
 
@@ -867,7 +868,7 @@ class Face3D(Base2DIn3D):
         """
         _plane_int = point.project(self._plane.n, self._plane.o)
         _plane_int2d = self._plane.xyz_to_xy(_plane_int)
-        if self.polygon2d.is_point_inside_bound_rect(_plane_int2d):
+        if self.polygon2d.is_point_inside_bound_rect(_plane_int2d, Vector2D(1, 0.00001)):
             return _plane_int
         return None
 
@@ -1883,7 +1884,7 @@ class Face3D(Base2DIn3D):
         move_vec = move_vec * (tolerance + 0.00001)
         point_on_face = self.boundary[0] + move_vec
         vert2d = self.plane.xyz_to_xy(point_on_face)
-        if not self.polygon2d.is_point_inside(vert2d):
+        if not self.polygon2d.is_point_inside(vert2d, Vector2D(1, 0.00001)):
             point_on_face = self.boundary[0] - move_vec
         return point_on_face
 
