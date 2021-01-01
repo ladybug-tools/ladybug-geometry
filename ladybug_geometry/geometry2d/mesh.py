@@ -8,6 +8,7 @@ from .pointvector import Point2D, Vector2D
 from .line import LineSegment2D
 from .polygon import Polygon2D
 
+import collections
 try:
     from itertools import izip as zip  # python 2
 except ImportError:
@@ -495,14 +496,31 @@ class Mesh2D(MeshBase):
         """Triangulate a polygon using the ear clipping method."""
         _faces = []
         _clipping_poly = polygon.duplicate()
+        cnt = 0
         while len(_clipping_poly) > 3:
-            _ear, _index = Mesh2D._find_ear(_clipping_poly)
+            try:
+                _clipping_poly, _ear, _index = Mesh2D._get_ear(_clipping_poly)
+            except TypeError:  # we have reached the end of the vertices
+                return _faces
             _faces.append(_ear)
             new_verts = list(_clipping_poly.vertices)
             del new_verts[_index]
             _clipping_poly = Polygon2D(new_verts)
         _faces.append(_clipping_poly.vertices)
         return _faces
+
+    @staticmethod
+    def _get_ear(polygon):
+        """Get an ear of a polygon if its available or untangle a polygon if not."""
+        try:
+            return Mesh2D._find_ear(polygon)
+        except UnboundLocalError:  # polygon is self-intersecting
+            # untangle the polygon in the case that triply duplicated vertices are found
+            polygon = Mesh2D._untangle_polygon(polygon)
+            try:
+                return Mesh2D._find_ear(polygon)
+            except UnboundLocalError:  # polygon is self-intersecting
+                raise TypeError('End of vertices')
 
     @staticmethod
     def _find_ear(polygon):
@@ -513,21 +531,39 @@ class Mesh2D(MeshBase):
         is convex or concave, it always has at least two ears that can be "clipped"
         to yield a simpler polygon.
         """
-        for i in xrange(0, len(polygon) - 1):
-            diagonal = LineSegment2D.from_end_points(polygon[i - 1], polygon[i + 1])
+        for i in xrange(len(polygon)):
+            diagonal = LineSegment2D.from_end_points(polygon[i - 2], polygon[i])
             mid_pt = diagonal.midpoint
-            if polygon.is_point_inside(mid_pt):
+            if polygon.is_point_inside(mid_pt, Vector2D(1, 0.00001)):
                 # scale diagonal to avoid intersecting the polygon endpoints
                 diagonal = diagonal.scale(0.999999, mid_pt)
                 if len(polygon.intersect_line_ray(diagonal)) == 0:
-                    ear = (polygon[i - 1], polygon[i], polygon[i + 1])  # found an ear!
+                    ear = (polygon[i - 2], polygon[i - 1], polygon[i])  # found an ear!
                     break
-        try:
-            return ear, i
-        except UnboundLocalError:
-            raise ValueError(
-                'Polygon {} is not in a valid format for triangulation.'
-                ' The polygon likely has self-intersecting edges.'.format(polygon))
+        return polygon, ear, i - 1
+
+    @staticmethod
+    def _untangle_polygon(polygon):
+        """Untangle a polygon that has triply-duplicated vertices.
+
+        This situation can result from ear clipping of polygons with several holes.
+        """
+        # gather together the duplicate vertices
+        p_verts = list(polygon.vertices)
+        dup_pts = [pt for pt, count in collections.Counter(p_verts).items() if count > 1]
+        if len(dup_pts) == 0:
+            raise TypeError('End of vertices')
+
+        # attempt to untangle the polygon at the duplicate vertex intersection
+        for pt_dup in dup_pts:
+            ptsi = []
+            for i, pt in enumerate(p_verts):
+                if pt == pt_dup:
+                    ptsi.append(i)
+            if len(ptsi) == 3:
+                p_verts = p_verts[:ptsi[0]] + p_verts[ptsi[1]:ptsi[2]] + \
+                    p_verts[ptsi[0]:ptsi[1]] + p_verts[ptsi[2]:]
+        return Polygon2D(p_verts)
 
     @staticmethod
     def _quad_to_triangles(verts):
@@ -557,7 +593,7 @@ class Mesh2D(MeshBase):
         """Return two triangles that represent a concave quadrilateral."""
         quad_poly = Polygon2D(verts)
         diagonal = LineSegment2D.from_end_points(quad_poly[0], quad_poly[2])
-        if quad_poly.is_point_inside(diagonal.midpoint):
+        if quad_poly.is_point_inside(diagonal.midpoint, Vector2D(1, 0.00001)):
             # if the diagonal midpoint is inside the quad, it splits it into two ears
             return [(0, 1, 2), (2, 3, 0)]
         else:

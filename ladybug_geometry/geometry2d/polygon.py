@@ -907,7 +907,14 @@ class Polygon2D(Base2DIn2D):
         return _a < 0
 
     def __copy__(self):
-        return Polygon2D(self._vertices)
+        _new_poly = Polygon2D(self._vertices)
+        _new_poly._segments = self._segments
+        _new_poly._perimeter = self._perimeter
+        _new_poly._area = self._area
+        _new_poly._is_clockwise = self._is_clockwise
+        _new_poly._is_convex = self._is_convex
+        _new_poly._is_self_intersecting = self._is_self_intersecting
+        return _new_poly
 
     def __key(self):
         """A tuple based on the object properties, useful for hashing."""
