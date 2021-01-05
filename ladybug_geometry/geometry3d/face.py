@@ -315,7 +315,8 @@ class Face3D(Base2DIn3D):
     def triangulated_mesh2d(self):
         """A triangulated Mesh2D in the 2D space of the face's plane."""
         if self._mesh2d is None:
-            self._mesh2d = Mesh2D.from_polygon_triangulated(self.polygon2d)
+            self._mesh2d = Mesh2D.from_polygon_triangulated(
+                self.boundary_polygon2d, self.hole_polygon2d)
         return self._mesh2d
 
     @property
@@ -394,7 +395,7 @@ class Face3D(Base2DIn3D):
     def hole_polygon2d(self):
         """A list of Polygon2D for the face holes in the 2D space of the face's plane.
         """
-        if self._hole_polygon2d is None:
+        if self._holes is not None and self._hole_polygon2d is None:
             self._hole_polygon2d = []
             for hole in self.holes:
                 _vert2d = tuple(self._plane.xyz_to_xy(_v) for _v in hole)

@@ -211,14 +211,14 @@ class Polygon2D(Base2DIn2D):
                 'hole should have at least 3 vertices. Got {}'.format(len(hole))
 
         # check that the direction of vertices for the hole is opposite the boundary
-        bound_direction = Polygon2D._are_clockwise(boundary)
+        bound_direction = cls._are_clockwise(boundary)
         for hole in holes:
-            if Polygon2D._are_clockwise(hole) is bound_direction:
+            if cls._are_clockwise(hole) is bound_direction:
                 hole.reverse()
 
         # recursively add the nearest hole to the boundary until there are none left.
         while len(holes) > 0:
-            boundary, holes = Polygon2D._merge_boundary_and_closest_hole(boundary, holes)
+            boundary, holes = cls._merge_boundary_and_closest_hole(boundary, holes)
 
         # return the polygon with some properties set based on what we know
         _new_poly = cls(boundary)
