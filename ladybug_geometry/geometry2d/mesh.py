@@ -3,12 +3,12 @@
 from __future__ import division
 
 from .._mesh import MeshBase
+from ..triangulation import earcut
 
 from .pointvector import Point2D, Vector2D
 from .line import LineSegment2D
 from .polygon import Polygon2D
 
-import collections
 try:
     from itertools import izip as zip  # python 2
 except ImportError:
@@ -99,37 +99,33 @@ class Mesh2D(MeshBase):
         return cls(tuple(vertices), tuple(face_collector))
 
     @classmethod
-    def from_polygon_triangulated(cls, polygon, purge=True):
+    def from_polygon_triangulated(cls, boundary_polygon, hole_polygons=None):
         """Initialize a triangulated Mesh2D from a Polygon2D.
 
-        Such a triangulated mesh will completely fill the polygon since any
-        polygon can be subdivided into a set of triangles.
+        The triangles of the mesh faces will always completely fill the shape
+        defines by the input boundary_polygon with holes subtracted from it.
 
         Args:
-            polygon: A Polygon2D.
-            purge: A boolean to indicate if duplicate vertices should be shared between
-                faces. This has no bearing on the triangulation of convex polygons
-                and only affects concave polygons with more than 4 sides.
-                Default is True to purge duplicate vertices, which can be slow
-                for concave polygons composed of a large number of triangles but
-                ultimately results in a higher-quality mesh. Default is True.
+            boundary_polygon: A Polygon2D object representing the boundary of the shape.
+            hole_polygons: Optional list of Polygon2D objects representing holes
+                within the boundary_polygon.
         """
-        assert isinstance(polygon, Polygon2D), 'polygon must be a Polygon2D to use ' \
-            'from_polygon_triangulated. Got {}.'.format(type(polygon))
+        assert isinstance(boundary_polygon, Polygon2D), 'boundary_polygon must be a ' \
+            'Polygon2D to use from_polygon_triangulated. Got {}.'.format(type(polygon))
 
-        if polygon.is_convex:
-            # super-fast fan triangulation!
+        if hole_polygons is None and boundary_polygon.is_convex:  # fast fan triangulation!
             _faces = []
-            for i in xrange(1, len(polygon) - 1):
+            for i in xrange(1, len(boundary_polygon) - 1):
                 _faces.append((0, i, i + 1))
-            _new_mesh = cls(polygon.vertices, _faces)
-        elif len(polygon) == 4:
-            _faces = Mesh2D._concave_quad_to_triangles(polygon.vertices)
-            _new_mesh = cls(polygon.vertices, _faces)
-        else:
-            # slow ear-clipping method
-            _faces = Mesh2D._ear_clipping_triangulation(polygon)
-            _new_mesh = cls.from_face_vertices(_faces, purge)
+            _new_mesh = cls(boundary_polygon.vertices, _faces)
+        else:  # slower ear-clipping method
+            if hole_polygons is not None:
+                for hole in hole_polygons:
+                    assert isinstance(hole, Polygon2D), 'Hole must be a Polygon2D ' \
+                        'to use from_polygon_triangulated. Got {}.'.format(type(hole))
+            _vertices, _faces = Mesh2D._ear_clipping_triangulation(
+                boundary_polygon, hole_polygons)
+            _new_mesh = cls(_vertices, _faces)
 
         return _new_mesh
 
@@ -137,7 +133,7 @@ class Mesh2D(MeshBase):
     def from_polygon_grid(cls, polygon, x_dim, y_dim, generate_centroids=True):
         """Initialize a gridded Mesh2D from a Polygon2D.
 
-        Note that this gridded mesh will likely not completely fill the polygon.
+        Note that this gridded mesh will usually not completely fill the polygon.
         Essentially, this method generates a grid over the domain of the polygon
         and then removes any points that do not lie within the polygon.
 
@@ -492,78 +488,26 @@ class Mesh2D(MeshBase):
         return vertices
 
     @staticmethod
-    def _ear_clipping_triangulation(polygon):
-        """Triangulate a polygon using the ear clipping method."""
-        _faces = []
-        _clipping_poly = polygon.duplicate()
-        cnt = 0
-        while len(_clipping_poly) > 3:
-            try:
-                _clipping_poly, _ear, _index = Mesh2D._get_ear(_clipping_poly)
-            except TypeError:  # we have reached the end of the vertices
-                return _faces
-            _faces.append(_ear)
-            new_verts = list(_clipping_poly.vertices)
-            del new_verts[_index]
-            _clipping_poly = Polygon2D(new_verts)
-        _faces.append(_clipping_poly.vertices)
-        return _faces
+    def _ear_clipping_triangulation(polygon, holes=None):
+        """Triangulate a polygon and holes using the ear clipping method."""
+        # flatten the list of vertices and holes into a single list for earcut
+        vert_coords, hole_indices = [], None
+        for pt in polygon:
+            vert_coords.extend((pt.x, pt.y))
+        if holes is not None:
+            hole_indices = []
+            for hole in holes:
+                hole_indices.append(int(len(vert_coords) / 2))
+                for pt in hole:
+                    vert_coords.extend((pt.x, pt.y))
 
-    @staticmethod
-    def _get_ear(polygon):
-        """Get an ear of a polygon if its available or untangle a polygon if not."""
-        try:
-            return Mesh2D._find_ear(polygon)
-        except UnboundLocalError:  # polygon is self-intersecting
-            # untangle the polygon in the case that triply duplicated vertices are found
-            polygon = Mesh2D._untangle_polygon(polygon)
-            try:
-                return Mesh2D._find_ear(polygon)
-            except UnboundLocalError:  # polygon is self-intersecting
-                raise TypeError('End of vertices')
-
-    @staticmethod
-    def _find_ear(polygon):
-        """Find an ear of a polygon.
-
-        An ear is a triangle with two sides as edges of the polygon and the third
-        side is a diagonal that lies completely inside the polygon. Whether a polygon
-        is convex or concave, it always has at least two ears that can be "clipped"
-        to yield a simpler polygon.
-        """
-        for i in xrange(len(polygon)):
-            diagonal = LineSegment2D.from_end_points(polygon[i - 2], polygon[i])
-            mid_pt = diagonal.midpoint
-            if polygon.is_point_inside(mid_pt, Vector2D(1, 0.00001)):
-                # scale diagonal to avoid intersecting the polygon endpoints
-                diagonal = diagonal.scale(0.999999, mid_pt)
-                if len(polygon.intersect_line_ray(diagonal)) == 0:
-                    ear = (polygon[i - 2], polygon[i - 1], polygon[i])  # found an ear!
-                    break
-        return polygon, ear, i - 1
-
-    @staticmethod
-    def _untangle_polygon(polygon):
-        """Untangle a polygon that has triply-duplicated vertices.
-
-        This situation can result from ear clipping of polygons with several holes.
-        """
-        # gather together the duplicate vertices
-        p_verts = list(polygon.vertices)
-        dup_pts = [pt for pt, count in collections.Counter(p_verts).items() if count > 1]
-        if len(dup_pts) == 0:
-            raise TypeError('End of vertices')
-
-        # attempt to untangle the polygon at the duplicate vertex intersection
-        for pt_dup in dup_pts:
-            ptsi = []
-            for i, pt in enumerate(p_verts):
-                if pt == pt_dup:
-                    ptsi.append(i)
-            if len(ptsi) == 3:
-                p_verts = p_verts[:ptsi[0]] + p_verts[ptsi[1]:ptsi[2]] + \
-                    p_verts[ptsi[0]:ptsi[1]] + p_verts[ptsi[2]:]
-        return Polygon2D(p_verts)
+        # run the ear clipping triangulation
+        result_tri = earcut(vert_coords, hole_indices)
+        vertices = tuple(Point2D(*vert_coords[st:st + 2])
+                         for st in range(0, len(vert_coords), 2))
+        faces = tuple(tuple(result_tri[st:st + 3])
+                      for st in range(0, len(result_tri), 3))
+        return vertices, faces
 
     @staticmethod
     def _quad_to_triangles(verts):

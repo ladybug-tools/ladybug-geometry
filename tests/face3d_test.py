@@ -646,6 +646,17 @@ def test_triangulated_mesh_with_holes():
     assert face_geo.triangulated_mesh3d.area == pytest.approx(face_geo.area, rel=1e-3)
 
 
+def test_triangulated_mesh_with_many_holes():
+    """Test the triangulation properties of a Face3D with many holes."""
+    geo_file = './tests/json/faces_with_many_holes.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    for geo in geo_dict:
+        face_geo = Face3D.from_dict(geo)
+        assert face_geo.triangulated_mesh3d.area == \
+            pytest.approx(face_geo.area, rel=1e-3)
+
+
 def test_check_planar():
     """Test the check_planar method of Face3D."""
     pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))

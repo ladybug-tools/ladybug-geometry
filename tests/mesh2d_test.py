@@ -223,30 +223,19 @@ def test_mesh2d_init_from_polygon_triangulated_concave():
              Point2D(1, 2), Point2D(0, 2))
     polygon = Polygon2D(verts)
     mesh_1 = Mesh2D.from_polygon_triangulated(polygon)
-    mesh_2 = Mesh2D.from_polygon_triangulated(polygon, False)
 
     assert len(mesh_1.vertices) == 6
-    assert len(mesh_2.vertices) == 12
-    assert len(mesh_1.faces) == len(mesh_2.faces) == 4
-    assert mesh_1.area == mesh_2.area == 3
+    assert len(mesh_1.faces) == 4
+    assert mesh_1.area == 3
 
-    assert mesh_1.min == mesh_2.min == Point2D(0, 0)
-    assert mesh_1.max == mesh_2.max == Point2D(2, 2)
-    assert mesh_1.center == mesh_2.center == Point2D(1, 1)
-    assert mesh_1.centroid.x == mesh_2.centroid.x == pytest.approx(0.8333, rel=1e-2)
-    assert mesh_1.centroid.y == mesh_2.centroid.y == pytest.approx(0.8333, rel=1e-2)
+    assert mesh_1.min == Point2D(0, 0)
+    assert mesh_1.max == Point2D(2, 2)
+    assert mesh_1.center == Point2D(1, 1)
+    assert mesh_1.centroid.x == pytest.approx(0.8333, rel=1e-2)
+    assert mesh_1.centroid.y == pytest.approx(0.8333, rel=1e-2)
 
-    assert len(mesh_1.face_areas) == len(mesh_2.face_areas) == 4
-    assert len(mesh_1.face_centroids) == len(mesh_2.face_centroids) == 4
-
-
-def test_mesh2d_init_from_polygon_triangulated_incorrect():
-    """Test the initialization of Mesh2D from_polygon_triangulated."""
-    verts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 1), Point2D(1, 1),
-             Point2D(1, 2), Point2D(2, 0))
-    polygon = Polygon2D(verts)
-    with pytest.raises(AssertionError):
-        Mesh2D.from_polygon_triangulated(polygon)
+    assert len(mesh_1.face_areas) == 4
+    assert len(mesh_1.face_centroids) == 4
 
 
 def test_mesh2d_init_from_polygon_grid():
