@@ -602,6 +602,19 @@ def test_remove_colinear_vertices():
     assert len(face_2.remove_colinear_vertices(0.0001).vertices) == 4
 
 
+def test_remove_colinear_vertices_custom():
+    """Test the remove_colinear_vertices method with some custom geometry."""
+    geo_file = './tests/json/dup_vert_face.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    face_geo = Face3D.from_dict(geo_dict)
+
+    assert -1e-3 < face_geo.normal.z < 1e-3
+    assert len(face_geo.vertices) == 17
+
+    assert len(face_geo.remove_colinear_vertices(0.0001).vertices) == 16
+
+
 def test_triangulated_mesh_and_centroid():
     """Test the triangulation properties of Face3D."""
     pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))

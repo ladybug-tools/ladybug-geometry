@@ -704,7 +704,7 @@ class Face3D(Base2DIn3D):
             return self
         if not self.has_holes:  # we only need to evaluate one list of vertices
             new_vertices = self._remove_colinear(
-            self._vertices, self.polygon2d, tolerance)
+                self._vertices, self.polygon2d, tolerance)
             _new_face = Face3D(new_vertices, self.plane, enforce_right_hand=False)
             return _new_face
         # the face has holes
@@ -1738,11 +1738,15 @@ class Face3D(Base2DIn3D):
         triangle formed by 3 vertices is less than the tolerance.
         """
         new_vertices = []
+        skip = 0
         for i, _v in enumerate(pts_2d):
-            _a = pts_2d[i - 2].determinant(pts_2d[i - 1]) + \
-                pts_2d[i - 1].determinant(_v) + _v.determinant(pts_2d[i - 2])
+            _a = pts_2d[i - 2 - skip].determinant(pts_2d[i - 1]) + \
+                pts_2d[i - 1].determinant(_v) + _v.determinant(pts_2d[i - 2 - skip])
             if abs(_a) >= tolerance:
                 new_vertices.append(pts_3d[i - 1])
+                skip = 0
+            else:
+                skip += 1
         return new_vertices
 
     def _is_sub_face(self, face):
@@ -1913,6 +1917,7 @@ class Face3D(Base2DIn3D):
             normal = [x1 + x2, y1 + y2, z1 + z2]
             # walk around the whole shape to avoid colinear vertices
             for i in range(len(verts) - 2):
+                tri_verts = verts[i:i + 3]
                 x, y, z = Face3D._normal_from_3pts(*verts[i:i + 3])
                 normal[0] += x
                 normal[1] += y
@@ -1936,11 +1941,10 @@ class Face3D(Base2DIn3D):
         # normalize the vectors to make them unit vectors
         d1 = math.sqrt(v1[0] ** 2 + v1[1] ** 2 + v1[2] ** 2)
         d2 = math.sqrt(v2[0] ** 2 + v2[1] ** 2 + v2[2] ** 2)
-        try:
-            v1 = (v1[0] / d1, v1[1] / d1, v1[2] / d1)
-            v2 = (v2[0] / d2, v2[1] / d2, v2[2] / d2)
-        except ZeroDivisionError:  # duplicate vertices in triplet
+        if d1 < 1e-9 or d2 < 1e-9:  # effectively duplicate vertices in triplet
             return (0, 0, 0)
+        v1 = (v1[0] / d1, v1[1] / d1, v1[2] / d1)
+        v2 = (v2[0] / d2, v2[1] / d2, v2[2] / d2)
         # return the cross product
         return (v1[1] * v2[2] - v1[2] * v2[1],
                 -v1[0] * v2[2] + v1[2] * v2[0],
