@@ -27,6 +27,8 @@ class Polyline2D(Base2DIn2D):
         * min
         * max
         * center
+        * p1
+        * p2
         * length
         * is_self_intersecting
         * interpolated
@@ -91,6 +93,16 @@ class Polyline2D(Base2DIn2D):
         if self._length is None:
             self._length = sum([seg.length for seg in self.segments])
         return self._length
+
+    @property
+    def p1(self):
+        """Starting point of the Polyline2D."""
+        return self._vertices[0]
+
+    @property
+    def p2(self):
+        """End point of the Polyline2D."""
+        return self._vertices[-1]
 
     @property
     def is_self_intersecting(self):

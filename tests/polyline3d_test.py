@@ -12,7 +12,7 @@ import math
 
 
 def test_polyline3d_init():
-    """Test the initalization of Polyline3D objects and basic properties."""
+    """Test the initialization of Polyline3D objects and basic properties."""
     pts = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 2), Point3D(0, 2))
     pline = Polyline3D(pts)
 
@@ -29,6 +29,9 @@ def test_polyline3d_init():
     for seg in pline.segments:
         assert isinstance(seg, LineSegment3D)
         assert seg.length == 2
+
+    assert pline.p1 == pts[0]
+    assert pline.p2 == pts[-1]
 
     assert pline.length == 6
     assert pline.vertices[0] == pline[0]

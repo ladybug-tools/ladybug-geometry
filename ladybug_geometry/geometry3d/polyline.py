@@ -30,6 +30,8 @@ class Polyline3D(Base2DIn3D):
         * min
         * max
         * center
+        * p1
+        * p2
         * length
         * interpolated
     """
@@ -87,6 +89,16 @@ class Polyline3D(Base2DIn3D):
                 tuple(LineSegment3D.from_end_points(vert, self._vertices[i + 1])
                       for i, vert in enumerate(self._vertices[:-1]))
         return self._segments
+
+    @property
+    def p1(self):
+        """Starting point of the Polyline3D."""
+        return self._vertices[0]
+
+    @property
+    def p2(self):
+        """End point of the Polyline3D."""
+        return self._vertices[-1]
 
     @property
     def length(self):
