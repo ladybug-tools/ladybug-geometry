@@ -11,7 +11,7 @@ import math
 
 
 def test_polyline2d_init():
-    """Test the initalization of Polyline2D objects and basic properties."""
+    """Test the initialization of Polyline2D objects and basic properties."""
     pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
     pline = Polyline2D(pts)
 
@@ -28,6 +28,9 @@ def test_polyline2d_init():
     for seg in pline.segments:
         assert isinstance(seg, LineSegment2D)
         assert seg.length == 2
+
+    assert pline.p1 == pts[0]
+    assert pline.p2 == pts[-1]
 
     assert pline.length == 6
     assert pline.is_self_intersecting is False
