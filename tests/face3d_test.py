@@ -690,6 +690,19 @@ def test_check_planar():
         face_3.check_planar(0.000001)
 
 
+def test_normal_with_slightly_nonplanar():
+    """Test that a slightly non-planar shape still has a relatively close normal."""
+    geo_file = './tests/json/slight_nonplanar_face.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    face_geo = Face3D.from_dict(geo_dict)
+
+    assert -0.99 > face_geo.normal.z > -1.01
+    assert face_geo.check_planar(0.000001, False) is False
+    with pytest.raises(Exception):
+        face_geo.check_planar(0.000001)
+
+
 def test_flip():
     """Test the flip method of Face3D."""
     pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
