@@ -1917,7 +1917,6 @@ class Face3D(Base2DIn3D):
             normal = [x1 + x2, y1 + y2, z1 + z2]
             # walk around the whole shape to avoid colinear vertices
             for i in range(len(verts) - 2):
-                tri_verts = verts[i:i + 3]
                 x, y, z = Face3D._normal_from_3pts(*verts[i:i + 3])
                 normal[0] += x
                 normal[1] += y
@@ -1938,17 +1937,15 @@ class Face3D(Base2DIn3D):
         # get two vectors for the two edges the 3 points form
         v1 = (pt2.x - pt1.x, pt2.y - pt1.y, pt2.z - pt1.z)
         v2 = (pt3.x - pt1.x, pt3.y - pt1.y, pt3.z - pt1.z)
-        # normalize the vectors to make them unit vectors
-        d1 = math.sqrt(v1[0] ** 2 + v1[1] ** 2 + v1[2] ** 2)
-        d2 = math.sqrt(v2[0] ** 2 + v2[1] ** 2 + v2[2] ** 2)
-        if d1 < 1e-9 or d2 < 1e-9:  # effectively duplicate vertices in triplet
+        # get the cross product of the two edge vectors
+        c_prod = (v1[1] * v2[2] - v1[2] * v2[1],
+                  -v1[0] * v2[2] + v1[2] * v2[0],
+                  v1[0] * v2[1] - v1[1] * v2[0])
+        # normalize the vector to make it a unit vector
+        d = math.sqrt(c_prod[0] ** 2 + c_prod[1] ** 2 + c_prod[2] ** 2)
+        if d < 1e-9:  # effectively duplicate vertices in triplet
             return (0, 0, 0)
-        v1 = (v1[0] / d1, v1[1] / d1, v1[2] / d1)
-        v2 = (v2[0] / d2, v2[1] / d2, v2[2] / d2)
-        # return the cross product
-        return (v1[1] * v2[2] - v1[2] * v2[1],
-                -v1[0] * v2[2] + v1[2] * v2[0],
-                v1[0] * v2[1] - v1[1] * v2[0])
+        return (c_prod[0] / d, c_prod[1] / d, c_prod[2] / d)
 
     @staticmethod
     def _corner_pt_verts(corner_pt, verts3d, verts2d):
