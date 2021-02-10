@@ -1923,7 +1923,8 @@ class Face3D(Base2DIn3D):
                 normal[2] += z
         except Exception as e:
             raise ValueError('Incorrect vertices input for Face3D:\n\t{}'.format(e))
-        return Plane(Vector3D(normal[0], normal[1], normal[2]), verts[0])
+        return Plane(Vector3D(normal[0], normal[1], normal[2]), verts[0]) \
+            if normal != [0, 0, 0] else Plane(o=verts[0])
 
     @staticmethod
     def _normal_from_3pts(pt1, pt2, pt3):
