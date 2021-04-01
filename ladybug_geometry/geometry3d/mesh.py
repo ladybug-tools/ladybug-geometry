@@ -382,14 +382,6 @@ class Mesh3D(MeshBase):
             new_mesh = Mesh3D(verts, faces, colors)
         else:
             new_mesh = Mesh3D(verts, faces)
-
-        # attempt to transfer the centroids and normals
-        if all(msh._face_centroids is not None for msh in meshes):
-            new_mesh._face_centroids = tuple(pt for msh in meshes for pt in msh)
-        if all(msh._face_normals is not None for msh in meshes):
-            new_mesh._face_normals = tuple(v for msh in meshes for v in msh.face_normals)
-        if all(msh._face_areas is not None for msh in meshes):
-            new_mesh._face_areas = tuple(a for msh in meshes for a in msh.face_areas)
         return new_mesh
 
     def _calculate_min_max(self):

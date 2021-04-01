@@ -469,5 +469,3 @@ def test_join_meshes():
     assert isinstance(joined_mesh, Mesh3D)
     assert len(joined_mesh.faces) == 2
     assert len(joined_mesh.vertices) == 8
-    assert joined_mesh._face_centroids is not None
-    assert joined_mesh._face_normals is not None
