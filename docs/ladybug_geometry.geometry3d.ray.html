@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ladybug_geometry.geometry3d.ray module &#8212; ladybug geometry  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ladybug_geometry.geometry3d.sphere module" href="ladybug_geometry.geometry3d.sphere.html" />
+    <link rel="prev" title="ladybug_geometry.geometry3d.polyline module" href="ladybug_geometry.geometry3d.polyline.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          ladybug geometry</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ladybug_geometry.html">ladybug_geometry package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ladybug_geometry.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.mesh.html">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.bounding.html">ladybug_geometry.bounding module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.intersection2d.html">ladybug_geometry.intersection2d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.intersection3d.html">ladybug_geometry.intersection3d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.triangulation.html">ladybug_geometry.triangulation module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ladybug_geometry.html">ladybug_geometry package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ladybug_geometry.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="ladybug_geometry.geometry3d.polyline.html" title="Previous Chapter: ladybug_geometry.geometry3d.polyline module"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; ladybug_geome...</span>
+    </a>
+  </li>
+  <li>
+    <a href="ladybug_geometry.geometry3d.sphere.html" title="Next Chapter: ladybug_geometry.geometry3d.sphere module"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">ladybug_geome... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/ladybug_geometry.geometry3d.ray.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ladybug_geometry.html">ladybug_geometry package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ladybug_geometry.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <div class="section" id="module-ladybug_geometry.geometry3d.ray">
+<span id="ladybug-geometry-geometry3d-ray-module"></span><h1>ladybug_geometry.geometry3d.ray module<a class="headerlink" href="#module-ladybug_geometry.geometry3d.ray" title="Permalink to this headline">¶</a></h1>
+<p>3D Ray</p>
+<dl class="py class">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">ladybug_geometry.geometry3d.ray.</span></code><code class="sig-name descname"><span class="pre">Ray3D</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/ray.html#Ray3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ladybug_geometry.geometry3d._1d.Base1DIn3D</span></code></p>
+<p>3D Ray object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> – A Point3D representing the base of the ray.</p></li>
+<li><p><strong>v</strong> – A Vector3D representing the direction of the ray.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Properties:</dt><dd><ul class="simple">
+<li><p>p</p></li>
+<li><p>v</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.ToString">
+<code class="sig-name descname"><span class="pre">ToString</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.ToString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overwrite .NET ToString.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.closest_point">
+<code class="sig-name descname"><span class="pre">closest_point</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.closest_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the closest Point3D on this object to another Point3D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>point</strong> – A Point3D object to which the closest point on this object
+will be computed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Point3D for the closest point on this line/ray to the input point.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.distance_to_point">
+<code class="sig-name descname"><span class="pre">distance_to_point</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.distance_to_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum distance between this object and the input point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>point</strong> – A Point3D object to which the minimum distance will be computed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The distance to the input point.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.duplicate">
+<code class="sig-name descname"><span class="pre">duplicate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.duplicate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of this object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.from_array">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_array</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ray_array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/ray.html#Ray3D.from_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.from_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Ray3D from a nested array with a point and a vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ray_array</strong> – Nested tuples ((p.x, p.y), (v.x, v.y)).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.from_dict">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a LineSegment3D/Ray3D from a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – A python dictionary in the following format</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="s2">&quot;p&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="s2">&quot;v&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.intersect_plane">
+<code class="sig-name descname"><span class="pre">intersect_plane</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plane</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.intersect_plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the intersection between this object and a Plane.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>plane</strong> – A Plane that will be intersected with this object.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Point3D object if the intersection was successful.
+None if no intersection exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.is_colinear">
+<code class="sig-name descname"><span class="pre">is_colinear</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line_ray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_tolerance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.is_colinear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test whether this object is colinear to another LineSegment3D or Ray3D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>line_ray</strong> – Another LineSegment3D or Ray3D for which co-linearity
+with this object will be tested.</p></li>
+<li><p><strong>tolerance</strong> – The maximum distance between the line_ray and the infinite
+extension of this object for them to be considered colinear.</p></li>
+<li><p><strong>angle_tolerance</strong> – The max angle in radians that the direction between
+this object and another can vary for them to be considered
+parallel.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.is_parallel">
+<code class="sig-name descname"><span class="pre">is_parallel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line_ray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_tolerance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.is_parallel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test whether this object is parallel to another LineSegment3D or Ray3D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>line_ray</strong> – Another LineSegment3D or Ray3D for which parallel-ization
+with this objects will be tested.</p></li>
+<li><p><strong>angle_tolerance</strong> – The max angle in radians that the direction between
+this object and another can vary for them to be considered
+parallel.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.move">
+<code class="sig-name descname"><span class="pre">move</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moving_vec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/ray.html#Ray3D.move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a ray that has been moved along a vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>moving_vec</strong> – A Vector3D with the direction and distance to move the ray.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.reflect">
+<code class="sig-name descname"><span class="pre">reflect</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/ray.html#Ray3D.reflect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.reflect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a ray reflected across a plane with the input normal vector and origin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>normal</strong> – A Vector3D representing the normal vector for the plane across
+which the ray will be reflected. THIS VECTOR MUST BE NORMALIZED.</p></li>
+<li><p><strong>origin</strong> – A Point3D representing the origin from which to reflect.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.reverse">
+<code class="sig-name descname"><span class="pre">reverse</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/ray.html#Ray3D.reverse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.reverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of this ray that is reversed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.rotate">
+<code class="sig-name descname"><span class="pre">rotate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/ray.html#Ray3D.rotate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.rotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate a ray by a certain angle around an axis and origin.</p>
+<p>Right hand rule applies:
+If axis has a positive orientation, rotation will be clockwise.
+If axis has a negative orientation, rotation will be counterclockwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> – A Vector3D axis representing the axis of rotation.</p></li>
+<li><p><strong>angle</strong> – An angle for rotation in radians.</p></li>
+<li><p><strong>origin</strong> – A Point3D for the origin around which the object will be rotated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.rotate_xy">
+<code class="sig-name descname"><span class="pre">rotate_xy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/ray.html#Ray3D.rotate_xy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.rotate_xy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a ray rotated counterclockwise in the XY plane by a certain angle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angle</strong> – An angle in radians.</p></li>
+<li><p><strong>origin</strong> – A Point3D for the origin around which the object will be rotated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.scale">
+<code class="sig-name descname"><span class="pre">scale</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/ray.html#Ray3D.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale a ray by a factor from an origin point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>factor</strong> – A number representing how much the ray should be scaled.</p></li>
+<li><p><strong>origin</strong> – A Point3D representing the origin from which to scale.
+If None, it will be scaled from the World origin (0, 0, 0).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.scale_world_origin">
+<code class="sig-name descname"><span class="pre">scale_world_origin</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/ray.html#Ray3D.scale_world_origin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.scale_world_origin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale a ray by a factor from the world origin. Faster than Ray2D.scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>factor</strong> – A number representing how much the ray should be scaled.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.to_array">
+<code class="sig-name descname"><span class="pre">to_array</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/ray.html#Ray3D.to_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.to_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>A nested array representing the start point and vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.to_dict">
+<code class="sig-name descname"><span class="pre">to_dict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/ray.html#Ray3D.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Ray3D as a dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.p">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">p</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.p" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base point.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.ray.Ray3D.v">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">v</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.ray.Ray3D.v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Direction vector.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

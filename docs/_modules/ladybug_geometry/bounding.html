@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ladybug_geometry.bounding &#8212; ladybug geometry  documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          ladybug geometry</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ladybug_geometry.html">ladybug_geometry package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ladybug_geometry.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.mesh.html">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../ladybug_geometry.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ladybug_geometry.bounding.html">ladybug_geometry.bounding module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ladybug_geometry.intersection2d.html">ladybug_geometry.intersection2d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ladybug_geometry.intersection3d.html">ladybug_geometry.intersection3d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ladybug_geometry.triangulation.html">ladybug_geometry.triangulation module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <h1>Source code for ladybug_geometry.bounding</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;Utility functions for computing bounding boxes and extents around geometry.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">ladybug_geometry.geometry2d.pointvector</span> <span class="kn">import</span> <span class="n">Point2D</span>
+<span class="kn">from</span> <span class="nn">ladybug_geometry.geometry3d.pointvector</span> <span class="kn">import</span> <span class="n">Point3D</span>
+
+
+<div class="viewcode-block" id="bounding_domain_x"><a class="viewcode-back" href="../../ladybug_geometry.bounding.html#ladybug_geometry.bounding.bounding_domain_x">[docs]</a><span class="k">def</span> <span class="nf">bounding_domain_x</span><span class="p">(</span><span class="n">geometries</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get minimum and maximum X coordinates of multiple geometries.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        geometries: An array of any ladybug_geometry objects for which the extents</span>
+<span class="sd">            of the X domain will be computed. Note that all objects must have</span>
+<span class="sd">            a min and max property.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple with the min and the max X coordinates around the geometry.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">min_x</span><span class="p">,</span> <span class="n">max_x</span> <span class="o">=</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">x</span>
+    <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="n">geom</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">min_x</span><span class="p">:</span>
+            <span class="n">min_x</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">x</span>
+        <span class="k">if</span> <span class="n">geom</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">max_x</span><span class="p">:</span>
+            <span class="n">max_x</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">x</span>
+    <span class="k">return</span> <span class="n">min_x</span><span class="p">,</span> <span class="n">max_x</span></div>
+
+
+<div class="viewcode-block" id="bounding_domain_y"><a class="viewcode-back" href="../../ladybug_geometry.bounding.html#ladybug_geometry.bounding.bounding_domain_y">[docs]</a><span class="k">def</span> <span class="nf">bounding_domain_y</span><span class="p">(</span><span class="n">geometries</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get minimum and maximum Y coordinates of multiple geometries.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        geometries: An array of any ladybug_geometry objects for which the extents</span>
+<span class="sd">            of the Y domain will be computed. Note that all objects must have</span>
+<span class="sd">            a min and max property.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple with the min and the max Y coordinates around the geometry.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">min_y</span><span class="p">,</span> <span class="n">max_y</span> <span class="o">=</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">y</span>
+    <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="n">geom</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;</span> <span class="n">min_y</span><span class="p">:</span>
+            <span class="n">min_y</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">if</span> <span class="n">geom</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">max_y</span><span class="p">:</span>
+            <span class="n">max_y</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">y</span>
+    <span class="k">return</span> <span class="n">min_y</span><span class="p">,</span> <span class="n">max_y</span></div>
+
+
+<div class="viewcode-block" id="bounding_domain_z"><a class="viewcode-back" href="../../ladybug_geometry.bounding.html#ladybug_geometry.bounding.bounding_domain_z">[docs]</a><span class="k">def</span> <span class="nf">bounding_domain_z</span><span class="p">(</span><span class="n">geometries</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get minimum and maximum Z coordinates of multiple geometries.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        geometries: An array of any 3D ladybug_geometry objects for which the extents</span>
+<span class="sd">            of the Z domain will be computed. Note that all objects must have</span>
+<span class="sd">            a min and max property and they cannot be 2D objects.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple with the min and the max Z coordinates around the geometry.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">min_z</span><span class="p">,</span> <span class="n">max_z</span> <span class="o">=</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">z</span>
+    <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">geometries</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">geom</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">z</span> <span class="o">&gt;</span> <span class="n">max_z</span><span class="p">:</span>
+            <span class="n">max_z</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">z</span>
+        <span class="k">if</span> <span class="n">geom</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">z</span> <span class="o">&lt;</span> <span class="n">min_z</span><span class="p">:</span>
+            <span class="n">min_z</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">z</span>
+    <span class="k">return</span> <span class="n">min_z</span><span class="p">,</span> <span class="n">max_z</span></div>
+
+
+<span class="k">def</span> <span class="nf">_orient_geometry</span><span class="p">(</span><span class="n">geometries</span><span class="p">,</span> <span class="n">axis_angle</span><span class="p">,</span> <span class="n">center</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Orient both 2D and 3D geometry to a given axis angle and center point.</span>
+
+<span class="sd">    This is used by the methods that compute bounding rectangles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_geometries</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">geometries</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>  <span class="c1"># assume that it is a 2D geometry object</span>
+            <span class="n">new_geometries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="o">-</span><span class="n">axis_angle</span><span class="p">,</span> <span class="n">center</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># it&#39;s a 3D geometry object</span>
+            <span class="n">new_geometries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">rotate_xy</span><span class="p">(</span><span class="o">-</span><span class="n">axis_angle</span><span class="p">,</span> <span class="n">center</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">new_geometries</span>
+
+
+<div class="viewcode-block" id="bounding_rectangle"><a class="viewcode-back" href="../../ladybug_geometry.bounding.html#ladybug_geometry.bounding.bounding_rectangle">[docs]</a><span class="k">def</span> <span class="nf">bounding_rectangle</span><span class="p">(</span><span class="n">geometries</span><span class="p">,</span> <span class="n">axis_angle</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the min and max of an oriented bounding rectangle around 2D or 3D geometry.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        geometries: An array of 2D or 3D geometry objects. Note that all objects</span>
+<span class="sd">            must have a min and max property.</span>
+<span class="sd">        axis_angle: The counter-clockwise rotation angle in radians in the XY plane</span>
+<span class="sd">            to represent the orientation of the bounding rectangle extents. (Default: 0).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple with two Point2D objects representing the min point and max point</span>
+<span class="sd">        of the bounding rectangle respectively.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">axis_angle</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># rotate geometry to the bounding box</span>
+        <span class="n">cpt</span> <span class="o">=</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">geometries</span> <span class="o">=</span> <span class="n">_orient_geometry</span><span class="p">(</span><span class="n">geometries</span><span class="p">,</span> <span class="n">axis_angle</span><span class="p">,</span> <span class="n">cpt</span><span class="p">)</span>
+    <span class="n">xx</span> <span class="o">=</span> <span class="n">bounding_domain_x</span><span class="p">(</span><span class="n">geometries</span><span class="p">)</span>
+    <span class="n">yy</span> <span class="o">=</span> <span class="n">bounding_domain_y</span><span class="p">(</span><span class="n">geometries</span><span class="p">)</span>
+    <span class="n">min_pt</span> <span class="o">=</span> <span class="n">Point2D</span><span class="p">(</span><span class="n">xx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">yy</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">max_pt</span> <span class="o">=</span> <span class="n">Point2D</span><span class="p">(</span><span class="n">xx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">yy</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">axis_angle</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># rotate the points back</span>
+        <span class="n">cpt</span> <span class="o">=</span> <span class="n">Point2D</span><span class="p">(</span><span class="n">cpt</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">cpt</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>  <span class="c1"># cast Point3D to Point2D</span>
+        <span class="n">min_pt</span> <span class="o">=</span> <span class="n">min_pt</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis_angle</span><span class="p">,</span> <span class="n">cpt</span><span class="p">)</span>
+        <span class="n">max_pt</span> <span class="o">=</span> <span class="n">max_pt</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis_angle</span><span class="p">,</span> <span class="n">cpt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">min_pt</span><span class="p">,</span> <span class="n">max_pt</span></div>
+
+
+<div class="viewcode-block" id="bounding_rectangle_extents"><a class="viewcode-back" href="../../ladybug_geometry.bounding.html#ladybug_geometry.bounding.bounding_rectangle_extents">[docs]</a><span class="k">def</span> <span class="nf">bounding_rectangle_extents</span><span class="p">(</span><span class="n">geometries</span><span class="p">,</span> <span class="n">axis_angle</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the width and length of an oriented bounding rectangle around 2D or 3D geometry.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        geometries: An array of 2D or 3D geometry objects. Note that all objects</span>
+<span class="sd">            must have a min and max property.</span>
+<span class="sd">        axis_angle: The counter-clockwise rotation angle in radians in the XY plane</span>
+<span class="sd">            to represent the orientation of the bounding rectangle extents. (Default: 0).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple with 2 values corresponding to the width and length of the bounding</span>
+<span class="sd">        rectangle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">axis_angle</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">cpt</span> <span class="o">=</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">geometries</span> <span class="o">=</span> <span class="n">_orient_geometry</span><span class="p">(</span><span class="n">geometries</span><span class="p">,</span> <span class="n">axis_angle</span><span class="p">,</span> <span class="n">cpt</span><span class="p">)</span>
+    <span class="n">xx</span> <span class="o">=</span> <span class="n">bounding_domain_x</span><span class="p">(</span><span class="n">geometries</span><span class="p">)</span>
+    <span class="n">yy</span> <span class="o">=</span> <span class="n">bounding_domain_y</span><span class="p">(</span><span class="n">geometries</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">yy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">yy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="bounding_box"><a class="viewcode-back" href="../../ladybug_geometry.bounding.html#ladybug_geometry.bounding.bounding_box">[docs]</a><span class="k">def</span> <span class="nf">bounding_box</span><span class="p">(</span><span class="n">geometries</span><span class="p">,</span> <span class="n">axis_angle</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the min and max of an oriented bounding box around 3D geometry.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        geometries: An array of 3D geometry objects. Note that all objects must</span>
+<span class="sd">            have a min and max property.</span>
+<span class="sd">        axis_angle: The counter-clockwise rotation angle in radians in the XY plane</span>
+<span class="sd">            to represent the orientation of the bounding box extents. (Default: 0).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple with two Point3D objects representing the min point and max point</span>
+<span class="sd">        of the bounding box respectively.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">axis_angle</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># rotate geometry to the bounding box</span>
+        <span class="n">cpt</span> <span class="o">=</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">geometries</span> <span class="o">=</span> <span class="p">[</span><span class="n">geom</span><span class="o">.</span><span class="n">rotate_xy</span><span class="p">(</span><span class="o">-</span><span class="n">axis_angle</span><span class="p">,</span> <span class="n">cpt</span><span class="p">)</span> <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">geometries</span><span class="p">]</span>
+    <span class="n">xx</span> <span class="o">=</span> <span class="n">bounding_domain_x</span><span class="p">(</span><span class="n">geometries</span><span class="p">)</span>
+    <span class="n">yy</span> <span class="o">=</span> <span class="n">bounding_domain_y</span><span class="p">(</span><span class="n">geometries</span><span class="p">)</span>
+    <span class="n">zz</span> <span class="o">=</span> <span class="n">bounding_domain_z</span><span class="p">(</span><span class="n">geometries</span><span class="p">)</span>
+    <span class="n">min_pt</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="n">xx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">yy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">zz</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">max_pt</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="n">xx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">yy</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">zz</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">axis_angle</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># rotate the points back</span>
+        <span class="n">min_pt</span> <span class="o">=</span> <span class="n">min_pt</span><span class="o">.</span><span class="n">rotate_xy</span><span class="p">(</span><span class="n">axis_angle</span><span class="p">,</span> <span class="n">cpt</span><span class="p">)</span>
+        <span class="n">max_pt</span> <span class="o">=</span> <span class="n">max_pt</span><span class="o">.</span><span class="n">rotate_xy</span><span class="p">(</span><span class="n">axis_angle</span><span class="p">,</span> <span class="n">cpt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">min_pt</span><span class="p">,</span> <span class="n">max_pt</span></div>
+
+
+<div class="viewcode-block" id="bounding_box_extents"><a class="viewcode-back" href="../../ladybug_geometry.bounding.html#ladybug_geometry.bounding.bounding_box_extents">[docs]</a><span class="k">def</span> <span class="nf">bounding_box_extents</span><span class="p">(</span><span class="n">geometries</span><span class="p">,</span> <span class="n">axis_angle</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the width, length and height of an oriented bounding box around 3D geometry.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        geometries: An array of 3D geometry objects. Note that all objects must</span>
+<span class="sd">            have a min and max property.</span>
+<span class="sd">        axis_angle: The counter-clockwise rotation angle in radians in the XY plane</span>
+<span class="sd">            to represent the orientation of the bounding box extents. (Default: 0).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple with 3 values corresponding to the width, length and height of</span>
+<span class="sd">        the bounding box.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">axis_angle</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">cpt</span> <span class="o">=</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">geometries</span> <span class="o">=</span> <span class="p">[</span><span class="n">geom</span><span class="o">.</span><span class="n">rotate_xy</span><span class="p">(</span><span class="o">-</span><span class="n">axis_angle</span><span class="p">,</span> <span class="n">cpt</span><span class="p">)</span> <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">geometries</span><span class="p">]</span>
+    <span class="n">xx</span> <span class="o">=</span> <span class="n">bounding_domain_x</span><span class="p">(</span><span class="n">geometries</span><span class="p">)</span>
+    <span class="n">yy</span> <span class="o">=</span> <span class="n">bounding_domain_y</span><span class="p">(</span><span class="n">geometries</span><span class="p">)</span>
+    <span class="n">zz</span> <span class="o">=</span> <span class="n">bounding_domain_z</span><span class="p">(</span><span class="n">geometries</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">xx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">yy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">yy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">zz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">zz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

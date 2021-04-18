@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ladybug_geometry.geometry3d.line &#8212; ladybug geometry  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          ladybug geometry</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.mesh.html">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.bounding.html">ladybug_geometry.bounding module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.intersection2d.html">ladybug_geometry.intersection2d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.intersection3d.html">ladybug_geometry.intersection3d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.triangulation.html">ladybug_geometry.triangulation module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <h1>Source code for ladybug_geometry.geometry3d.line</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;3D Line Segment&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">.pointvector</span> <span class="kn">import</span> <span class="n">Point3D</span>
+<span class="kn">from</span> <span class="nn">._1d</span> <span class="kn">import</span> <span class="n">Base1DIn3D</span>
+
+
+<div class="viewcode-block" id="LineSegment3D"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D">[docs]</a><span class="k">class</span> <span class="nc">LineSegment3D</span><span class="p">(</span><span class="n">Base1DIn3D</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;3D line segment object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        p: A Point3D representing the first point of the line segment.</span>
+<span class="sd">        v: A Vector3D representing the vector to the second point.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        * p</span>
+<span class="sd">        * v</span>
+<span class="sd">        * p1</span>
+<span class="sd">        * p2</span>
+<span class="sd">        * midpoint</span>
+<span class="sd">        * length</span>
+<span class="sd">        * vertices</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize LineSegment3D.&quot;&quot;&quot;</span>
+        <span class="n">Base1DIn3D</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LineSegment3D.from_end_points"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.from_end_points">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_end_points</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a line segment from a start point and and end point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            p1: A Point3D representing the first point of the line segment.</span>
+<span class="sd">            p2: A Point3D representing the second point of the line segment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.from_sdl"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.from_sdl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_sdl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a line segment from a start point, direction, and length.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            s: A Point3D representing the start point of the line segment.</span>
+<span class="sd">            d: A Vector3D representing the direction of the line segment.</span>
+<span class="sd">            length: A number representing the length of the line segment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">d</span> <span class="o">*</span> <span class="n">length</span> <span class="o">/</span> <span class="n">d</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.from_array"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.from_array">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_array</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">line_array</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a LineSegment3D from a nested array of two endpoint coordinates.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            line_array: Nested tuples ((pt1.x, pt1.y, pt.z), (pt2.x, pt2.y, pt.z)),</span>
+<span class="sd">                where pt1 and pt2 represent the endpoints of the line segment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LineSegment3D</span><span class="o">.</span><span class="n">from_end_points</span><span class="p">(</span><span class="o">*</span><span class="nb">tuple</span><span class="p">(</span><span class="n">Point3D</span><span class="p">(</span><span class="o">*</span><span class="n">pt</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">line_array</span><span class="p">))</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">p1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;First point (same as p).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">p2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Second point.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Point3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">z</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">midpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Midpoint.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">point_at</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The length of the line segment.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">magnitude</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tuple of both vertices in this object.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LineSegment3D.is_horizontal"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.is_horizontal">[docs]</a>    <span class="k">def</span> <span class="nf">is_horizontal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test whether this line segment is horizontal within a certain tolerance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tolerance: The maximum difference between the z values of the start and</span>
+<span class="sd">                end coordinates at which the line segment is considered horizontal.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">z</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tolerance</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.is_vertical"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.is_vertical">[docs]</a>    <span class="k">def</span> <span class="nf">is_vertical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test whether this line segment is vertical within a certain tolerance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tolerance: The maximum difference between the x and y values of the start</span>
+<span class="sd">                and end coordinates at which the line segment is considered horizontal.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tolerance</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tolerance</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.flip"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.flip">[docs]</a>    <span class="k">def</span> <span class="nf">flip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a copy of this line segment that is flipped.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LineSegment3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">reverse</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.move"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.move">[docs]</a>    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moving_vec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a line segment that has been moved along a vector.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            moving_vec: A Vector3D with the direction and distance to move the ray.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LineSegment3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">moving_vec</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.rotate"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Rotate a line segment by a certain angle around an axis and origin.</span>
+
+<span class="sd">        Right hand rule applies:</span>
+<span class="sd">        If axis has a positive orientation, rotation will be clockwise.</span>
+<span class="sd">        If axis has a negative orientation, rotation will be counterclockwise.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            axis: A Vector3D axis representing the axis of rotation.</span>
+<span class="sd">            angle: An angle for rotation in radians.</span>
+<span class="sd">            origin: A Point3D for the origin around which the object will be rotated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LineSegment3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">),</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.rotate_xy"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.rotate_xy">[docs]</a>    <span class="k">def</span> <span class="nf">rotate_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a line segment rotated counterclockwise in the XY plane by a certain angle.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            angle: An angle in radians.</span>
+<span class="sd">            origin: A Point3D for the origin around which the object will be rotated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LineSegment3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">rotate_xy</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">),</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">rotate_xy</span><span class="p">(</span><span class="n">angle</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.reflect"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.reflect">[docs]</a>    <span class="k">def</span> <span class="nf">reflect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normal</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a line segment reflected across a plane with the input normal vector and origin.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            normal: A Vector3D representing the normal vector for the plane across</span>
+<span class="sd">                which the line segment will be reflected. THIS VECTOR MUST BE NORMALIZED.</span>
+<span class="sd">            origin: A Point3D representing the origin from which to reflect.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LineSegment3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">origin</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">normal</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.scale"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale a line segment by a factor from an origin point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            factor: A number representing how much the line segment should be scaled.</span>
+<span class="sd">            origin: A Point3D representing the origin from which to scale.</span>
+<span class="sd">                If None, it will be scaled from the World origin (0, 0, 0).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LineSegment3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="n">origin</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="n">factor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.subdivide"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.subdivide">[docs]</a>    <span class="k">def</span> <span class="nf">subdivide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distances</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get Point3D values along the line that subdivide it based on input distances.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            distances: A list of distances along the line at which to subdivide it.</span>
+<span class="sd">                This can also be a single number that will be repeated until the</span>
+<span class="sd">                end of the line.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+            <span class="n">distances</span> <span class="o">=</span> <span class="p">[</span><span class="n">distances</span><span class="p">]</span>
+        <span class="c1"># this assert prevents the while loop from being infinite</span>
+        <span class="k">assert</span> <span class="nb">sum</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Segment subdivisions must be greater than 0&#39;</span>
+        <span class="n">line_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">sub_pts</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">line_length</span><span class="p">:</span>
+            <span class="n">sub_pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">point_at_length</span><span class="p">(</span><span class="n">dist</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">dist</span> <span class="o">+=</span> <span class="n">distances</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="n">sub_pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sub_pts</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.subdivide_evenly"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.subdivide_evenly">[docs]</a>    <span class="k">def</span> <span class="nf">subdivide_evenly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get Point3D values along the line that divide it into evenly-spaced segments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            number: Integer for the number of segments into which the line will</span>
+<span class="sd">                be divided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># this assert prevents the while loop from being infinite</span>
+        <span class="k">assert</span> <span class="n">number</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Segment subdivisions must be greater than 0&#39;</span>
+        <span class="n">interval</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">number</span>
+        <span class="n">parameter</span> <span class="o">=</span> <span class="n">interval</span>
+        <span class="n">sub_pts</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">parameter</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sub_pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">point_at</span><span class="p">(</span><span class="n">parameter</span><span class="p">))</span>
+            <span class="n">parameter</span> <span class="o">+=</span> <span class="n">interval</span>
+        <span class="k">return</span> <span class="n">sub_pts</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.point_at"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.point_at">[docs]</a>    <span class="k">def</span> <span class="nf">point_at</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a Point3D at a given fraction along the line segment.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameter: The fraction between the start and end point where the</span>
+<span class="sd">                desired point lies. For example, 0.5 will yield the midpoint.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="n">parameter</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.point_at_length"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.point_at_length">[docs]</a>    <span class="k">def</span> <span class="nf">point_at_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a Point3D at a given distance along the line segment.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            length: The distance along the line from the start point where the</span>
+<span class="sd">                desired point lies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.split_with_plane"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.split_with_plane">[docs]</a>    <span class="k">def</span> <span class="nf">split_with_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plane</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Split this LineSegment3D in 2 smaller LineSegment3Ds using a Plane.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            plane: A Plane that will be used to split this line segment.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of two LineSegment3D objects if the split was successful.</span>
+<span class="sd">            Will be a list with 1 LineSegment3D if no intersection exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_plane_int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersect_plane</span><span class="p">(</span><span class="n">plane</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_plane_int</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">LineSegment3D</span><span class="o">.</span><span class="n">from_end_points</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="p">,</span> <span class="n">_plane_int</span><span class="p">),</span>
+                    <span class="n">LineSegment3D</span><span class="o">.</span><span class="n">from_end_points</span><span class="p">(</span><span class="n">_plane_int</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.to_dict"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get LineSegment3D as a dictionary.&quot;&quot;&quot;</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">Base1DIn3D</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">base</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;LineSegment3D&#39;</span>
+        <span class="k">return</span> <span class="n">base</span></div>
+
+<div class="viewcode-block" id="LineSegment3D.to_array"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.line.html#ladybug_geometry.geometry3d.line.LineSegment3D.to_array">[docs]</a>    <span class="k">def</span> <span class="nf">to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; A nested list representing the two line endpoint coordinates.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p1</span><span class="o">.</span><span class="n">to_array</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">p2</span><span class="o">.</span><span class="n">to_array</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">_u_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">u</span> <span class="o">&gt;=</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">u</span> <span class="o">&lt;=</span> <span class="mf">1.0</span>
+
+    <span class="k">def</span> <span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">LineSegment3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A tuple based on the object properties, useful for hashing.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="p">),</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">LineSegment3D</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__key</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;LineSegment3D (&lt;</span><span class="si">%.2f</span><span class="s1">, </span><span class="si">%.2f</span><span class="s1">, </span><span class="si">%.2f</span><span class="s1">&gt; to &lt;</span><span class="si">%.2f</span><span class="s1">, </span><span class="si">%.2f</span><span class="s1">, </span><span class="si">%.2f</span><span class="s1">&gt;)&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">z</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">z</span><span class="p">)</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

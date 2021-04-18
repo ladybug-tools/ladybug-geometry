@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ladybug_geometry.geometry2d.mesh module &#8212; ladybug geometry  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ladybug_geometry.geometry2d.pointvector module" href="ladybug_geometry.geometry2d.pointvector.html" />
+    <link rel="prev" title="ladybug_geometry.geometry2d.line module" href="ladybug_geometry.geometry2d.line.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          ladybug geometry</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ladybug_geometry.html">ladybug_geometry package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ladybug_geometry.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.bounding.html">ladybug_geometry.bounding module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.intersection2d.html">ladybug_geometry.intersection2d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.intersection3d.html">ladybug_geometry.intersection3d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.triangulation.html">ladybug_geometry.triangulation module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ladybug_geometry.html">ladybug_geometry package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ladybug_geometry.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="ladybug_geometry.geometry2d.line.html" title="Previous Chapter: ladybug_geometry.geometry2d.line module"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; ladybug_geome...</span>
+    </a>
+  </li>
+  <li>
+    <a href="ladybug_geometry.geometry2d.pointvector.html" title="Next Chapter: ladybug_geometry.geometry2d.pointvector module"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">ladybug_geome... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/ladybug_geometry.geometry2d.mesh.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ladybug_geometry.html">ladybug_geometry package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ladybug_geometry.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <div class="section" id="module-ladybug_geometry.geometry2d.mesh">
+<span id="ladybug-geometry-geometry2d-mesh-module"></span><h1>ladybug_geometry.geometry2d.mesh module<a class="headerlink" href="#module-ladybug_geometry.geometry2d.mesh" title="Permalink to this headline">¶</a></h1>
+<p>2D Mesh</p>
+<dl class="py class">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">ladybug_geometry.geometry2d.mesh.</span></code><code class="sig-name descname"><span class="pre">Mesh2D</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">faces</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ladybug_geometry._mesh.MeshBase</span></code></p>
+<p>2D Mesh object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vertices</strong> – A list or tuple of Point2D objects for vertices.</p></li>
+<li><p><strong>faces</strong> – A list of tuples with each tuple having either 3 or 4 integers.
+These integers correspond to indices within the list of vertices.</p></li>
+<li><p><strong>colors</strong> – An optional list of colors that correspond to either the faces
+of the mesh or the vertices of the mesh. Default is None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Properties:</dt><dd><ul class="simple">
+<li><p>vertices</p></li>
+<li><p>faces</p></li>
+<li><p>colors</p></li>
+<li><p>is_color_by_face</p></li>
+<li><p>min</p></li>
+<li><p>max</p></li>
+<li><p>center</p></li>
+<li><p>area</p></li>
+<li><p>centroid</p></li>
+<li><p>face_areas</p></li>
+<li><p>face_centroids</p></li>
+<li><p>vertex_connected_faces</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.ToString">
+<code class="sig-name descname"><span class="pre">ToString</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.ToString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overwrite .NET ToString.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.duplicate">
+<code class="sig-name descname"><span class="pre">duplicate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.duplicate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of this object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.from_dict">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Mesh2D from a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – A python dictionary in the following format</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Mesh2D&quot;</span><span class="p">,</span>
+<span class="s2">&quot;vertices&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)],</span>
+<span class="s2">&quot;faces&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],</span>
+<span class="s2">&quot;colors&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">255</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.from_face_vertices">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_face_vertices</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">faces</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">purge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.from_face_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.from_face_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a mesh from a list of faces with each face defined by a list of Point2Ds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>faces</strong> – A list of faces with each face defined as a list of 3 or 4 Point2D.</p></li>
+<li><p><strong>purge</strong> – A boolean to indicate if duplicate vertices should be shared between
+faces. Default is True to purge duplicate vertices, which can be slow
+for large lists of faces but results in a higher-quality mesh with
+a smaller size in memory. Default is True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.from_grid">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_grid</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Point2D(0.0,</span> <span class="pre">0.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_centroids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.from_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.from_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a Mesh2D from parameters that define a grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_point</strong> – The base point from which the mesh grid will be generated.
+Default is (0, 0).</p></li>
+<li><p><strong>num_x</strong> – An integer for the number of mesh cells to generate in the
+x direction. Default is 1.</p></li>
+<li><p><strong>num_y</strong> – An integer for the number of mesh cells to generate in the
+y direction. Default is 1.</p></li>
+<li><p><strong>x_dim</strong> – The x dimension of the grid cells as a number. Default is 1.</p></li>
+<li><p><strong>y_dim</strong> – The y dimension of the grid cells as a number. Default is 1.</p></li>
+<li><p><strong>generate_centroids</strong> – Set to True to have the face centroids generated
+alongside the grid of vertices, which is much faster than having
+them generated upon request as they typically are. However, if you
+have no need for the face centroids, you would save memory by setting
+this to False. Default is True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.from_polygon_grid">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_polygon_grid</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polygon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_centroids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.from_polygon_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.from_polygon_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a gridded Mesh2D from a Polygon2D.</p>
+<p>Note that this gridded mesh will usually not completely fill the polygon.
+Essentially, this method generates a grid over the domain of the polygon
+and then removes any points that do not lie within the polygon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polygon</strong> – A Polygon2D object.</p></li>
+<li><p><strong>x_dim</strong> – The x dimension of the grid cells as a number.</p></li>
+<li><p><strong>y_dim</strong> – The y dimension of the grid cells as a number.</p></li>
+<li><p><strong>generate_centroids</strong> – Set to True to have the face centroids generated
+alongside the grid of vertices, which is much faster than having
+them generated upon request as they typically are. However, if you
+have no need for the face centroids, you would save memory by setting
+this to False. Default is True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.from_polygon_triangulated">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_polygon_triangulated</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">boundary_polygon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hole_polygons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.from_polygon_triangulated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.from_polygon_triangulated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a triangulated Mesh2D from a Polygon2D.</p>
+<p>The triangles of the mesh faces will always completely fill the shape
+defines by the input boundary_polygon with holes subtracted from it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>boundary_polygon</strong> – A Polygon2D object representing the boundary of the shape.</p></li>
+<li><p><strong>hole_polygons</strong> – Optional list of Polygon2D objects representing holes
+within the boundary_polygon.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.join_meshes">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">join_meshes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meshes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.join_meshes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.join_meshes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join an array of Mesh2Ds into a single Mesh2D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>meshes</strong> – An array of meshes to be joined into one.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A single Mesh2D object derived from the input meshes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.move">
+<code class="sig-name descname"><span class="pre">move</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moving_vec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a mesh that has been moved along a vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>moving_vec</strong> – A Vector with the direction and distance to move the mesh.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.reflect">
+<code class="sig-name descname"><span class="pre">reflect</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.reflect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a mesh reflected across a plane with the input normal vector and origin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>normal</strong> – A Vector representing the normal vector for the plane across
+which the mesh will be reflected. THIS VECTOR MUST BE NORMALIZED.</p></li>
+<li><p><strong>origin</strong> – A Point representing the origin from which to reflect.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.remove_faces">
+<code class="sig-name descname"><span class="pre">remove_faces</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.remove_faces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.remove_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a version of this mesh where faces are removed according to a pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pattern</strong> – A list of boolean values denoting whether a face should
+remain in the mesh (True) or be removed from the mesh (False).
+The length of this list must match the number of this mesh’s faces.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>A tuple with two elements</p>
+<ul class="simple">
+<li><p>new_mesh:
+A mesh where the faces have been removed according
+to the input pattern.</p></li>
+<li><p>vertex_pattern:
+A list of boolean values that corresponds to the
+original mesh vertices noting whether the vertex is in the new mesh
+(True) or has been removed from the new mesh (False).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.remove_faces_only">
+<code class="sig-name descname"><span class="pre">remove_faces_only</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.remove_faces_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.remove_faces_only" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a version of this mesh where faces are removed and vertices are not altered.</p>
+<p>This is faster than the Mesh2D.remove_faces method but will likely result
+a lower-quality mesh where several vertices exist in the mesh that are not
+referenced by any face. This may be preferred if pure speed of removing
+faces is a priority over smallest size of the mesh in memory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pattern</strong> – A list of boolean values denoting whether a face should
+remain in the mesh (True) or be removed from the mesh (False).
+The length of this list must match the number of this mesh’s faces.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>new_mesh – A mesh where the faces have been removed according
+to the input pattern.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.remove_vertices">
+<code class="sig-name descname"><span class="pre">remove_vertices</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.remove_vertices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.remove_vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a version of this mesh where vertices are removed according to a pattern.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pattern</strong> – A list of boolean values denoting whether a vertex should
+remain in the mesh (True) or be removed from the mesh (False).
+The length of this list must match the number of this mesh’s vertices.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>A tuple with two elements</p>
+<ul class="simple">
+<li><p>new_mesh:
+A mesh where the vertices have been removed according
+to the input pattern.</p></li>
+<li><p>face_pattern:
+A list of boolean values that corresponds to the
+original mesh faces noting whether the face is in the new mesh (True)
+or has been removed from the new mesh (False).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.rotate">
+<code class="sig-name descname"><span class="pre">rotate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.rotate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.rotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a mesh that is rotated counterclockwise by a certain angle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angle</strong> – An angle for rotation in radians.</p></li>
+<li><p><strong>origin</strong> – A Point2D for the origin around which the point will be rotated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.scale">
+<code class="sig-name descname"><span class="pre">scale</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale a mesh by a factor from an origin point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>factor</strong> – A number representing how much the mesh should be scaled.</p></li>
+<li><p><strong>origin</strong> – A Point representing the origin from which to scale.
+If None, it will be scaled from the World origin (0, 0).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.to_dict">
+<code class="sig-name descname"><span class="pre">to_dict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Mesh2D as a dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.triangulated">
+<code class="sig-name descname"><span class="pre">triangulated</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry2d/mesh.html#Mesh2D.triangulated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.triangulated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a version of this Mesh2D where all quads have been triangulated.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.area">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">area</span></code><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.area" title="Permalink to this definition">¶</a></dt>
+<dd><p>The area of the entire mesh.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.center">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">center</span></code><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.center" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Point2D for the center of the bounding rectangle around this geometry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.centroid">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">centroid</span></code><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>The centroid of the mesh as a Point2D (aka. center of mass).</p>
+<p>Note that the centroid is more time consuming to compute than the center
+(or the middle point of the bounding rectangle). So the center might be
+preferred over the centroid if you just need a rough point for the middle
+of the mesh.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.colors">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">colors</span></code><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.colors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get or set a list of colors for the mesh. Will be None if no colors assigned.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.face_areas">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">face_areas</span></code><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.face_areas" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple of face areas that parallels the faces property.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.face_centroids">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">face_centroids</span></code><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.face_centroids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple of face centroids that parallels the Faces property.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.faces">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">faces</span></code><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple of all faces in the mesh.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.is_color_by_face">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_color_by_face</span></code><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.is_color_by_face" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean for whether colors are face-by-face (True) or vertex-by-vertex (False)</p>
+<p>When colors are assigned to the mesh, this property is linked to the colors
+and cannot be set. However, when no colors are assigned, it can be set
+because it affects how the mesh is translated to external interfaces.
+In such cases, this property notes whether the mesh will be translated
+in a format that can accept face-by-face colors.
+Default is False when no colors are assigned.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.max">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">max</span></code><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.max" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Point2D for the maximum bounding rectangle vertex around this geometry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.min">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">min</span></code><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.min" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Point2D for the minimum bounding rectangle vertex around this geometry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.vertex_connected_faces">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">vertex_connected_faces</span></code><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.vertex_connected_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple with a tuple for each vertex that lists the indexes of connected faces.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry2d.mesh.Mesh2D.vertices">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">vertices</span></code><a class="headerlink" href="#ladybug_geometry.geometry2d.mesh.Mesh2D.vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple of all vertices in this geometry.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

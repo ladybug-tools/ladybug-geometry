@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ladybug_geometry.geometry3d.plane module &#8212; ladybug geometry  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ladybug_geometry.geometry3d.pointvector module" href="ladybug_geometry.geometry3d.pointvector.html" />
+    <link rel="prev" title="ladybug_geometry.geometry3d.mesh module" href="ladybug_geometry.geometry3d.mesh.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          ladybug geometry</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ladybug_geometry.html">ladybug_geometry package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ladybug_geometry.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.mesh.html">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.bounding.html">ladybug_geometry.bounding module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.intersection2d.html">ladybug_geometry.intersection2d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.intersection3d.html">ladybug_geometry.intersection3d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.triangulation.html">ladybug_geometry.triangulation module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ladybug_geometry.html">ladybug_geometry package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ladybug_geometry.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="ladybug_geometry.geometry3d.mesh.html" title="Previous Chapter: ladybug_geometry.geometry3d.mesh module"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; ladybug_geome...</span>
+    </a>
+  </li>
+  <li>
+    <a href="ladybug_geometry.geometry3d.pointvector.html" title="Next Chapter: ladybug_geometry.geometry3d.pointvector module"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">ladybug_geome... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/ladybug_geometry.geometry3d.plane.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ladybug_geometry.html">ladybug_geometry package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ladybug_geometry.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <div class="section" id="module-ladybug_geometry.geometry3d.plane">
+<span id="ladybug-geometry-geometry3d-plane-module"></span><h1>ladybug_geometry.geometry3d.plane module<a class="headerlink" href="#module-ladybug_geometry.geometry3d.plane" title="Permalink to this headline">¶</a></h1>
+<p>Plane</p>
+<dl class="py class">
+<dt id="ladybug_geometry.geometry3d.plane.Plane">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">ladybug_geometry.geometry3d.plane.</span></code><code class="sig-name descname"><span class="pre">Plane</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Vector3D(0.0,</span> <span class="pre">0.0,</span> <span class="pre">1.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Point3D(0.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Plane object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – A Vector3D representing the normal of the plane.</p></li>
+<li><p><strong>o</strong> – A Point3D representing the origin point of the plane.</p></li>
+<li><p><strong>x</strong> – An optional Vector3D for the X-Axis of the Plane.
+Note that this vector must be orthagonal to the input normal vector.
+If None, the default will find an X-Axis in the world XY plane.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Properties:</dt><dd><ul class="simple">
+<li><p>n</p></li>
+<li><p>o</p></li>
+<li><p>k</p></li>
+<li><p>x</p></li>
+<li><p>y</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.ToString">
+<code class="sig-name descname"><span class="pre">ToString</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.ToString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.ToString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overwrite .NET ToString.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.closest_point">
+<code class="sig-name descname"><span class="pre">closest_point</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.closest_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.closest_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the closest Point3D on this plane to another Point3D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>point</strong> – A Point3D object to which the closest point on this plane
+will be computed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Point3D for the closest point on this plane to the input point.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.closest_points_between_line">
+<code class="sig-name descname"><span class="pre">closest_points_between_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line_ray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.closest_points_between_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.closest_points_between_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the two closest Point3D between this plane and a Line3D or Ray3D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>line_ray</strong> – A Line3D or Ray3D object to which the closest points
+will be computed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Two Point3D objects representing</p>
+<ol class="arabic simple">
+<li><p>The closest point on the input line_ray to this plane.</p></li>
+<li><p>The closest point on this plane to the input line_ray.</p></li>
+</ol>
+<p>Will be None if the line_ray intersects this plant</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.distance_to_line">
+<code class="sig-name descname"><span class="pre">distance_to_line</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line_ray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.distance_to_line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.distance_to_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum distance between this plane and the input Line3D or Ray3D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>line_ray</strong> – A Line3D or Ray3D object to which the minimum distance
+will be computed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The minimum distance to the input line_ray.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.distance_to_point">
+<code class="sig-name descname"><span class="pre">distance_to_point</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.distance_to_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.distance_to_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the minimum distance between this plane and the input point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>point</strong> – A Point3D object to which the minimum distance will be computed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The distance to the input point.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.duplicate">
+<code class="sig-name descname"><span class="pre">duplicate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.duplicate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.duplicate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of this object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.flip">
+<code class="sig-name descname"><span class="pre">flip</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.flip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.flip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a flipped version of this plane (facing the opposite direction).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.from_dict">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Plane from a dictionary.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Plane&quot;</span>
+<span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="s2">&quot;o&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.from_normal_k">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_normal_k</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.from_normal_k"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.from_normal_k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a Plane from a normal vector and a scalar constant.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>o</strong> – A Point3D representing the origin point of the plane.</p></li>
+<li><p><strong>k</strong> – Scalar constant relating origin point to normal vector</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.from_three_points">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_three_points</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.from_three_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.from_three_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a Plane from three Point3D objects that are not co-linear.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>o</strong> – A Point3D representing the origin point of the plane.</p></li>
+<li><p><strong>p2</strong> – A Point3D representing a point the plane.</p></li>
+<li><p><strong>p3</strong> – A Point3D representing a point the plane.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.intersect_arc">
+<code class="sig-name descname"><span class="pre">intersect_arc</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.intersect_arc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.intersect_arc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the intersection between this Plane and an Arc3D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>plane</strong> – A Plane object for which intersection will be computed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of 2 Point3D objects if a full intersection exists.
+A list with a single Point3D object if the line is tangent or intersects
+only once. None if no intersection exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.intersect_line_ray">
+<code class="sig-name descname"><span class="pre">intersect_line_ray</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line_ray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.intersect_line_ray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.intersect_line_ray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the intersection between this plane and the input Line3D or Ray3D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>line_ray</strong> – A Line3D or Ray3D object for which intersection will be computed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Point3D for the intersection. Will be None if no intersection exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.intersect_plane">
+<code class="sig-name descname"><span class="pre">intersect_plane</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plane</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.intersect_plane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.intersect_plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the intersection between this Plane and another Plane.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>plane</strong> – A Plane object for which intersection will be computed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Ray3D for the intersection. Will be None if planes are parallel.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.is_coplanar">
+<code class="sig-name descname"><span class="pre">is_coplanar</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plane</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.is_coplanar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.is_coplanar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if another Plane object is perfectly coplanar with this Plane.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>plane</strong> – A Plane object for which co-planarity will be tested.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if plane is coplanar. False if it is not coplanar.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.is_coplanar_tolerance">
+<code class="sig-name descname"><span class="pre">is_coplanar_tolerance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plane</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_tolerance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.is_coplanar_tolerance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.is_coplanar_tolerance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if another Plane object is coplanar within a certain tolerance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plane</strong> – A Plane object for which co-planarity will be tested.</p></li>
+<li><p><strong>tolerance</strong> – The distance between the two planes at which point they can
+be considered coplanar.</p></li>
+<li><p><strong>angle_tolerance</strong> – The angle in radians that the plane normals can
+differ from one another in order for the planes to be considered
+coplanar.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if plane is coplanar. False if it is not coplanar.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.is_point_above">
+<code class="sig-name descname"><span class="pre">is_point_above</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.is_point_above"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.is_point_above" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test if a given point is above or below this plane.</p>
+<p>Above is defined as being on the side of the plane that the plane normal
+is pointing towards.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>point</strong> – A Point3D object to test.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True is point is above; False if below.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.move">
+<code class="sig-name descname"><span class="pre">move</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moving_vec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a plane that has been moved along a vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>moving_vec</strong> – A Vector3D with the direction and distance to move the plane.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.reflect">
+<code class="sig-name descname"><span class="pre">reflect</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.reflect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.reflect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a plane reflected across a plane with the input normal vector and origin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>normal</strong> – A Vector3D representing the normal vector for the plane across
+which the plane will be reflected. THIS VECTOR MUST BE NORMALIZED.</p></li>
+<li><p><strong>origin</strong> – A Point3D representing the origin from which to reflect.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.rotate">
+<code class="sig-name descname"><span class="pre">rotate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.rotate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.rotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate a plane by a certain angle around an axis and origin.</p>
+<p>Right hand rule applies:
+If axis has a positive orientation, rotation will be clockwise.
+If axis has a negative orientation, rotation will be counterclockwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> – A Vector3D axis representing the axis of rotation.</p></li>
+<li><p><strong>angle</strong> – An angle for rotation in radians.</p></li>
+<li><p><strong>origin</strong> – A Point3D for the origin around which the object will be rotated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.rotate_xy">
+<code class="sig-name descname"><span class="pre">rotate_xy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.rotate_xy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.rotate_xy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a plane rotated counterclockwise in the world XY plane by a certain angle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angle</strong> – An angle in radians.</p></li>
+<li><p><strong>origin</strong> – A Point3D for the origin around which the object will be rotated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.scale">
+<code class="sig-name descname"><span class="pre">scale</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale a plane by a factor from an origin point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>factor</strong> – A number representing how much the plane should be scaled.</p></li>
+<li><p><strong>origin</strong> – A Point3D representing the origin from which to scale.
+If None, it will be scaled from the World origin (0, 0, 0).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.to_dict">
+<code class="sig-name descname"><span class="pre">to_dict</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Plane as a dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.xy_to_xyz">
+<code class="sig-name descname"><span class="pre">xy_to_xyz</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.xy_to_xyz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.xy_to_xyz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a Point3D from a Point2D in the coordinate system of this plane.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.xyz_to_xy">
+<code class="sig-name descname"><span class="pre">xyz_to_xy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/plane.html#Plane.xyz_to_xy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.xyz_to_xy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a Point2D in the coordinate system of this plane from a Point3D.</p>
+<p>Note that the input Point3D should lie within this plane object in order
+for the result to be valid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.k">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">k</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.k" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scalar constant relating origin point to normal vector.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.n">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">n</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.n" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normal vector. This vector will always be normalized (magnitude = 1).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.o">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">o</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.o" title="Permalink to this definition">¶</a></dt>
+<dd><p>Origin point.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.x">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">x</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plane X-Axis. This vector will always be normalized (magnitude = 1).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.plane.Plane.y">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">y</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.plane.Plane.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plane Y-Axis. This vector will always be normalized (magnitude = 1).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

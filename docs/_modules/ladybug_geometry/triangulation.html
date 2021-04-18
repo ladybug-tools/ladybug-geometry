@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ladybug_geometry.triangulation &#8212; ladybug geometry  documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          ladybug geometry</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ladybug_geometry.html">ladybug_geometry package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ladybug_geometry.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.mesh.html">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../ladybug_geometry.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ladybug_geometry.bounding.html">ladybug_geometry.bounding module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ladybug_geometry.intersection2d.html">ladybug_geometry.intersection2d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ladybug_geometry.intersection3d.html">ladybug_geometry.intersection3d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ladybug_geometry.triangulation.html">ladybug_geometry.triangulation module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <h1>Source code for ladybug_geometry.triangulation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Core triangulation functions used by various geometry modules.</span>
+
+<span class="sd">The functions here are derived from the earcut-python library available at</span>
+<span class="sd">https://github.com/joshuaskelly/earcut-python</span>
+
+<span class="sd">The earcut-python library is, itself, a pure Python port of the earcut JavaScript</span>
+<span class="sd">triangulation library maintained by Mapbox. The original project can be found at</span>
+<span class="sd">https://github.com/mapbox/earcut</span>
+
+<span class="sd">The version here is based off of the JavaScript earcut 2.1.1 release, and is</span>
+<span class="sd">functionally identical.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+
+<div class="viewcode-block" id="earcut"><a class="viewcode-back" href="../../ladybug_geometry.triangulation.html#ladybug_geometry.triangulation.earcut">[docs]</a><span class="k">def</span> <span class="nf">earcut</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">hole_indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Triangulate a list of vertices that make up a shape, either with or without holes.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        data: A flat array of vertex coordinates like [x0,y0, x1,y1, x2,y2, ...].</span>
+<span class="sd">        hole_indices: A flat array of the starting indices for each hole. For example,</span>
+<span class="sd">            [5, 8] for a 12-vertex input would mean one hole with vertices 5-7</span>
+<span class="sd">            and another with 8-11. If a single vertex is passed as as a hole,</span>
+<span class="sd">            Earcut treats it as a Steiner point. If None, no holes will be assumed</span>
+<span class="sd">            for the shape. (Default: None).</span>
+<span class="sd">        dim: An integer for the number of coordinates per vertex in the input</span>
+<span class="sd">            array. For example, 3 means each vertex exists in 3D space with</span>
+<span class="sd">            XX, Y, Z coordinates. (Default: 2 for 2D coordinates).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span> <span class="ow">or</span> <span class="mi">2</span>
+    <span class="n">hasHoles</span> <span class="o">=</span> <span class="n">hole_indices</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">hole_indices</span><span class="p">)</span>
+    <span class="n">outerLen</span> <span class="o">=</span>  <span class="n">hole_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">dim</span> <span class="k">if</span> <span class="n">hasHoles</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">outerNode</span> <span class="o">=</span> <span class="n">_linked_list</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">outerLen</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">triangles</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">outerNode</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">triangles</span>
+
+    <span class="n">minX</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">minY</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">maxX</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">maxY</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">hasHoles</span><span class="p">:</span>
+        <span class="n">outerNode</span> <span class="o">=</span> <span class="n">_eliminate_holes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">hole_indices</span><span class="p">,</span> <span class="n">outerNode</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+
+    <span class="c1"># if the shape is not too simple, we&#39;ll use z-order curve hash later</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">80</span> <span class="o">*</span> <span class="n">dim</span><span class="p">):</span>  <span class="c1"># calculate polygon bbox</span>
+        <span class="n">minX</span> <span class="o">=</span> <span class="n">maxX</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">minY</span> <span class="o">=</span> <span class="n">maxY</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">outerLen</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">minX</span><span class="p">:</span>
+                <span class="n">minX</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="k">if</span> <span class="n">y</span> <span class="o">&lt;</span> <span class="n">minY</span><span class="p">:</span>
+                <span class="n">minY</span> <span class="o">=</span> <span class="n">y</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">maxX</span><span class="p">:</span>
+                <span class="n">maxX</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="k">if</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="n">maxY</span><span class="p">:</span>
+                <span class="n">maxY</span> <span class="o">=</span> <span class="n">y</span>
+
+        <span class="c1"># minX, minY and size are later used to transform coords into integers</span>
+        <span class="c1"># integers are used for z-order calculation</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">maxX</span> <span class="o">-</span> <span class="n">minX</span><span class="p">,</span> <span class="n">maxY</span> <span class="o">-</span> <span class="n">minY</span><span class="p">)</span>
+
+    <span class="n">_earcut_linked</span><span class="p">(</span><span class="n">outerNode</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">triangles</span></div>
+
+
+<span class="k">def</span> <span class="nf">_linked_list</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">clockwise</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a circular doubly linked list from polygon points.</span>
+
+<span class="sd">    Points will be in the specified winding order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">last</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">clockwise</span> <span class="o">==</span> <span class="p">(</span><span class="n">_signed_area</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="n">_insert_node</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">last</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">dim</span><span class="p">)):</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="n">_insert_node</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">last</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">last</span> <span class="ow">and</span> <span class="n">_equals</span><span class="p">(</span><span class="n">last</span><span class="p">,</span> <span class="n">last</span><span class="o">.</span><span class="n">next</span><span class="p">)):</span>
+        <span class="n">_remove_node</span><span class="p">(</span><span class="n">last</span><span class="p">)</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">last</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">return</span> <span class="n">last</span>
+
+
+<span class="k">def</span> <span class="nf">_signed_area</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the signed area from a list of coordinate data.&quot;&quot;&quot;</span>
+    <span class="nb">sum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">dim</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+        <span class="nb">sum</span> <span class="o">+=</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="n">i</span>
+
+    <span class="k">return</span> <span class="nb">sum</span>
+
+
+<span class="k">def</span> <span class="nf">_filter_points</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Eliminate colinear or duplicate points.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">start</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">start</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">end</span><span class="p">:</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">start</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">start</span>
+    <span class="n">again</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">while</span> <span class="n">again</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">end</span><span class="p">:</span>
+        <span class="n">again</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">p</span><span class="o">.</span><span class="n">steiner</span> <span class="ow">and</span> <span class="p">(</span><span class="n">_equals</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_area</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">prev</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="n">_remove_node</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">end</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">prev</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="n">again</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">return</span> <span class="n">end</span>
+
+
+<span class="k">def</span> <span class="nf">_earcut_linked</span><span class="p">(</span><span class="n">ear</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">_pass</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main ear slicing loop which triangulates a polygon (given as a linked list).&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ear</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="c1"># interlink polygon nodes in z-order</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_pass</span> <span class="ow">and</span> <span class="n">size</span><span class="p">:</span>
+        <span class="n">_index_curve</span><span class="p">(</span><span class="n">ear</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+    <span class="n">stop</span> <span class="o">=</span> <span class="n">ear</span>
+    <span class="n">prev</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="nb">next</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># iterate through ears, slicing them one by one</span>
+    <span class="k">while</span> <span class="n">ear</span><span class="o">.</span><span class="n">prev</span> <span class="o">!=</span> <span class="n">ear</span><span class="o">.</span><span class="n">next</span><span class="p">:</span>
+        <span class="n">prev</span> <span class="o">=</span> <span class="n">ear</span><span class="o">.</span><span class="n">prev</span>
+        <span class="nb">next</span> <span class="o">=</span> <span class="n">ear</span><span class="o">.</span><span class="n">next</span>
+
+        <span class="k">if</span> <span class="n">_is_ear_hashed</span><span class="p">(</span><span class="n">ear</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span> <span class="k">if</span> <span class="n">size</span> <span class="k">else</span> <span class="n">_is_ear</span><span class="p">(</span><span class="n">ear</span><span class="p">):</span>
+            <span class="c1"># cut off the triangle</span>
+            <span class="n">triangles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prev</span><span class="o">.</span><span class="n">i</span> <span class="o">//</span> <span class="n">dim</span><span class="p">)</span>
+            <span class="n">triangles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ear</span><span class="o">.</span><span class="n">i</span> <span class="o">//</span> <span class="n">dim</span><span class="p">)</span>
+            <span class="n">triangles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="o">.</span><span class="n">i</span> <span class="o">//</span> <span class="n">dim</span><span class="p">)</span>
+
+            <span class="n">_remove_node</span><span class="p">(</span><span class="n">ear</span><span class="p">)</span>
+
+            <span class="c1"># skipping the next vertice leads to less sliver triangles</span>
+            <span class="n">ear</span> <span class="o">=</span> <span class="nb">next</span><span class="o">.</span><span class="n">next</span>
+            <span class="n">stop</span> <span class="o">=</span> <span class="nb">next</span><span class="o">.</span><span class="n">next</span>
+
+            <span class="k">continue</span>
+
+        <span class="n">ear</span> <span class="o">=</span> <span class="nb">next</span>
+
+        <span class="c1"># if we looped through the whole remaining polygon and can&#39;t find any more ears</span>
+        <span class="k">if</span> <span class="n">ear</span> <span class="o">==</span> <span class="n">stop</span><span class="p">:</span>
+            <span class="c1"># try filtering points and slicing again</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_pass</span><span class="p">:</span>
+                <span class="n">_earcut_linked</span><span class="p">(</span><span class="n">_filter_points</span><span class="p">(</span><span class="n">ear</span><span class="p">),</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+                <span class="c1"># if this didn&#39;t work, try curing all small self-intersections locally</span>
+            <span class="k">elif</span> <span class="n">_pass</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">ear</span> <span class="o">=</span> <span class="n">_cure_local_intersections</span><span class="p">(</span><span class="n">ear</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">dim</span><span class="p">)</span>
+                <span class="n">_earcut_linked</span><span class="p">(</span><span class="n">ear</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+                <span class="c1"># as a last resort, try splitting the remaining polygon into two</span>
+            <span class="k">elif</span> <span class="n">_pass</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">_split_earcut</span><span class="p">(</span><span class="n">ear</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+            <span class="k">break</span>
+
+
+<span class="k">def</span> <span class="nf">_is_ear</span><span class="p">(</span><span class="n">ear</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check whether a polygon node forms a valid ear with adjacent nodes.&quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">ear</span><span class="o">.</span><span class="n">prev</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">ear</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">ear</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">if</span> <span class="n">_area</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span> <span class="c1"># reflex, can&#39;t be an ear</span>
+
+    <span class="c1"># now make sure we don&#39;t have other points inside the potential ear</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">ear</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">while</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">ear</span><span class="o">.</span><span class="n">prev</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_point_in_triangle</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="n">_area</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">prev</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_is_ear_hashed</span><span class="p">(</span><span class="n">ear</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check whether a polygon node forms a valid ear using hashes.&quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">ear</span><span class="o">.</span><span class="n">prev</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">ear</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">ear</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">if</span> <span class="n">_area</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span> <span class="c1"># reflex, can&#39;t be an ear</span>
+
+    <span class="c1"># triangle bbox; min &amp; max are calculated like this for speed</span>
+    <span class="n">minTX</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span> <span class="k">else</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="k">else</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span> <span class="k">else</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">minTY</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">y</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span> <span class="k">else</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="k">else</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span> <span class="k">else</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">maxTX</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span> <span class="k">else</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="k">else</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span> <span class="k">else</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">maxTY</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">y</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span> <span class="k">else</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="k">else</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span> <span class="k">else</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="c1"># z-order range for the current triangle bbox;</span>
+    <span class="n">minZ</span> <span class="o">=</span> <span class="n">_z_order</span><span class="p">(</span><span class="n">minTX</span><span class="p">,</span> <span class="n">minTY</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+    <span class="n">maxZ</span> <span class="o">=</span> <span class="n">_z_order</span><span class="p">(</span><span class="n">maxTX</span><span class="p">,</span> <span class="n">maxTY</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+    <span class="c1"># first look for points inside the triangle in increasing z-order</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">ear</span><span class="o">.</span><span class="n">nextZ</span>
+
+    <span class="k">while</span> <span class="n">p</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">z</span> <span class="o">&lt;=</span> <span class="n">maxZ</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">ear</span><span class="o">.</span><span class="n">prev</span> <span class="ow">and</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">ear</span><span class="o">.</span><span class="n">next</span> <span class="ow">and</span> \
+                <span class="n">_point_in_triangle</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="n">_area</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">prev</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">nextZ</span>
+
+    <span class="c1"># then look for points in decreasing z-order</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">ear</span><span class="o">.</span><span class="n">prevZ</span>
+
+    <span class="k">while</span> <span class="n">p</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">z</span> <span class="o">&gt;=</span> <span class="n">minZ</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">ear</span><span class="o">.</span><span class="n">prev</span> <span class="ow">and</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">ear</span><span class="o">.</span><span class="n">next</span> <span class="ow">and</span> \
+                <span class="n">_point_in_triangle</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="n">_area</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">prev</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">prevZ</span>
+
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_cure_local_intersections</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Go through all polygon nodes and cure small local self-intersections.&quot;&quot;&quot;</span>
+    <span class="n">do</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">start</span>
+
+    <span class="k">while</span> <span class="n">do</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">start</span><span class="p">:</span>
+        <span class="n">do</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">prev</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">next</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_equals</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_intersects</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="n">_locally_inside</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_locally_inside</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+            <span class="n">triangles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">i</span> <span class="o">//</span> <span class="n">dim</span><span class="p">)</span>
+            <span class="n">triangles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">i</span> <span class="o">//</span> <span class="n">dim</span><span class="p">)</span>
+            <span class="n">triangles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">i</span> <span class="o">//</span> <span class="n">dim</span><span class="p">)</span>
+
+            <span class="c1"># remove two nodes involved</span>
+            <span class="n">_remove_node</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="n">_remove_node</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="p">)</span>
+
+            <span class="n">p</span> <span class="o">=</span> <span class="n">start</span> <span class="o">=</span> <span class="n">b</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">return</span> <span class="n">p</span>
+
+
+<span class="k">def</span> <span class="nf">_split_earcut</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;try splitting polygon into two and triangulate them independently.&quot;&quot;&quot;</span>
+    <span class="c1"># look for a valid diagonal that divides the polygon into two</span>
+    <span class="n">do</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">start</span>
+
+    <span class="k">while</span> <span class="n">do</span> <span class="ow">or</span> <span class="n">a</span> <span class="o">!=</span> <span class="n">start</span><span class="p">:</span>
+        <span class="n">do</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">next</span>
+
+        <span class="k">while</span> <span class="n">b</span> <span class="o">!=</span> <span class="n">a</span><span class="o">.</span><span class="n">prev</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">i</span> <span class="o">!=</span> <span class="n">b</span><span class="o">.</span><span class="n">i</span> <span class="ow">and</span> <span class="n">_is_valid_diagonal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+                <span class="c1"># split the polygon in two by the diagonal</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">_split_polygon</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+                <span class="c1"># filter colinear points around the cuts</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="n">_filter_points</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">next</span><span class="p">)</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">_filter_points</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">next</span><span class="p">)</span>
+
+                <span class="c1"># run earcut on each half</span>
+                <span class="n">_earcut_linked</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+                <span class="n">_earcut_linked</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">triangles</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">next</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">next</span>
+
+
+<span class="k">def</span> <span class="nf">_eliminate_holes</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">hole_indices</span><span class="p">,</span> <span class="n">outerNode</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Link holes into the outer loop, producing a single-ring polygon without holes.&quot;&quot;&quot;</span>
+    <span class="n">queue</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hole_indices</span><span class="p">)</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_list</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hole_indices</span><span class="p">)):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">hole_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">dim</span>
+        <span class="n">end</span> <span class="o">=</span>  <span class="n">hole_indices</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">dim</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">_len</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">_list</span> <span class="o">=</span> <span class="n">_linked_list</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">_list</span> <span class="o">==</span> <span class="n">_list</span><span class="o">.</span><span class="n">next</span><span class="p">):</span>
+            <span class="n">_list</span><span class="o">.</span><span class="n">steiner</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_get_leftmost</span><span class="p">(</span><span class="n">_list</span><span class="p">))</span>
+
+    <span class="n">queue</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">queue</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># process holes from left to right</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">queue</span><span class="p">)):</span>
+        <span class="n">_eliminate_hole</span><span class="p">(</span><span class="n">queue</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">outerNode</span><span class="p">)</span>
+        <span class="n">outerNode</span> <span class="o">=</span> <span class="n">_filter_points</span><span class="p">(</span><span class="n">outerNode</span><span class="p">,</span> <span class="n">outerNode</span><span class="o">.</span><span class="n">next</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">outerNode</span>
+
+
+<span class="k">def</span> <span class="nf">_eliminate_hole</span><span class="p">(</span><span class="n">hole</span><span class="p">,</span> <span class="n">outerNode</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find a bridge between vertices that connects hole with an outer ring.</span>
+<span class="sd">    </span>
+<span class="sd">    Return a shape with the hole linked into it.&quot;&quot;&quot;</span>
+    <span class="n">outerNode</span> <span class="o">=</span> <span class="n">_find_hole_bridge</span><span class="p">(</span><span class="n">hole</span><span class="p">,</span> <span class="n">outerNode</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outerNode</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">_split_polygon</span><span class="p">(</span><span class="n">outerNode</span><span class="p">,</span> <span class="n">hole</span><span class="p">)</span>
+        <span class="n">_filter_points</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">next</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_find_hole_bridge</span><span class="p">(</span><span class="n">hole</span><span class="p">,</span> <span class="n">outerNode</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;David Eberly&#39;s algorithm for finding a bridge between hole and outer polygon.&quot;&quot;&quot;</span>
+    <span class="n">do</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">outerNode</span>
+    <span class="n">hx</span> <span class="o">=</span> <span class="n">hole</span><span class="o">.</span><span class="n">x</span>
+    <span class="n">hy</span> <span class="o">=</span> <span class="n">hole</span><span class="o">.</span><span class="n">y</span>
+    <span class="n">qx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># find a segment intersected by a ray from the hole&#39;s leftmost point to the left;</span>
+    <span class="c1"># segment&#39;s endpoint with lesser x will be potential connection point</span>
+    <span class="k">while</span> <span class="n">do</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">outerNode</span><span class="p">:</span>
+        <span class="n">do</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">hy</span> <span class="o">&lt;=</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="ow">and</span> <span class="n">hy</span> <span class="o">&gt;=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">y</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="n">hy</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">hx</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">qx</span><span class="p">:</span>
+                <span class="n">qx</span> <span class="o">=</span> <span class="n">x</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">hx</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">hy</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">p</span>
+                    <span class="k">if</span> <span class="n">hy</span> <span class="o">==</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">y</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+
+                <span class="n">m</span> <span class="o">=</span> <span class="n">p</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">x</span> <span class="k">else</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">hx</span> <span class="o">==</span> <span class="n">qx</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">prev</span> <span class="c1"># hole touches outer segment; pick lower endpoint</span>
+
+    <span class="c1"># check points inside the triangle of hole point, segment intersection and endpoint</span>
+    <span class="c1"># if there are no points found, we have a valid connection</span>
+    <span class="c1"># otherwise choose the point of the minimum angle with the ray as connection point</span>
+
+    <span class="n">stop</span> <span class="o">=</span> <span class="n">m</span>
+    <span class="n">mx</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">x</span>
+    <span class="n">my</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">y</span>
+    <span class="n">tanMin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+    <span class="n">tan</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">while</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">stop</span><span class="p">:</span>
+        <span class="n">hx_or_qx</span> <span class="o">=</span> <span class="n">hx</span> <span class="k">if</span> <span class="n">hy</span> <span class="o">&lt;</span> <span class="n">my</span> <span class="k">else</span> <span class="n">qx</span>
+        <span class="n">qx_or_hx</span> <span class="o">=</span> <span class="n">qx</span> <span class="k">if</span> <span class="n">hy</span> <span class="o">&lt;</span> <span class="n">my</span> <span class="k">else</span> <span class="n">hx</span>
+
+        <span class="k">if</span> <span class="n">hx</span> <span class="o">&gt;=</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">mx</span> <span class="ow">and</span> \
+                <span class="n">_point_in_triangle</span><span class="p">(</span><span class="n">hx_or_qx</span><span class="p">,</span> <span class="n">hy</span><span class="p">,</span> <span class="n">mx</span><span class="p">,</span> <span class="n">my</span><span class="p">,</span> <span class="n">qx_or_hx</span><span class="p">,</span> <span class="n">hy</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">):</span>
+            <span class="n">tan</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">hy</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">hx</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="c1"># tangential</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">tan</span> <span class="o">&lt;</span> <span class="n">tanMin</span> <span class="ow">or</span> <span class="p">(</span><span class="n">tan</span> <span class="o">==</span> <span class="n">tanMin</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">m</span><span class="o">.</span><span class="n">x</span><span class="p">))</span> <span class="ow">and</span> \
+                    <span class="n">_locally_inside</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">hole</span><span class="p">):</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">p</span>
+                <span class="n">tanMin</span> <span class="o">=</span> <span class="n">tan</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">return</span> <span class="n">m</span>
+
+
+<span class="k">def</span> <span class="nf">_index_curve</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Interlink polygon nodes in z-order.&quot;&quot;&quot;</span>
+    <span class="n">do</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">start</span>
+
+    <span class="k">while</span> <span class="n">do</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">start</span><span class="p">:</span>
+        <span class="n">do</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">z</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">_z_order</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+        <span class="n">p</span><span class="o">.</span><span class="n">prevZ</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">prev</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">nextZ</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="n">p</span><span class="o">.</span><span class="n">prevZ</span><span class="o">.</span><span class="n">nextZ</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">prevZ</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">_sort_linked</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_sort_linked</span><span class="p">(</span><span class="n">_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simon Tatham&#39;s linked list merge sort algorithm.</span>
+
+<span class="sd">    More information available at https://www.chiark.greenend.org.uk/</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">do</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">tail</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">numMerges</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">pSize</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">qSize</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">inSize</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">while</span> <span class="n">do</span> <span class="ow">or</span> <span class="n">numMerges</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">do</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">_list</span>
+        <span class="n">_list</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">tail</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">numMerges</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">while</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">numMerges</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">p</span>
+            <span class="n">pSize</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">inSize</span><span class="p">):</span>
+                <span class="n">pSize</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">nextZ</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">q</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+            <span class="n">qSize</span> <span class="o">=</span> <span class="n">inSize</span>
+
+            <span class="k">while</span> <span class="n">pSize</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">qSize</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">q</span><span class="p">):</span>
+
+                <span class="k">if</span> <span class="n">pSize</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">e</span> <span class="o">=</span> <span class="n">q</span>
+                    <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">nextZ</span>
+                    <span class="n">qSize</span> <span class="o">-=</span> <span class="mi">1</span>
+
+                <span class="k">elif</span> <span class="p">(</span><span class="n">qSize</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">q</span><span class="p">):</span>
+                    <span class="n">e</span> <span class="o">=</span> <span class="n">p</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">nextZ</span>
+                    <span class="n">pSize</span> <span class="o">-=</span> <span class="mi">1</span>
+
+                <span class="k">elif</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">z</span> <span class="o">&lt;=</span> <span class="n">q</span><span class="o">.</span><span class="n">z</span><span class="p">):</span>
+                    <span class="n">e</span> <span class="o">=</span> <span class="n">p</span>
+                    <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">nextZ</span>
+                    <span class="n">pSize</span> <span class="o">-=</span> <span class="mi">1</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">e</span> <span class="o">=</span> <span class="n">q</span>
+                    <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">nextZ</span>
+                    <span class="n">qSize</span> <span class="o">-=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">tail</span><span class="p">:</span>
+                    <span class="n">tail</span><span class="o">.</span><span class="n">nextZ</span> <span class="o">=</span> <span class="n">e</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">_list</span> <span class="o">=</span> <span class="n">e</span>
+
+                <span class="n">e</span><span class="o">.</span><span class="n">prevZ</span> <span class="o">=</span> <span class="n">tail</span>
+                <span class="n">tail</span> <span class="o">=</span> <span class="n">e</span>
+
+            <span class="n">p</span> <span class="o">=</span> <span class="n">q</span>
+
+        <span class="n">tail</span><span class="o">.</span><span class="n">nextZ</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">inSize</span> <span class="o">*=</span> <span class="mi">2</span>
+
+    <span class="k">return</span> <span class="n">_list</span>
+
+
+<span class="k">def</span> <span class="nf">_z_order</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Z-order of a point given coords and size of the data bounding box.&quot;&quot;&quot;</span>
+    <span class="c1"># coords are transformed into non-negative 15-bit integer range</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">32767</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">minX</span><span class="p">)</span> <span class="o">//</span> <span class="n">size</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">32767</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">minY</span><span class="p">)</span> <span class="o">//</span> <span class="n">size</span><span class="p">)</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x00FF00FF</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x0F0F0F0F</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x33333333</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">x</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x55555555</span>
+
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">|</span> <span class="p">(</span><span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x00FF00FF</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">|</span> <span class="p">(</span><span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="mi">4</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x0F0F0F0F</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">|</span> <span class="p">(</span><span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x33333333</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">|</span> <span class="p">(</span><span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x55555555</span>
+
+    <span class="k">return</span> <span class="n">x</span> <span class="o">|</span> <span class="p">(</span><span class="n">y</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_leftmost</span><span class="p">(</span><span class="n">start</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Find the leftmost node of a polygon ring.&quot;&quot;&quot;</span>
+    <span class="n">do</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">start</span>
+    <span class="n">leftmost</span> <span class="o">=</span> <span class="n">start</span>
+
+    <span class="k">while</span> <span class="n">do</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">start</span><span class="p">:</span>
+        <span class="n">do</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">leftmost</span><span class="o">.</span><span class="n">x</span><span class="p">:</span>
+            <span class="n">leftmost</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">return</span> <span class="n">leftmost</span>
+
+
+<span class="k">def</span> <span class="nf">_point_in_triangle</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">ay</span><span class="p">,</span> <span class="n">bx</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if a point lies within a convex triangle.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">cx</span> <span class="o">-</span> <span class="n">px</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">ay</span> <span class="o">-</span> <span class="n">py</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">ax</span> <span class="o">-</span> <span class="n">px</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">cy</span> <span class="o">-</span> <span class="n">py</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> \
+        <span class="p">(</span><span class="n">ax</span> <span class="o">-</span> <span class="n">px</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">by</span> <span class="o">-</span> <span class="n">py</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">bx</span> <span class="o">-</span> <span class="n">px</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">ay</span> <span class="o">-</span> <span class="n">py</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> \
+        <span class="p">(</span><span class="n">bx</span> <span class="o">-</span> <span class="n">px</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">cy</span> <span class="o">-</span> <span class="n">py</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">cx</span> <span class="o">-</span> <span class="n">px</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">by</span> <span class="o">-</span> <span class="n">py</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+
+
+<span class="k">def</span> <span class="nf">_is_valid_diagonal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if a diagonal between two polygon nodes is valid.</span>
+
+<span class="sd">    A valid diagonal is defined as one that lies in polygon interior.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">a</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">i</span> <span class="o">!=</span> <span class="n">b</span><span class="o">.</span><span class="n">i</span> <span class="ow">and</span> <span class="n">a</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">i</span> <span class="o">!=</span> <span class="n">b</span><span class="o">.</span><span class="n">i</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_intersects_polygon</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">and</span> \
+        <span class="n">_locally_inside</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_locally_inside</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_middle_inside</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_area</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the signed area of a triangle.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">q</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">q</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_equals</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if two points are equal.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">p1</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="n">p2</span><span class="o">.</span><span class="n">x</span> <span class="ow">and</span> <span class="n">p1</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="n">p2</span><span class="o">.</span><span class="n">y</span>
+
+
+<span class="k">def</span> <span class="nf">_intersects</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">q2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if two segments intersect.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_equals</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">q1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_equals</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span> <span class="n">q2</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="n">_equals</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">q2</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_equals</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span> <span class="n">q1</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">_area</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">!=</span> <span class="n">_area</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> \
+        <span class="n">_area</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span> <span class="n">q2</span><span class="p">,</span> <span class="n">p1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">!=</span> <span class="n">_area</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span> <span class="n">q2</span><span class="p">,</span> <span class="n">q1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+
+<span class="k">def</span> <span class="nf">_intersects_polygon</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if a polygon diagonal intersects any polygon segments.&quot;&quot;&quot;</span>
+    <span class="n">do</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">a</span>
+
+    <span class="k">while</span> <span class="n">do</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">a</span><span class="p">:</span>
+        <span class="n">do</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">i</span> <span class="o">!=</span> <span class="n">a</span><span class="o">.</span><span class="n">i</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">i</span> <span class="o">!=</span> <span class="n">a</span><span class="o">.</span><span class="n">i</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">i</span> <span class="o">!=</span> <span class="n">b</span><span class="o">.</span><span class="n">i</span> <span class="ow">and</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">i</span> <span class="o">!=</span> <span class="n">b</span><span class="o">.</span><span class="n">i</span> <span class="ow">and</span> \
+                <span class="n">_intersects</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">_locally_inside</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if a polygon diagonal is locally inside the polygon.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">_area</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">prev</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">next</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_area</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">next</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">_area</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">prev</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_area</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">prev</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">_area</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">next</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span>
+
+
+<span class="k">def</span> <span class="nf">_middle_inside</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check if the middle point of a polygon diagonal is inside a polygon.&quot;&quot;&quot;</span>
+    <span class="n">do</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="n">inside</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">px</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">b</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">py</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+    <span class="k">while</span> <span class="n">do</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">a</span><span class="p">:</span>
+        <span class="n">do</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">p</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">py</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">py</span><span class="p">))</span> <span class="ow">and</span> \
+                <span class="p">(</span><span class="n">px</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">py</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">inside</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">inside</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">return</span> <span class="n">inside</span>
+
+
+<span class="k">def</span> <span class="nf">_split_polygon</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Link two polygon vertices with a bridge.</span>
+
+<span class="sd">    If the vertices belong to the same ring, the polygon will be split into two.</span>
+<span class="sd">    If one belongs to the outer ring and another to a hole, the hole will be merged</span>
+<span class="sd">    into a single ring.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a2</span> <span class="o">=</span> <span class="n">_Node</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">i</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">b2</span> <span class="o">=</span> <span class="n">_Node</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">i</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">an</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">next</span>
+    <span class="n">bp</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">prev</span>
+
+    <span class="n">a</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">b</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">a</span>
+
+    <span class="n">a2</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">an</span>
+    <span class="n">an</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">a2</span>
+
+    <span class="n">b2</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">a2</span>
+    <span class="n">a2</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">b2</span>
+
+    <span class="n">bp</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">b2</span>
+    <span class="n">b2</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">bp</span>
+
+    <span class="k">return</span> <span class="n">b2</span>
+
+
+<span class="k">def</span> <span class="nf">_insert_node</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">last</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a node and optionally link it with previous one.</span>
+
+<span class="sd">    Linking is done in a circular doubly linked list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">_Node</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">last</span><span class="p">:</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">last</span><span class="o">.</span><span class="n">next</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">last</span>
+        <span class="n">last</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="n">last</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span>
+
+    <span class="k">return</span> <span class="n">p</span>
+
+
+<span class="k">def</span> <span class="nf">_remove_node</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Remove a node from a list.&quot;&quot;&quot;</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">prev</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">prev</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">next</span>
+
+    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">prevZ</span><span class="p">:</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">prevZ</span><span class="o">.</span><span class="n">nextZ</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">nextZ</span>
+
+    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">nextZ</span><span class="p">:</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">nextZ</span><span class="o">.</span><span class="n">prevZ</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">prevZ</span>
+
+
+<span class="k">class</span> <span class="nc">_Node</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Node within a coordinate array.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="c1"># vertex index in coordinates array</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">i</span>
+
+        <span class="c1"># vertex coordinates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+
+        <span class="c1"># previous and next vertice nodes in a polygon ring</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># z-order curve value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># previous and next nodes in z-order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prevZ</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nextZ</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># indicates whether this is a steiner point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">steiner</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ladybug_geometry.geometry2d.polygon &#8212; ladybug geometry  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          ladybug geometry</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.mesh.html">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.bounding.html">ladybug_geometry.bounding module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.intersection2d.html">ladybug_geometry.intersection2d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.intersection3d.html">ladybug_geometry.intersection3d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.triangulation.html">ladybug_geometry.triangulation module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <h1>Source code for ladybug_geometry.geometry2d.polygon</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;2D Polygon&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">.pointvector</span> <span class="kn">import</span> <span class="n">Point2D</span><span class="p">,</span> <span class="n">Vector2D</span>
+<span class="kn">from</span> <span class="nn">.line</span> <span class="kn">import</span> <span class="n">LineSegment2D</span>
+<span class="kn">from</span> <span class="nn">.ray</span> <span class="kn">import</span> <span class="n">Ray2D</span>
+<span class="kn">from</span> <span class="nn">..intersection2d</span> <span class="kn">import</span> <span class="n">intersect_line2d</span><span class="p">,</span> <span class="n">intersect_line2d_infinite</span><span class="p">,</span> \
+    <span class="n">does_intersection_exist_line2d</span><span class="p">,</span> <span class="n">closest_point2d_on_line2d</span>
+<span class="kn">from</span> <span class="nn">._2d</span> <span class="kn">import</span> <span class="n">Base2DIn2D</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+
+<div class="viewcode-block" id="Polygon2D"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D">[docs]</a><span class="k">class</span> <span class="nc">Polygon2D</span><span class="p">(</span><span class="n">Base2DIn2D</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;2D polygon object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        vertices: A list of Point2D objects representing the vertices of the polygon.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        * vertices</span>
+<span class="sd">        * segments</span>
+<span class="sd">        * min</span>
+<span class="sd">        * max</span>
+<span class="sd">        * center</span>
+<span class="sd">        * perimeter</span>
+<span class="sd">        * area</span>
+<span class="sd">        * is_clockwise</span>
+<span class="sd">        * is_convex</span>
+<span class="sd">        * is_self_intersecting</span>
+<span class="sd">        * is_valid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_segments&#39;</span><span class="p">,</span> <span class="s1">&#39;_perimeter&#39;</span><span class="p">,</span> <span class="s1">&#39;_area&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;_is_clockwise&#39;</span><span class="p">,</span> <span class="s1">&#39;_is_convex&#39;</span><span class="p">,</span> <span class="s1">&#39;_is_self_intersecting&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize Polygon2D.&quot;&quot;&quot;</span>
+        <span class="n">Base2DIn2D</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_convex</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_self_intersecting</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Polygon2D.from_dict"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a Polygon2D from a dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data: A python dictionary in the following format</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            {</span>
+<span class="sd">            &quot;type&quot;: &quot;Polygon2D&quot;,</span>
+<span class="sd">            &quot;vertices&quot;: [(0, 0), (10, 0), (0, 10)]</span>
+<span class="sd">            }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">Point2D</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Polygon2D.from_array"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.from_array">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_array</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">point_array</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a Polygon2D from a nested array of vertex coordinates.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            point_array: nested array of point arrays.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Polygon2D</span><span class="p">(</span><span class="n">Point2D</span><span class="p">(</span><span class="o">*</span><span class="n">point</span><span class="p">)</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">point_array</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Polygon2D.from_rectangle"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.from_rectangle">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_rectangle</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_point</span><span class="p">,</span> <span class="n">height_vector</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">height</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize Polygon2D from rectangle parameters.</span>
+
+<span class="sd">        Initializing a polygon this way has the added benefit of having its properties</span>
+<span class="sd">        quickly computed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            base_point: A Point2D for the lower left vertex of the polygon.</span>
+<span class="sd">            height_vector: A vector denoting the direction of the rectangle height.</span>
+<span class="sd">            base: A number indicating the length of the base of the rectangle.</span>
+<span class="sd">            height: A number indicating the length of the height of the rectangle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base_point</span><span class="p">,</span> <span class="n">Point2D</span><span class="p">),</span> \
+            <span class="s1">&#39;base_point must be Point2D. Got </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">base_point</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">height_vector</span><span class="p">,</span> <span class="n">Vector2D</span><span class="p">),</span> \
+            <span class="s1">&#39;height_vector must be Vector2D. Got </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">height_vector</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)),</span> <span class="s1">&#39;base must be a number.&#39;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)),</span> <span class="s1">&#39;height must be a number.&#39;</span>
+        <span class="n">_hv_norm</span> <span class="o">=</span> <span class="n">height_vector</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+        <span class="n">_bv</span> <span class="o">=</span> <span class="n">Vector2D</span><span class="p">(</span><span class="n">_hv_norm</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="n">_hv_norm</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">base</span>
+        <span class="n">_hv</span> <span class="o">=</span> <span class="n">_hv_norm</span> <span class="o">*</span> <span class="n">height</span>
+        <span class="n">_verts</span> <span class="o">=</span> <span class="p">(</span><span class="n">base_point</span><span class="p">,</span> <span class="n">base_point</span> <span class="o">+</span> <span class="n">_bv</span><span class="p">,</span> <span class="n">base_point</span> <span class="o">+</span> <span class="n">_hv</span> <span class="o">+</span> <span class="n">_bv</span><span class="p">,</span> <span class="n">base_point</span> <span class="o">+</span> <span class="n">_hv</span><span class="p">)</span>
+        <span class="n">polygon</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">_verts</span><span class="p">)</span>
+        <span class="n">polygon</span><span class="o">.</span><span class="n">_perimeter</span> <span class="o">=</span> <span class="n">base</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">height</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="n">polygon</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="n">base</span> <span class="o">*</span> <span class="n">height</span>
+        <span class="n">polygon</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">polygon</span><span class="o">.</span><span class="n">_is_convex</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">polygon</span><span class="o">.</span><span class="n">_is_self_intersecting</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">polygon</span></div>
+
+<div class="viewcode-block" id="Polygon2D.from_regular_polygon"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.from_regular_polygon">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_regular_polygon</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">number_of_sides</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">base_point</span><span class="o">=</span><span class="n">Point2D</span><span class="p">()):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize Polygon2D from regular polygon parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            number_of_sides: An integer for the number of sides on the regular</span>
+<span class="sd">                polygon. This number must be greater than 2.</span>
+<span class="sd">            radius: A number indicating the distance from the polygon&#39;s center</span>
+<span class="sd">                where the vertices of the polygon will lie.</span>
+<span class="sd">                The default is set to 1.</span>
+<span class="sd">            base_point: A Point2D for the center of the regular polygon.</span>
+<span class="sd">                The default is the Origin at (0, 0).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">number_of_sides</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;number_of_sides must be an &#39;</span> \
+            <span class="s1">&#39;integer. Got </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">number_of_sides</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">number_of_sides</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;number_of_sides must be greater than 2. &#39;</span> \
+            <span class="s1">&#39;Got </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">number_of_sides</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">base_point</span><span class="p">,</span> <span class="n">Point2D</span><span class="p">),</span> \
+            <span class="s1">&#39;base_point must be Point2D. Got </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">base_point</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)),</span> <span class="s1">&#39;height must be a number.&#39;</span>
+
+        <span class="c1"># calculate angle at which each vertex is rotated from the previous one</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">number_of_sides</span>
+        <span class="n">cos_a</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+        <span class="n">sin_a</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+
+        <span class="c1"># pick a starting vertex that makes sense for the number of sides</span>
+        <span class="k">if</span> <span class="n">number_of_sides</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">start_vert</span> <span class="o">=</span> <span class="n">Point2D</span><span class="p">(</span><span class="n">base_point</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">radius</span><span class="p">,</span> <span class="n">base_point</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">start_vert</span> <span class="o">=</span> <span class="n">start_vert</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">angle</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">base_point</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">start_vert</span> <span class="o">=</span> <span class="n">Point2D</span><span class="p">(</span><span class="n">base_point</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">base_point</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">radius</span><span class="p">)</span>
+        <span class="n">_vertices</span> <span class="o">=</span> <span class="p">[</span><span class="n">start_vert</span><span class="p">]</span>
+
+        <span class="c1"># generate the vertices</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">number_of_sides</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">last_pt</span> <span class="o">=</span> <span class="n">_vertices</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">qx</span> <span class="o">=</span> <span class="n">cos_a</span> <span class="o">*</span> <span class="p">(</span><span class="n">last_pt</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">base_point</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">sin_a</span> <span class="o">*</span> <span class="p">(</span><span class="n">last_pt</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">base_point</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">qy</span> <span class="o">=</span> <span class="n">sin_a</span> <span class="o">*</span> <span class="p">(</span><span class="n">last_pt</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">base_point</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">cos_a</span> <span class="o">*</span> <span class="p">(</span><span class="n">last_pt</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">base_point</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">_vertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Point2D</span><span class="p">(</span><span class="n">qx</span> <span class="o">+</span> <span class="n">base_point</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">qy</span> <span class="o">+</span> <span class="n">base_point</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
+
+        <span class="c1"># build the new polygon and set the properties that we know.</span>
+        <span class="n">_new_poly</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">_vertices</span><span class="p">)</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_convex</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_self_intersecting</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">_new_poly</span></div>
+
+<div class="viewcode-block" id="Polygon2D.from_shape_with_hole"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.from_shape_with_hole">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_shape_with_hole</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">boundary</span><span class="p">,</span> <span class="n">hole</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a Polygon2D from a boundary shape with a hole inside of it.</span>
+
+<span class="sd">        This method will convert the shape into a single concave polygon by drawing</span>
+<span class="sd">        a line from the hole to the outer boundary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            boundary: A list of Point2D objects for the outer boundary of the polygon</span>
+<span class="sd">                inside of which the hole is contained.</span>
+<span class="sd">            hole: A list of Point2D objects for the hole.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check that the inputs are in the correct format</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> \
+            <span class="s1">&#39;boundary should be a list. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">boundary</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hole</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> \
+            <span class="s1">&#39;hole should be a list. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">hole</span><span class="p">))</span>
+
+        <span class="c1"># check that the direction of vertices for the hole is opposite the boundary</span>
+        <span class="n">bound_direction</span> <span class="o">=</span> <span class="n">Polygon2D</span><span class="o">.</span><span class="n">_are_clockwise</span><span class="p">(</span><span class="n">boundary</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_are_clockwise</span><span class="p">(</span><span class="n">hole</span><span class="p">)</span> <span class="ow">is</span> <span class="n">bound_direction</span><span class="p">:</span>
+            <span class="n">hole</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+
+        <span class="c1"># join the hole with the boundary at the closest point</span>
+        <span class="n">dist_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b_pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">boundary</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">h_pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hole</span><span class="p">):</span>
+                <span class="n">dist_dict</span><span class="p">[</span><span class="n">b_pt</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">h_pt</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+        <span class="n">boundary</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_merge_boundary_and_hole</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="n">hole</span><span class="p">,</span> <span class="n">dist_dict</span><span class="p">)</span>
+
+        <span class="c1"># return the polygon with some properties set based on what we know</span>
+        <span class="n">_new_poly</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">boundary</span><span class="p">)</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="o">=</span> <span class="n">bound_direction</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_convex</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_self_intersecting</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">_new_poly</span></div>
+
+<div class="viewcode-block" id="Polygon2D.from_shape_with_holes"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.from_shape_with_holes">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_shape_with_holes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">boundary</span><span class="p">,</span> <span class="n">holes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a Polygon2D from a boundary shape with holes inside of it.</span>
+
+<span class="sd">        This method will convert the shape into a single concave polygon by drawing</span>
+<span class="sd">        lines from the holes to the outer boundary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            boundary: A list of Point2D objects for the outer boundary of the polygon</span>
+<span class="sd">                inside of which all of the holes are contained.</span>
+<span class="sd">            holes: A list of lists with one list for each hole in the shape. Each hole</span>
+<span class="sd">                should be a list of at least 3 Point2D objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check that the inputs are in the correct format.</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> \
+            <span class="s1">&#39;boundary should be a list. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">boundary</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">holes</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> \
+            <span class="s1">&#39;holes should be a list. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">holes</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">hole</span> <span class="ow">in</span> <span class="n">holes</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hole</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> \
+                <span class="s1">&#39;hole should be a list. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">hole</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">hole</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">,</span> \
+                <span class="s1">&#39;hole should have at least 3 vertices. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hole</span><span class="p">))</span>
+
+        <span class="c1"># check that the direction of vertices for the hole is opposite the boundary</span>
+        <span class="n">bound_direction</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_are_clockwise</span><span class="p">(</span><span class="n">boundary</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">hole</span> <span class="ow">in</span> <span class="n">holes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_are_clockwise</span><span class="p">(</span><span class="n">hole</span><span class="p">)</span> <span class="ow">is</span> <span class="n">bound_direction</span><span class="p">:</span>
+                <span class="n">hole</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+
+        <span class="c1"># recursively add the nearest hole to the boundary until there are none left.</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">holes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">boundary</span><span class="p">,</span> <span class="n">holes</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_merge_boundary_and_closest_hole</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="n">holes</span><span class="p">)</span>
+
+        <span class="c1"># return the polygon with some properties set based on what we know</span>
+        <span class="n">_new_poly</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">boundary</span><span class="p">)</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="o">=</span> <span class="n">bound_direction</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_convex</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_self_intersecting</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">_new_poly</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tuple of all vertices in this geometry.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertices</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">segments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tuple of all line segments in the polygon.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_segs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments_from_vertices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_segs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">perimeter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The perimeter of the polygon.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">seg</span><span class="o">.</span><span class="n">length</span> <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The area of the polygon.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_a</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">):</span>
+                <span class="n">_a</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">pt</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">pt</span><span class="o">.</span><span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="n">_a</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_area</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_clockwise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Boolean for whether the polygon vertices are in clockwise order.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">area</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">&lt;</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_clockwise</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_convex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Boolean noting whether the polygon is convex (True) or non-convex (False).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_convex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_convex</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_segs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_clockwise</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">_segs</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">_segs</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">determinant</span><span class="p">(</span><span class="n">_s</span><span class="o">.</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># counterclockwise turn</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_is_convex</span> <span class="o">=</span> <span class="kc">False</span>
+                            <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">_segs</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">_segs</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">v</span><span class="o">.</span><span class="n">determinant</span><span class="p">(</span><span class="n">_s</span><span class="o">.</span><span class="n">v</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># clockwise turn</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_is_convex</span> <span class="o">=</span> <span class="kc">False</span>
+                            <span class="k">break</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_convex</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_self_intersecting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Boolean noting whether the polygon has self-intersecting edges.</span>
+
+<span class="sd">        Note that this property is relatively computationally intense to obtain and</span>
+<span class="sd">        most CAD programs forbid surfaces with self-intersecting edges.</span>
+<span class="sd">        So this property should only be used in quality control scripts where the</span>
+<span class="sd">        origin of the geometry is unknown.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_self_intersecting</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_is_self_intersecting</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_convex</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">_segs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">_segs</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">_segs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]):</span>
+                    <span class="n">_skip</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="n">_other_segs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">_segs</span><span class="p">)</span> <span class="k">if</span> <span class="n">j</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_skip</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">_oth_s</span> <span class="ow">in</span> <span class="n">_other_segs</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">_s</span><span class="o">.</span><span class="n">intersect_line_ray</span><span class="p">(</span><span class="n">_oth_s</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># intersection!</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_is_self_intersecting</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="k">break</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_self_intersecting</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="k">break</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_self_intersecting</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Boolean noting whether the polygon is valid (having a non-zero area).</span>
+
+<span class="sd">        Note that polygons are still considered valid if they have self-intersecting</span>
+<span class="sd">        edges, or duplicate/colinear vertices. The s_self_intersecting property</span>
+<span class="sd">        identifies self-intersecting edges, and the remove_colinear_vertices method</span>
+<span class="sd">        will remove duplicate/colinear vertices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">area</span> <span class="o">==</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="Polygon2D.is_equivalent"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.is_equivalent">[docs]</a>    <span class="k">def</span> <span class="nf">is_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Boolean noting equivalence (within tolerance) between this polygon and another.</span>
+
+<span class="sd">        The order of the polygon vertices do not have to start from the</span>
+<span class="sd">        same vertex for equivalence to be true, but must be in the same counterclockwise</span>
+<span class="sd">        or clockwise order.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            other: Polygon2D for comparison.</span>
+<span class="sd">            tolerance: float representing point equivalence.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if equivalent else False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check number of points</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">vertices</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">vertices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span>
+
+        <span class="c1"># Check order</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tolerance</span><span class="p">):</span>
+            <span class="n">self_idx</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">other_pt</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">pt</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="n">other_pt</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+                    <span class="n">self_idx</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">self_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Re-order polygon vertices to match other</span>
+            <span class="n">vertices</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">self_idx</span><span class="p">:]</span> <span class="o">+</span> <span class="n">vertices</span><span class="p">[:</span><span class="n">self_idx</span><span class="p">]</span>
+
+        <span class="n">is_equivalent</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">pt</span><span class="p">,</span> <span class="n">other_pt</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">other</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="n">is_equivalent</span> <span class="o">=</span> <span class="n">is_equivalent</span> <span class="ow">and</span> <span class="n">pt</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="n">other_pt</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">is_equivalent</span></div>
+
+<div class="viewcode-block" id="Polygon2D.remove_colinear_vertices"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.remove_colinear_vertices">[docs]</a>    <span class="k">def</span> <span class="nf">remove_colinear_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a version of this polygon without colinear or duplicate vertices.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tolerance: The minimum distance that a vertex can be from a line</span>
+<span class="sd">                before it is considered colinear.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>  <span class="c1"># Polygon2D cannot have fewer than 3 vertices</span>
+        <span class="n">new_vertices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">):</span>
+            <span class="n">_a</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">determinant</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">determinant</span><span class="p">(</span><span class="n">_v</span><span class="p">)</span> <span class="o">+</span> \
+                <span class="n">_v</span><span class="o">.</span><span class="n">determinant</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">2</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">_a</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">tolerance</span><span class="p">:</span>
+                <span class="n">new_vertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">Polygon2D</span><span class="p">(</span><span class="n">new_vertices</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Polygon2D.reverse"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.reverse">[docs]</a>    <span class="k">def</span> <span class="nf">reverse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a copy of this polygon where the vertices are reversed.&quot;&quot;&quot;</span>
+        <span class="n">_new_poly</span> <span class="o">=</span> <span class="n">Polygon2D</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">pt</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transfer_properties</span><span class="p">(</span><span class="n">_new_poly</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_clockwise</span>
+        <span class="k">return</span> <span class="n">_new_poly</span></div>
+
+<div class="viewcode-block" id="Polygon2D.move"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.move">[docs]</a>    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moving_vec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a polygon that has been moved along a vector.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            moving_vec: A Vector2D with the direction and distance to move the polygon.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_new_poly</span> <span class="o">=</span> <span class="n">Polygon2D</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">moving_vec</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transfer_properties</span><span class="p">(</span><span class="n">_new_poly</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_new_poly</span></div>
+
+<div class="viewcode-block" id="Polygon2D.rotate"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a polygon that is rotated counterclockwise by a certain angle.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            angle: An angle for rotation in radians.</span>
+<span class="sd">            origin: A Point2D for the origin around which the point will be rotated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_new_poly</span> <span class="o">=</span> <span class="n">Polygon2D</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transfer_properties</span><span class="p">(</span><span class="n">_new_poly</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_new_poly</span></div>
+
+<div class="viewcode-block" id="Polygon2D.reflect"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.reflect">[docs]</a>    <span class="k">def</span> <span class="nf">reflect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normal</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a polygon reflected across a plane with the input normal vector and origin.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            normal: A Vector2D representing the normal vector for the plane across</span>
+<span class="sd">                which the polygon will be reflected. THIS VECTOR MUST BE NORMALIZED.</span>
+<span class="sd">            origin: A Point2D representing the origin from which to reflect.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_new_poly</span> <span class="o">=</span> <span class="n">Polygon2D</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transfer_properties</span><span class="p">(</span><span class="n">_new_poly</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_clockwise</span>
+        <span class="k">return</span> <span class="n">_new_poly</span></div>
+
+<div class="viewcode-block" id="Polygon2D.scale"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale a polygon by a factor from an origin point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            factor: A number representing how much the polygon should be scaled.</span>
+<span class="sd">            origin: A Point2D representing the origin from which to scale.</span>
+<span class="sd">                If None, it will be scaled from the World origin (0, 0).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Polygon2D</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span>
+                <span class="n">Point2D</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">factor</span><span class="p">,</span> <span class="n">pt</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">factor</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Polygon2D</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Polygon2D.intersect_line_ray"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.intersect_line_ray">[docs]</a>    <span class="k">def</span> <span class="nf">intersect_line_ray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_ray</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the intersections between this polygon and a Ray2D or LineSegment2D.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            line_ray: A LineSegment2D or Ray2D or to intersect.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list with Point2D objects for the intersections.</span>
+<span class="sd">            List will be empty if no intersection exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">intersections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">_s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+            <span class="n">inters</span> <span class="o">=</span> <span class="n">intersect_line2d</span><span class="p">(</span><span class="n">_s</span><span class="p">,</span> <span class="n">line_ray</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">inters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">intersections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inters</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">intersections</span></div>
+
+<div class="viewcode-block" id="Polygon2D.intersect_line_infinite"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.intersect_line_infinite">[docs]</a>    <span class="k">def</span> <span class="nf">intersect_line_infinite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ray</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the intersections between this polygon and a Ray2D extended infintiely.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ray: A Ray2D or to intersect. This will be extended in both</span>
+<span class="sd">                directions infinitely for the intersection.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list with Point2D objects for the intersections.</span>
+<span class="sd">            List will be empty if no intersection exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">intersections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">_s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+            <span class="n">inters</span> <span class="o">=</span> <span class="n">intersect_line2d_infinite</span><span class="p">(</span><span class="n">_s</span><span class="p">,</span> <span class="n">ray</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">inters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">intersections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inters</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">intersections</span></div>
+
+<div class="viewcode-block" id="Polygon2D.point_relationship"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.point_relationship">[docs]</a>    <span class="k">def</span> <span class="nf">point_relationship</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test whether a Point2D lies inside, outside or on the boundary of the polygon.</span>
+
+<span class="sd">        This is the slowest of the methods for understanding the relationship</span>
+<span class="sd">        of a given point to a polygon. However, it covers all edge cases, including</span>
+<span class="sd">        the literal edge of the polygon.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            point: A Point2D for which the relationship to the polygon will be tested.</span>
+<span class="sd">            tolerance: The minimum distance from the edge at which a point is</span>
+<span class="sd">                considered to lie on the edge.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An integer denoting the relationship of the point.</span>
+
+<span class="sd">            This will be one of the following:</span>
+
+<span class="sd">            * -1 = Outside polygon</span>
+<span class="sd">            *  0 = On the edge of the polygon</span>
+<span class="sd">            * +1 = Inside polygon</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_point_on_edge</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_point_inside_check</span><span class="p">(</span><span class="n">point</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span></div>
+
+<div class="viewcode-block" id="Polygon2D.is_point_on_edge"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.is_point_on_edge">[docs]</a>    <span class="k">def</span> <span class="nf">is_point_on_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test whether a Point2D lies on the boundary edges of the polygon.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            point: A Point2D for which the edge relationship will be tested.</span>
+<span class="sd">            tolerance: The minimum distance from the edge at which a point is</span>
+<span class="sd">                considered to lie on the edge.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A boolean denoting whether the point lies on the polygon edges (True)</span>
+<span class="sd">            or not on the edges (False).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">_s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+            <span class="n">close_pt</span> <span class="o">=</span> <span class="n">closest_point2d_on_line2d</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">_s</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">point</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">close_pt</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tolerance</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Polygon2D.is_point_inside_check"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.is_point_inside_check">[docs]</a>    <span class="k">def</span> <span class="nf">is_point_inside_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test whether a Point2D lies inside the polygon with checks for fringe cases.</span>
+
+<span class="sd">        This method uses the same calculation as the the `is_point_inside` method</span>
+<span class="sd">        but it includes additional checks for the fringe cases noted in the</span>
+<span class="sd">        `is_point_inside` description. Using this method means that it will always</span>
+<span class="sd">        yield the right result for all convex polygons and concave polygons with</span>
+<span class="sd">        one concave turn (provided that they do not have colinear vertices).</span>
+<span class="sd">        This is suitable for nearly all practical purposes and the only cases</span>
+<span class="sd">        that could yield an incorrect result are when a point is co-linear with</span>
+<span class="sd">        two or more polygon edges along the X vector like so:</span>
+
+<span class="sd">        .. code-block:: shell</span>
+
+<span class="sd">             _____     _____     _____</span>
+<span class="sd">            |  .  |___|     |___|     |</span>
+<span class="sd">            |_________________________|</span>
+
+<span class="sd">        While this method covers most fringe cases, it will not test for whether</span>
+<span class="sd">        a point lies perfectly on the edge of the polygon so it assesses whether</span>
+<span class="sd">        a point lies inside the polygon up to Python floating point tolerance</span>
+<span class="sd">        (16 digits). If distinguishing edge conditions from inside/ outside is</span>
+<span class="sd">        important, the `point_relationship` method should be used.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            point: A Point2D for which the inside/ outside relationship will be tested.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            A boolean denoting whether the point lies inside (True) or outside (False).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">non_duplicate_intersect</span><span class="p">(</span><span class="n">test_ray</span><span class="p">):</span>
+            <span class="n">inters</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">n_int</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">_s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+                <span class="n">inter</span> <span class="o">=</span> <span class="n">intersect_line2d</span><span class="p">(</span><span class="n">_s</span><span class="p">,</span> <span class="n">test_ray</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">inter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">inter</span> <span class="o">!=</span> <span class="n">inters</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># ensure intersection is not duplicated</span>
+                            <span class="n">n_int</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="n">inters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inter</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                        <span class="n">n_int</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">inters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inter</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">n_int</span><span class="p">,</span> <span class="n">inters</span>
+
+        <span class="n">n_int</span><span class="p">,</span> <span class="n">inters</span> <span class="o">=</span> <span class="n">non_duplicate_intersect</span><span class="p">(</span><span class="n">Ray2D</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">Vector2D</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+        <span class="c1"># check that intersections do not form a polygon segment co-linear with test_ray</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_convex</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">n_int</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">_s</span><span class="o">.</span><span class="n">p1</span> <span class="o">==</span> <span class="n">inters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">_s</span><span class="o">.</span><span class="n">p2</span> <span class="o">==</span> <span class="n">inters</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_point_inside</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">Vector2D</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">n_int</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">n_int</span><span class="p">,</span> <span class="n">inters</span> <span class="o">=</span> <span class="n">non_duplicate_intersect</span><span class="p">(</span><span class="n">Ray2D</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">Vector2D</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+        <span class="c1"># check that intersections do not form a polygon segment co-linear with test_ray</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_convex</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">n_int</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">_s</span><span class="o">.</span><span class="n">p1</span> <span class="o">==</span> <span class="n">inters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">_s</span><span class="o">.</span><span class="n">p2</span> <span class="o">==</span> <span class="n">inters</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_point_inside</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">Vector2D</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">n_int</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Polygon2D.is_point_inside"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.is_point_inside">[docs]</a>    <span class="k">def</span> <span class="nf">is_point_inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">test_vector</span><span class="o">=</span><span class="n">Vector2D</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;Test whether a Point2D lies inside or outside the polygon.</span>
+
+<span class="sd">        This method is the fastest way to tell if a point is inside a polygon when</span>
+<span class="sd">        the given point lies inside the boundary rectangle of the polygon.</span>
+<span class="sd">        However, while this method gives the correct result in 99.9% of cases,</span>
+<span class="sd">        there are a few fringe cases where it will not give the correct result.</span>
+<span class="sd">        Specifically these are:</span>
+
+<span class="sd">        .. code-block:: shell</span>
+
+<span class="sd">            1 - When the test_ray intersects perfectly with a polygon vertex.</span>
+<span class="sd">                For example, this case with an X-unit test_vector:</span>
+<span class="sd">                                    _____________</span>
+<span class="sd">                                   |      .      |</span>
+<span class="sd">                                   |            /</span>
+<span class="sd">                                   |___________/</span>
+<span class="sd">            2 - When there are two polygon vertices that are colinear with the point</span>
+<span class="sd">                along the test_ray. For example, this case with an X-unit test_vector:</span>
+<span class="sd">                                      _____</span>
+<span class="sd">                                     |  .  |____</span>
+<span class="sd">                                     |__________|</span>
+
+<span class="sd">        Use the `is_point_inside_check` method if a result that covers these fringe</span>
+<span class="sd">        cases is needed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            point: A Point2D for which the inside/outside relationship will be tested.</span>
+<span class="sd">            test_vector: Optional vector to set the direction in which intersections</span>
+<span class="sd">                with the polygon edges will be evaluated to determine if the</span>
+<span class="sd">                point is inside. Default is the X-unit vector.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A boolean denoting whether the point lies inside (True) or outside (False).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">test_ray</span> <span class="o">=</span> <span class="n">Ray2D</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">test_vector</span><span class="p">)</span>
+        <span class="n">n_int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">_s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">does_intersection_exist_line2d</span><span class="p">(</span><span class="n">_s</span><span class="p">,</span> <span class="n">test_ray</span><span class="p">):</span>
+                <span class="n">n_int</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">n_int</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Polygon2D.is_point_inside_bound_rect"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.is_point_inside_bound_rect">[docs]</a>    <span class="k">def</span> <span class="nf">is_point_inside_bound_rect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">,</span> <span class="n">test_vector</span><span class="o">=</span><span class="n">Vector2D</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;Test whether a Point2D lies roughly inside or outside the polygon.</span>
+
+<span class="sd">        This function is virtually identical to the `is_point_inside`</span>
+<span class="sd">        method but will first do a check to see if the point lies inside the</span>
+<span class="sd">        polygon bounding rectangle. As such, it is a faster approach when one</span>
+<span class="sd">        expects many of tested points to lie far away from the polygon.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            point: A Point2D for which the inside/ outside relationship will be tested.</span>
+<span class="sd">            test_vector: Optional vector to set the direction in which intersections</span>
+<span class="sd">                with the polygon edges will be evaluated to determine if the</span>
+<span class="sd">                point is inside. Default is the X unit vector.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A boolean denoting whether the point lies inside (True) or outside (False).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min</span>
+        <span class="nb">max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span>
+        <span class="k">if</span> <span class="n">point</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="o">.</span><span class="n">x</span> <span class="ow">or</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;</span> <span class="nb">min</span><span class="o">.</span><span class="n">y</span> <span class="ow">or</span> <span class="n">point</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="o">.</span><span class="n">x</span> <span class="ow">or</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="o">.</span><span class="n">y</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_point_inside</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">test_vector</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Polygon2D.is_polygon_inside"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.is_polygon_inside">[docs]</a>    <span class="k">def</span> <span class="nf">is_polygon_inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polygon</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;&quot;Test whether another Polygon2D lies completely inside this polygon.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polygon: A Polygon2D to test whether it is completely inside this one.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A boolean denoting whether the polygon lies inside (True) or not (False).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if the first polygon vertex lies outside, we know it is not inside.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_point_inside_bound_rect</span><span class="p">(</span><span class="n">polygon</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># if one of the edges intersects, we know it has crossed outside.</span>
+        <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_s</span> <span class="ow">in</span> <span class="n">polygon</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">does_intersection_exist_line2d</span><span class="p">(</span><span class="n">seg</span><span class="p">,</span> <span class="n">_s</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Polygon2D.is_polygon_outside"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.is_polygon_outside">[docs]</a>    <span class="k">def</span> <span class="nf">is_polygon_outside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polygon</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;&quot;Test whether another Polygon2D lies completely outside this polygon.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polygon: A Polygon2D to test whether it is completely outside this one.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A boolean denoting whether the polygon lies outside (True) or not (False).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># if the first polygon vertex lies inside, we know it is not outside.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_point_inside_bound_rect</span><span class="p">(</span><span class="n">polygon</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># if one of the edges intersects, we know it has crossed inside.</span>
+        <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_s</span> <span class="ow">in</span> <span class="n">polygon</span><span class="o">.</span><span class="n">segments</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">does_intersection_exist_line2d</span><span class="p">(</span><span class="n">seg</span><span class="p">,</span> <span class="n">_s</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Polygon2D.to_dict"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get Polygon2D as a dictionary.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;Polygon2D&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">pt</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">]}</span></div>
+
+<div class="viewcode-block" id="Polygon2D.to_array"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.to_array">[docs]</a>    <span class="k">def</span> <span class="nf">to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a list of lists where each sub-list represents a Point2D vertex.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Polygon2D.intersect_polygon_segments"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.intersect_polygon_segments">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">intersect_polygon_segments</span><span class="p">(</span><span class="n">polygon_list</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Intersect the line segments of a Polygon2D array to ensure matching segments.</span>
+
+<span class="sd">        Specifically, this method checks a list of polygons in a pairwise manner to</span>
+<span class="sd">        see if one contains a vertex along an edge segment of the other within the</span>
+<span class="sd">        given tolerance. If so, the method creates a co-located vertex at that point,</span>
+<span class="sd">        partitioning the edge segment into two edge segments. Point ordering is</span>
+<span class="sd">        reserved within each Polygon2D and the order of Polygon2Ds within the input</span>
+<span class="sd">        polygon_list is also preserved.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polygon_list: List of Polygon2Ds which will have their segments</span>
+<span class="sd">                intersected with one another.</span>
+<span class="sd">            tolerance: Distance within which two points are considered to be</span>
+<span class="sd">                co-located.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The input list of Polygon2D objects with extra vertices inserted</span>
+<span class="sd">                where necessary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">polygon_list</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># No need for j to start at 0 since two polygons are passed</span>
+            <span class="c1"># and they are compared against one other within intersect_segments.</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">polygon_list</span><span class="p">)):</span>
+                <span class="n">polygon_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">polygon_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="n">Polygon2D</span><span class="o">.</span><span class="n">intersect_segments</span><span class="p">(</span><span class="n">polygon_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">polygon_list</span><span class="p">[</span><span class="n">j</span><span class="p">],</span>
+                                                 <span class="n">tolerance</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">polygon_list</span></div>
+
+<div class="viewcode-block" id="Polygon2D.intersect_segments"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.intersect_segments">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">intersect_segments</span><span class="p">(</span><span class="n">polygon1</span><span class="p">,</span> <span class="n">polygon2</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Intersect the line segments of two Polygon2Ds to ensure matching segments.</span>
+
+<span class="sd">        Specifically, this method checks two adjacent polygons to see if one contains</span>
+<span class="sd">        a vertex along an edge segment of the other within the given tolerance. If so,</span>
+<span class="sd">        it creates a co-located vertex at that point, partitioning the edge segment</span>
+<span class="sd">        into two edge segments. Point ordering is preserved.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polygon1: First polygon to check.</span>
+<span class="sd">            polygon2: Second polygon to check.</span>
+<span class="sd">            tolerance: Distance within which two points are considered to be co-located.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Two polygon objects with extra vertices inserted if necessary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">polygon1_updates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">polygon2_updates</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># bounding rectangle check</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">Polygon2D</span><span class="o">.</span><span class="n">overlapping_bounding_rect</span><span class="p">(</span><span class="n">polygon1</span><span class="p">,</span> <span class="n">polygon2</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">polygon1</span><span class="p">,</span> <span class="n">polygon2</span>  <span class="c1"># no overlap</span>
+
+        <span class="c1"># test if each point of polygon2 is within the tolerance distance of any segment</span>
+        <span class="c1"># of polygon1.  If so, add the closest point on the segment to the polygon1</span>
+        <span class="c1"># update list. And vice versa (testing polygon2 against polygon1).</span>
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">seg1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">polygon1</span><span class="o">.</span><span class="n">segments</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i2</span><span class="p">,</span> <span class="n">seg2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">polygon2</span><span class="o">.</span><span class="n">segments</span><span class="p">):</span>
+                <span class="c1"># Test polygon1 against polygon2</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">closest_point2d_on_line2d</span><span class="p">(</span><span class="n">seg2</span><span class="o">.</span><span class="n">p1</span><span class="p">,</span> <span class="n">seg1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">tolerance</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">polygon1</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> \
+                        <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">seg2</span><span class="o">.</span><span class="n">p1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tolerance</span><span class="p">:</span>
+                    <span class="n">polygon1_updates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i1</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+                <span class="c1"># Test polygon2 against polygon1</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">closest_point2d_on_line2d</span><span class="p">(</span><span class="n">seg1</span><span class="o">.</span><span class="n">p1</span><span class="p">,</span> <span class="n">seg2</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">tolerance</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">polygon2</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> \
+                        <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">seg1</span><span class="o">.</span><span class="n">p1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tolerance</span><span class="p">:</span>
+                    <span class="n">polygon2_updates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i2</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+
+        <span class="c1"># apply any updates to polygon1</span>
+        <span class="n">polygon1</span> <span class="o">=</span> <span class="n">Polygon2D</span><span class="o">.</span><span class="n">_insert_updates_in_order</span><span class="p">(</span><span class="n">polygon1</span><span class="p">,</span> <span class="n">polygon1_updates</span><span class="p">)</span>
+
+        <span class="c1"># Apply any updates to polygon2</span>
+        <span class="n">polygon2</span> <span class="o">=</span> <span class="n">Polygon2D</span><span class="o">.</span><span class="n">_insert_updates_in_order</span><span class="p">(</span><span class="n">polygon2</span><span class="p">,</span> <span class="n">polygon2_updates</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">polygon1</span><span class="p">,</span> <span class="n">polygon2</span></div>
+
+<div class="viewcode-block" id="Polygon2D.overlapping_bounding_rect"><a class="viewcode-back" href="../../../ladybug_geometry.geometry2d.polygon.html#ladybug_geometry.geometry2d.polygon.Polygon2D.overlapping_bounding_rect">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">overlapping_bounding_rect</span><span class="p">(</span><span class="n">polygon1</span><span class="p">,</span> <span class="n">polygon2</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if the bounding rectangles of two polygons overlap within a tolerance.</span>
+
+<span class="sd">        This is particularly useful as a check before performing computationally intense</span>
+<span class="sd">        processes between two polygons like intersection or checking for adjacency.</span>
+<span class="sd">        Checking the overlap of the bounding boxes is extremely quick given this</span>
+<span class="sd">        method&#39;s use of the Separating Axis Theorem.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polygon1: The first polygon to check.</span>
+<span class="sd">            polygon2: The second polygon to check.</span>
+<span class="sd">            tolerance: Distance within which two points are considered to be co-located.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Bounding rectangle check using the Separating Axis Theorem</span>
+        <span class="n">polygon1_width</span> <span class="o">=</span> <span class="n">polygon1</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">polygon1</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">polygon2_width</span> <span class="o">=</span> <span class="n">polygon2</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">polygon2</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">dist_btwn_x</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">polygon1</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">polygon2</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x_gap_btwn_rect</span> <span class="o">=</span> <span class="n">dist_btwn_x</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">polygon1_width</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">polygon2_width</span><span class="p">)</span>
+
+        <span class="n">polygon1_height</span> <span class="o">=</span> <span class="n">polygon1</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">polygon1</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">polygon2_height</span> <span class="o">=</span> <span class="n">polygon2</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">polygon2</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">dist_btwn_y</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">polygon1</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">polygon2</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">y_gap_btwn_rect</span> <span class="o">=</span> <span class="n">dist_btwn_y</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">polygon1_height</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">polygon2_height</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">x_gap_btwn_rect</span> <span class="o">&gt;</span> <span class="n">tolerance</span> <span class="ow">or</span> <span class="n">y_gap_btwn_rect</span> <span class="o">&gt;</span> <span class="n">tolerance</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># no overlap</span>
+        <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># overlap exists</span></div>
+
+    <span class="k">def</span> <span class="nf">_transfer_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_polygon</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transfer properties from this polygon to a new polygon.</span>
+
+<span class="sd">        This is used by the transform methods that don&#39;t alter the relationship of</span>
+<span class="sd">        face vertices to one another (move, rotate, reflect).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_polygon</span><span class="o">.</span><span class="n">_perimeter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span>
+        <span class="n">new_polygon</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span>
+        <span class="n">new_polygon</span><span class="o">.</span><span class="n">_is_convex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_convex</span>
+        <span class="n">new_polygon</span><span class="o">.</span><span class="n">_is_self_intersecting</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_self_intersecting</span>
+        <span class="n">new_polygon</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_clockwise</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_insert_updates_in_order</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">polygon_updates</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Insert updates from the intersect_segments method into a polygon.</span>
+
+<span class="sd">        This method ensures that multiple updates to a single segment are inserted</span>
+<span class="sd">        in the correct order over the polygon.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            polygon: A Polygon2D to be updated with intersection points</span>
+<span class="sd">            polygon_updates: A list of tuples where each tuple has two values. The</span>
+<span class="sd">                first is the index of the segment to be updated and the second is</span>
+<span class="sd">                the point to insert.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">polygon_updates</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># sort updates by order of insertion</span>
+        <span class="n">poly_points</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">polygon</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>  <span class="c1"># convert tuple to mutable list</span>
+        <span class="n">last_i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">colinear_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">update</span> <span class="ow">in</span> <span class="n">polygon_updates</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># traverse backwards to preserve order</span>
+            <span class="n">new_i</span> <span class="o">=</span> <span class="n">update</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">new_i</span> <span class="o">==</span> <span class="n">last_i</span><span class="p">:</span>  <span class="c1"># check order of new intersections on the same segment</span>
+                <span class="n">colinear_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">p1</span> <span class="o">=</span> <span class="n">poly_points</span><span class="p">[</span><span class="n">update</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">poly_points</span><span class="p">[</span><span class="n">new_i</span><span class="p">:</span><span class="n">new_i</span> <span class="o">+</span> <span class="n">colinear_count</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="n">p1</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">p1</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">update</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                        <span class="n">poly_points</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">new_i</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">update</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">poly_points</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">new_i</span> <span class="o">+</span> <span class="n">colinear_count</span><span class="p">,</span> <span class="n">update</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">colinear_count</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">poly_points</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">new_i</span><span class="p">,</span> <span class="n">update</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">last_i</span> <span class="o">=</span> <span class="n">new_i</span>
+        <span class="k">return</span> <span class="n">Polygon2D</span><span class="p">(</span><span class="n">poly_points</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_segments_from_vertices</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
+        <span class="n">_segs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">vert</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
+            <span class="n">_seg</span> <span class="o">=</span> <span class="n">LineSegment2D</span><span class="o">.</span><span class="n">from_end_points</span><span class="p">(</span><span class="n">vertices</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">vert</span><span class="p">)</span>
+            <span class="n">_segs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_seg</span><span class="p">)</span>
+        <span class="n">_segs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_segs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>  <span class="c1"># segments will start from the first point</span>
+        <span class="k">return</span> <span class="n">_segs</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_merge_boundary_and_closest_hole</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="n">holes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of points for a boundary merged with the closest hole.&quot;&quot;&quot;</span>
+        <span class="n">hole_dicts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">min_dists</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">hole</span> <span class="ow">in</span> <span class="n">holes</span><span class="p">:</span>
+            <span class="n">dist_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b_pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">boundary</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">h_pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hole</span><span class="p">):</span>
+                    <span class="n">dist_dict</span><span class="p">[</span><span class="n">b_pt</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">h_pt</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+            <span class="n">hole_dicts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dist_dict</span><span class="p">)</span>
+            <span class="n">min_dists</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">dist_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="n">hole_index</span> <span class="o">=</span> <span class="n">min_dists</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">min_dists</span><span class="p">))</span>
+        <span class="n">new_boundary</span> <span class="o">=</span> <span class="n">Polygon2D</span><span class="o">.</span><span class="n">_merge_boundary_and_hole</span><span class="p">(</span>
+            <span class="n">boundary</span><span class="p">,</span> <span class="n">holes</span><span class="p">[</span><span class="n">hole_index</span><span class="p">],</span> <span class="n">hole_dicts</span><span class="p">[</span><span class="n">hole_index</span><span class="p">])</span>
+        <span class="n">holes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">hole_index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_boundary</span><span class="p">,</span> <span class="n">holes</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_merge_boundary_and_hole</span><span class="p">(</span><span class="n">boundary</span><span class="p">,</span> <span class="n">hole</span><span class="p">,</span> <span class="n">dist_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a single list of points describing a boundary shape with a hole.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            boundary: A list of Point2D objects for the outer boundary inside of</span>
+<span class="sd">                which the hole is contained.</span>
+<span class="sd">            hole: A list of Point2D objects for the hole.</span>
+<span class="sd">            dist_dict: A dictionary with keys of distances between each of the points</span>
+<span class="sd">                in the boundary and hole lists and values as tuples with two values:</span>
+<span class="sd">                (the index of the boundary point, the index of the hole point)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">min_dist</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">dist_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">min_indexes</span> <span class="o">=</span> <span class="n">dist_dict</span><span class="p">[</span><span class="n">min_dist</span><span class="p">]</span>
+        <span class="n">hole_deque</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">hole</span><span class="p">)</span>
+        <span class="n">hole_deque</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="o">-</span><span class="n">min_indexes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">hole_insert</span> <span class="o">=</span> <span class="p">[</span><span class="n">boundary</span><span class="p">[</span><span class="n">min_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">hole_deque</span><span class="p">)</span> <span class="o">+</span> \
+            <span class="p">[</span><span class="n">hole</span><span class="p">[</span><span class="n">min_indexes</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span>
+        <span class="n">boundary</span><span class="p">[</span><span class="n">min_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">min_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">hole_insert</span>
+        <span class="k">return</span> <span class="n">boundary</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_are_clockwise</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if a list of vertices are clockwise.</span>
+
+<span class="sd">        This is a quicker calculation when all you need is the direction and not area.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_a</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">pt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
+            <span class="n">_a</span> <span class="o">+=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">pt</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">vertices</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">pt</span><span class="o">.</span><span class="n">x</span>
+        <span class="k">return</span> <span class="n">_a</span> <span class="o">&lt;</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">_new_poly</span> <span class="o">=</span> <span class="n">Polygon2D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertices</span><span class="p">)</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_segments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_perimeter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perimeter</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_clockwise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_clockwise</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_convex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_convex</span>
+        <span class="n">_new_poly</span><span class="o">.</span><span class="n">_is_self_intersecting</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_self_intersecting</span>
+        <span class="k">return</span> <span class="n">_new_poly</span>
+
+    <span class="k">def</span> <span class="nf">__key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A tuple based on the object properties, useful for hashing.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertices</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Polygon2D</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__key</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Polygon2D (</span><span class="si">{}</span><span class="s1"> vertices)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

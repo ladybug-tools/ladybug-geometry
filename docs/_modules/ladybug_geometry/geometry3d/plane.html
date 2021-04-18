@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ladybug_geometry.geometry3d.plane &#8212; ladybug geometry  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          ladybug geometry</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.mesh.html">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.bounding.html">ladybug_geometry.bounding module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.intersection2d.html">ladybug_geometry.intersection2d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.intersection3d.html">ladybug_geometry.intersection3d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.triangulation.html">ladybug_geometry.triangulation module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <h1>Source code for ladybug_geometry.geometry3d.plane</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;Plane&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">.pointvector</span> <span class="kn">import</span> <span class="n">Point3D</span><span class="p">,</span> <span class="n">Vector3D</span>
+<span class="kn">from</span> <span class="nn">.ray</span> <span class="kn">import</span> <span class="n">Ray3D</span>
+<span class="kn">from</span> <span class="nn">..intersection3d</span> <span class="kn">import</span> <span class="n">intersect_line3d_plane</span><span class="p">,</span> <span class="n">intersect_plane_plane</span><span class="p">,</span> \
+    <span class="n">closest_point3d_on_plane</span><span class="p">,</span> <span class="n">closest_point3d_between_line3d_plane</span>
+<span class="kn">from</span> <span class="nn">..geometry2d.pointvector</span> <span class="kn">import</span> <span class="n">Point2D</span>
+<span class="kn">from</span> <span class="nn">..geometry2d.ray</span> <span class="kn">import</span> <span class="n">Ray2D</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+
+
+<div class="viewcode-block" id="Plane"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane">[docs]</a><span class="k">class</span> <span class="nc">Plane</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plane object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n: A Vector3D representing the normal of the plane.</span>
+<span class="sd">        o: A Point3D representing the origin point of the plane.</span>
+<span class="sd">        x: An optional Vector3D for the X-Axis of the Plane.</span>
+<span class="sd">            Note that this vector must be orthagonal to the input normal vector.</span>
+<span class="sd">            If None, the default will find an X-Axis in the world XY plane.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        * n</span>
+<span class="sd">        * o</span>
+<span class="sd">        * k</span>
+<span class="sd">        * x</span>
+<span class="sd">        * y</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_n&#39;</span><span class="p">,</span> <span class="s1">&#39;_o&#39;</span><span class="p">,</span> <span class="s1">&#39;_k&#39;</span><span class="p">,</span> <span class="s1">&#39;_x&#39;</span><span class="p">,</span> <span class="s1">&#39;_y&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">Vector3D</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">o</span><span class="o">=</span><span class="n">Point3D</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize Plane.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">Vector3D</span><span class="p">),</span> \
+            <span class="s2">&quot;Expected Vector3D for plane normal. Got </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">Point3D</span><span class="p">),</span> \
+            <span class="s2">&quot;Expected Point3D for plane origin. Got </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">o</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_o</span> <span class="o">=</span> <span class="n">o</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_o</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">Vector3D</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">Vector3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Vector3D</span><span class="p">),</span> \
+                <span class="s2">&quot;Expected Vector3D for plane X-axis. Got </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">x</span><span class="o">.</span><span class="n">z</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-2</span><span class="p">,</span> \
+                <span class="s1">&#39;Plane X-axis and normal vector are not orthagonal. Got angle of </span><span class="si">{}</span><span class="s1"> &#39;</span> \
+                <span class="s1">&#39;degrees between them.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Plane.from_dict"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a Plane from a dictionary.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            {</span>
+<span class="sd">            &quot;type&quot;: &quot;Plane&quot;</span>
+<span class="sd">            &quot;n&quot;: (0, 0, 1),</span>
+<span class="sd">            &quot;o&quot;: (0, 10, 0),</span>
+<span class="sd">            &quot;x&quot;: (1, 0, 0)</span>
+<span class="sd">            }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s1">&#39;x&#39;</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">Vector3D</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">Vector3D</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;n&#39;</span><span class="p">]),</span>
+                   <span class="n">Point3D</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;o&#39;</span><span class="p">]),</span> <span class="n">x</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Plane.from_three_points"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.from_three_points">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_three_points</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a Plane from three Point3D objects that are not co-linear.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            o: A Point3D representing the origin point of the plane.</span>
+<span class="sd">            p2: A Point3D representing a point the plane.</span>
+<span class="sd">            p3: A Point3D representing a point the plane.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">((</span><span class="n">p2</span> <span class="o">-</span> <span class="n">o</span><span class="p">)</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">p3</span> <span class="o">-</span> <span class="n">o</span><span class="p">),</span> <span class="n">o</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Plane.from_normal_k"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.from_normal_k">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_normal_k</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a Plane from a normal vector and a scalar constant.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            o: A Point3D representing the origin point of the plane.</span>
+<span class="sd">            k: Scalar constant relating origin point to normal vector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get an arbitrary point on the plane for the origin</span>
+        <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">z</span><span class="p">:</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">k</span> <span class="o">/</span> <span class="n">n</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">n</span><span class="o">.</span><span class="n">y</span><span class="p">:</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">k</span> <span class="o">/</span> <span class="n">n</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="n">k</span> <span class="o">/</span> <span class="n">n</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Normal vector. This vector will always be normalized (magnitude = 1).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">o</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Origin point.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_o</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scalar constant relating origin point to normal vector.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plane X-Axis. This vector will always be normalized (magnitude = 1).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plane Y-Axis. This vector will always be normalized (magnitude = 1).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_y</span>
+
+<div class="viewcode-block" id="Plane.flip"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.flip">[docs]</a>    <span class="k">def</span> <span class="nf">flip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a flipped version of this plane (facing the opposite direction).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Plane</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">reverse</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">reverse</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Plane.move"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.move">[docs]</a>    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moving_vec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a plane that has been moved along a vector.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            moving_vec: A Vector3D with the direction and distance to move the plane.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Plane</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">moving_vec</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Plane.rotate"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Rotate a plane by a certain angle around an axis and origin.</span>
+
+<span class="sd">        Right hand rule applies:</span>
+<span class="sd">        If axis has a positive orientation, rotation will be clockwise.</span>
+<span class="sd">        If axis has a negative orientation, rotation will be counterclockwise.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            axis: A Vector3D axis representing the axis of rotation.</span>
+<span class="sd">            angle: An angle for rotation in radians.</span>
+<span class="sd">            origin: A Point3D for the origin around which the object will be rotated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Plane</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">),</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">),</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Plane.rotate_xy"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.rotate_xy">[docs]</a>    <span class="k">def</span> <span class="nf">rotate_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a plane rotated counterclockwise in the world XY plane by a certain angle.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            angle: An angle in radians.</span>
+<span class="sd">            origin: A Point3D for the origin around which the object will be rotated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Plane</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">rotate_xy</span><span class="p">(</span><span class="n">angle</span><span class="p">),</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">rotate_xy</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">),</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">rotate_xy</span><span class="p">(</span><span class="n">angle</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Plane.reflect"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.reflect">[docs]</a>    <span class="k">def</span> <span class="nf">reflect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normal</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a plane reflected across a plane with the input normal vector and origin.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            normal: A Vector3D representing the normal vector for the plane across</span>
+<span class="sd">                which the plane will be reflected. THIS VECTOR MUST BE NORMALIZED.</span>
+<span class="sd">            origin: A Point3D representing the origin from which to reflect.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Plane</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">normal</span><span class="p">),</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">origin</span><span class="p">),</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">normal</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Plane.scale"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale a plane by a factor from an origin point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            factor: A number representing how much the plane should be scaled.</span>
+<span class="sd">            origin: A Point3D representing the origin from which to scale.</span>
+<span class="sd">                If None, it will be scaled from the World origin (0, 0, 0).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Plane</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="n">origin</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Plane.xyz_to_xy"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.xyz_to_xy">[docs]</a>    <span class="k">def</span> <span class="nf">xyz_to_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a Point2D in the coordinate system of this plane from a Point3D.</span>
+
+<span class="sd">        Note that the input Point3D should lie within this plane object in order</span>
+<span class="sd">        for the result to be valid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_diff</span> <span class="o">=</span> <span class="n">Vector3D</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">z</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Point2D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">_diff</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">_diff</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Plane.xy_to_xyz"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.xy_to_xyz">[docs]</a>    <span class="k">def</span> <span class="nf">xy_to_xyz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a Point3D from a Point2D in the coordinate system of this plane.&quot;&quot;&quot;</span>
+        <span class="c1"># This method returns the same result as the following code:</span>
+        <span class="c1"># self.o + (self.x * point.x) + (self.y * point.y)</span>
+        <span class="c1"># It has been written explicitly to cut out the isinstance() checks for speed</span>
+        <span class="n">_u</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">point</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">point</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">point</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">_v</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Point3D</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">_u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">_v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">_u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">_v</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">z</span> <span class="o">+</span> <span class="n">_u</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">_v</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Plane.is_point_above"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.is_point_above">[docs]</a>    <span class="k">def</span> <span class="nf">is_point_above</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test if a given point is above or below this plane.</span>
+
+<span class="sd">        Above is defined as being on the side of the plane that the plane normal</span>
+<span class="sd">        is pointing towards.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            point: A Point3D object to test.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True is point is above; False if below.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">Vector3D</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">point</span><span class="o">.</span><span class="n">z</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="Plane.closest_point"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.closest_point">[docs]</a>    <span class="k">def</span> <span class="nf">closest_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the closest Point3D on this plane to another Point3D.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            point: A Point3D object to which the closest point on this plane</span>
+<span class="sd">                will be computed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Point3D for the closest point on this plane to the input point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">closest_point3d_on_plane</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Plane.distance_to_point"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.distance_to_point">[docs]</a>    <span class="k">def</span> <span class="nf">distance_to_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the minimum distance between this plane and the input point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            point: A Point3D object to which the minimum distance will be computed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The distance to the input point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">close_pt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">closest_point</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">point</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">close_pt</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Plane.closest_points_between_line"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.closest_points_between_line">[docs]</a>    <span class="k">def</span> <span class="nf">closest_points_between_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_ray</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the two closest Point3D between this plane and a Line3D or Ray3D.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            line_ray: A Line3D or Ray3D object to which the closest points</span>
+<span class="sd">                will be computed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Two Point3D objects representing</span>
+
+<span class="sd">            1) The closest point on the input line_ray to this plane.</span>
+<span class="sd">            2) The closest point on this plane to the input line_ray.</span>
+
+<span class="sd">            Will be None if the line_ray intersects this plant</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">closest_point3d_between_line3d_plane</span><span class="p">(</span><span class="n">line_ray</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Plane.distance_to_line"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.distance_to_line">[docs]</a>    <span class="k">def</span> <span class="nf">distance_to_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_ray</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the minimum distance between this plane and the input Line3D or Ray3D.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            line_ray: A Line3D or Ray3D object to which the minimum distance</span>
+<span class="sd">                will be computed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The minimum distance to the input line_ray.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">closest_points_between_line</span><span class="p">(</span><span class="n">line_ray</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># intersection</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Plane.intersect_line_ray"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.intersect_line_ray">[docs]</a>    <span class="k">def</span> <span class="nf">intersect_line_ray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_ray</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the intersection between this plane and the input Line3D or Ray3D.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            line_ray: A Line3D or Ray3D object for which intersection will be computed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Point3D for the intersection. Will be None if no intersection exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">intersect_line3d_plane</span><span class="p">(</span><span class="n">line_ray</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Plane.intersect_arc"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.intersect_arc">[docs]</a>    <span class="k">def</span> <span class="nf">intersect_arc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the intersection between this Plane and an Arc3D.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            plane: A Plane object for which intersection will be computed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of 2 Point3D objects if a full intersection exists.</span>
+<span class="sd">            A list with a single Point3D object if the line is tangent or intersects</span>
+<span class="sd">            only once. None if no intersection exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_plane_int_ray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersect_plane</span><span class="p">(</span><span class="n">arc</span><span class="o">.</span><span class="n">plane</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_plane_int_ray</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_p12d</span> <span class="o">=</span> <span class="n">arc</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xyz_to_xy</span><span class="p">(</span><span class="n">_plane_int_ray</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+            <span class="n">_p22d</span> <span class="o">=</span> <span class="n">arc</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xyz_to_xy</span><span class="p">(</span><span class="n">_plane_int_ray</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="n">_plane_int_ray</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">_v2d</span> <span class="o">=</span> <span class="n">_p22d</span> <span class="o">-</span> <span class="n">_p12d</span>
+            <span class="n">_int_ray2d</span> <span class="o">=</span> <span class="n">Ray2D</span><span class="p">(</span><span class="n">_p12d</span><span class="p">,</span> <span class="n">_v2d</span><span class="p">)</span>
+            <span class="n">_int_pt2d</span> <span class="o">=</span> <span class="n">arc</span><span class="o">.</span><span class="n">arc2d</span><span class="o">.</span><span class="n">intersect_line_infinite</span><span class="p">(</span><span class="n">_int_ray2d</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_int_pt2d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">arc</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xy_to_xyz</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">_int_pt2d</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Plane.intersect_plane"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.intersect_plane">[docs]</a>    <span class="k">def</span> <span class="nf">intersect_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plane</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the intersection between this Plane and another Plane.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            plane: A Plane object for which intersection will be computed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Ray3D for the intersection. Will be None if planes are parallel.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">intersect_plane_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plane</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Ray3D</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Plane.is_coplanar"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.is_coplanar">[docs]</a>    <span class="k">def</span> <span class="nf">is_coplanar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plane</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test if another Plane object is perfectly coplanar with this Plane.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            plane: A Plane object for which co-planarity will be tested.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if plane is coplanar. False if it is not coplanar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">==</span> <span class="n">plane</span><span class="o">.</span><span class="n">n</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="n">plane</span><span class="o">.</span><span class="n">k</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">==</span> <span class="n">plane</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">reverse</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="o">-</span><span class="n">plane</span><span class="o">.</span><span class="n">k</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Plane.is_coplanar_tolerance"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.is_coplanar_tolerance">[docs]</a>    <span class="k">def</span> <span class="nf">is_coplanar_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">,</span> <span class="n">angle_tolerance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Test if another Plane object is coplanar within a certain tolerance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            plane: A Plane object for which co-planarity will be tested.</span>
+<span class="sd">            tolerance: The distance between the two planes at which point they can</span>
+<span class="sd">                be considered coplanar.</span>
+<span class="sd">            angle_tolerance: The angle in radians that the plane normals can</span>
+<span class="sd">                differ from one another in order for the planes to be considered</span>
+<span class="sd">                coplanar.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if plane is coplanar. False if it is not coplanar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">plane</span><span class="o">.</span><span class="n">n</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">angle_tolerance</span> <span class="ow">or</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">plane</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">reverse</span><span class="p">())</span> <span class="o">&lt;=</span> <span class="n">angle_tolerance</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">plane</span><span class="o">.</span><span class="n">o</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tolerance</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Plane.duplicate"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.duplicate">[docs]</a>    <span class="k">def</span> <span class="nf">duplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a copy of this object.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copy__</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Plane.to_dict"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get Plane as a dictionary.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;Plane&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">to_array</span><span class="p">(),</span>
+                <span class="s1">&#39;o&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">to_array</span><span class="p">(),</span>
+                <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">to_array</span><span class="p">()}</span></div>
+
+    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Plane</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A tuple based on the object properties, useful for hashing.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Plane</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__key</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Plane.ToString"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.plane.html#ladybug_geometry.geometry3d.plane.Plane.ToString">[docs]</a>    <span class="k">def</span> <span class="nf">ToString</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Overwrite .NET ToString.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Plane (&lt;</span><span class="si">%.2f</span><span class="s1">, </span><span class="si">%.2f</span><span class="s1">, </span><span class="si">%.2f</span><span class="s1">&gt; normal) (&lt;</span><span class="si">%.2f</span><span class="s1">, </span><span class="si">%.2f</span><span class="s1">, </span><span class="si">%.2f</span><span class="s1">&gt; origin)&#39;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">o</span><span class="o">.</span><span class="n">z</span><span class="p">)</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

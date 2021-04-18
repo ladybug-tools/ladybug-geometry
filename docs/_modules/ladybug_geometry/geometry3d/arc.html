@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ladybug_geometry.geometry3d.arc &#8212; ladybug geometry  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          ladybug geometry</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.mesh.html">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.bounding.html">ladybug_geometry.bounding module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.intersection2d.html">ladybug_geometry.intersection2d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.intersection3d.html">ladybug_geometry.intersection3d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.triangulation.html">ladybug_geometry.triangulation module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <h1>Source code for ladybug_geometry.geometry3d.arc</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;3D Arc&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">.plane</span> <span class="kn">import</span> <span class="n">Plane</span>
+
+<span class="kn">from</span> <span class="nn">..geometry2d.pointvector</span> <span class="kn">import</span> <span class="n">Point2D</span><span class="p">,</span> <span class="n">Vector2D</span>
+<span class="kn">from</span> <span class="nn">..geometry2d.ray</span> <span class="kn">import</span> <span class="n">Ray2D</span>
+<span class="kn">from</span> <span class="nn">..geometry2d.arc</span> <span class="kn">import</span> <span class="n">Arc2D</span>
+<span class="kn">from</span> <span class="nn">.polyline</span> <span class="kn">import</span> <span class="n">Polyline3D</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+
+
+<div class="viewcode-block" id="Arc3D"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D">[docs]</a><span class="k">class</span> <span class="nc">Arc3D</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;3D arc object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        plane: A Plane in which the arc lies with an origin representing the</span>
+<span class="sd">            center of the circle for the arc.</span>
+<span class="sd">        radius: A number representing the radius of the arc.</span>
+<span class="sd">        a1: A number between 0 and 2 * pi for the start angle of the arc.</span>
+<span class="sd">        a2: A number between 0 and 2 * pi for the end angle of the arc.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        * plane</span>
+<span class="sd">        * radius</span>
+<span class="sd">        * a1</span>
+<span class="sd">        * a2</span>
+<span class="sd">        * p1</span>
+<span class="sd">        * p2</span>
+<span class="sd">        * midpoint</span>
+<span class="sd">        * c</span>
+<span class="sd">        * length</span>
+<span class="sd">        * angle</span>
+<span class="sd">        * is_circle</span>
+<span class="sd">        * arc2d</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_plane&#39;</span><span class="p">,</span> <span class="s1">&#39;_arc2d&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plane</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">a1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">a2</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize Arc3D.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plane</span><span class="p">,</span> <span class="n">Plane</span><span class="p">),</span> <span class="s2">&quot;Expected Plane. Got </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">plane</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plane</span> <span class="o">=</span> <span class="n">plane</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_arc2d</span> <span class="o">=</span> <span class="n">Arc2D</span><span class="p">(</span><span class="n">Point2D</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">radius</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Arc3D.from_dict"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a Arc3D from a dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data: A python dictionary in the following format</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            {</span>
+<span class="sd">            &quot;type&quot;: &quot;Arc3D&quot;</span>
+<span class="sd">            &quot;plane&quot;: {&quot;n&quot;: (0, 0, 1), &quot;o&quot;: (0, 10, 0), &quot;x&quot;: (1, 0, 0)},</span>
+<span class="sd">            &quot;radius&quot;: 5,</span>
+<span class="sd">            &quot;a1&quot;: 0,</span>
+<span class="sd">            &quot;a2&quot;: 3.14159</span>
+<span class="sd">            }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">Plane</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;plane&#39;</span><span class="p">]),</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">],</span>
+                   <span class="n">data</span><span class="p">[</span><span class="s1">&#39;a1&#39;</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;a2&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Arc3D.from_start_mid_end"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.from_start_mid_end">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_start_mid_end</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">circle</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize a new arc from start, middle, and end points.</span>
+
+<span class="sd">        Note that input points will be assumed to be in counterclockwise order.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            p1: The start point of the arc.</span>
+<span class="sd">            m: Any point along the length of the arc that is not the start or end.</span>
+<span class="sd">            p2: The end point of the arc.</span>
+<span class="sd">            circle: Set to True if you would like the output to be a full circle</span>
+<span class="sd">                defined by the three points instead of an arc with a start and end.</span>
+<span class="sd">                Default is False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plane</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_plane_from_vertices</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+        <span class="n">p1_2d</span><span class="p">,</span> <span class="n">m_2d</span><span class="p">,</span> <span class="n">p2_2d</span> <span class="o">=</span> <span class="n">plane</span><span class="o">.</span><span class="n">xyz_to_xy</span><span class="p">(</span><span class="n">p1</span><span class="p">),</span> <span class="n">plane</span><span class="o">.</span><span class="n">xyz_to_xy</span><span class="p">(</span><span class="n">m</span><span class="p">),</span> <span class="n">plane</span><span class="o">.</span><span class="n">xyz_to_xy</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
+        <span class="n">arc_2d</span> <span class="o">=</span> <span class="n">Arc2D</span><span class="o">.</span><span class="n">from_start_mid_end</span><span class="p">(</span><span class="n">p1_2d</span><span class="p">,</span> <span class="n">m_2d</span><span class="p">,</span> <span class="n">p2_2d</span><span class="p">,</span> <span class="n">circle</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">Plane</span><span class="p">(</span><span class="n">plane</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">plane</span><span class="o">.</span><span class="n">xy_to_xyz</span><span class="p">(</span><span class="n">arc_2d</span><span class="o">.</span><span class="n">c</span><span class="p">),</span> <span class="n">plane</span><span class="o">.</span><span class="n">x</span><span class="p">),</span>
+                   <span class="n">arc_2d</span><span class="o">.</span><span class="n">r</span><span class="p">,</span> <span class="n">arc_2d</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">arc_2d</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">plane</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A Plane in which the arc lies with an origin for the center of the arc.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plane</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">radius</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Radius of arc.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arc2d</span><span class="o">.</span><span class="n">r</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">a1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start angle of the arc in radians.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arc2d</span><span class="o">.</span><span class="n">a1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">a2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;End angle of the arc in radians.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arc2d</span><span class="o">.</span><span class="n">a2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">p1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start point.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xy_to_xyz</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arc2d</span><span class="o">.</span><span class="n">p1</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">p2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;End point.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xy_to_xyz</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arc2d</span><span class="o">.</span><span class="n">p2</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">midpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Midpoint.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">point_at</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">c</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Center point of the circle on which the arc lies.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">o</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The length of the arc.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">angle</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">angle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The total angle over the domain of the arc in radians.&quot;&quot;&quot;</span>
+        <span class="n">_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">a1</span>
+        <span class="k">return</span> <span class="n">_diff</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_inverted</span> <span class="k">else</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="n">_diff</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Area of the circle to which the arc belongs.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_circle</span><span class="p">,</span> <span class="s1">&#39;Arc must be a closed circle to access &quot;area&quot; property.&#39;</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">**</span> <span class="mi">2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_circle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Boolean for whether the arc is a full circle (True) or not (False).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">a1</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">a2</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_inverted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Boolean noting whether the end angle a2 is smaller than the start angle a1.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">a2</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">a1</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">arc2d</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;An Arc2D within the plane of the Arc3D.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arc2d</span>
+
+<div class="viewcode-block" id="Arc3D.move"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.move">[docs]</a>    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">moving_vec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get an arc that has been moved along a vector.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            moving_vec: A Vector3D with the direction and distance to move the arc.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Arc3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">moving_vec</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Arc3D.rotate"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Rotate this arc by a certain angle around an axis and origin.</span>
+
+<span class="sd">        Right hand rule applies:</span>
+<span class="sd">        If axis has a positive orientation, rotation will be clockwise.</span>
+<span class="sd">        If axis has a negative orientation, rotation will be counterclockwise.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            axis: A Vector3D axis representing the axis of rotation.</span>
+<span class="sd">            angle: An angle for rotation in radians.</span>
+<span class="sd">            origin: A Point3D for the origin around which the object will be rotated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Arc3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">),</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Arc3D.rotate_xy"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.rotate_xy">[docs]</a>    <span class="k">def</span> <span class="nf">rotate_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a arc that is rotated counterclockwise in the world XY plane by a certain angle.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            angle: An angle for rotation in radians.</span>
+<span class="sd">            origin: A Point3D for the origin around which the arc will be rotated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Arc3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">rotate_xy</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Arc3D.reflect"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.reflect">[docs]</a>    <span class="k">def</span> <span class="nf">reflect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">normal</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a arc reflected across a plane with the input normal vector and origin.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            normal: A Vector3D representing the normal vector for the plane across</span>
+<span class="sd">                which the arc will be reflected. THIS VECTOR MUST BE NORMALIZED.</span>
+<span class="sd">            origin: A Point3D representing the origin from which to reflect.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">arc2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arc2d</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">Vector2D</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">Point2D</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Arc3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">origin</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">arc2d</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">arc2d</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Arc3D.scale"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale a arc by a factor from an origin point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            factor: A number representing how much the arc should be scaled.</span>
+<span class="sd">            origin: A Point2D representing the origin from which to scale.</span>
+<span class="sd">                If None, it will be scaled from the World origin (0, 0, 0).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Arc3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="n">origin</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">*</span> <span class="n">factor</span><span class="p">,</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Arc3D.subdivide"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.subdivide">[docs]</a>    <span class="k">def</span> <span class="nf">subdivide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distances</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get Point3D values along the arc that subdivide it based on input distances.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            distances: A list of distances along the arc at which to subdivide it.</span>
+<span class="sd">                This can also be a single number that will be repeated until the</span>
+<span class="sd">                end of the arc.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xy_to_xyz</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arc2d</span><span class="o">.</span><span class="n">subdivide</span><span class="p">(</span><span class="n">distances</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="Arc3D.subdivide_evenly"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.subdivide_evenly">[docs]</a>    <span class="k">def</span> <span class="nf">subdivide_evenly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get Point3D values along the arc that divide it into evenly-spaced segments.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            number: The number of segments into which the arc will be divided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xy_to_xyz</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arc2d</span><span class="o">.</span><span class="n">subdivide_evenly</span><span class="p">(</span><span class="n">number</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="Arc3D.point_at"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.point_at">[docs]</a>    <span class="k">def</span> <span class="nf">point_at</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a point at a given fraction along the arc.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameter: The fraction between the start and end point where the</span>
+<span class="sd">                desired point lies. For example, 0.5 will yield the midpoint.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xy_to_xyz</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arc2d</span><span class="o">.</span><span class="n">point_at</span><span class="p">(</span><span class="n">parameter</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Arc3D.point_at_angle"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.point_at_angle">[docs]</a>    <span class="k">def</span> <span class="nf">point_at_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a point at a given angle along the arc.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            angle: The angle in radians from the start point along the arc</span>
+<span class="sd">                to get the Point3D.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xy_to_xyz</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arc2d</span><span class="o">.</span><span class="n">point_at_angle</span><span class="p">(</span><span class="n">angle</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Arc3D.point_at_length"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.point_at_length">[docs]</a>    <span class="k">def</span> <span class="nf">point_at_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a point at a given distance along the arc segment.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            length: The distance along the arc from the start point where the</span>
+<span class="sd">                desired point lies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">point_at</span><span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Arc3D.closest_point"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.closest_point">[docs]</a>    <span class="k">def</span> <span class="nf">closest_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the closest Point3D on this object to another Point3D.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            point: A Point3D object to which the closest point on this object</span>
+<span class="sd">                will be computed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Point3D for the closest point on this line to the input point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plane_pt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">closest_point</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xy_to_xyz</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">arc2d</span><span class="o">.</span><span class="n">closest_point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xyz_to_xy</span><span class="p">(</span><span class="n">plane_pt</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="Arc3D.distance_to_point"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.distance_to_point">[docs]</a>    <span class="k">def</span> <span class="nf">distance_to_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the minimum distance between this object and the input point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            point: A Point3D object to which the minimum distance will be computed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The distance to the input point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">close_pt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">closest_point</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">point</span><span class="o">.</span><span class="n">distance_to_point</span><span class="p">(</span><span class="n">close_pt</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Arc3D.intersect_plane"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.intersect_plane">[docs]</a>    <span class="k">def</span> <span class="nf">intersect_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plane</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the intersection between this Arc3D and a Plane.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            plane: A Plane that will be intersected with this arc.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of Point3D objects if the intersection was successful.</span>
+<span class="sd">            None if no intersection exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_plane_int_ray</span> <span class="o">=</span> <span class="n">plane</span><span class="o">.</span><span class="n">intersect_plane</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_plane_int_ray</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_p12d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xyz_to_xy</span><span class="p">(</span><span class="n">_plane_int_ray</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+            <span class="n">_p22d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xyz_to_xy</span><span class="p">(</span><span class="n">_plane_int_ray</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="n">_plane_int_ray</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">_v2d</span> <span class="o">=</span> <span class="n">_p22d</span> <span class="o">-</span> <span class="n">_p12d</span>
+            <span class="n">_int_ray2d</span> <span class="o">=</span> <span class="n">Ray2D</span><span class="p">(</span><span class="n">_p12d</span><span class="p">,</span> <span class="n">_v2d</span><span class="p">)</span>
+            <span class="n">_int_pt2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arc2d</span><span class="o">.</span><span class="n">intersect_line_infinite</span><span class="p">(</span><span class="n">_int_ray2d</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">_int_pt2d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xy_to_xyz</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">_int_pt2d</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Arc3D.split_with_plane"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.split_with_plane">[docs]</a>    <span class="k">def</span> <span class="nf">split_with_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plane</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Split this Arc3D in 2 or 3 smaller arcs using a Plane.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            plane: A Plane that will be used to split this arc.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list with two or three Arc3D objects if the split was successful.</span>
+<span class="sd">            Will be a list with 1 Arc3D if no intersection exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_plane_int_ray</span> <span class="o">=</span> <span class="n">plane</span><span class="o">.</span><span class="n">intersect_plane</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_plane_int_ray</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_p12d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xyz_to_xy</span><span class="p">(</span><span class="n">_plane_int_ray</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+            <span class="n">_p22d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">xyz_to_xy</span><span class="p">(</span><span class="n">_plane_int_ray</span><span class="o">.</span><span class="n">p</span> <span class="o">+</span> <span class="n">_plane_int_ray</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">_v2d</span> <span class="o">=</span> <span class="n">_p22d</span> <span class="o">-</span> <span class="n">_p12d</span>
+            <span class="n">_int_ray2d</span> <span class="o">=</span> <span class="n">Ray2D</span><span class="p">(</span><span class="n">_p12d</span><span class="p">,</span> <span class="n">_v2d</span><span class="p">)</span>
+            <span class="n">_int_pt2d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arc2d</span><span class="o">.</span><span class="n">split_line_infinite</span><span class="p">(</span><span class="n">_int_ray2d</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_int_pt2d</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">Arc3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="n">arc</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="n">arc</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">arc</span> <span class="ow">in</span> <span class="n">_int_pt2d</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Arc3D.to_polyline"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.to_polyline">[docs]</a>    <span class="k">def</span> <span class="nf">to_polyline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">divisions</span><span class="p">,</span> <span class="n">interpolated</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get this Arc3D as an approximated Polyline3D.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            divisions: The number of segments into which the arc will be divided.</span>
+<span class="sd">            interpolated: Boolean to note whether the polyline should be interpolated</span>
+<span class="sd">                between the input vertices when it is translated to other interfaces.</span>
+<span class="sd">                This property has no effect on the geometric calculations performed</span>
+<span class="sd">                by this library and is only present in order to assist with</span>
+<span class="sd">                display/translation. (Default: True)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subdivide_evenly</span><span class="p">(</span><span class="n">divisions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Polyline3D</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">interpolated</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Arc3D.to_dict"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get Arc3D as a dictionary.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;Arc3D&#39;</span><span class="p">,</span> <span class="s1">&#39;plane&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+                <span class="s1">&#39;radius&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="s1">&#39;a1&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="s1">&#39;a2&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">a2</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="Arc3D.duplicate"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.duplicate">[docs]</a>    <span class="k">def</span> <span class="nf">duplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a copy of this object.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copy__</span><span class="p">()</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_plane_from_vertices</span><span class="p">(</span><span class="n">pt1</span><span class="p">,</span> <span class="n">pt2</span><span class="p">,</span> <span class="n">pt3</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a plane from three vertices.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">v1</span> <span class="o">=</span> <span class="n">pt2</span> <span class="o">-</span> <span class="n">pt1</span>
+            <span class="n">v2</span> <span class="o">=</span> <span class="n">pt3</span> <span class="o">-</span> <span class="n">pt1</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">v1</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Incorrect Point3D input for Arc3D:</span><span class="se">\n\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Plane</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">pt1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Arc3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A tuple based on the object properties, useful for hashing.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">a2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Arc3D</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__key</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Arc3D.ToString"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.arc.html#ladybug_geometry.geometry3d.arc.Arc3D.ToString">[docs]</a>    <span class="k">def</span> <span class="nf">ToString</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Overwrite .NET ToString.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Arc3D (center </span><span class="si">{}</span><span class="s1">) (radius </span><span class="si">{}</span><span class="s1">) (length </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plane</span><span class="o">.</span><span class="n">o</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">)</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

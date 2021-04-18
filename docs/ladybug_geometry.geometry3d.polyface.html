@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ladybug_geometry.geometry3d.polyface module &#8212; ladybug geometry  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ladybug_geometry.geometry3d.polyline module" href="ladybug_geometry.geometry3d.polyline.html" />
+    <link rel="prev" title="ladybug_geometry.geometry3d.pointvector module" href="ladybug_geometry.geometry3d.pointvector.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          ladybug geometry</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ladybug_geometry.html">ladybug_geometry package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ladybug_geometry.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.mesh.html">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.bounding.html">ladybug_geometry.bounding module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.intersection2d.html">ladybug_geometry.intersection2d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.intersection3d.html">ladybug_geometry.intersection3d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.triangulation.html">ladybug_geometry.triangulation module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ladybug_geometry.html">ladybug_geometry package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ladybug_geometry.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="ladybug_geometry.geometry3d.pointvector.html" title="Previous Chapter: ladybug_geometry.geometry3d.pointvector module"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; ladybug_geome...</span>
+    </a>
+  </li>
+  <li>
+    <a href="ladybug_geometry.geometry3d.polyline.html" title="Next Chapter: ladybug_geometry.geometry3d.polyline module"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">ladybug_geome... &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/ladybug_geometry.geometry3d.polyface.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ladybug_geometry.html">ladybug_geometry package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="ladybug_geometry.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <div class="section" id="module-ladybug_geometry.geometry3d.polyface">
+<span id="ladybug-geometry-geometry3d-polyface-module"></span><h1>ladybug_geometry.geometry3d.polyface module<a class="headerlink" href="#module-ladybug_geometry.geometry3d.polyface" title="Permalink to this headline">¶</a></h1>
+<p>Object with Multiple Planar Faces in 3D Space</p>
+<dl class="py class">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">ladybug_geometry.geometry3d.polyface.</span></code><code class="sig-name descname"><span class="pre">Polyface3D</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_information</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ladybug_geometry.geometry3d._2d.Base2DIn3D</span></code></p>
+<p>Object with Multiple Planar Faces in 3D Space. Includes solid objects and polyhedra.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vertices</strong> – A list of Point3D objects representing the vertices of
+this PolyFace.</p></li>
+<li><p><strong>face_indices</strong> – A list of lists with one list for each face of the polyface.
+Each face list must contain at least one tuple of integers corresponding
+to indices within the vertices list. Additional tuples of integers may
+follow this one such that the first tuple denotes the boundary of the
+face while each subsequent tuple denotes a hole in the face.</p></li>
+<li><p><strong>edge_information</strong> – <p>Optional edge information, which will speed up the
+creation of the Polyface object if it is available but should be left
+as None if it is unknown. If None, edge_information will be computed
+from the vertices and face_indices inputs. Edge information
+should be formatted as a dictionary with two keys as follows:</p>
+<ul>
+<li><p>’edge_indices’:
+An array objects that each contain two integers.
+These integers correspond to indices within the vertices list and
+each tuple represents a line segment for an edge of the polyface.</p></li>
+<li><p>’edge_types’:
+An array of integers for each edge that parallels the edge_indices
+list. An integer of 0 denotes a naked edge, an integer of 1
+denotes an internal edge. Anything higher is a non-manifold edge.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Properties:</dt><dd><ul class="simple">
+<li><p>vertices</p></li>
+<li><p>faces</p></li>
+<li><p>edges</p></li>
+<li><p>naked_edges</p></li>
+<li><p>internal_edges</p></li>
+<li><p>non_manifold_edges</p></li>
+<li><p>face_indices</p></li>
+<li><p>edge_indices</p></li>
+<li><p>edge_types</p></li>
+<li><p>min</p></li>
+<li><p>max</p></li>
+<li><p>center</p></li>
+<li><p>area</p></li>
+<li><p>volume</p></li>
+<li><p>is_solid</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.ToString">
+<code class="sig-name descname"><span class="pre">ToString</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.ToString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overwrite .NET ToString.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.does_intersect_line_ray_exist">
+<code class="sig-name descname"><span class="pre">does_intersect_line_ray_exist</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line_ray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.does_intersect_line_ray_exist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.does_intersect_line_ray_exist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean denoting whether an intersection exists between the input Line3D or Ray3D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>line_ray</strong> – A Line3D or Ray3D object for which intersection will be evaluated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if an intersection exists. False if it does not exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.duplicate">
+<code class="sig-name descname"><span class="pre">duplicate</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.duplicate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of this object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.from_box">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_box</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_plane</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.from_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.from_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize Polyface3D from parameters describing a box.</p>
+<p>Initializing a polyface this way has the added benefit of having its
+faces property quickly calculated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>width</strong> – A number for the width of the box (in the X direction).</p></li>
+<li><p><strong>depth</strong> – A number for the depth of the box (in the Y direction).</p></li>
+<li><p><strong>height</strong> – A number for the height of the box (in the Z direction).</p></li>
+<li><p><strong>base_plane</strong> – A Plane object from which to generate the box.
+If None, default is the WorldXY plane.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.from_dict">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Face3D from a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – A python dictionary in the following format</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Polyface3D&quot;</span><span class="p">,</span>
+<span class="s2">&quot;vertices&quot;</span><span class="p">:</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+<span class="s2">&quot;face_indices&quot;</span><span class="p">:</span> <span class="p">[[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],</span> <span class="p">[(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]],</span>
+<span class="s2">&quot;edge_information&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;edge_indices&quot;</span><span class="p">:[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+                     <span class="s2">&quot;edge_types&quot;</span><span class="p">:[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.from_faces">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_faces</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">faces</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.from_faces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.from_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize Polyface3D from a list of Face3D objects.</p>
+<p>Note that the Polyface3D.faces property of the resulting polyface will
+have an order of faces that matches the order input to this classmethod.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>faces</strong> – A list of Face3D objects representing the boundary of this Polyface.</p></li>
+<li><p><strong>tolerance</strong> – The maximum difference between x, y, and z values at which
+the vertex of two adjacent faces is considered the same.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.from_offset_face">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_offset_face</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">face</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.from_offset_face"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.from_offset_face" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a solid Polyface3D from a Face3D offset along its normal.</p>
+<p>The resulting polyface will always be offset in the direction of
+the face normal.</p>
+<p>When a polyface is initialized this way, the first face of the
+Polysurface3D.faces will always be the input face used to create the
+object, the last face will be the offset version of the face, and all
+other faces will form the extrusion connecting the two.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>face</strong> – A Face3D to serve as a base for the polyface.</p></li>
+<li><p><strong>offset</strong> – A number for the distance to offset the face to make a solid.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.get_outward_faces">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">get_outward_faces</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">faces</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.get_outward_faces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.get_outward_faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn a list of faces forming a solid into one where they all point outward.</p>
+<p>Note that, if the input faces do not form a closed solid, there may be some
+output faces that are not pointing outward.  However, if the gaps in the
+combined solid are within the input tolerance, this should not be an issue.</p>
+<p>Also, note that this method runs automatically for any solid polyface
+(meaning every solid polyface automatically has outward-facing faces). So there
+is no need to rerun this method for faces from a solid polyface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>faces</strong> – A list of Face3D objects that together form a solid.</p></li>
+<li><p><strong>tolerance</strong> – Optional tolerance for the permissable size of gap between
+faces at which point the faces are considered to have a single edge.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>outward_faces – A list of the input Face3D objects that all point outwards
+(provided the input faces form a solid).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.intersect_line_ray">
+<code class="sig-name descname"><span class="pre">intersect_line_ray</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line_ray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.intersect_line_ray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.intersect_line_ray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the intersections between this polyface and the input Line3D or Ray3D.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>line_ray</strong> – A Line3D or Ray3D object for which intersection will be computed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of Point3D for the intersection. Will be an empty list if no
+intersection exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.intersect_plane">
+<code class="sig-name descname"><span class="pre">intersect_plane</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plane</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.intersect_plane"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.intersect_plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the intersection between this polyface and the input plane.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>plane</strong> – A Plane object for which intersection will be computed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of LineSegment3D objects for the intersection.
+Will be an empty list if no intersection exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.is_point_inside">
+<code class="sig-name descname"><span class="pre">is_point_inside</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_vector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Vector3D(1.0,</span> <span class="pre">0.0,</span> <span class="pre">0.0)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.is_point_inside"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.is_point_inside" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test whether a Point3D lies inside or outside the polyface.</p>
+<p>Note that, if this polyface is not solid, the result will always be False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>point</strong> – A Point3D for which the inside/outside relationship will be tested.</p></li>
+<li><p><strong>test_vector</strong> – Optional vector to set the direction in which intersections
+with the polyface faces will be evaluated to determine if the
+point is inside. Default is the X-unit vector.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A boolean denoting whether the point lies inside (True) or outside (False).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.merge_overlapping_edges">
+<code class="sig-name descname"><span class="pre">merge_overlapping_edges</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tolerance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_tolerance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.merge_overlapping_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.merge_overlapping_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get this object with overlapping naked edges merged into single internal edges.</p>
+<p>This can be used to determine if a polyface is truly solid.
+The default test of edge conditions that runs upon creation of a polyface does
+not check for cases where overlapping colinear edges could be considered
+a single internal edge such as the case below:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span> <span class="p">|</span>           <span class="m">1</span>          <span class="p">|</span>
+A<span class="p">|</span>______________________<span class="p">|</span>C
+ <span class="p">|</span>          B<span class="p">|</span>          <span class="p">|</span>
+ <span class="p">|</span>           <span class="p">|</span>          <span class="p">|</span>
+ <span class="p">|</span>     <span class="m">2</span>     <span class="p">|</span>     <span class="m">3</span>    <span class="p">|</span>
+</pre></div>
+</div>
+<p>If Face 1 only has edge AC and not two separate edges for AB and BC, the
+creation of the polyface will yield naked edges for AC, AB, and BC, meaning
+the shape would not be considered solid when it might actually be so. This
+merge_overlapping_edges method overcomes this by replacing the entire set
+of 3 naked edges above a single internal edge running from A to C.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tolerance</strong> – The minimum distance between a vertex and the boundary segments
+at which point the vertex is considered colinear.</p></li>
+<li><p><strong>angle_tolerance</strong> – The max angle in radians that vertices are allowed to
+differ from one another in order to consider them colinear.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.move">
+<code class="sig-name descname"><span class="pre">move</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moving_vec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a polyface that has been moved along a vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>moving_vec</strong> – A Vector3D with the direction and distance to move the polyface.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.overlapping_bounding_boxes">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">overlapping_bounding_boxes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polyface1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polyface2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.overlapping_bounding_boxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.overlapping_bounding_boxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the bounding boxes of two polyfaces overlap within a tolerance.</p>
+<p>This is particularly useful as a check before performing computationally
+intenseprocesses between two polyfaces like intersection or checking for
+adjacency. Checking the overlap of the bounding boxes is extremely quick
+given this method’s use of the Separating Axis Theorem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polyface1</strong> – The first polyface to check.</p></li>
+<li><p><strong>polyface2</strong> – The second polyface to check.</p></li>
+<li><p><strong>tolerance</strong> – Distance within which two points are considered to be co-located.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.reflect">
+<code class="sig-name descname"><span class="pre">reflect</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">normal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.reflect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.reflect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a polyface reflected across a plane with the input normal vector and origin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>normal</strong> – A Vector3D representing the normal vector for the plane across
+which the polyface will be reflected. THIS VECTOR MUST BE NORMALIZED.</p></li>
+<li><p><strong>origin</strong> – A Point3D representing the origin from which to reflect.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.rotate">
+<code class="sig-name descname"><span class="pre">rotate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.rotate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.rotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate a polyface by a certain angle around an axis and origin.</p>
+<p>Right hand rule applies:
+If axis has a positive orientation, rotation will be clockwise.
+If axis has a negative orientation, rotation will be counterclockwise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axis</strong> – A Vector3D axis representing the axis of rotation.</p></li>
+<li><p><strong>angle</strong> – An angle for rotation in radians.</p></li>
+<li><p><strong>origin</strong> – A Point3D for the origin around which the object will be rotated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.rotate_xy">
+<code class="sig-name descname"><span class="pre">rotate_xy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.rotate_xy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.rotate_xy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a polyface rotated counterclockwise in the world XY plane by an angle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angle</strong> – An angle in radians.</p></li>
+<li><p><strong>origin</strong> – A Point3D for the origin around which the object will be rotated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.scale">
+<code class="sig-name descname"><span class="pre">scale</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scale a polyface by a factor from an origin point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>factor</strong> – A number representing how much the polyface should be scaled.</p></li>
+<li><p><strong>origin</strong> – A Point3D representing the origin from which to scale.
+If None, it will be scaled from the World origin (0, 0, 0).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.to_dict">
+<code class="sig-name descname"><span class="pre">to_dict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_edge_information</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ladybug_geometry/geometry3d/polyface.html#Polyface3D.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Polyface3D as a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>include_edge_information</strong> – Set to True to include the edge_information
+in the dictionary, which will allow for fast initialization when
+it is de-serialized. Default True.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.area">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">area</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.area" title="Permalink to this definition">¶</a></dt>
+<dd><p>The total surface area of the polyface.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.center">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">center</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.center" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Point3D for the center of the bounding box around this geometry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.edge_indices">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">edge_indices</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.edge_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple of edge tuples with integers corresponding to indices of vertices.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.edge_information">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">edge_information</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.edge_information" title="Permalink to this definition">¶</a></dt>
+<dd><p>‘edge_indices’, ‘edge_types’ and corresponding properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Dictionary with keys</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.edge_types">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">edge_types</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.edge_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple of integers for each edge that denotes the type of edge.</p>
+<p>0 denotes a naked edge, 1 denotes an internal edge, and anything higher is a
+non-manifold edge.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.edges">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">edges</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>“Tuple of all edges in this polyface as LineSegment3D objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.face_indices">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">face_indices</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.face_indices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple of face tuples with integers corresponding to indices of vertices.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.faces">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">faces</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.faces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple of all Face3D objects making up this polyface.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.internal_edges">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">internal_edges</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.internal_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>“Tuple of all internal edges in this polyface as LineSegment3D objects.</p>
+<p>Internal edges are shared between two faces in the polyface.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.is_solid">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">is_solid</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.is_solid" title="Permalink to this definition">¶</a></dt>
+<dd><p>A boolean to note whether the polyface is solid (True) or is open (False).</p>
+<p>Note that all solid polyface objects will have faces pointing outwards.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.max">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">max</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.max" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Point3D for the maximum bounding box vertex around this geometry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.min">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">min</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.min" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Point3D for the minimum bounding box vertex around this geometry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.naked_edges">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">naked_edges</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.naked_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>“Tuple of all naked edges in this polyface as LineSegment3D objects.</p>
+<p>Naked edges belong to only one face in the polyface (they are not
+shared between faces).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.non_manifold_edges">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">non_manifold_edges</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.non_manifold_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>“Tuple of all non-manifold edges in this polyface as LineSegment3D objects.</p>
+<p>Non-manifold edges are shared between three or more faces and are therefore
+not allowed in solid polyfaces.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.vertices">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">vertices</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.vertices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple of all vertices in this polyface.</p>
+<p>Note that, in the case of a polyface with holes, some vertices will be repeated
+since this property effectively traces out a single boundary around the
+whole shape, winding inward to cut out the holes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="ladybug_geometry.geometry3d.polyface.Polyface3D.volume">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">volume</span></code><a class="headerlink" href="#ladybug_geometry.geometry3d.polyface.Polyface3D.volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>The volume enclosed by the polyface.</p>
+<p>Note that, if this polyface is not solid (with all face normals pointing
+outward), the value of this property will not be valid.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

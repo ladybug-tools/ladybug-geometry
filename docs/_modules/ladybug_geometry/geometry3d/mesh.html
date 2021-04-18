@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ladybug_geometry.geometry3d.mesh &#8212; ladybug geometry  documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html">
+          ladybug geometry</a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html">ladybug_geometry.geometry2d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.arc.html">ladybug_geometry.geometry2d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.line.html">ladybug_geometry.geometry2d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.mesh.html">ladybug_geometry.geometry2d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.pointvector.html">ladybug_geometry.geometry2d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.polygon.html">ladybug_geometry.geometry2d.polygon module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.polyline.html">ladybug_geometry.geometry2d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.ray.html">ladybug_geometry.geometry2d.ray module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry2d.html#module-ladybug_geometry.geometry2d">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html">ladybug_geometry.geometry3d package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html#submodules">Submodules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.arc.html">ladybug_geometry.geometry3d.arc module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.cone.html">ladybug_geometry.geometry3d.cone module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.cylinder.html">ladybug_geometry.geometry3d.cylinder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.face.html">ladybug_geometry.geometry3d.face module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.line.html">ladybug_geometry.geometry3d.line module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.mesh.html">ladybug_geometry.geometry3d.mesh module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.plane.html">ladybug_geometry.geometry3d.plane module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.pointvector.html">ladybug_geometry.geometry3d.pointvector module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.polyface.html">ladybug_geometry.geometry3d.polyface module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.polyline.html">ladybug_geometry.geometry3d.polyline module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.ray.html">ladybug_geometry.geometry3d.ray module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.sphere.html">ladybug_geometry.geometry3d.sphere module</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../ladybug_geometry.geometry3d.html#module-ladybug_geometry.geometry3d">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#submodules">Submodules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.bounding.html">ladybug_geometry.bounding module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.intersection2d.html">ladybug_geometry.intersection2d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.intersection3d.html">ladybug_geometry.intersection3d module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../ladybug_geometry.triangulation.html">ladybug_geometry.triangulation module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../ladybug_geometry.html#module-ladybug_geometry">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+              <li class="hidden-sm"></li>
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-4">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ladybug_geometry.html">ladybug_geometry package</a></li>
+</ul>
+
+        </div>
+      </div>
+    <div class="body col-md-8 content" role="main">
+      
+  <h1>Source code for ladybug_geometry.geometry3d.mesh</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coding=utf-8</span>
+<span class="sd">&quot;&quot;&quot;3D Mesh&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+
+<span class="kn">from</span> <span class="nn">.._mesh</span> <span class="kn">import</span> <span class="n">MeshBase</span>
+<span class="kn">from</span> <span class="nn">..geometry2d.mesh</span> <span class="kn">import</span> <span class="n">Mesh2D</span>
+
+<span class="kn">from</span> <span class="nn">.pointvector</span> <span class="kn">import</span> <span class="n">Point3D</span><span class="p">,</span> <span class="n">Vector3D</span>
+<span class="kn">from</span> <span class="nn">.plane</span> <span class="kn">import</span> <span class="n">Plane</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">izip</span> <span class="k">as</span> <span class="nb">zip</span>  <span class="c1"># python 2</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">xrange</span> <span class="o">=</span> <span class="nb">range</span>  <span class="c1"># python 3</span>
+
+
+<div class="viewcode-block" id="Mesh3D"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D">[docs]</a><span class="k">class</span> <span class="nc">Mesh3D</span><span class="p">(</span><span class="n">MeshBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;3D Mesh object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        vertices: A list or tuple of Point3D objects for vertices.</span>
+<span class="sd">        faces: A list of tuples with each tuple having either 3 or 4 integers.</span>
+<span class="sd">            These integers correspond to indices within the list of vertices.</span>
+<span class="sd">        colors: An optional list of colors that correspond to either the faces</span>
+<span class="sd">            of the mesh or the vertices of the mesh. Default is None.</span>
+
+<span class="sd">    Properties:</span>
+<span class="sd">        * vertices</span>
+<span class="sd">        * faces</span>
+<span class="sd">        * colors</span>
+<span class="sd">        * is_color_by_face</span>
+<span class="sd">        * min</span>
+<span class="sd">        * max</span>
+<span class="sd">        * center</span>
+<span class="sd">        * area</span>
+<span class="sd">        * face_areas</span>
+<span class="sd">        * face_centroids</span>
+<span class="sd">        * face_normals</span>
+<span class="sd">        * vertex_normals</span>
+<span class="sd">        * vertex_connected_faces</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_min&#39;</span><span class="p">,</span> <span class="s1">&#39;_max&#39;</span><span class="p">,</span> <span class="s1">&#39;_center&#39;</span><span class="p">,</span> <span class="s1">&#39;_face_normals&#39;</span><span class="p">,</span> <span class="s1">&#39;_vertex_normals&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize Mesh3D.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vertices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_vertices_input</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_faces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_faces_input</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_color_by_face</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># default if colors is None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colors</span> <span class="o">=</span> <span class="n">colors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_min</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_center</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_face_areas</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_face_centroids</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_face_normals</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_normals</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_connected_faces</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Mesh3D.from_dict"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a Mesh3D from a dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data: A python dictionary in the following format</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            {</span>
+<span class="sd">            &quot;type&quot;: &quot;Mesh3D&quot;,</span>
+<span class="sd">            &quot;vertices&quot;: [(0, 0, 0), (10, 0, 0), (0, 10, 0)],</span>
+<span class="sd">            &quot;faces&quot;: [(0, 1, 2)],</span>
+<span class="sd">            &quot;colors&quot;: [{&quot;r&quot;: 255, &quot;g&quot;: 0, &quot;b&quot;: 0}]</span>
+<span class="sd">            }</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s1">&#39;colors&#39;</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;colors&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;colors&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">ladybug.color</span> <span class="kn">import</span> <span class="n">Color</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;Colors are specified in input Mesh2D dictionary &#39;</span>
+                                  <span class="s1">&#39;but failed to import ladybug.color&#39;</span><span class="p">)</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">Color</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">col</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;colors&#39;</span><span class="p">])</span>
+        <span class="n">fcs</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">])</span>  <span class="c1"># cast to immutable type</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">Point3D</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]),</span> <span class="n">fcs</span><span class="p">,</span> <span class="n">colors</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mesh3D.from_face_vertices"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.from_face_vertices">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_face_vertices</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">purge</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a mesh from a list of faces with each face defined by a list of Point3Ds.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            faces: A list of faces with each face defined as a list of 3 or 4 Point3D.</span>
+<span class="sd">            purge: A boolean to indicate if duplicate vertices should be shared between</span>
+<span class="sd">                faces. Default is True to purge duplicate vertices, which can be slow</span>
+<span class="sd">                for large lists of faces but results in a higher-quality mesh with</span>
+<span class="sd">                a smaller size in memory. Default is True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vertices</span><span class="p">,</span> <span class="n">face_collector</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_interpret_input_from_face_vertices</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">purge</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">vertices</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">face_collector</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Mesh3D.from_mesh2d"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.from_mesh2d">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_mesh2d</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mesh_2d</span><span class="p">,</span> <span class="n">plane</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a Mesh3D from a Mesh2D and a Plane in which the mesh exists.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mesh_2d: A Mesh2D object.</span>
+<span class="sd">            plane: A Plane object to represent the plane in which the Mesh2D exists</span>
+<span class="sd">                within 3D space. If None, the WorldXY plane will be used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mesh_2d</span><span class="p">,</span> <span class="n">Mesh2D</span><span class="p">),</span> <span class="s1">&#39;Expected Mesh2D for from_mesh_2d. &#39;</span> \
+            <span class="s1">&#39;Got </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">mesh_2d</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">plane</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">Point3D</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">pt</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">mesh_2d</span><span class="o">.</span><span class="n">vertices</span><span class="p">),</span>
+                       <span class="n">mesh_2d</span><span class="o">.</span><span class="n">faces</span><span class="p">,</span> <span class="n">mesh_2d</span><span class="o">.</span><span class="n">colors</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plane</span><span class="p">,</span> <span class="n">Plane</span><span class="p">),</span> <span class="s1">&#39;Expected Plane. Got </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">plane</span><span class="p">))</span>
+            <span class="n">_verts3d</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">plane</span><span class="o">.</span><span class="n">xy_to_xyz</span><span class="p">(</span><span class="n">_v</span><span class="p">)</span> <span class="k">for</span> <span class="n">_v</span> <span class="ow">in</span> <span class="n">mesh_2d</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">_verts3d</span><span class="p">,</span> <span class="n">mesh_2d</span><span class="o">.</span><span class="n">faces</span><span class="p">,</span> <span class="n">mesh_2d</span><span class="o">.</span><span class="n">colors</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A Point3D for the minimum bounding box vertex around this mesh.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_min_max</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A Point3D for the maximum bounding box vertex around this mesh.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_min_max</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A Point3D for the center of the bounding box around this mesh.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_center</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span>
+                <span class="p">(</span><span class="nb">min</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="nb">max</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="nb">min</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="nb">max</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="nb">min</span><span class="o">.</span><span class="n">z</span> <span class="o">+</span> <span class="nb">max</span><span class="o">.</span><span class="n">z</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">face_areas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A tuple of face areas that parallels the faces property.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_normals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_face_areas_and_normals</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_face_areas</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>  <span class="c1"># same area for each face</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_face_areas</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_face_areas</span> <span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_areas</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">face_normals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tuple of Vector3D objects for all face normals.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_normals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_face_areas_and_normals</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_face_normals</span><span class="p">,</span> <span class="n">Vector3D</span><span class="p">):</span>  <span class="c1"># same normal for each face</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_face_normals</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_face_normals</span> <span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_normals</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vertex_normals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Tuple of Vector3D objects for all vertex normals.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_normals</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_vertex_normals</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex_normals</span><span class="p">,</span> <span class="n">Vector3D</span><span class="p">):</span>  <span class="c1"># same normal for each vertex</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_normals</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex_normals</span> <span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_normals</span>
+
+<div class="viewcode-block" id="Mesh3D.remove_vertices"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.remove_vertices">[docs]</a>    <span class="k">def</span> <span class="nf">remove_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a version of this mesh where vertices are removed according to a pattern.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pattern: A list of boolean values denoting whether a vertex should</span>
+<span class="sd">                remain in the mesh (True) or be removed from the mesh (False).</span>
+<span class="sd">                The length of this list must match the number of this mesh&#39;s vertices.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple with two elements.</span>
+
+<span class="sd">            -   new_mesh:</span>
+<span class="sd">                A mesh where the vertices have been removed according</span>
+<span class="sd">                to the input pattern.</span>
+
+<span class="sd">            -   face_pattern:</span>
+<span class="sd">                A list of boolean values that corresponds to the</span>
+<span class="sd">                original mesh faces noting whether the face is in the new mesh</span>
+<span class="sd">                (True) or has been removed from the new mesh (False).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_new_verts</span><span class="p">,</span> <span class="n">_new_faces</span><span class="p">,</span> <span class="n">_new_colors</span><span class="p">,</span> <span class="n">_new_f_cent</span><span class="p">,</span> <span class="n">_new_f_area</span><span class="p">,</span> <span class="n">face_pattern</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remove_vertices</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+
+        <span class="n">new_mesh</span> <span class="o">=</span> <span class="n">Mesh3D</span><span class="p">(</span><span class="n">_new_verts</span><span class="p">,</span> <span class="n">_new_faces</span><span class="p">,</span> <span class="n">_new_colors</span><span class="p">)</span>
+        <span class="n">new_mesh</span><span class="o">.</span><span class="n">_face_centroids</span> <span class="o">=</span> <span class="n">_new_f_cent</span>
+        <span class="n">new_mesh</span><span class="o">.</span><span class="n">_face_areas</span> <span class="o">=</span> <span class="n">_new_f_area</span>
+        <span class="k">return</span> <span class="n">new_mesh</span><span class="p">,</span> <span class="n">face_pattern</span></div>
+
+<div class="viewcode-block" id="Mesh3D.remove_faces"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.remove_faces">[docs]</a>    <span class="k">def</span> <span class="nf">remove_faces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a version of this mesh where faces are removed according to a pattern.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pattern: A list of boolean values denoting whether a face should</span>
+<span class="sd">                remain in the mesh (True) or be removed from the mesh (False).</span>
+<span class="sd">                The length of this list must match the number of this mesh&#39;s faces.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A tuple with two elements.</span>
+
+<span class="sd">            -   new_mesh:</span>
+<span class="sd">                A mesh where the faces have been removed according</span>
+<span class="sd">                to the input pattern.</span>
+
+<span class="sd">            -   vertex_pattern:</span>
+<span class="sd">                A list of boolean values that corresponds to the</span>
+<span class="sd">                original mesh vertices noting whether the vertex is in the new mesh</span>
+<span class="sd">                (True) or has been removed from the new mesh (False).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vertex_pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_pattern_from_remove_faces</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+        <span class="n">_new_verts</span><span class="p">,</span> <span class="n">_new_faces</span><span class="p">,</span> <span class="n">_new_colors</span><span class="p">,</span> <span class="n">_new_f_cent</span><span class="p">,</span> <span class="n">_new_f_area</span><span class="p">,</span> <span class="n">face_pattern</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remove_vertices</span><span class="p">(</span><span class="n">vertex_pattern</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
+
+        <span class="n">new_mesh</span> <span class="o">=</span> <span class="n">Mesh3D</span><span class="p">(</span><span class="n">_new_verts</span><span class="p">,</span> <span class="n">_new_faces</span><span class="p">,</span> <span class="n">_new_colors</span><span class="p">)</span>
+        <span class="n">new_mesh</span><span class="o">.</span><span class="n">_face_centroids</span> <span class="o">=</span> <span class="n">_new_f_cent</span>
+        <span class="n">new_mesh</span><span class="o">.</span><span class="n">_face_areas</span> <span class="o">=</span> <span class="n">_new_f_area</span>
+        <span class="k">return</span> <span class="n">new_mesh</span><span class="p">,</span> <span class="n">vertex_pattern</span></div>
+
+<div class="viewcode-block" id="Mesh3D.remove_faces_only"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.remove_faces_only">[docs]</a>    <span class="k">def</span> <span class="nf">remove_faces_only</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a version of this mesh where faces are removed and vertices are not altered.</span>
+
+<span class="sd">        This is faster than the Mesh3D.remove_faces method but will likely result</span>
+<span class="sd">        a lower-quality mesh where several vertices exist in the mesh that are not</span>
+<span class="sd">        referenced by any face. This may be preferred if pure speed of removing</span>
+<span class="sd">        faces is a priority over smallest size of the mesh in memory.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pattern: A list of boolean values denoting whether a face should</span>
+<span class="sd">                remain in the mesh (True) or be removed from the mesh (False).</span>
+<span class="sd">                The length of this list must match the number of this mesh&#39;s faces.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            new_mesh -- A mesh where the faces have been removed according</span>
+<span class="sd">            to the input pattern.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_new_faces</span><span class="p">,</span> <span class="n">_new_colors</span><span class="p">,</span> <span class="n">_new_f_cent</span><span class="p">,</span> <span class="n">_new_f_area</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remove_faces_only</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+
+        <span class="n">new_mesh</span> <span class="o">=</span> <span class="n">Mesh3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">_new_faces</span><span class="p">,</span> <span class="n">_new_colors</span><span class="p">)</span>
+        <span class="n">new_mesh</span><span class="o">.</span><span class="n">_face_centroids</span> <span class="o">=</span> <span class="n">_new_f_cent</span>
+        <span class="n">new_mesh</span><span class="o">.</span><span class="n">_face_areas</span> <span class="o">=</span> <span class="n">_new_f_area</span>
+        <span class="k">return</span> <span class="n">new_mesh</span></div>
+
+<div class="viewcode-block" id="Mesh3D.rotate"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Rotate a mesh by a certain angle around an axis and origin.</span>
+
+<span class="sd">        Right hand rule applies:</span>
+<span class="sd">        If axis has a positive orientation, rotation will be clockwise.</span>
+<span class="sd">        If axis has a negative orientation, rotation will be counterclockwise.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            axis: A Vector3D axis representing the axis of rotation.</span>
+<span class="sd">            angle: An angle for rotation in radians.</span>
+<span class="sd">            origin: A Point3D for the origin around which the point will be rotated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_verts</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh_transform</span><span class="p">(</span><span class="n">_verts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mesh3D.rotate_xy"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.rotate_xy">[docs]</a>    <span class="k">def</span> <span class="nf">rotate_xy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a mesh rotated counterclockwise in the XY plane by a certain angle.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            angle: An angle for rotation in radians.</span>
+<span class="sd">            origin: A Point3D for the origin around which the point will be rotated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_verts</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">rotate_xy</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh_transform</span><span class="p">(</span><span class="n">_verts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mesh3D.scale"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.scale">[docs]</a>    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale a mesh by a factor from an origin point.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            factor: A number representing how much the mesh should be scaled.</span>
+<span class="sd">            origin: A Point representing the origin from which to scale.</span>
+<span class="sd">                If None, it will be scaled from the World origin (0, 0, 0).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_verts</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+                <span class="n">Point3D</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">factor</span><span class="p">,</span> <span class="n">pt</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">factor</span><span class="p">,</span> <span class="n">pt</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">factor</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_verts</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh_scale</span><span class="p">(</span><span class="n">_verts</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mesh3D.offset_mesh"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.offset_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">offset_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a Mesh3D that has been offset from this one by a certain difference.</span>
+
+<span class="sd">        Effectively, this method moves each mesh vertex along the vertex normal</span>
+<span class="sd">        by the offset distance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            distance: A number for the distance to offset the mesh.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_verts</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">norm</span> <span class="o">*</span> <span class="n">distance</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span><span class="p">,</span> <span class="n">norm</span> <span class="ow">in</span>
+                          <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_normals</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Mesh3D</span><span class="p">(</span><span class="n">new_verts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colors</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mesh3D.height_field_mesh"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.height_field_mesh">[docs]</a>    <span class="k">def</span> <span class="nf">height_field_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">domain</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a Mesh3D that has faces or vertices offset according to a list of values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            values: A list of values that has a length matching the number of faces</span>
+<span class="sd">                or vertices in this mesh.</span>
+<span class="sd">            domain: A tuple or list of two numbers for the upper and lower distances</span>
+<span class="sd">                that the mesh vertices should be offset. (ie. (0, 3))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)),</span> <span class="s1">&#39;Expected tuple for domain. &#39;</span>\
+            <span class="s1">&#39;Got </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">domain</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Expected domain to be in the format (min, max). &#39;</span> \
+            <span class="s1">&#39;Got </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">):</span>
+            <span class="n">remap_vals</span> <span class="o">=</span> <span class="n">Mesh3D</span><span class="o">.</span><span class="n">_remap_values</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">domain</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">vert_remap_vals</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">vf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_connected_faces</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">vf</span><span class="p">:</span>
+                    <span class="n">v</span> <span class="o">+=</span> <span class="n">remap_vals</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">v</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vf</span><span class="p">)</span>  <span class="c1"># average the vertex value over its connected faces</span>
+                <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+                    <span class="k">pass</span>  <span class="c1"># lone vertex without any faces</span>
+                <span class="n">vert_remap_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">new_verts</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">norm</span> <span class="o">*</span> <span class="n">dist</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">dist</span> <span class="ow">in</span>
+                              <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_normals</span><span class="p">,</span> <span class="n">vert_remap_vals</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">):</span>
+            <span class="n">remap_vals</span> <span class="o">=</span> <span class="n">Mesh3D</span><span class="o">.</span><span class="n">_remap_values</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">domain</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">domain</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">new_verts</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">norm</span> <span class="o">*</span> <span class="n">dist</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">dist</span> <span class="ow">in</span>
+                              <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_normals</span><span class="p">,</span> <span class="n">remap_vals</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Input values for height_field_mesh (</span><span class="si">{}</span><span class="s1">) does not match the number of&#39;</span>
+                <span class="s1">&#39; mesh faces (</span><span class="si">{}</span><span class="s1">) nor the number of vertices (</span><span class="si">{}</span><span class="s1">).&#39;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">Mesh3D</span><span class="p">(</span><span class="n">new_verts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colors</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Mesh3D.to_dict"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get Mesh3D as a dictionary.&quot;&quot;&quot;</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;Mesh3D&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">pt</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">],</span>
+                <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">base</span><span class="p">[</span><span class="s1">&#39;colors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colors</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">base</span></div>
+
+<div class="viewcode-block" id="Mesh3D.join_meshes"><a class="viewcode-back" href="../../../ladybug_geometry.geometry3d.mesh.html#ladybug_geometry.geometry3d.mesh.Mesh3D.join_meshes">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">join_meshes</span><span class="p">(</span><span class="n">meshes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Join an array of Mesh3Ds into a single Mesh3D.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            meshes: An array of meshes to be joined into one.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A single Mesh3D object derived from the input meshes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># set up empty lists of objects to be filled</span>
+        <span class="n">verts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">faces</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># loop through all of the meshes and get new faces</span>
+        <span class="n">total_v_i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">mesh</span> <span class="ow">in</span> <span class="n">meshes</span><span class="p">:</span>
+            <span class="n">verts</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">_vertices</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">fc</span> <span class="ow">in</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_faces</span><span class="p">:</span>
+                <span class="n">faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">v_i</span> <span class="o">+</span> <span class="n">total_v_i</span> <span class="k">for</span> <span class="n">v_i</span> <span class="ow">in</span> <span class="n">fc</span><span class="p">))</span>
+            <span class="n">total_v_i</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">_vertices</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mesh</span><span class="o">.</span><span class="n">_colors</span><span class="p">:</span>
+                <span class="n">colors</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">_colors</span><span class="p">)</span>
+
+        <span class="c1"># create the new mesh</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">new_mesh</span> <span class="o">=</span> <span class="n">Mesh3D</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">colors</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_mesh</span> <span class="o">=</span> <span class="n">Mesh3D</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_mesh</span></div>
+
+    <span class="k">def</span> <span class="nf">_calculate_min_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate maximum and minimum Point3D for this object.&quot;&quot;&quot;</span>
+        <span class="n">min_pt</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">z</span><span class="p">]</span>
+        <span class="n">max_pt</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">z</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">min_pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">min_pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">x</span>
+            <span class="k">elif</span> <span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">max_pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">max_pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">x</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span> <span class="o">&lt;</span> <span class="n">min_pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">min_pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span>
+            <span class="k">elif</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">max_pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">max_pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">y</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">z</span> <span class="o">&lt;</span> <span class="n">min_pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                <span class="n">min_pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">z</span>
+            <span class="k">elif</span> <span class="n">v</span><span class="o">.</span><span class="n">z</span> <span class="o">&gt;</span> <span class="n">max_pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                <span class="n">max_pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">z</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_min</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="n">min_pt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">min_pt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">min_pt</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max</span> <span class="o">=</span> <span class="n">Point3D</span><span class="p">(</span><span class="n">max_pt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_pt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">max_pt</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_face_areas_and_normals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate face areas and normals from vertices.&quot;&quot;&quot;</span>
+        <span class="n">_f_norm</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">_f_area</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">:</span>
+            <span class="n">pts</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">face</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">face</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">n</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_normal_and_area_for_triangle</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_normal_and_area_for_quad</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+            <span class="n">_f_norm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="n">_f_area</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_face_normals</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_f_norm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_face_areas</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_f_area</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_vertex_normals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate vertex normals.</span>
+
+<span class="sd">        This is accomplished by normalizing the average of the surface normals</span>
+<span class="sd">        of the faces that contain that vertex.  This particular method weights</span>
+<span class="sd">        this average by the area of each face, though this does not always need</span>
+<span class="sd">        to be the case as noted here:</span>
+<span class="sd">        https://en.wikipedia.org/wiki/Vertex_normal</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># find shared faces for each vertices</span>
+        <span class="n">mapper</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">))]</span>
+        <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">face</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">face</span><span class="p">:</span>
+                <span class="n">mapper</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="c1"># now calculate vertex normal based on face normals</span>
+        <span class="n">vn</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_normals</span>
+        <span class="n">fa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">face_areas</span>
+        <span class="k">for</span> <span class="n">fi</span> <span class="ow">in</span> <span class="n">mapper</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">fn</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fi</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">fa</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fi</span><span class="p">)):</span>
+                <span class="n">x</span> <span class="o">+=</span> <span class="n">n</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">a</span>
+                <span class="n">y</span> <span class="o">+=</span> <span class="n">n</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">a</span>
+                <span class="n">z</span> <span class="o">+=</span> <span class="n">n</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">a</span>
+            <span class="n">_v</span> <span class="o">=</span> <span class="n">Vector3D</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+            <span class="n">vn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_v</span><span class="o">.</span><span class="n">normalize</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_normals</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">vn</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_tri_face_centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">face</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the centroid of a triangular face.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Mesh3D</span><span class="o">.</span><span class="n">_tri_centroid</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">face</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_quad_face_centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">face</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the centroid of a quadrilateral face.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Mesh3D</span><span class="o">.</span><span class="n">_quad_centroid</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">face</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_mesh_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transform mesh in a way that transfers properties and avoids extra checks.&quot;&quot;&quot;</span>
+        <span class="n">_new_mesh</span> <span class="o">=</span> <span class="n">Mesh3D</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transfer_properties</span><span class="p">(</span><span class="n">_new_mesh</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_new_mesh</span>
+
+    <span class="k">def</span> <span class="nf">_mesh_transform_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Move mesh in a way that transfers properties and avoids extra checks.&quot;&quot;&quot;</span>
+        <span class="n">_new_mesh</span> <span class="o">=</span> <span class="n">Mesh3D</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transfer_properties</span><span class="p">(</span><span class="n">_new_mesh</span><span class="p">)</span>
+        <span class="n">_new_mesh</span><span class="o">.</span><span class="n">_face_normals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_normals</span>
+        <span class="n">_new_mesh</span><span class="o">.</span><span class="n">_vertex_normals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_normals</span>
+        <span class="k">return</span> <span class="n">_new_mesh</span>
+
+    <span class="k">def</span> <span class="nf">_mesh_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verts</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Scale mesh in a way that transfers properties and avoids extra checks.&quot;&quot;&quot;</span>
+        <span class="n">_new_mesh</span> <span class="o">=</span> <span class="n">Mesh3D</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transfer_properties_scale</span><span class="p">(</span><span class="n">_new_mesh</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span>
+        <span class="n">_new_mesh</span><span class="o">.</span><span class="n">_face_normals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_normals</span>
+        <span class="n">_new_mesh</span><span class="o">.</span><span class="n">_vertex_normals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_normals</span>
+        <span class="k">return</span> <span class="n">_new_mesh</span>
+
+    <span class="k">def</span> <span class="nf">_check_vertices_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check the input vertices.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">vertices</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">vert</span> <span class="ow">in</span> <span class="n">vertices</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vert</span><span class="p">,</span> <span class="n">Point3D</span><span class="p">),</span> \
+                <span class="s1">&#39;Expected Point3D for </span><span class="si">{}</span><span class="s1"> vertex. Got </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">vert</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">vertices</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_calculate_normal_and_area_for_triangle</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate normal and area for three points.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            n = Normalized normal vector for the triangle.</span>
+<span class="sd">            a = Area of the triangle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">v1</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">v1</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">n</span><span class="o">.</span><span class="n">normalize</span><span class="p">(),</span> <span class="n">a</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_calculate_normal_and_area_for_quad</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate normal and area for four points.</span>
+
+<span class="sd">        This method uses an area-weighted average of the two triangle normals</span>
+<span class="sd">        that compose the quad face.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            n = Normalized normal vector for the quad.</span>
+<span class="sd">            a = Area of the quad.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: Get this method to work for concave quads.</span>
+        <span class="c1"># This method is only reliable when quads are convex since we assume</span>
+        <span class="c1"># either diagonal of the quad splits it into two triangles.</span>
+        <span class="c1"># It seems Rhino never produces concave quads when it automatically meshes</span>
+        <span class="c1"># but we will likely want to add support for this if meshes have other origins</span>
+        <span class="n">v1</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n1</span> <span class="o">=</span> <span class="n">v1</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+
+        <span class="n">v3</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">v4</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">n2</span> <span class="o">=</span> <span class="n">v3</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v4</span><span class="p">)</span>
+
+        <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">n1</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">+</span> <span class="n">n2</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Vector3D</span><span class="p">((</span><span class="n">n1</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">n2</span><span class="o">.</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">n1</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">n2</span><span class="o">.</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">n1</span><span class="o">.</span><span class="n">z</span> <span class="o">+</span> <span class="n">n2</span><span class="o">.</span><span class="n">z</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n</span><span class="o">.</span><span class="n">normalize</span><span class="p">(),</span> <span class="n">a</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_tri_centroid</span><span class="p">(</span><span class="n">verts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the centroid of a list of 3 Point3D vertices.&quot;&quot;&quot;</span>
+        <span class="n">_cent_x</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">v</span><span class="o">.</span><span class="n">x</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">verts</span><span class="p">])</span>
+        <span class="n">_cent_y</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">v</span><span class="o">.</span><span class="n">y</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">verts</span><span class="p">])</span>
+        <span class="n">_cent_z</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">v</span><span class="o">.</span><span class="n">z</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">verts</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">Point3D</span><span class="p">(</span><span class="n">_cent_x</span> <span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="n">_cent_y</span> <span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="n">_cent_z</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_quad_centroid</span><span class="p">(</span><span class="n">verts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the centroid of a list of 4 Point3D vertices.&quot;&quot;&quot;</span>
+        <span class="c1"># TODO: Get this method to recognize concave quads.</span>
+        <span class="c1"># This method is only reliable when quads are convex since we assume</span>
+        <span class="c1"># either diagonal of the quad splits it into two triangles.</span>
+        <span class="c1"># It seems Rhino never produces concave quads when it automatically meshes</span>
+        <span class="c1"># but we will likely want to add support for this if meshes have other origins</span>
+        <span class="n">_tri_verts</span> <span class="o">=</span> <span class="p">((</span><span class="n">verts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">verts</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">verts</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="p">(</span><span class="n">verts</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">verts</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">verts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">_tri_c</span> <span class="o">=</span> <span class="p">[</span><span class="n">Mesh3D</span><span class="o">.</span><span class="n">_tri_centroid</span><span class="p">(</span><span class="n">tri</span><span class="p">)</span> <span class="k">for</span> <span class="n">tri</span> <span class="ow">in</span> <span class="n">_tri_verts</span><span class="p">]</span>
+        <span class="n">_tri_a</span> <span class="o">=</span> <span class="p">[</span><span class="n">Mesh3D</span><span class="o">.</span><span class="n">_get_tri_area</span><span class="p">(</span><span class="n">tri</span><span class="p">)</span> <span class="k">for</span> <span class="n">tri</span> <span class="ow">in</span> <span class="n">_tri_verts</span><span class="p">]</span>
+        <span class="n">_tot_a</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">_tri_a</span><span class="p">)</span>
+        <span class="n">_cent_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">_tri_c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">_tri_a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">_tri_c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">_tri_a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">_tot_a</span>
+        <span class="n">_cent_y</span> <span class="o">=</span> <span class="p">(</span><span class="n">_tri_c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">_tri_a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">_tri_c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">_tri_a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">_tot_a</span>
+        <span class="n">_cent_z</span> <span class="o">=</span> <span class="p">(</span><span class="n">_tri_c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">_tri_a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">_tri_c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">_tri_a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">_tot_a</span>
+        <span class="k">return</span> <span class="n">Point3D</span><span class="p">(</span><span class="n">_cent_x</span><span class="p">,</span> <span class="n">_cent_y</span><span class="p">,</span> <span class="n">_cent_z</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_tri_area</span><span class="p">(</span><span class="n">pts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the area of a triangle from three Point3D objects.&quot;&quot;&quot;</span>
+        <span class="n">v1</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n1</span> <span class="o">=</span> <span class="n">v1</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n1</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">/</span> <span class="mi">2</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_remap_values</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remap a set of values to offset distances within a domain.&quot;&quot;&quot;</span>
+        <span class="n">omin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">omax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">odiff</span> <span class="o">=</span> <span class="n">omax</span> <span class="o">-</span> <span class="n">omin</span>
+        <span class="n">tdiff</span> <span class="o">=</span> <span class="n">tmax</span> <span class="o">-</span> <span class="n">tmin</span>
+        <span class="k">if</span> <span class="n">odiff</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">tmin</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[(</span><span class="n">v</span> <span class="o">-</span> <span class="n">omin</span><span class="p">)</span> <span class="o">*</span> <span class="n">tdiff</span> <span class="o">/</span> <span class="n">odiff</span> <span class="o">+</span> <span class="n">tmin</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__copy__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">_new_mesh</span> <span class="o">=</span> <span class="n">Mesh3D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transfer_properties</span><span class="p">(</span><span class="n">_new_mesh</span><span class="p">)</span>
+        <span class="n">_new_mesh</span><span class="o">.</span><span class="n">_face_centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_centroids</span>
+        <span class="n">_new_mesh</span><span class="o">.</span><span class="n">_face_normals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_face_normals</span>
+        <span class="n">_new_mesh</span><span class="o">.</span><span class="n">_vertex_normals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_normals</span>
+        <span class="k">return</span> <span class="n">_new_mesh</span>
+
+    <span class="k">def</span> <span class="nf">__key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A tuple based on the object properties, useful for hashing.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertices</span><span class="p">)</span> <span class="o">+</span> \
+            <span class="nb">tuple</span><span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="n">face</span><span class="p">)</span> <span class="k">for</span> <span class="n">face</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_faces</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Mesh3D</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">__key</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;Mesh3D (</span><span class="si">{}</span><span class="s1"> faces) (</span><span class="si">{}</span><span class="s1"> vertices)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">faces</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2021, Ladybug Tools.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.5.4.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
