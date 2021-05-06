@@ -13,11 +13,12 @@ import math
 
 
 def test_plane_init():
-    """Test the initalization of Plane objects and basic properties."""
+    """Test the initialization of Plane objects and basic properties."""
     pt = Point3D(2, 0, 2)
     vec = Vector3D(0, 2, 0)
     plane = Plane(vec, pt)
     str(plane)  # test the string representation
+    hash(plane)
 
     assert plane.o == Point3D(2, 0, 2)
     assert plane.n == Vector3D(0, 1, 0)
@@ -57,7 +58,7 @@ def test_equality():
 
 
 def test_plane_to_from_dict():
-    """Test the initalization of Plane objects and basic properties."""
+    """Test the initialization of Plane objects and basic properties."""
     pt = Point3D(2, 0, 2)
     vec = Vector3D(0, 2, 0)
     plane = Plane(vec, pt)
@@ -68,7 +69,7 @@ def test_plane_to_from_dict():
 
 
 def test_init_from_three_points():
-    """Test the initalization of Plane from end points."""
+    """Test the initialization of Plane from end points."""
     plane = Plane.from_three_points(Point3D(0, 0, 2), Point3D(0, 2, 2),
                                     Point3D(2, 2, 2))
     assert plane.o == Point3D(0, 0, 2)
@@ -87,7 +88,7 @@ def test_init_from_three_points():
 
 
 def test_init_from_normal_k():
-    """Test the initalization of Plane from end points."""
+    """Test the initialization of Plane from end points."""
     plane = Plane.from_normal_k(Vector3D(0, 0, 1), 2)
     assert plane.o == Point3D(0, 0, 2)
     assert plane.n == Vector3D(0, 0, 1)
