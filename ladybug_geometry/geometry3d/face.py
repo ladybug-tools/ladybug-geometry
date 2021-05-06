@@ -1912,15 +1912,22 @@ class Face3D(Base2DIn3D):
             verts: The vertices to be used to extract the normal.
         """
         try:
-            x1, y1, z1 = Face3D._normal_from_3pts(verts[-2], verts[-1], verts[0])
-            x2, y2, z2 = Face3D._normal_from_3pts(verts[-1], verts[0], verts[1])
-            normal = [x1 + x2, y1 + y2, z1 + z2]
-            # walk around the whole shape to avoid colinear vertices
+            # walk around the shape and get cross products and magnitudes
+            cprod1, d1 = Face3D._normal_from_3pts(verts[-2], verts[-1], verts[0])
+            cprod2, d2 = Face3D._normal_from_3pts(verts[-1], verts[0], verts[1])
+            cprods, ds = [cprod1, cprod2], [d1, d2]
             for i in range(len(verts) - 2):
-                x, y, z = Face3D._normal_from_3pts(*verts[i:i + 3])
-                normal[0] += x
-                normal[1] += y
-                normal[2] += z
+                cprodx, dx = Face3D._normal_from_3pts(*verts[i:i + 3])
+                cprods.append(cprodx)
+                ds.append(dx)
+            # sum together the cross products of any vertices that are not colinear
+            min_d = (sum(ds) / len(ds)) * 1e-3  # rel tolerance for colinear vertices
+            normal = [0, 0, 0]
+            for cprodx, dx in zip(cprods, ds):
+                if dx > min_d:
+                    normal[0] += cprodx[0] / dx
+                    normal[1] += cprodx[1] / dx
+                    normal[2] += cprodx[2] / dx
         except Exception as e:
             raise ValueError('Incorrect vertices input for Face3D:\n\t{}'.format(e))
         return Plane(Vector3D(normal[0], normal[1], normal[2]), verts[0]) \
@@ -1944,9 +1951,7 @@ class Face3D(Base2DIn3D):
                   v1[0] * v2[1] - v1[1] * v2[0])
         # normalize the vector to make it a unit vector
         d = math.sqrt(c_prod[0] ** 2 + c_prod[1] ** 2 + c_prod[2] ** 2)
-        if d < 1e-9:  # effectively duplicate vertices in triplet
-            return (0, 0, 0)
-        return (c_prod[0] / d, c_prod[1] / d, c_prod[2] / d)
+        return c_prod, d
 
     @staticmethod
     def _corner_pt_verts(corner_pt, verts3d, verts2d):

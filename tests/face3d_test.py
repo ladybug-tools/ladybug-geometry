@@ -697,10 +697,21 @@ def test_normal_with_slightly_nonplanar():
         geo_dict = json.load(fp)
     face_geo = Face3D.from_dict(geo_dict)
 
-    assert -0.99 > face_geo.normal.z > -1.01
+    assert 0.99 < face_geo.normal.z < 1.01
     assert face_geo.check_planar(0.000001, False) is False
     with pytest.raises(Exception):
         face_geo.check_planar(0.000001)
+
+
+def test_normal_with_colinear_vertices():
+    """Test that shapes with colinear vertices have a relatively close normal."""
+    geo_file = './tests/json/faces_colinear_verts.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    face_geos = [Face3D.from_dict(geo) for geo in geo_dict]
+
+    assert -0.01 < face_geos[0].normal.z < 0.01
+    assert -0.01 < face_geos[1].normal.z < 0.01
 
 
 def test_flip():
