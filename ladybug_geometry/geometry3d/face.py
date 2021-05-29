@@ -940,7 +940,7 @@ class Face3D(Base2DIn3D):
 
         return grid_mesh3d
 
-    def countour_by_number(self, contour_count, direction_vector, flip_side, tolerance):
+    def contour_by_number(self, contour_count, direction_vector, flip_side, tolerance):
         """Generate a list of LineSegment3D objects contouring the face.
 
         Args:
@@ -982,8 +982,8 @@ class Face3D(Base2DIn3D):
             contours = [l_seg for l_seg in contours if l_seg.length >= tolerance]
         return contours
 
-    def countour_by_distance_between(self, distance, direction_vector, flip_side,
-                                     tolerance):
+    def contour_by_distance_between(self, distance, direction_vector, flip_side,
+                                    tolerance):
         """Generate a list of LineSegment3D objects contouring the face.
 
         Args:
@@ -1030,8 +1030,8 @@ class Face3D(Base2DIn3D):
             contours = [l_seg for l_seg in contours if l_seg.length >= tolerance]
         return contours
 
-    def countour_fins_by_number(self, fin_count, depth, offset, angle,
-                                contour_vector, flip_side, tolerance):
+    def contour_fins_by_number(self, fin_count, depth, offset, angle,
+                               contour_vector, flip_side, tolerance):
         """Generate a list of Fac3D objects over this face (like louvers or fins).
 
         Args:
@@ -1055,12 +1055,12 @@ class Face3D(Base2DIn3D):
                 than the tolerance.
         """
         extru_vec = self._get_fin_extrusion_vector(depth, angle, contour_vector)
-        contours = self.countour_by_number(
+        contours = self.contour_by_number(
             fin_count, contour_vector, flip_side, tolerance)
         return self._get_extrusion_fins(contours, extru_vec, offset)
 
-    def countour_fins_by_distance_between(self, distance, depth, offset, angle,
-                                          contour_vector, flip_side, tolerance):
+    def contour_fins_by_distance_between(self, distance, depth, offset, angle,
+                                         contour_vector, flip_side, tolerance):
         """Generate a list of Fac3D objects over this face (like louvers or fins).
 
         Args:
@@ -1084,7 +1084,7 @@ class Face3D(Base2DIn3D):
                 than the tolerance.
         """
         extru_vec = self._get_fin_extrusion_vector(depth, angle, contour_vector)
-        contours = self.countour_by_distance_between(
+        contours = self.contour_by_distance_between(
             distance, contour_vector, flip_side, tolerance)
         return self._get_extrusion_fins(contours, extru_vec, offset)
 
