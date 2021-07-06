@@ -86,6 +86,22 @@ class Vector2D(object):
         """
         return abs(self.x) <= tolerance and abs(self.y) <= tolerance
 
+    def is_equivalent(self, other, tolerance):
+        """Test whether this object is equivalent to another within a certain tolerance.
+
+        Note that if you want to test whether the coordinate values are perfectly
+        equal to one another, the == operator can be used.
+
+        Args:
+            other: Another Point2D for which geometric equivalency will be tested.
+            tolerance: The minimum difference between the coordinate values of two
+                objects at which they can be considered geometrically equivalent.
+        Returns:
+            True if equivalent.  False if not equivalent.
+        """
+        return abs(self.x - other.x) <= tolerance and \
+            abs(self.y - other.y) <= tolerance
+
     def normalize(self):
         """Get a copy of the vector that is a unit vector (magnitude=1)."""
         d = self.magnitude
@@ -366,22 +382,6 @@ class Point2D(Vector2D):
         """Get the distance from this point to another Point2D."""
         vec = (self.x - point.x, self.y - point.y)
         return math.sqrt(vec[0] ** 2 + vec[1] ** 2)
-
-    def is_equivalent(self, point, tolerance):
-        """Test whether this point is equivalent to another within a certain tolerance.
-
-        Note that if you want to test whether the coordinate values are perfectly
-        equal to one another, the == operator can be used.
-
-        Args:
-            point: Another Point2D for which geometric equivalency will be tested.
-            tolerance: The minimum difference between the coordinate values of two
-                points at which they can be considered geometrically equivalent.
-        Returns:
-            True if equivalent.  False if not equivalent.
-        """
-        return abs(self.x - point.x) <= tolerance and \
-            abs(self.y - point.y) <= tolerance
 
     def to_dict(self):
         """Get Point2D as a dictionary."""
