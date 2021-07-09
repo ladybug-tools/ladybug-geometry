@@ -1884,7 +1884,7 @@ class Face3D(Base2DIn3D):
             move_vec = self._inward_pointing_vec(self)
         except ZeroDivisionError:  # face has duplicated start vertices; remove them
             face = self.remove_colinear_vertices(tolerance)
-            move_vec = Polyface3D._inward_pointing_vec(face)
+            move_vec = self._inward_pointing_vec(face)
 
         move_vec = move_vec * (tolerance + 0.00001)
         point_on_face = self.boundary[0] + move_vec
