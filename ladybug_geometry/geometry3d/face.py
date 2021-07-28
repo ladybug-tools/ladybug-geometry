@@ -1883,8 +1883,11 @@ class Face3D(Base2DIn3D):
         try:
             move_vec = self._inward_pointing_vec(self)
         except ZeroDivisionError:  # face has duplicated start vertices; remove them
-            face = self.remove_colinear_vertices(tolerance)
-            move_vec = self._inward_pointing_vec(face)
+            try:
+                face = self.remove_colinear_vertices(tolerance)
+                move_vec = self._inward_pointing_vec(face)
+            except (AssertionError, ZeroDivisionError):  # zero area Face3D; use the center
+                return self.center
 
         move_vec = move_vec * (tolerance + 0.00001)
         point_on_face = self.boundary[0] + move_vec
