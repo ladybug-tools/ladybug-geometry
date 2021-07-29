@@ -1924,7 +1924,7 @@ class Face3D(Base2DIn3D):
                 cprods.append(cprodx)
                 ds.append(dx)
             # sum together the cross products of any vertices that are not colinear
-            min_d = (sum(ds) / len(ds)) * 1e-3  # rel tolerance for colinear vertices
+            min_d = (sum(ds) / len(ds)) * 0.05  # rel tolerance for colinear vertices
             normal = [0, 0, 0]
             for cprodx, dx in zip(cprods, ds):
                 if dx > min_d:

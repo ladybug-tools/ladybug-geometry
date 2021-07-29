@@ -698,7 +698,7 @@ def test_normal_with_slightly_nonplanar():
     face_geo = Face3D.from_dict(geo_dict)
 
     assert 0.99 < face_geo.normal.z < 1.01
-    assert face_geo.check_planar(0.000001, False) is False
+    assert not face_geo.check_planar(0.000001, False)
     with pytest.raises(Exception):
         face_geo.check_planar(0.000001)
 
@@ -712,6 +712,18 @@ def test_normal_with_colinear_vertices():
 
     assert -0.01 < face_geos[0].normal.z < 0.01
     assert -0.01 < face_geos[1].normal.z < 0.01
+
+
+def test_normal_with_jagged_vertices():
+    """Test that shapes with colinear vertices have a relatively close normal."""
+    geo_file = './tests/json/face_jagged.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    face_geo = Face3D.from_dict(geo_dict)
+
+    assert 0.99 < face_geo.normal.z < 1.01
+    assert not face_geo.check_planar(0.000001, False)
+    face_geo.remove_colinear_vertices(0.01)  # correct plan ensures removal of verts
 
 
 def test_flip():
@@ -1103,7 +1115,7 @@ def test_contour_fins_by_distance_between():
     assert len(fins) == 4
 
     fins = face_1.contour_fins_by_distance_between(
-        0.25, 0.5, 0.5,0, Vector2D(1), False, 0.01)
+        0.25, 0.5, 0.5, 0, Vector2D(1), False, 0.01)
     assert len(fins) == 8
 
     fins = face_2.contour_fins_by_distance_between(
