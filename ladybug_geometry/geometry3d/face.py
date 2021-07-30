@@ -1915,26 +1915,26 @@ class Face3D(Base2DIn3D):
             verts: The vertices to be used to extract the normal.
         """
         try:
-            # walk around the shape and get cross products and magnitudes
-            cprod1, d1 = Face3D._normal_from_3pts(verts[-2], verts[-1], verts[0])
-            cprod2, d2 = Face3D._normal_from_3pts(verts[-1], verts[0], verts[1])
-            cprods, ds = [cprod1, cprod2], [d1, d2]
+            # walk around the shape and get cross products
+            cprods, base_vert = [], verts[0]
             for i in range(len(verts) - 2):
-                cprodx, dx = Face3D._normal_from_3pts(*verts[i:i + 3])
-                cprods.append(cprodx)
-                ds.append(dx)
-            # sum together the cross products of any vertices that are not colinear
-            min_d = (sum(ds) / len(ds)) * 0.05  # rel tolerance for colinear vertices
+                verts_3 = (base_vert, verts[i + 1], verts[i + 2])
+                cprods.append(Face3D._normal_from_3pts(*verts_3))
+            # sum together the cross products
             normal = [0, 0, 0]
-            for cprodx, dx in zip(cprods, ds):
-                if dx > min_d:
-                    normal[0] += cprodx[0] / dx
-                    normal[1] += cprodx[1] / dx
-                    normal[2] += cprodx[2] / dx
+            for cprodx in cprods:
+                normal[0] += cprodx[0]
+                normal[1] += cprodx[1]
+                normal[2] += cprodx[2]
+            # normalize the vector
+            if normal != [0, 0, 0]:
+                ds = math.sqrt(normal[0] ** 2 + normal[1] ** 2 + normal[2] ** 2)
+                normal_vec = Vector3D(normal[0] / ds, normal[1] / ds, normal[2] / ds)
+            else:  # zero area Face3D; default to positive Z axis
+                normal_vec = Vector3D(0, 0, 1)
         except Exception as e:
             raise ValueError('Incorrect vertices input for Face3D:\n\t{}'.format(e))
-        return Plane(Vector3D(normal[0], normal[1], normal[2]), verts[0]) \
-            if normal != [0, 0, 0] else Plane(o=verts[0])
+        return Plane(normal_vec, verts[0])
 
     @staticmethod
     def _normal_from_3pts(pt1, pt2, pt3):
@@ -1949,12 +1949,9 @@ class Face3D(Base2DIn3D):
         v1 = (pt2.x - pt1.x, pt2.y - pt1.y, pt2.z - pt1.z)
         v2 = (pt3.x - pt1.x, pt3.y - pt1.y, pt3.z - pt1.z)
         # get the cross product of the two edge vectors
-        c_prod = (v1[1] * v2[2] - v1[2] * v2[1],
-                  -v1[0] * v2[2] + v1[2] * v2[0],
-                  v1[0] * v2[1] - v1[1] * v2[0])
-        # normalize the vector to make it a unit vector
-        d = math.sqrt(c_prod[0] ** 2 + c_prod[1] ** 2 + c_prod[2] ** 2)
-        return c_prod, d
+        return (v1[1] * v2[2] - v1[2] * v2[1],
+                -v1[0] * v2[2] + v1[2] * v2[0],
+                v1[0] * v2[1] - v1[1] * v2[0])
 
     @staticmethod
     def _corner_pt_verts(corner_pt, verts3d, verts2d):

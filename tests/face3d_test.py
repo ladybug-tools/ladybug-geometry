@@ -723,7 +723,28 @@ def test_normal_with_jagged_vertices():
 
     assert 0.99 < face_geo.normal.z < 1.01
     assert not face_geo.check_planar(0.000001, False)
-    face_geo.remove_colinear_vertices(0.01)  # correct plan ensures removal of verts
+    face_geo.remove_colinear_vertices(0.01)  # correct plane ensures removal of verts
+
+
+def test_jagged_l_face():
+    """Test that shapes with colinear vertices have a relatively close normal."""
+    geo_file = './tests/json/jagged_l.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    face_geo = Face3D.from_dict(geo_dict)
+
+    assert -0.99 > face_geo.normal.z > -1.01
+
+
+def test_face_with_tough_normal():
+    """Test that shapes with perfect symmetry to undermine normal calc."""
+    geo_file = './tests/json/face_with_tough_normal.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    face_geo = Face3D.from_dict(geo_dict)
+
+    assert 0.99 < face_geo.normal.z < 1.01
+    face_geo.remove_colinear_vertices(0.01)  # correct plane ensures removal of verts
 
 
 def test_flip():
