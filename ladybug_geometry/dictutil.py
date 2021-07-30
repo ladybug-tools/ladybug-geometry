@@ -12,7 +12,8 @@ from ladybug_geometry.geometry3d import (Vector3D, Point3D, Ray3D,
                             LineSegment3D, Arc3D, Polyline3D, Polyface3D, Mesh3D,
                             Plane, Face3D, Sphere, Cone, Cylinder)
 
-def lb_geom_dict_to_object(ladybug_geom_dict, raise_exception=True): #-> Optional[object]
+def geometry_dict_to_object(ladybug_geom_dict, raise_exception=True):
+    # type (dict, bool) -> object | None
     """
     Args:
         ladybug_geom_dict (dict): A dictionary of any Ladybug Geometry object. Note
