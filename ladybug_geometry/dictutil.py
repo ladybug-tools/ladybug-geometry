@@ -6,24 +6,22 @@ Ladybug_geometry library in order to be able to re-serialize almost any
 dictionary produced from the library.
 """
 
-from ladybug_geometry.geometry2d import (Vector2D, Point2D, Ray2D, 
-                            LineSegment2D, Arc2D, Polyline2D, Polygon2D, Mesh2D)
-from ladybug_geometry.geometry3d import (Vector3D, Point3D, Ray3D,
-                            LineSegment3D, Arc3D, Polyline3D, Polyface3D, Mesh3D,
-                            Plane, Face3D, Sphere, Cone, Cylinder)
+from ladybug_geometry.geometry2d import Vector2D, Point2D, Ray2D, \
+                            LineSegment2D, Arc2D, Polyline2D, Polygon2D, Mesh2D
+from ladybug_geometry.geometry3d import Vector3D, Point3D, Ray3D, \
+                            LineSegment3D, Arc3D, Polyline3D, Polyface3D, Mesh3D,\
+                            Plane, Face3D, Sphere, Cone, Cylinder
 
 def geometry_dict_to_object(ladybug_geom_dict, raise_exception=True):
-    # type (dict, bool) -> object | None
     """
     Args:
-        ladybug_geom_dict (dict): A dictionary of any Ladybug Geometry object. Note
-            that this should be a non-abridged dictionary to be valid.
+        ladybug_geom_dict (dict): A dictionary of any Ladybug Geometry object.
         raise_exception (bool): Boolean to note whether an exception should be raised
-            if the object is not identified as a part of honeybee.
+            if the object is not identified as a part of ladybug_geometry.
             Default: True.
 
     Returns:
-        Optional[object]: A Python object derived from the input ladybug_geom_dict. 
+        A Python object derived from the input ladybug_geom_dict. 
     """
 
     lbt_types = {
@@ -50,13 +48,13 @@ def geometry_dict_to_object(ladybug_geom_dict, raise_exception=True):
         'Cylinder':Cylinder,
     }
 
-    #- Get the Object Type
+    # Get the ladybug_geometry object 'Type'
     try:
         obj_type = ladybug_geom_dict['type']
     except KeyError:
         raise ValueError('Ladybug dictionary lacks required "type" key.')
 
-    #- Build a new Ladybug Object based on the "Type"
+    # Build a new Ladybug Python Object based on the "Type"
     try:
         lbt_class = lbt_types[obj_type]
         return lbt_class.from_dict( ladybug_geom_dict )
