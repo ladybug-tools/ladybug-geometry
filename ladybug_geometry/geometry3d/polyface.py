@@ -167,7 +167,12 @@ class Polyface3D(Base2DIn3D):
             face_indices.append(tuple(ind))
 
         # get the polyface object and assign correct faces to it
-        return cls(vertices, face_indices)
+        face_obj = cls(vertices, face_indices)
+        if face_obj._is_solid:
+            face_obj._faces = cls.get_outward_faces(faces, 0.01)
+        else:
+            face_obj._faces = tuple(faces)
+        return face_obj
 
     @classmethod
     def from_box(cls, width, depth, height, base_plane=None):
