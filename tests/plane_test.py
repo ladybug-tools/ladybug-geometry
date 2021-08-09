@@ -36,8 +36,8 @@ def test_plane_init():
     plane_flip = plane.flip()
     assert plane_flip.o == Point3D(2, 0, 2)
     assert plane_flip.n == Vector3D(0, -1, 0)
-    assert plane_flip.x == Vector3D(-1, 0, 0)
-    assert plane_flip.y == Vector3D(0, 0, -1)
+    assert plane_flip.x == Vector3D(1, 0, 0)
+    assert plane_flip.y == Vector3D(0, 0, 1)
     assert plane_flip.k == 0
 
 

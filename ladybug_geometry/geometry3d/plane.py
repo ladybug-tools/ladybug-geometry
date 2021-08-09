@@ -132,7 +132,7 @@ class Plane(object):
 
     def flip(self):
         """Get a flipped version of this plane (facing the opposite direction)."""
-        return Plane(self.n.reverse(), self.o, self.x.reverse())
+        return Plane(self.n.reverse(), self.o, self.x)
 
     def move(self, moving_vec):
         """Get a plane that has been moved along a vector.
