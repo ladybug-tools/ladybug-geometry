@@ -273,3 +273,16 @@ def test_reflect():
     test_1 = pt_1.reflect(normal_2, origin_1)
     assert test_1.x == pytest.approx(1, rel=1e-3)
     assert test_1.y == pytest.approx(3, rel=1e-3)
+
+
+def test_circular_mean():
+    """Test the circular mean staticmethod."""
+    angles_1 = [math.radians(x) for x in [45, 315]]
+    angles_2 = [math.radians(x) for x in [45, 135]]
+    angles_3 = [math.radians(x) for x in [90, 270]]
+
+    assert Vector2D.circular_mean(angles_1) == pytest.approx(0, rel=1e-3)
+    assert Vector2D.circular_mean(angles_2) == \
+        pytest.approx(math.radians(90), rel=1e-3)
+    assert Vector2D.circular_mean(angles_3) == \
+        pytest.approx(math.radians(180), rel=1e-3)

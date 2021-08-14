@@ -180,6 +180,21 @@ class Vector2D(object):
                 'x': self.x,
                 'y': self.y}
 
+    @staticmethod
+    def circular_mean(angles):
+        """Compute the circular mean across a list of angles in radians.
+
+        If no circular mean exists, the normal mean will be returned.
+
+        Args:
+            angles: A list of angles in radians.
+        """
+        avg_x = sum(math.cos(ang) for ang in angles) / len(angles)
+        avg_y = sum(math.sin(ang) for ang in angles) / len(angles)
+        if (avg_x, avg_y) == (0, 0):  # just return the normal mean
+            return sum(angles) / len(angles)
+        return math.atan2(avg_y, avg_x)
+
     def _cast_to_float(self, value):
         """Ensure that an input coordinate value is a float."""
         try:
