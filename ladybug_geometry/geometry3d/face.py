@@ -1747,6 +1747,11 @@ class Face3D(Base2DIn3D):
                 skip = 0
             else:
                 skip += 1
+        if skip != 0 and pts_3d[-2].is_equivalent(pts_3d[-1], tolerance):
+            _a = pts_2d[-3].determinant(pts_2d[-1]) + \
+                pts_2d[-1].determinant(pts_2d[0]) + pts_2d[0].determinant(pts_2d[-3])
+            if abs(_a) >= tolerance:
+                new_vertices.append(pts_3d[-1])
         return new_vertices
 
     def _is_sub_face(self, face):
