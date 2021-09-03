@@ -1886,19 +1886,16 @@ class Face3D(Base2DIn3D):
     def _point_on_face(self, tolerance):
         """Get a point that is always reliably on this face."""
         try:
-            move_vec = self._inward_pointing_vec(self)
-        except ZeroDivisionError:  # face has duplicated start vertices; remove them
-            try:
-                face = self.remove_colinear_vertices(tolerance)
-                move_vec = self._inward_pointing_vec(face)
-            except (AssertionError, ZeroDivisionError):  # zero area Face3D; use the center
-                return self.center
+            face = self.remove_colinear_vertices(tolerance)
+            move_vec = self._inward_pointing_vec(face)
+        except (AssertionError, ZeroDivisionError):  # zero area Face3D; use center
+            return self.center
 
         move_vec = move_vec * (tolerance + 0.00001)
-        point_on_face = self.boundary[0] + move_vec
-        vert2d = self.plane.xyz_to_xy(point_on_face)
-        if not self.polygon2d.is_point_inside(vert2d, Vector2D(1, 0.00001)):
-            point_on_face = self.boundary[0] - move_vec
+        point_on_face = face.boundary[0] + move_vec
+        vert2d = face.plane.xyz_to_xy(point_on_face)
+        if not face.polygon2d.is_point_inside(vert2d, Vector2D(1, 0.00001)):
+            point_on_face = face.boundary[0] - move_vec
         return point_on_face
 
     @staticmethod
