@@ -399,7 +399,10 @@ def _find_hole_bridge(hole, outerNode):
 
         if hx >= p.x and p.x >= mx and \
                 _point_in_triangle(hx_or_qx, hy, mx, my, qx_or_hx, hy, p.x, p.y):
-            tan = abs(hy - p.y) / (hx - p.x) # tangential
+            try:
+                tan = abs(hy - p.y) / (hx - p.x) # tangential
+            except ZeroDivisionError:
+                break
 
             if (tan < tanMin or (tan == tanMin and p.x > m.x)) and \
                     _locally_inside(p, hole):
