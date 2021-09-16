@@ -551,9 +551,14 @@ class Mesh3D(MeshBase):
         _tri_c = [Mesh3D._tri_centroid(tri) for tri in _tri_verts]
         _tri_a = [Mesh3D._get_tri_area(tri) for tri in _tri_verts]
         _tot_a = sum(_tri_a)
-        _cent_x = (_tri_c[0].x * _tri_a[0] + _tri_c[1].x * _tri_a[1]) / _tot_a
-        _cent_y = (_tri_c[0].y * _tri_a[0] + _tri_c[1].y * _tri_a[1]) / _tot_a
-        _cent_z = (_tri_c[0].z * _tri_a[0] + _tri_c[1].z * _tri_a[1]) / _tot_a
+        try:
+            _cent_x = (_tri_c[0].x * _tri_a[0] + _tri_c[1].x * _tri_a[1]) / _tot_a
+            _cent_y = (_tri_c[0].y * _tri_a[0] + _tri_c[1].y * _tri_a[1]) / _tot_a
+            _cent_z = (_tri_c[0].z * _tri_a[0] + _tri_c[1].z * _tri_a[1]) / _tot_a
+        except ZeroDivisionError:
+            _cent_x = sum([v.x for v in verts]) / 4
+            _cent_y = sum([v.y for v in verts]) / 4
+            _cent_z = sum([v.z for v in verts]) / 4
         return Point3D(_cent_x, _cent_y, _cent_z)
 
     @staticmethod
