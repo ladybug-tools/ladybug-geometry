@@ -88,8 +88,9 @@ class Polyface3D(Base2DIn3D):
                                 ind = edge_i.index((fi[i - 1], vi))
                                 edge_t[ind] += 1
                             except ValueError:  # add a new edge
-                                edge_i.append((fi[i - 1], vi))
-                                edge_t.append(0)
+                                if fi[i - 1] != vi:  # avoid cases of same start and end
+                                    edge_i.append((fi[i - 1], vi))
+                                    edge_t.append(0)
         self._edge_indices = edge_i if isinstance(edge_i, tuple) else tuple(edge_i)
         self._edge_types = edge_t if isinstance(edge_t, tuple) else tuple(edge_t)
 
