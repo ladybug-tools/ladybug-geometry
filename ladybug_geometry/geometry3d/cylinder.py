@@ -64,10 +64,10 @@ class Cylinder(object):
         .. code-block:: python
 
             {
-            "type": "Cylinder"
-            "center": (10, 0, 0),
-            "axis": (0, 0, 1),
-            "radius": 1.0,
+                "type": "Cylinder"
+                "center": (10, 0, 0),
+                "axis": (0, 0, 1),
+                "radius": 1.0
             }
         """
         return cls(Point3D.from_array(data['center']),

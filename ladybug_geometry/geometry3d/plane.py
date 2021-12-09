@@ -65,10 +65,10 @@ class Plane(object):
         .. code-block:: python
 
             {
-            "type": "Plane"
-            "n": (0, 0, 1),
-            "o": (0, 10, 0),
-            "x": (1, 0, 0)
+                "type": "Plane"
+                "n": (0, 0, 1),
+                "o": (0, 10, 0),
+                "x": (1, 0, 0)
             }
         """
         x = None
