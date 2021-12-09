@@ -42,9 +42,9 @@ class Vector3D(object):
         .. code-block:: python
 
             {
-            "x": 10,
-            "y": 0,
-            "z": 0
+                "x": 10,
+                "y": 0,
+                "z": 0
             }
         """
         return cls(data['x'], data['y'], data['z'])
@@ -174,6 +174,15 @@ class Vector3D(object):
                 which the vector will be reflected. THIS VECTOR MUST BE NORMALIZED.
         """
         return Vector3D._reflect(self, normal)
+
+    def project(self, normal):
+        """Get a vector projected into a plane with a given normal.
+
+        Args:
+            normal: A Vector3D representing the normal vector of the plane into which
+                the plane will be projected. THIS VECTOR MUST BE NORMALIZED.
+        """
+        return self - normal * self.dot(normal)
 
     def duplicate(self):
         """Get a copy of this vector."""
@@ -429,7 +438,7 @@ class Point3D(Vector3D):
             return (factor * (self - origin)) + origin
 
     def project(self, normal, origin):
-        """Get a point projected a point3d into a plane with a given normal and origin.
+        """Get a point that is projected into a plane with a given normal and origin.
 
         Args:
             normal: A Vector3D representing the normal vector of the plane into which

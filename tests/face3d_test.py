@@ -572,6 +572,33 @@ def test_upper_left_counter_clockwise_vertices_triangle():
     assert up_cclock_1 == up_cclock_2
 
 
+def test_corner_vertices():
+    """Test the various properties for corner vertices."""
+    plane_1 = Plane(Vector3D(0, 1, 0))
+    plane_2 = Plane(Vector3D(0, -1, 0))
+    pts_1 = (Point3D(0, 0, 0), Point3D(2, 0, 0), Point3D(2, 0, 2), Point3D(0, 0, 2))
+    pts_2 = (Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 0, 0))
+    face_1 = Face3D(pts_1, plane_1)
+    face_2 = Face3D(pts_2, plane_1)
+    face_3 = Face3D(pts_1, plane_2)
+    face_4 = Face3D(pts_2, plane_2)
+
+    assert face_1.upper_left_corner.is_equivalent(Point3D(2, 0, 2), 1e-6)
+    assert face_1.lower_left_corner.is_equivalent(Point3D(2, 0, 0), 1e-6)
+    assert face_1.upper_right_corner.is_equivalent(Point3D(0, 0, 2), 1e-6)
+    assert face_1.lower_right_corner.is_equivalent(Point3D(0, 0, 0), 1e-6)
+
+    assert face_2.upper_left_corner.is_equivalent(Point3D(2, 0, 2), 1e-6)
+    assert face_2.lower_left_corner.is_equivalent(Point3D(2, 0, 0), 1e-6)
+    assert face_2.upper_right_corner.is_equivalent(Point3D(0, 0, 2), 1e-6)
+    assert face_2.lower_right_corner.is_equivalent(Point3D(0, 0, 0), 1e-6)
+
+    assert face_3.upper_left_corner.is_equivalent(Point3D(0, 0, 2), 1e-6)
+    assert face_3.lower_left_corner.is_equivalent(Point3D(0, 0, 0), 1e-6)
+    assert face_3.upper_right_corner.is_equivalent(Point3D(2, 0, 2), 1e-6)
+    assert face_3.lower_right_corner.is_equivalent(Point3D(2, 0, 0), 1e-6)
+
+
 def test_duplicate():
     """Test the duplicate method of Face3D."""
     pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))

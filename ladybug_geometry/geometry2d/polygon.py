@@ -55,8 +55,8 @@ class Polygon2D(Base2DIn2D):
         .. code-block:: python
 
             {
-            "type": "Polygon2D",
-            "vertices": [(0, 0), (10, 0), (0, 10)]
+                "type": "Polygon2D",
+                "vertices": [(0, 0), (10, 0), (0, 10)]
             }
         """
         return cls(tuple(Point2D.from_array(pt) for pt in data['vertices']))

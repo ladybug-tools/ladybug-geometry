@@ -120,11 +120,11 @@ class Polyface3D(Base2DIn3D):
         .. code-block:: python
 
             {
-            "type": "Polyface3D",
-            "vertices": [(0, 0, 0), (10, 0, 0), (10, 10, 0), (0, 10, 0)],
-            "face_indices": [[(0, 1, 2)], [(3, 0, 1)]],
-            "edge_information": {"edge_indices":[(0, 1), (1, 2), (2, 0), (2, 3), (3, 0)],
-                                 "edge_types":[0, 0, 1, 0, 0]}
+                "type": "Polyface3D",
+                "vertices": [(0, 0, 0), (10, 0, 0), (10, 10, 0), (0, 10, 0)],
+                "face_indices": [[(0, 1, 2)], [(3, 0, 1)]],
+                "edge_information": {"edge_indices":[(0, 1), (1, 2), (2, 0), (2, 3), (3, 0)],
+                                    "edge_types":[0, 0, 1, 0, 0]}
             }
         """
         if 'edge_information' in data and data['edge_information'] is not None:

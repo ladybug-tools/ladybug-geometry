@@ -37,8 +37,8 @@ class Vector2D(object):
         .. code-block:: python
 
             {
-            "x": 10,
-            "y": 0
+                "x": 10,
+                "y": 0
             }
         """
         return cls(data['x'], data['y'])

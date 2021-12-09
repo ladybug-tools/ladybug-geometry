@@ -54,8 +54,8 @@ class Polyline3D(Base2DIn3D):
         .. code-block:: python
 
             {
-            "type": "Polyline3D",
-            "vertices": [(0, 0, 0), (10, 0, 2), (0, 10, 4)]
+                "type": "Polyline3D",
+                "vertices": [(0, 0, 0), (10, 0, 2), (0, 10, 4)]
             }
         """
         interp = data['interpolated'] if 'interpolated' in data else False

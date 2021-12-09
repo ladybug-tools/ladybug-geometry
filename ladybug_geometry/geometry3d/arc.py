@@ -54,11 +54,11 @@ class Arc3D(object):
         .. code-block:: python
 
             {
-            "type": "Arc3D"
-            "plane": {"n": (0, 0, 1), "o": (0, 10, 0), "x": (1, 0, 0)},
-            "radius": 5,
-            "a1": 0,
-            "a2": 3.14159
+                "type": "Arc3D"
+                "plane": {"n": (0, 0, 1), "o": (0, 10, 0), "x": (1, 0, 0)},
+                "radius": 5,
+                "a1": 0,
+                "a2": 3.14159
             }
         """
         return cls(Plane.from_dict(data['plane']), data['radius'],

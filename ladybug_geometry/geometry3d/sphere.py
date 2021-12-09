@@ -49,9 +49,9 @@ class Sphere(object):
         .. code-block:: python
 
             {
-            "type": "Sphere"
-            "center": (10, 0, 0),
-            "radius": 5,
+                "type": "Sphere"
+                "center": (10, 0, 0),
+                "radius": 5
             }
         """
         return cls(Point3D.from_array(data['center']), data['radius'])

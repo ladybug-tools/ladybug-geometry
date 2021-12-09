@@ -50,10 +50,10 @@ class Cone(object):
         .. code-block:: python
 
             {
-            "type": "Cone"
-            "vertex": (10, 0, 0),
-            "axis": (0, 0, 1),
-            "angle": 1.0,
+                "type": "Cone"
+                "vertex": (10, 0, 0),
+                "axis": (0, 0, 1),
+                "angle": 1.0
             }
         """
         return cls(Point3D.from_array(data['vertex']),

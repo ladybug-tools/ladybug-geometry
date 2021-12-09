@@ -60,11 +60,11 @@ class Arc2D(object):
         .. code-block:: python
 
             {
-            "type": "Arc2D"
-            "c": (10, 0),
-            "r": 5,
-            "a1": 0,
-            "a2": 3.14159
+                "type": "Arc2D"
+                "c": (10, 0),
+                "r": 5,
+                "a1": 0,
+                "a2": 3.14159
             }
         """
         return cls(Point2D.from_array(data['c']),

@@ -67,10 +67,10 @@ class Mesh2D(MeshBase):
         .. code-block:: python
 
             {
-            "type": "Mesh2D",
-            "vertices": [(0, 0), (10, 0), (0, 10)],
-            "faces": [(0, 1, 2)],
-            "colors": [{"r": 255, "g": 0, "b": 0}]
+                "type": "Mesh2D",
+                "vertices": [(0, 0), (10, 0), (0, 10)],
+                "faces": [(0, 1, 2)],
+                "colors": [{"r": 255, "g": 0, "b": 0}]
             }
         """
         colors = None

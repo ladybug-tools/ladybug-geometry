@@ -302,7 +302,19 @@ def test_reflect():
     assert test_1.z == pytest.approx(2, rel=1e-3)
 
 
-def test_project():
+def test_project_vector3d():
+    """Test the Point3D project method."""
+    v_1 = Vector3D(2, 2, 2)
+    normal_1 = Vector3D(0, 1, 0)
+    normal_2 = Vector3D(1, 0, 0)
+    normal_3 = Vector3D(0, 0, 1)
+
+    assert v_1.project(normal_1) == Vector3D(2, 0, 2)
+    assert v_1.project(normal_2) == Vector3D(0, 2, 2)
+    assert v_1.project(normal_3) == Vector3D(2, 2, 0)
+
+
+def test_project_point3d():
     """Test the Point3D project method."""
     pt_1 = Point3D(2, 2, 2)
     origin_1 = Point3D(1, 0, 0)

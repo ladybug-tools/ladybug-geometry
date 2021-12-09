@@ -73,7 +73,12 @@ class Face3D(Base2DIn3D):
         * is_self_intersecting
         * is_valid
         * has_holes
+        * upper_left_corner
+        * lower_left_corner
+        * upper_right_corner
+        * lower_right_corner
         * upper_left_counter_clockwise_vertices
+        * upper_left_counter_clockwise_boundary
     """
     __slots__ = ('_plane', '_polygon2d', '_mesh2d', '_mesh3d',
                  '_boundary', '_holes', '_boundary_segments', '_hole_segments',
@@ -145,10 +150,10 @@ class Face3D(Base2DIn3D):
         .. code-block:: python
 
             {
-            "type": "Face3D",
-            "boundary": [(0, 0, 0), (10, 0, 0), (0, 10, 0)],
-            "plane": {"n": (0, 0, 1), "o": (0, 0, 0), "x": (1, 0, 0)},
-            "holes": [[(2, 2, 0), (5, 2, 0), (2, 5, 0)]]
+                "type": "Face3D",
+                "boundary": [(0, 0, 0), (10, 0, 0), (0, 10, 0)],
+                "plane": {"n": (0, 0, 1), "o": (0, 0, 0), "x": (1, 0, 0)},
+                "holes": [[(2, 2, 0), (5, 2, 0), (2, 5, 0)]]
             }
         """
         holes = None
@@ -489,6 +494,26 @@ class Face3D(Base2DIn3D):
         return self._holes is not None
 
     @property
+    def upper_left_corner(self):
+        """Get the vertex in the upper-left corner of the face's bounding box."""
+        return self._corner_point('min', 'max')
+
+    @property
+    def lower_left_corner(self):
+        """Get the vertex in the lower-left corner of the face's bounding box."""
+        return self._corner_point('min', 'min')
+
+    @property
+    def upper_right_corner(self):
+        """Get the vertex in the upper-right corner of the face's bounding box."""
+        return self._corner_point('max', 'max')
+
+    @property
+    def lower_right_corner(self):
+        """Get the vertex in the lower-right corner of the face's bounding box."""
+        return self._corner_point('max', 'min')
+
+    @property
     def upper_left_counter_clockwise_vertices(self):
         """Get this face's vertices starting from the upper left and moving counterclockwise.
 
@@ -496,13 +521,13 @@ class Face3D(Base2DIn3D):
         same global geometry rules for export to engines like EnergyPlus.
         """
         if self._plane.n.z == 1 or self._plane.n.z == -1:  # no vertex is above another
-            return self.vertices
+            return self.vertices if not self.is_clockwise \
+                else tuple(reversed(self.vertices))
         # get a 2d polygon in the face plane that has a positive Y axis.
-        if self._plane.y.z < 0:
-            ref_plane = self._plane.rotate(self._plane.n, math.pi, self._plane.o)
-            polygon = Polygon2D(tuple(ref_plane.xyz_to_xy(v) for v in self._vertices))
-        else:
-            polygon = self.polygon2d
+        proj_y = Vector3D(0, 0, 1).project(self._plane.n)
+        proj_x = proj_y.rotate(self._plane.n, math.pi / -2)
+        ref_plane = Plane(self._plane.n, self._plane.o, proj_x)
+        polygon = Polygon2D(tuple(ref_plane.xyz_to_xy(v) for v in self._vertices))
         # get counterclockwise vertices
         if self.is_clockwise:
             verts3d = tuple(reversed(self.vertices))
@@ -516,16 +541,19 @@ class Face3D(Base2DIn3D):
 
     @property
     def upper_left_counter_clockwise_boundary(self):
-        """Get this face's boundary starting from the upper left and moving counterclockwise.
+        """Get this face's boundary starting from upper left and moving counterclockwise.
+
+        Unlike the upper_left_counter_clockwise_vertices property, this property
+        does not include any holes in the Face3D.
         """
         if self._plane.n.z == 1 or self._plane.n.z == -1:  # no vertex is above another
-            return self.boundary
+            return self.boundary if not self.is_clockwise \
+                else tuple(reversed(self.boundary))
         # get a 2d polygon in the face plane that has a positive Y axis.
-        if self._plane.y.z < 0:
-            ref_plane = self._plane.rotate(self._plane.n, math.pi, self._plane.o)
-            polygon = Polygon2D(tuple(ref_plane.xyz_to_xy(v) for v in self._boundary))
-        else:
-            polygon = self.boundary_polygon2d
+        proj_y = Vector3D(0, 0, 1).project(self._plane.n)
+        proj_x = proj_y.rotate(self._plane.n, math.pi / -2)
+        ref_plane = Plane(self._plane.n, self._plane.o, proj_x)
+        polygon = Polygon2D(tuple(ref_plane.xyz_to_xy(v) for v in self._boundary))
         # get counterclockwise boundary
         if self.is_clockwise:
             verts3d = tuple(reversed(self.boundary))
@@ -639,6 +667,35 @@ class Face3D(Base2DIn3D):
 
         # if it is, convert sub-face to a polygon in this face's plane
         return self._is_sub_face(face)
+
+    def polygon_in_face(self, sub_face, origin=None, flip=False):
+        """Get a Polygon2D for a sub_face within the plane of this Face3D.
+
+        Args:
+            sub_face: A Face3D for which a Polygon2D in the plane of this
+                Face3D will be returned.
+            origin: An optional Point3D to set the origin of the plane in which
+                the sub_face will be evaluated. Plugging in values like the
+                Face's lower_left_corner can standardize the geometry rules
+                for the resulting polygon. If None, this face's own
+                plane will be used. (Default: None).
+            flip: Boolean to note whether the x-axis of the plane should be flipped
+                when translating this the sub_face vertices.
+        """
+        # set the process the origin into a plane
+        if origin is None:
+            plane = self.plane if not flip else self.plane.flip()
+        else:
+            if self._plane.n.z in (1, -1):
+                plane = Plane(self._plane.n, origin, Vector3D(1, 0, 0)) if not flip \
+                    else Plane(self._plane.n, origin, Vector3D(-1, 0, 0))
+            else:
+                angle = math.pi / -2 if not flip else math.pi / 2
+                proj_y = Vector3D(0, 0, 1).project(self._plane.n)
+                proj_x = proj_y.rotate(self._plane.n, math.pi / -2)
+                plane = Plane(self._plane.n, origin, proj_x)
+        pts_2d = tuple(plane.xyz_to_xy(pt) for pt in sub_face.boundary)
+        return Polygon2D(pts_2d)
 
     def is_point_on_face(self, point, tolerance):
         """Check whether a given point is on this face.
@@ -1897,6 +1954,26 @@ class Face3D(Base2DIn3D):
         if not face.polygon2d.is_point_inside(vert2d, Vector2D(1, 0.00001)):
             point_on_face = face.boundary[0] - move_vec
         return point_on_face
+
+    def _corner_point(self, x_corner='min', y_corner='min'):
+        """Get a Plane with an origin that is in the corner of this Face3D.
+        
+        Args:
+            x_corner: Either "min" or "max" depending on the desired corner.
+            y_corner: Either "min" or "max" depending on the desired corner.
+        """
+        # get a correctly-oriented polygon
+        if self._plane.n.z == 1 or self._plane.n.z == -1:  # no vertex is above another
+            ref_plane = Plane(self._plane.n, self._plane.o, Vector3D(1, 0, 0))
+        else:
+            proj_y = Vector3D(0, 0, 1).project(self._plane.n)
+            proj_x = proj_y.rotate(self._plane.n, math.pi / -2)
+            ref_plane = Plane(self._plane.n, self._plane.o, proj_x)
+        polygon = Polygon2D(tuple(ref_plane.xyz_to_xy(v) for v in self._boundary))
+        # sort points so that they start with the right corner
+        x_pt = getattr(polygon, x_corner)
+        y_pt = getattr(polygon, y_corner)
+        return ref_plane.xy_to_xyz(Point2D(x_pt.x, y_pt.y))
 
     @staticmethod
     def _inward_pointing_vec(face):
