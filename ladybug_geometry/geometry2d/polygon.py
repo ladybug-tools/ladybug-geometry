@@ -685,6 +685,20 @@ class Polygon2D(Base2DIn2D):
                     return False
         return True
 
+    def distance_to_point(self, point):
+        """Get the minimum distance between this shape and the input point.
+
+        Args:
+            point: A Point2D object to which the minimum distance will be computed.
+
+        Returns:
+            The distance to the input point. Will be zero if the point is
+            inside the Polygon2D.
+        """
+        if self.is_point_inside_bound_rect(point):
+            return 0
+        return min(seg.distance_to_point(point) for seg in self.segments)
+
     def to_dict(self):
         """Get Polygon2D as a dictionary."""
         return {'type': 'Polygon2D',
