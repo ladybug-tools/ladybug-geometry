@@ -1957,7 +1957,7 @@ class Face3D(Base2DIn3D):
 
     def _corner_point(self, x_corner='min', y_corner='min'):
         """Get a Plane with an origin that is in the corner of this Face3D.
-        
+
         Args:
             x_corner: Either "min" or "max" depending on the desired corner.
             y_corner: Either "min" or "max" depending on the desired corner.

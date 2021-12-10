@@ -523,6 +523,20 @@ def test_is_polygon_inside_outside():
     assert polygon.is_polygon_outside(hole_4)
 
 
+def test_distance_to_point():
+    """Test the distance_to_point method."""
+    pts = (Point2D(0, 0), Point2D(4, 0), Point2D(4, 2), Point2D(2, 2),
+           Point2D(2, 4), Point2D(0, 4))
+    polygon = Polygon2D(pts)
+
+    assert polygon.distance_to_point(Point2D(-2, 1)) == 2
+    assert polygon.distance_to_point(Point2D(1, -1)) == 1
+    assert polygon.distance_to_point(Point2D(1, 5)) == 1
+    assert polygon.distance_to_point(Point2D(5, 1)) == 1
+    assert polygon.distance_to_point(Point2D(3, 3)) == 1
+    assert polygon.distance_to_point(Point2D(1, 1)) == 0
+
+
 def test_intersect_segments():
     """Tests that polygons within tolerance distance have vertices updated."""
     tolerance = 0.02
