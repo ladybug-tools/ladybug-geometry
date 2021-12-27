@@ -41,7 +41,7 @@ def test_linesegment2_to_from_dict():
 
 
 def test_init_from_endpoints():
-    """Test the initalization of LineSegement2D from end points."""
+    """Test the initialization of LineSegment2D from end points."""
     pt_1 = Point2D(2, 0)
     pt_2 = Point2D(2, 2)
     seg = LineSegment2D.from_end_points(pt_1, pt_2)
@@ -54,7 +54,7 @@ def test_init_from_endpoints():
 
 
 def test_init_from_sdl():
-    """Test the initalization of LineSegement2D from start, direction, length."""
+    """Test the initialization of LineSegment2D from start, direction, length."""
     pt = Point2D(2, 0)
     vec = Vector2D(0, 1)
     seg = LineSegment2D.from_sdl(pt, vec, 2)
@@ -67,7 +67,7 @@ def test_init_from_sdl():
 
 
 def test_linesegment2_immutability():
-    """Test the immutability of LineSegement2D objects."""
+    """Test the immutability of LineSegment2D objects."""
     pt = Point2D(2, 0)
     vec = Vector2D(0, 2)
     seg = LineSegment2D(pt, vec)
@@ -88,7 +88,7 @@ def test_linesegment2_immutability():
 
 
 def test_equality():
-    """Test the equality of LineSegement2D objects."""
+    """Test the equality of LineSegment2D objects."""
     pt = Point2D(2, 0)
     vec = Vector2D(0, 2)
     seg = LineSegment2D(pt, vec)
@@ -131,7 +131,7 @@ def test_equivalent():
 
 
 def test_move():
-    """Test the LineSegement2D move method."""
+    """Test the LineSegment2D move method."""
     pt = Point2D(2, 0)
     vec = Vector2D(0, 2)
     seg = LineSegment2D(pt, vec)
@@ -145,7 +145,7 @@ def test_move():
 
 
 def test_scale():
-    """Test the LineSegement2D scale method."""
+    """Test the LineSegment2D scale method."""
     pt = Point2D(2, 2)
     vec = Vector2D(0, 2)
     seg = LineSegment2D(pt, vec)
@@ -163,7 +163,7 @@ def test_scale():
 
 
 def test_scale_world_origin():
-    """Test the LineSegement2D scale method with None origin."""
+    """Test the LineSegment2D scale method with None origin."""
     pt = Point2D(2, 2)
     vec = Vector2D(0, 2)
     seg = LineSegment2D(pt, vec)
@@ -175,7 +175,7 @@ def test_scale_world_origin():
 
 
 def test_rotate():
-    """Test the LineSegement2D rotate method."""
+    """Test the LineSegment2D rotate method."""
     pt = Point2D(2, 2)
     vec = Vector2D(0, 2)
     seg = LineSegment2D(pt, vec)
@@ -195,7 +195,7 @@ def test_rotate():
 
 
 def test_reflect():
-    """Test the LineSegement2D reflect method."""
+    """Test the LineSegment2D reflect method."""
     pt = Point2D(2, 2)
     vec = Vector2D(0, 2)
     seg = LineSegment2D(pt, vec)
@@ -223,7 +223,7 @@ def test_reflect():
 
 
 def test_subdivide():
-    """Test the LineSegement2D subdivide methods."""
+    """Test the LineSegment2D subdivide methods."""
     pt = Point2D(2, 2)
     vec = Vector2D(0, 2)
     seg = LineSegment2D(pt, vec)
@@ -254,7 +254,7 @@ def test_subdivide():
 
 
 def test_closest_point():
-    """Test the LineSegement2D closest_point method."""
+    """Test the LineSegment2D closest_point method."""
     pt = Point2D(2, 2)
     vec = Vector2D(0, 2)
     seg = LineSegment2D(pt, vec)
@@ -268,7 +268,7 @@ def test_closest_point():
 
 
 def test_distance_to_point():
-    """Test the LineSegement2D distance_to_point method."""
+    """Test the LineSegment2D distance_to_point method."""
     pt = Point2D(2, 2)
     vec = Vector2D(0, 2)
     seg = LineSegment2D(pt, vec)
@@ -282,7 +282,7 @@ def test_distance_to_point():
 
 
 def test_intersect_line_ray():
-    """Test the LineSegement2D distance_to_point method."""
+    """Test the LineSegment2D intersect_line_ray method."""
     pt_1 = Point2D(2, 2)
     vec_1 = Vector2D(0, 2)
     seg_1 = LineSegment2D(pt_1, vec_1)
@@ -299,8 +299,41 @@ def test_intersect_line_ray():
     assert seg_1.intersect_line_ray(seg_3) is None
 
 
+def test_intersect_line_ray_colinear():
+    """Test the LineSegment2D intersect_line_ray method with colinear segments."""
+    pt_1 = Point2D(3.5362137509358353, -2.3574758339572237)
+    vec_1 = Vector2D(2.6625609418810905, -1.7750406279207271)
+    seg_1 = LineSegment2D(pt_1, vec_1)
+
+    pt_2 = Point2D(-1.7889081328263625, 1.1926054218842419)
+    vec_2 = Vector2D(1.7889081328263625, -1.1926054218842419)
+    seg_2 = LineSegment2D(pt_2, vec_2)
+
+    assert seg_1.intersect_line_ray(seg_2) is None
+
+    pt_1 = Point2D(0, 0)
+    vec_1 = Vector2D(1, 0)
+    seg_1 = LineSegment2D(pt_1, vec_1)
+
+    pt_2 = Point2D(0, 0)
+    vec_2 = Vector2D(0, 1)
+    seg_2 = LineSegment2D(pt_2, vec_2)
+
+    assert seg_1.intersect_line_ray(seg_2) == Point2D(0, 0)
+
+    pt_1 = Point2D(1, 0)
+    vec_1 = Vector2D(-1, 0)
+    seg_1 = LineSegment2D(pt_1, vec_1)
+
+    assert seg_1.intersect_line_ray(seg_2) == Point2D(0, 0)
+
+    pt_2 = Point2D(0, 1)
+    vec_2 = Vector2D(0, -1)
+    seg_2 = LineSegment2D(pt_2, vec_2)
+
+
 def test_closest_points_between_line():
-    """Test the LineSegement2D distance_to_point method."""
+    """Test the LineSegment2D distance_to_point method."""
     pt_1 = Point2D(2, 2)
     vec_1 = Vector2D(0, 2)
     seg_1 = LineSegment2D(pt_1, vec_1)
