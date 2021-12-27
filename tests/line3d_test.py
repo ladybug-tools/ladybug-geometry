@@ -31,7 +31,7 @@ def test_linesegment3d_init():
 
 
 def test_equality():
-    """Test the equality of LineSegement3D objects."""
+    """Test the equality of LineSegment3D objects."""
     pt = Point3D(2, 0, 2)
     vec = Vector3D(0, 2, 0)
     seg = LineSegment3D(pt, vec)
@@ -58,7 +58,7 @@ def test_linesegment3_to_from_dict():
 
 
 def test_init_from_endpoints():
-    """Test the initalization of LineSegment3D from end points."""
+    """Test the initialization of LineSegment3D from end points."""
     pt_1 = Point3D(2, 0, 2)
     pt_2 = Point3D(2, 2, 2)
     seg = LineSegment3D.from_end_points(pt_1, pt_2)
@@ -71,7 +71,7 @@ def test_init_from_endpoints():
 
 
 def test_init_from_sdl():
-    """Test the initalization of LineSegment3D from start, direction, length."""
+    """Test the initialization of LineSegment3D from start, direction, length."""
     pt = Point3D(2, 0, 2)
     vec = Vector3D(0, 1, 0)
     seg = LineSegment3D.from_sdl(pt, vec, 2)
