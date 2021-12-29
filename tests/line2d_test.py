@@ -310,6 +310,10 @@ def test_intersect_line_ray_colinear():
     seg_2 = LineSegment2D(pt_2, vec_2)
 
     assert seg_1.intersect_line_ray(seg_2) is None
+    seg_1 = seg_1.flip()
+    assert seg_1.intersect_line_ray(seg_2) is None
+    seg_2 = seg_2.flip()
+    assert seg_1.intersect_line_ray(seg_2) is None
 
     pt_1 = Point2D(0, 0)
     vec_1 = Vector2D(1, 0)
@@ -330,6 +334,26 @@ def test_intersect_line_ray_colinear():
     pt_2 = Point2D(0, 1)
     vec_2 = Vector2D(0, -1)
     seg_2 = LineSegment2D(pt_2, vec_2)
+
+    assert seg_1.intersect_line_ray(seg_2) == Point2D(0, 0)
+
+    pt_1 = Point2D(0, -1)
+    vec_1 = Vector2D(0, 1)
+    seg_1 = LineSegment2D(pt_1, vec_1)
+
+    assert seg_1.intersect_line_ray(seg_2) is None
+
+    pt_2 = Point2D(0, 0)
+    vec_2 = Vector2D(-1, 0)
+    seg_2 = LineSegment2D(pt_2, vec_2)
+
+    assert seg_1.intersect_line_ray(seg_2) == Point2D(0, 0)
+
+    pt_2 = Point2D(-1, 0)
+    vec_2 = Vector2D(1, 0)
+    seg_2 = LineSegment2D(pt_2, vec_2)
+
+    assert seg_1.intersect_line_ray(seg_2) == Point2D(0, 0)
 
 
 def test_closest_points_between_line():
