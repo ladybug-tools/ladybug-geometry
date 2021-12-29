@@ -78,7 +78,9 @@ class Face3D(Base2DIn3D):
         * upper_right_corner
         * lower_right_corner
         * upper_left_counter_clockwise_vertices
-        * upper_left_counter_clockwise_boundary
+        * lower_left_counter_clockwise_vertices
+        * lower_right_counter_clockwise_vertices
+        * upper_right_counter_clockwise_vertices
     """
     __slots__ = ('_plane', '_polygon2d', '_mesh2d', '_mesh3d',
                  '_boundary', '_holes', '_boundary_segments', '_hole_segments',
@@ -515,55 +517,59 @@ class Face3D(Base2DIn3D):
 
     @property
     def upper_left_counter_clockwise_vertices(self):
-        """Get this face's vertices starting from the upper left and moving counterclockwise.
+        """Get face vertices starting from the upper left and moving counterclockwise.
 
-        This is useful for getting the vertices of several faces aligned with the
-        same global geometry rules for export to engines like EnergyPlus.
+        Horizontal faces will treat the positive Y axis as up. All other faces
+        treat the positive Z axis as up.
         """
-        if self._plane.n.z == 1 or self._plane.n.z == -1:  # no vertex is above another
-            return self.vertices if not self.is_clockwise \
-                else tuple(reversed(self.vertices))
-        # get a 2d polygon in the face plane that has a positive Y axis.
-        proj_y = Vector3D(0, 0, 1).project(self._plane.n)
-        proj_x = proj_y.rotate(self._plane.n, math.pi / -2)
-        ref_plane = Plane(self._plane.n, self._plane.o, proj_x)
-        polygon = Polygon2D(tuple(ref_plane.xyz_to_xy(v) for v in self._vertices))
-        # get counterclockwise vertices
-        if self.is_clockwise:
-            verts3d = tuple(reversed(self.vertices))
-            verts2d = tuple(reversed(polygon.vertices))
-        else:
-            verts3d = self.vertices
-            verts2d = polygon.vertices
-        # sort points so that they start with the upper left point
-        corner_pt = Point2D(polygon.min.x, polygon.max.y)
+        corner_pt, polygon = self._corner_point_and_polygon(self._vertices, 'min', 'max')
+        verts3d, verts2d = self._counter_clockwise_verts(polygon)
         return self._corner_pt_verts(corner_pt, verts3d, verts2d)
 
     @property
-    def upper_left_counter_clockwise_boundary(self):
-        """Get this face's boundary starting from upper left and moving counterclockwise.
+    def lower_left_counter_clockwise_vertices(self):
+        """Get face vertices starting from the lower left and moving counterclockwise.
 
-        Unlike the upper_left_counter_clockwise_vertices property, this property
-        does not include any holes in the Face3D.
+        Horizontal faces will treat the positive Y axis as up. All other faces
+        treat the positive Z axis as up.
         """
-        if self._plane.n.z == 1 or self._plane.n.z == -1:  # no vertex is above another
-            return self.boundary if not self.is_clockwise \
-                else tuple(reversed(self.boundary))
-        # get a 2d polygon in the face plane that has a positive Y axis.
-        proj_y = Vector3D(0, 0, 1).project(self._plane.n)
-        proj_x = proj_y.rotate(self._plane.n, math.pi / -2)
-        ref_plane = Plane(self._plane.n, self._plane.o, proj_x)
-        polygon = Polygon2D(tuple(ref_plane.xyz_to_xy(v) for v in self._boundary))
-        # get counterclockwise boundary
-        if self.is_clockwise:
-            verts3d = tuple(reversed(self.boundary))
-            verts2d = tuple(reversed(polygon.vertices))
-        else:
-            verts3d = self.boundary
-            verts2d = polygon.vertices
-        # sort points so that they start with the upper left point
-        corner_pt = Point2D(polygon.min.x, polygon.max.y)
+        corner_pt, polygon = self._corner_point_and_polygon(self._vertices, 'min', 'min')
+        verts3d, verts2d = self._counter_clockwise_verts(polygon)
         return self._corner_pt_verts(corner_pt, verts3d, verts2d)
+
+    @property
+    def lower_right_counter_clockwise_vertices(self):
+        """Get face vertices starting from the lower left and moving counterclockwise.
+
+        Horizontal faces will treat the positive Y axis as up. All other faces
+        treat the positive Z axis as up.
+        """
+        corner_pt, polygon = self._corner_point_and_polygon(self._vertices, 'max', 'min')
+        verts3d, verts2d = self._counter_clockwise_verts(polygon)
+        return self._corner_pt_verts(corner_pt, verts3d, verts2d)
+
+    @property
+    def upper_right_counter_clockwise_vertices(self):
+        """Get face vertices starting from the lower left and moving counterclockwise.
+
+        Horizontal faces will treat the positive Y axis as up. All other faces
+        treat the positive Z axis as up.
+        """
+        corner_pt, polygon = self._corner_point_and_polygon(self._vertices, 'max', 'max')
+        verts3d, verts2d = self._counter_clockwise_verts(polygon)
+        return self._corner_pt_verts(corner_pt, verts3d, verts2d)
+
+    def is_horizontal(self, tolerance):
+        """Check whether a this face is horizontal within a given tolerance.
+
+        Args:
+            tolerance: The minimum difference between the coordinate values of two
+                vertices at which they can be considered equivalent.
+
+        Returns:
+            True if the face is horizontal. False if it is not.
+        """
+        return self.max.z - self.min.z <= tolerance 
 
     def is_geometrically_equivalent(self, face, tolerance):
         """Check whether a given face is geometrically equivalent to this Face.
@@ -704,7 +710,7 @@ class Face3D(Base2DIn3D):
         face and a check to ensure that point lies in the boundary of the face.
 
         Args:
-            face: Another face for which sub-face equivalency will be tested.
+            point: A Point3D to evaluate whether it lies on the face.
             tolerance: The minimum difference between the coordinate values of two
                 vertices at which they can be considered equivalent.
         Returns:
@@ -1680,7 +1686,7 @@ class Face3D(Base2DIn3D):
             base['boundary'] = [pt.to_array() for pt in self.boundary]
         else:
             base['boundary'] = [pt.to_array() for pt in
-                                self.upper_left_counter_clockwise_boundary]
+                                self._upper_left_counter_clockwise_boundary()]
         if include_plane:
             base['plane'] = self.plane.to_dict()
         if self.has_holes:
@@ -1955,25 +1961,77 @@ class Face3D(Base2DIn3D):
             point_on_face = face.boundary[0] - move_vec
         return point_on_face
 
-    def _corner_point(self, x_corner='min', y_corner='min'):
-        """Get a Plane with an origin that is in the corner of this Face3D.
-
-        Args:
-            x_corner: Either "min" or "max" depending on the desired corner.
-            y_corner: Either "min" or "max" depending on the desired corner.
+    def _upper_oriented_plane(self):
+        """Get a version of this Face3D's plane where Y is oriented towards positive Z.
+        
+        If the Face3D is horizontal, the plane will be the World XY.
         """
-        # get a correctly-oriented polygon
         if self._plane.n.z == 1 or self._plane.n.z == -1:  # no vertex is above another
             ref_plane = Plane(self._plane.n, self._plane.o, Vector3D(1, 0, 0))
         else:
             proj_y = Vector3D(0, 0, 1).project(self._plane.n)
             proj_x = proj_y.rotate(self._plane.n, math.pi / -2)
             ref_plane = Plane(self._plane.n, self._plane.o, proj_x)
+        return ref_plane
+
+    def _corner_point(self, x_corner='min', y_corner='min'):
+        """Get a Point3D that is in a particular corner of this Face3D.
+
+        Args:
+            x_corner: Either "min" or "max" depending on the desired corner.
+            y_corner: Either "min" or "max" depending on the desired corner.
+        """
+        # get a correctly-oriented polygon
+        ref_plane = self._upper_oriented_plane()
         polygon = Polygon2D(tuple(ref_plane.xyz_to_xy(v) for v in self._boundary))
-        # sort points so that they start with the right corner
+        # sort points so that they start with the correct corner
         x_pt = getattr(polygon, x_corner)
         y_pt = getattr(polygon, y_corner)
         return ref_plane.xy_to_xyz(Point2D(x_pt.x, y_pt.y))
+
+    def _corner_point_and_polygon(self, points_3d, x_corner='min', y_corner='min'):
+        """Get a Point2D and corresponding Polygon in a particular corner of this Face3D.
+
+        Args:
+            points_3d: A list of Point3Ds for the output Polygon.
+            x_corner: Either "min" or "max" depending on the desired corner.
+            y_corner: Either "min" or "max" depending on the desired corner.
+        """
+        if self.is_horizontal(0.01):  # EnergyPlus tolerance
+            polygon = Polygon2D(tuple(Point2D(v.x, v.y) for v in points_3d))
+            if self._plane.n.z < 0:  # flip the direction of what counts as "right"
+                x_corner = 'max' if x_corner == 'min' else 'min'
+            x_pt = getattr(self, x_corner)
+            y_pt = getattr(self, y_corner)
+        else:
+            # get a 2d polygon in the face plane that has a positive Y axis.
+            proj_y = Vector3D(0, 0, 1).project(self._plane.n)
+            proj_x = proj_y.rotate(self._plane.n, math.pi / -2)
+            ref_plane = Plane(self._plane.n, self._plane.o, proj_x)
+            polygon = Polygon2D(tuple(ref_plane.xyz_to_xy(v) for v in points_3d))
+            x_pt = getattr(polygon, x_corner)
+            y_pt = getattr(polygon, y_corner)
+        return Point2D(x_pt.x, y_pt.y), polygon
+
+    def _counter_clockwise_verts(self, polygon):
+        """Get aligned lists of counter-clockwise 2D and 3D vertices."""
+        if self.is_clockwise:
+            return tuple(reversed(self.vertices)), tuple(reversed(polygon.vertices))
+        else:
+            return self.vertices, polygon.vertices
+
+    def _upper_left_counter_clockwise_boundary(self):
+        """Get this face's boundary starting from upper left and moving counterclockwise.
+
+        Horizontal faces will treat the positive Y axis as up. All other faces
+        treat the positive Z axis as up.
+
+        Unlike the upper_left_counter_clockwise_vertices property, this property
+        does not include any holes in the Face3D.
+        """
+        corner_pt, polygon = self._corner_point_and_polygon(self._boundary, 'min', 'max')
+        verts3d, verts2d = self._counter_clockwise_verts(polygon)
+        return self._corner_pt_verts(corner_pt, verts3d, verts2d)
 
     @staticmethod
     def _inward_pointing_vec(face):
