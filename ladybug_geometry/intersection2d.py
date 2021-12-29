@@ -51,6 +51,10 @@ def intersect_line2d(line_ray_a, line_ray_b):
     if not line_ray_b._u_in(ub):
         return None
 
+    # final check for co-linearity that escapes floating tolerance
+    if ua == ub == 0 and math.copysign(1, ua) == -1 and math.copysign(1, ub) == -1:
+        return None
+
     return Point2D(line_ray_a.p.x + ua * line_ray_a.v.x,
                    line_ray_a.p.y + ua * line_ray_a.v.y)
 

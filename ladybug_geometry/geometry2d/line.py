@@ -2,8 +2,6 @@
 """2D Line Segment"""
 from __future__ import division
 
-import math
-
 from .pointvector import Vector2D, Point2D
 from ._1d import Base1DIn2D
 from ..intersection2d import closest_point2d_between_line2d
@@ -249,7 +247,7 @@ class LineSegment2D(Base1DIn2D):
         return (self.p1.to_array(), self.p2.to_array())
 
     def _u_in(self, u):
-        return u >= 0.0 and u <= 1.0 and math.copysign(1, u) != -1
+        return u >= 0.0 and u <= 1.0
 
     def __abs__(self):
         return abs(self.v)
