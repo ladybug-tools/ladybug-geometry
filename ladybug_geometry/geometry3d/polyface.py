@@ -357,7 +357,7 @@ class Polyface3D(Base2DIn3D):
                 self.edges
             nm_edges = []
             for i, type in enumerate(self._edge_types):
-                if type > 2:
+                if type > 1:
                     nm_edges.append(self._edges[i])
             self._non_manifold_edges = tuple(nm_edges)
         return self._non_manifold_edges

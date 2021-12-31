@@ -2030,7 +2030,11 @@ class Face3D(Base2DIn3D):
         does not include any holes in the Face3D.
         """
         corner_pt, polygon = self._corner_point_and_polygon(self._boundary, 'min', 'max')
-        verts3d, verts2d = self._counter_clockwise_verts(polygon)
+        if self.is_clockwise:
+            verts3d, verts2d = \
+                tuple(reversed(self.boundary)), tuple(reversed(polygon.vertices))
+        else:
+            verts3d, verts2d = self.boundary, polygon.vertices
         return self._corner_pt_verts(corner_pt, verts3d, verts2d)
 
     @staticmethod
