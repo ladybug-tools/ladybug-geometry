@@ -1463,6 +1463,9 @@ class Face3D(Base2DIn3D):
         rectangular window surfaces.
 
         Args:
+            base_plane: A Plane object in which the rectangle exists.
+                The origin of this plane will be the lower left corner of the
+                rectangle and the X and Y axes will form the sides.
             parent_base: A number indicating the length of the base of the
                 parent rectangle.
             parent_height: A number indicating the length of the height of the
@@ -1483,10 +1486,6 @@ class Face3D(Base2DIn3D):
             vertical_separation: An optional number to create a single vertical
                 separation between top and bottom sub-rectangles. The default is
                 0 for no separation.
-            base_plane: A Plane object in which the rectangle exists.
-                The origin of this plane will be the lower left corner of the
-                rectangle and the X and Y axes will form the sides.
-                Default is the world XY plane.
 
         Returns:
             A list of Face3D objects for sub faces.
@@ -1590,7 +1589,6 @@ class Face3D(Base2DIn3D):
             base_plane: A Plane object in which the rectangle exists.
                 The origin of this plane will be the lower left corner of the
                 rectangle and the X and Y axes will form the sides.
-                Default is the world XY plane.
             parent_base: A number indicating the length of the base of the
                 parent rectangle.
             parent_height: A number indicating the length of the height of the
