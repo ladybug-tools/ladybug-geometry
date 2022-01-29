@@ -1251,7 +1251,10 @@ class Face3D(Base2DIn3D):
         scale_factor = ratio ** .5
         sub_faces = [rect_face.scale(scale_factor, rect_face.center)]
         for face in other_faces:
-            sub_faces.extend(face.sub_faces_by_ratio(ratio))
+            sfs = face.sub_faces_by_ratio(ratio)
+            for sf in sfs:
+                if sf.area > tolerance:
+                    sub_faces.append(sf)
         return sub_faces
 
     def sub_faces_by_ratio_sub_rectangle(self, ratio, sub_rect_height, sill_height,
@@ -1294,12 +1297,17 @@ class Face3D(Base2DIn3D):
             return self.sub_faces_by_ratio(ratio)
         bottom_seg, top_seg, other_faces = rect_res
         height_seg = LineSegment3D.from_end_points(bottom_seg.p, top_seg.p)
-        base_plane = Plane(self.normal, bottom_seg.p, bottom_seg.v)
+        norm_tup = self._normal_from_3pts(bottom_seg.p, bottom_seg.p2, top_seg.p)
+        norm = Vector3D(*norm_tup).normalize()
+        base_plane = Plane(norm, bottom_seg.p, bottom_seg.v)
         sub_faces = Face3D.sub_rects_from_rect_ratio(
             base_plane, bottom_seg.length, height_seg.length, ratio,
             sub_rect_height, sill_height, horizontal_separation, vertical_separation)
         for face in other_faces:
-            sub_faces.extend(face.sub_faces_by_ratio(ratio))
+            sfs = face.sub_faces_by_ratio(ratio)
+            for sf in sfs:
+                if sf.area > tolerance:
+                    sub_faces.append(sf)
         return sub_faces
 
     def sub_faces_by_dimension_rectangle(self, sub_rect_height, sub_rect_width,
