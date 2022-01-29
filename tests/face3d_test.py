@@ -1303,12 +1303,48 @@ def test_sub_faces_by_ratio_sub_rectangle():
     assert len(sub_faces) == 5
     areas = [srf.area for srf in sub_faces]
     assert sum(areas) == pytest.approx(face_1.area * 0.4, rel=1e-3)
+    for sf in sub_faces:
+        assert face_1.is_sub_face(sf, 0.01, 1)
 
     sub_faces_2 = face_1.sub_faces_by_ratio_sub_rectangle(
-        0.99, window_height, sill_height, horiz_separation, vert_separation, 0.0001)
-    assert len(sub_faces_2) == 2
+        0.95, window_height, sill_height, horiz_separation, vert_separation, 0.0001)
+    assert len(sub_faces_2) == 5
     areas = [srf.area for srf in sub_faces_2]
-    assert sum(areas) == pytest.approx(face_1.area * 0.99, rel=1e-3)
+    assert sum(areas) == pytest.approx(face_1.area * 0.95, rel=1e-3)
+    for sf in sub_faces_2:
+        assert face_1.is_sub_face(sf, 0.01, 1)
+
+
+def test_sub_faces_by_ratio_sub_rectangle_non_rect():
+    """Test the sub_faces_by_ratio_sub_rectangle method with a non-rectangular face."""
+    pts_1 = (Point3D(0, 0, 0), Point3D(5, 0, 0), Point3D(5, 0, 6), Point3D(0, 0, 5))
+    face_1 = Face3D(pts_1)
+
+    sub_faces = face_1.sub_faces_by_ratio_sub_rectangle(0.25, 2, 0.8, 3, 0, 0.01)
+    assert len(sub_faces) == 3
+    areas = [srf.area for srf in sub_faces]
+    assert sum(areas) == pytest.approx(face_1.area * 0.25, rel=1e-3)
+    for sf in sub_faces:
+        assert face_1.is_sub_face(sf, 0.01, 1)
+    
+    pts_2 = [
+        Point3D(34.068566268151841,  18.694085210192, 3.9999999999999987), 
+        Point3D(34.068566268151862, 18.694085210192011, 7.0), 
+        Point3D(34.442641391689776, 21.198643189820409, 7.0000000000000018), 
+        Point3D(34.442641391689783, 21.198643189820412, 7.4999999999999973), 
+        Point3D(33.710274088688173, 16.295199316291654, 7.5), 
+        Point3D(33.710274088688173, 16.295199316291651, 4.0)
+    ]
+    face_2 = Face3D(pts_2)
+
+    sub_faces = face_2.sub_faces_by_ratio_sub_rectangle(0.25, 2, 0.8, 3, 0, 0.01)
+    assert len(sub_faces) == 4
+    areas = [srf.area for srf in sub_faces]
+    assert all(a > 0.001 for a in areas)
+    assert sum(areas) == pytest.approx(face_2.area * 0.25, rel=1e-3)
+    for sf in sub_faces:
+        assert face_2.is_sub_face(sf, 0.01, 1)
+
 
 
 def test_sub_faces_by_ratio():
