@@ -100,11 +100,7 @@ class Face3D(Base2DIn3D):
         self._plane = plane
 
         # process boundary and holes input
-        if holes is None:
-            self._holes = None
-            self._vertices = self._boundary
-            self._polygon2d = None
-        else:
+        if holes:
             assert isinstance(holes, (tuple, list)), \
                 'holes should be a tuple or list. Got {}'.format(type(holes))
             self._holes = tuple(
@@ -117,6 +113,10 @@ class Face3D(Base2DIn3D):
             self._vertices = tuple(self._plane.xy_to_xyz(_v)
                                    for _v in _polygon2d.vertices)
             self._polygon2d = _polygon2d
+        else:
+            self._holes = None
+            self._vertices = self._boundary
+            self._polygon2d = None
 
         # perform a check of vertex orientation and enforce counter clockwise vertices
         if enforce_right_hand is True:

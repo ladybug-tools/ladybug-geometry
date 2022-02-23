@@ -63,6 +63,16 @@ def test_equality():
     assert hash(face) != hash(face_alt)
 
 
+def test_face3d_no_holes():
+    """Test the initialization of Face3D without holes."""
+    pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
+    plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+    face = Face3D(pts, plane, None)
+    assert not face.has_holes
+    face = Face3D(pts, plane, [])
+    assert not face.has_holes
+
+
 def test_face3d_to_from_dict():
     """Test the to/from dict of Face3D objects."""
     pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
