@@ -40,6 +40,8 @@ def test_face3d_init():
 
     assert face.area == 4
     assert face.perimeter == 8
+    assert round(face.altitude, 3) == round(math.pi / 2, 3)
+    assert round(face.azimuth, 3) == 0
     assert face.is_clockwise is False
     assert face.is_convex is True
     assert face.is_self_intersecting is False
@@ -591,7 +593,6 @@ def test_corner_vertices():
     face_1 = Face3D(pts_1, plane_1)
     face_2 = Face3D(pts_2, plane_1)
     face_3 = Face3D(pts_1, plane_2)
-    face_4 = Face3D(pts_2, plane_2)
 
     assert face_1.upper_left_corner.is_equivalent(Point3D(2, 0, 2), 1e-6)
     assert face_1.lower_left_corner.is_equivalent(Point3D(2, 0, 0), 1e-6)
@@ -633,12 +634,12 @@ def test_remove_colinear_vertices():
              Point3D(0, 2))
     pts_3 = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 2),
              Point3D(0, 2), Point3D(0, 2))
-    pts_4 = (Point3D (24.21, 23.22, 8.00), Point3D (24.21, 23.22, 11.60),
-             Point3D (24.61, 23.22, 11.60), Point3D (27.85, 23.22, 11.60),
-             Point3D (30.28, 23.22, 11.60), Point3D (30.28, 23.22, 0.00),
-             Point3D (27.85, 23.22, 0.00), Point3D (27.85, 23.22, 4.00),
-             Point3D (27.85, 23.22, 8.00), Point3D (27.85, 23.22, 8.00),
-             Point3D (24.61, 23.22, 8.00), Point3D (24.61, 23.22, 8.00))
+    pts_4 = (Point3D(24.21, 23.22, 8.00), Point3D(24.21, 23.22, 11.60),
+             Point3D(24.61, 23.22, 11.60), Point3D(27.85, 23.22, 11.60),
+             Point3D(30.28, 23.22, 11.60), Point3D(30.28, 23.22, 0.00),
+             Point3D(27.85, 23.22, 0.00), Point3D(27.85, 23.22, 4.00),
+             Point3D(27.85, 23.22, 8.00), Point3D(27.85, 23.22, 8.00),
+             Point3D(24.61, 23.22, 8.00), Point3D(24.61, 23.22, 8.00))
     plane_1 = Plane(Vector3D(0, 0, 1))
     face_1 = Face3D(pts_1, plane_1)
     face_2 = Face3D(pts_2, plane_1)
@@ -1336,13 +1337,13 @@ def test_sub_faces_by_ratio_sub_rectangle_non_rect():
     assert sum(areas) == pytest.approx(face_1.area * 0.25, rel=1e-3)
     for sf in sub_faces:
         assert face_1.is_sub_face(sf, 0.01, 1)
-    
+
     pts_2 = [
-        Point3D(34.068566268151841,  18.694085210192, 3.9999999999999987), 
-        Point3D(34.068566268151862, 18.694085210192011, 7.0), 
-        Point3D(34.442641391689776, 21.198643189820409, 7.0000000000000018), 
-        Point3D(34.442641391689783, 21.198643189820412, 7.4999999999999973), 
-        Point3D(33.710274088688173, 16.295199316291654, 7.5), 
+        Point3D(34.068566268151841,  18.694085210192, 3.9999999999999987),
+        Point3D(34.068566268151862, 18.694085210192011, 7.0),
+        Point3D(34.442641391689776, 21.198643189820409, 7.0000000000000018),
+        Point3D(34.442641391689783, 21.198643189820412, 7.4999999999999973),
+        Point3D(33.710274088688173, 16.295199316291654, 7.5),
         Point3D(33.710274088688173, 16.295199316291651, 4.0)
     ]
     face_2 = Face3D(pts_2)
@@ -1354,7 +1355,6 @@ def test_sub_faces_by_ratio_sub_rectangle_non_rect():
     assert sum(areas) == pytest.approx(face_2.area * 0.25, rel=1e-3)
     for sf in sub_faces:
         assert face_2.is_sub_face(sf, 0.01, 1)
-
 
 
 def test_sub_faces_by_ratio():
@@ -1380,12 +1380,10 @@ def test_sub_faces_by_dimension_rectangle():
     """Test the sub_faces_by_dimension_rectangle method."""
     pts_1 = (Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 0, 0))
     pts_2 = (Point3D(0, 0, 0), Point3D(0, 0, 2), Point3D(4, 0, 2), Point3D(4, 0, 0))
-    plane = Plane(Vector3D(0, 0, 1))
     face_1 = Face3D(pts_1)
     face_2 = Face3D(pts_2)
     sub_face_height = 1.0
     sill_height = 1.0
-    rect_height = 2.0
     div_dist = 1.0
 
     sub_faces_1 = face_1.sub_faces_by_dimension_rectangle(

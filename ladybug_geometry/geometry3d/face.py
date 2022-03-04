@@ -68,6 +68,8 @@ class Face3D(Base2DIn3D):
         * perimeter
         * area
         * centroid
+        * altitude
+        * azimuth
         * is_clockwise
         * is_convex
         * is_self_intersecting
@@ -446,6 +448,19 @@ class Face3D(Base2DIn3D):
         return self._centroid
 
     @property
+    def azimuth(self):
+        """Get the azimuth of the Face3D (between 0 and 2 * Pi).
+
+        This will be zero if the Face3D is perfectly horizontal.
+        """
+        return self.plane.azimuth
+
+    @property
+    def altitude(self):
+        """Get the altitude of the Face3D (between Pi/2 and -Pi/2)."""
+        return self.plane.altitude
+
+    @property
     def is_clockwise(self):
         """Boolean for whether the face vertices and boundary are in clockwise order.
 
@@ -569,7 +584,7 @@ class Face3D(Base2DIn3D):
         Returns:
             True if the face is horizontal. False if it is not.
         """
-        return self.max.z - self.min.z <= tolerance 
+        return self.max.z - self.min.z <= tolerance
 
     def is_geometrically_equivalent(self, face, tolerance):
         """Check whether a given face is geometrically equivalent to this Face.
@@ -696,7 +711,6 @@ class Face3D(Base2DIn3D):
                 plane = Plane(self._plane.n, origin, Vector3D(1, 0, 0)) if not flip \
                     else Plane(self._plane.n, origin, Vector3D(-1, 0, 0))
             else:
-                angle = math.pi / -2 if not flip else math.pi / 2
                 proj_y = Vector3D(0, 0, 1).project(self._plane.n)
                 proj_x = proj_y.rotate(self._plane.n, math.pi / -2)
                 plane = Plane(self._plane.n, origin, proj_x)
@@ -1859,7 +1873,7 @@ class Face3D(Base2DIn3D):
 
     def _diagonal_along_self(self, direction_vector, tolerance):
         """Get the diagonal oriented along this face and always starts on the left."""
-        tol_pt = Vector3D(1.0e-7, 1.0e-7, 1.0e-7)  # closer to Python tolerance than input
+        tol_pt = Vector3D(1.0e-7, 1.0e-7, 1.0e-7)  # closer than float tolerance
         diagonal = LineSegment3D.from_end_points(self.min + tol_pt, self.max - tol_pt)
         # invert the diagonal XY if it is not oriented with the face plane
         if self._plane.distance_to_point(diagonal.p) > tolerance:
@@ -1969,7 +1983,7 @@ class Face3D(Base2DIn3D):
 
     def _upper_oriented_plane(self):
         """Get a version of this Face3D's plane where Y is oriented towards positive Z.
-        
+
         If the Face3D is horizontal, the plane will be the World XY.
         """
         if self._plane.n.z == 1 or self._plane.n.z == -1:  # no vertex is above another
