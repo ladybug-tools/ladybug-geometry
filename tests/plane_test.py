@@ -25,6 +25,8 @@ def test_plane_init():
     assert plane.x == Vector3D(1, 0, 0)
     assert plane.y == Vector3D(0, 0, -1)
     assert plane.k == 0
+    assert round(plane.altitude, 3) == 0
+    assert round(plane.azimuth, 3) == 0
 
     plane_dup = plane.duplicate()
     assert plane_dup.o == Point3D(2, 0, 2)
@@ -32,6 +34,8 @@ def test_plane_init():
     assert plane_dup.x == Vector3D(1, 0, 0)
     assert plane_dup.y == Vector3D(0, 0, -1)
     assert plane_dup.k == 0
+    assert round(plane.altitude, 3) == 0
+    assert round(plane.azimuth, 3) == 0
 
     plane_flip = plane.flip()
     assert plane_flip.o == Point3D(2, 0, 2)
@@ -39,6 +43,8 @@ def test_plane_init():
     assert plane_flip.x == Vector3D(1, 0, 0)
     assert plane_flip.y == Vector3D(0, 0, 1)
     assert plane_flip.k == 0
+    assert round(plane_flip.altitude, 3) == 0
+    assert round(plane_flip.azimuth, 3) == round(math.pi, 3)
 
 
 def test_equality():
@@ -77,6 +83,8 @@ def test_init_from_three_points():
     assert plane.x == Vector3D(1, 0, 0)
     assert plane.y == Vector3D(0, -1, 0)
     assert plane.k == -2
+    assert round(plane.altitude, 3) == round(-math.pi / 2, 3)
+    assert round(plane.azimuth, 3) == 0
 
     plane = Plane.from_three_points(Point3D(2, 2, 2), Point3D(0, 2, 2),
                                     Point3D(0, 0, 2))
@@ -85,6 +93,8 @@ def test_init_from_three_points():
     assert plane.x == Vector3D(1, 0, 0)
     assert plane.y == Vector3D(0, 1, 0)
     assert plane.k == 2
+    assert round(plane.altitude, 3) == round(math.pi / 2, 3)
+    assert round(plane.azimuth, 3) == 0
 
 
 def test_init_from_normal_k():

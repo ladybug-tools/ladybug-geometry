@@ -6,7 +6,7 @@ from .pointvector import Point3D, Vector3D
 from .ray import Ray3D
 from ..intersection3d import intersect_line3d_plane, intersect_plane_plane, \
     closest_point3d_on_plane, closest_point3d_between_line3d_plane
-from ..geometry2d.pointvector import Point2D
+from ..geometry2d.pointvector import Point2D, Vector2D
 from ..geometry2d.ray import Ray2D
 
 import math
@@ -28,8 +28,10 @@ class Plane(object):
         * k
         * x
         * y
+        * altitude
+        * azimuth
     """
-    __slots__ = ('_n', '_o', '_k', '_x', '_y')
+    __slots__ = ('_n', '_o', '_k', '_x', '_y', '_altitude', '_azimuth')
 
     def __init__(self, n=Vector3D(0, 0, 1), o=Point3D(0, 0, 0), x=None):
         """Initialize Plane."""
@@ -57,6 +59,8 @@ class Plane(object):
                 'degrees between them.'.format(math.degrees(self._n.angle(x)))
             self._x = x
         self._y = self._n.cross(self._x)
+        self._altitude = None
+        self._azimuth = None
 
     @classmethod
     def from_dict(cls, data):
@@ -129,6 +133,27 @@ class Plane(object):
     def y(self):
         """Plane Y-Axis. This vector will always be normalized (magnitude = 1)."""
         return self._y
+
+    @property
+    def azimuth(self):
+        """Get the azimuth of the plane (between 0 and 2 * Pi).
+
+        This will be zero if the plane is perfectly horizontal.
+        """
+        if self._azimuth is None:
+            try:
+                n_vec = Vector2D(0, 1)
+                self._azimuth = n_vec.angle_clockwise(Vector2D(self.n.x, self.n.y))
+            except ZeroDivisionError:  # plane is perfectly horizontal
+                self._azimuth = 0
+        return self._azimuth
+
+    @property
+    def altitude(self):
+        """Get the altitude of the plane (between Pi/2 and -Pi/2)."""
+        if self._altitude is None:
+            self._altitude = self.n.angle(Vector3D(0, 0, -1)) - math.pi / 2
+        return self._altitude
 
     def flip(self):
         """Get a flipped version of this plane (facing the opposite direction)."""
