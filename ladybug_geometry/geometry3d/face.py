@@ -877,8 +877,7 @@ class Face3D(Base2DIn3D):
                 If None, it will be scaled from the World origin (0, 0, 0).
         """
         _verts = self._scale(self.vertices, factor, origin)
-        _new_face = self._face_transform_scale(
-            _verts, self.plane.scale(factor, origin), factor)
+        _new_face = self._face_transform_scale(_verts, None, factor)
         if self._holes is not None:
             _new_face._boundary = self._scale(self._boundary, factor, origin)
             _new_face._holes = tuple(self._scale(hole, factor, origin)
