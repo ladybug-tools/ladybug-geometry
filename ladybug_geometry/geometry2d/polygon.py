@@ -373,11 +373,21 @@ class Polygon2D(Base2DIn2D):
         if len(self.vertices) == 3:
             return self  # Polygon2D cannot have fewer than 3 vertices
         new_vertices = []
+        skip = 0
         for i, _v in enumerate(self.vertices):
             _a = self[i - 2].determinant(self[i - 1]) + self[i - 1].determinant(_v) + \
                 _v.determinant(self[i - 2])
             if abs(_a) >= tolerance:
                 new_vertices.append(self[i - 1])
+                skip = 0
+            else:
+                skip += 1
+        if skip != 0 and self.vertices[-2].is_equivalent(self.vertices[-1], tolerance):
+            pts_2d = self.vertices
+            _a = pts_2d[-3].determinant(pts_2d[-1]) + \
+                pts_2d[-1].determinant(pts_2d[0]) + pts_2d[0].determinant(pts_2d[-3])
+            if abs(_a) >= tolerance:
+                new_vertices.append(pts_2d[-1])
         return Polygon2D(new_vertices)
 
     def reverse(self):
