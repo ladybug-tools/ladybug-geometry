@@ -469,3 +469,49 @@ def test_join_meshes():
     assert isinstance(joined_mesh, Mesh3D)
     assert len(joined_mesh.faces) == 2
     assert len(joined_mesh.vertices) == 8
+
+
+def test_from_stl_ascii():
+    """Test from_stl method with an ascii STL file."""
+    file_path = 'tests/stl/cube_ascii.stl'
+    mesh = Mesh3D.from_stl(file_path)
+    centroids = [
+        Point3D(3.33, 0.00, 1.67),
+        Point3D(1.67, 0.00, 3.33),
+        Point3D(5.00, 3.33, 1.67),
+        Point3D(5.00, 1.67, 3.33),
+        Point3D(1.67, 5.00, 1.67),
+        Point3D(3.33, 5.00, 3.33),
+        Point3D(0.00, 1.67, 1.67),
+        Point3D(0.00, 3.33, 3.33),
+        Point3D(1.67, 1.67, 0.00),
+        Point3D(3.33, 3.33, 0.00),
+        Point3D(1.67, 1.67, 5.00),
+        Point3D(3.33, 3.33, 5.00),
+        Point3D(3.33, 0.00, 1.67)
+    ]
+    for count, cent in enumerate(mesh.face_centroids):
+        assert cent.distance_to_point(centroids[count]) <= 0.01
+
+
+def test_from_stl_binary():
+    """Test from_stl method with a binary STL file."""
+    file_path = 'tests/stl/cube_binary.stl'
+    mesh = Mesh3D.from_stl(file_path)
+    centroids = [
+        Point3D(3.33, 0.00, 1.67),
+        Point3D(1.67, 0.00, 3.33),
+        Point3D(5.00, 3.33, 1.67),
+        Point3D(5.00, 1.67, 3.33),
+        Point3D(1.67, 5.00, 1.67),
+        Point3D(3.33, 5.00, 3.33),
+        Point3D(0.00, 1.67, 1.67),
+        Point3D(0.00, 3.33, 3.33),
+        Point3D(1.67, 1.67, 0.00),
+        Point3D(3.33, 3.33, 0.00),
+        Point3D(1.67, 1.67, 5.00),
+        Point3D(3.33, 3.33, 5.00),
+        Point3D(3.33, 3.33, 5.00)
+    ]
+    for count, cent in enumerate(mesh.face_centroids):
+        assert cent.distance_to_point(centroids[count]) <= 0.01
