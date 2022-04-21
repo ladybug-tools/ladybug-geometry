@@ -1,10 +1,12 @@
 # coding=utf-8
 """3D Mesh"""
+
 from __future__ import division
 
+import struct
 from .._mesh import MeshBase
 from ..geometry2d.mesh import Mesh2D
-
+from ._stl import STL
 from .pointvector import Point3D, Vector3D
 from .plane import Plane
 
@@ -117,6 +119,12 @@ class Mesh3D(MeshBase):
             assert isinstance(plane, Plane), 'Expected Plane. Got {}'.format(type(plane))
             _verts3d = tuple(plane.xy_to_xyz(_v) for _v in mesh_2d.vertices)
             return cls(_verts3d, mesh_2d.faces, mesh_2d.colors)
+
+    @classmethod
+    def from_stl(cls, file_path):
+        """Create a Mesh3D from an STL file."""
+        face_vertices = STL(file_path).face_vertices
+        return cls.from_face_vertices(face_vertices)
 
     @property
     def min(self):
