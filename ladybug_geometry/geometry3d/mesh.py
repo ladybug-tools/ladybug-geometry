@@ -3,7 +3,7 @@
 
 from __future__ import division
 
-import struct
+
 from .._mesh import MeshBase
 from ..geometry2d.mesh import Mesh2D
 from ._stl import STL

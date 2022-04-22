@@ -40,7 +40,6 @@ class STL:
         with open(self._file_path, 'rb') as fp:
             h = fp.read(80)
             first_word = h[0:5]
-            fp.close()
 
         if first_word.decode('utf-8') == 'solid':
             self._load_text_stl()
