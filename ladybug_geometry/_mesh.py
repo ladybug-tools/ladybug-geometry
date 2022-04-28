@@ -25,6 +25,7 @@ class MeshBase(object):
         * face_areas
         * area
         * face_centroids
+        * face_vertices
         * vertex_connected_faces
     """
     __slots__ = ('_vertices', '_faces', '_colors', '_is_color_by_face',
@@ -108,6 +109,11 @@ class MeshBase(object):
                     _f_cent.append(self._quad_face_centroid(face))
             self._face_centroids = tuple(_f_cent)
         return self._face_centroids
+
+    @property
+    def face_vertices(self):
+        """Tuple of mesh faces with each face defined as a tuple of Point3Ds."""
+        return tuple(tuple(self._vertices[i] for i in f) for f in self._faces)
 
     @property
     def vertex_connected_faces(self):
