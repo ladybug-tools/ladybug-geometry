@@ -37,6 +37,7 @@ class Mesh2D(MeshBase):
         * centroid
         * face_areas
         * face_centroids
+        * face_vertices
         * vertex_connected_faces
     """
     __slots__ = ('_min', '_max', '_center', '_centroid')
@@ -111,9 +112,10 @@ class Mesh2D(MeshBase):
                 within the boundary_polygon.
         """
         assert isinstance(boundary_polygon, Polygon2D), 'boundary_polygon must be a ' \
-            'Polygon2D to use from_polygon_triangulated. Got {}.'.format(type(polygon))
+            'Polygon2D to use from_polygon_triangulated. Got {}.'.format(
+                type(boundary_polygon))
 
-        if hole_polygons is None and boundary_polygon.is_convex:  # fast fan triangulation!
+        if hole_polygons is None and boundary_polygon.is_convex:  # fan triangulation!
             _faces = []
             for i in xrange(1, len(boundary_polygon) - 1):
                 _faces.append((0, i, i + 1))
@@ -265,7 +267,8 @@ class Mesh2D(MeshBase):
                 _new_faces.append(face)
             else:
                 _triangles = Mesh2D._quad_to_triangles([self._vertices[i] for i in face])
-                _triangles = [tuple(face[vertex_idx] for vertex_idx in new_face) for new_face in _triangles]
+                _triangles = [tuple(face[vertex_idx] for vertex_idx in new_face)
+                              for new_face in _triangles]
                 _new_faces.extend(_triangles)
         _new_faces = tuple(_new_faces)
 

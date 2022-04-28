@@ -165,9 +165,12 @@ def test_mesh3d_init_from_face_vertices():
     assert mesh_1.face_areas[1] == mesh_2.face_areas[1] == 2
     assert len(mesh_1.face_centroids) == len(mesh_2.face_centroids) == 2
     assert mesh_1.face_centroids[0] == mesh_2.face_centroids[0] == Point3D(1, 1, 2)
-    assert mesh_1.face_centroids[1].x == mesh_2.face_centroids[1].x == pytest.approx(2.67, rel=1e-2)
-    assert mesh_1.face_centroids[1].y == mesh_2.face_centroids[1].y == pytest.approx(0.67, rel=1e-2)
-    assert mesh_1.face_centroids[1].z == mesh_2.face_centroids[1].z == pytest.approx(2, rel=1e-2)
+    assert mesh_1.face_centroids[1].x == mesh_2.face_centroids[1].x == \
+        pytest.approx(2.67, rel=1e-2)
+    assert mesh_1.face_centroids[1].y == mesh_2.face_centroids[1].y == \
+        pytest.approx(0.67, rel=1e-2)
+    assert mesh_1.face_centroids[1].z == mesh_2.face_centroids[1].z == \
+        pytest.approx(2, rel=1e-2)
 
     assert mesh_1._is_color_by_face is mesh_1._is_color_by_face is False
     assert mesh_1.colors is mesh_1.colors is None
@@ -469,3 +472,54 @@ def test_join_meshes():
     assert isinstance(joined_mesh, Mesh3D)
     assert len(joined_mesh.faces) == 2
     assert len(joined_mesh.vertices) == 8
+
+
+def test_to_from_stl_ascii():
+    """Test from_stl method with an ascii STL file."""
+    file_path = 'tests/stl/cube_ascii.stl'
+    mesh = Mesh3D.from_stl(file_path)
+    centroids = [
+        Point3D(3.33, 0.00, 1.67),
+        Point3D(1.67, 0.00, 3.33),
+        Point3D(5.00, 3.33, 1.67),
+        Point3D(5.00, 1.67, 3.33),
+        Point3D(1.67, 5.00, 1.67),
+        Point3D(3.33, 5.00, 3.33),
+        Point3D(0.00, 1.67, 1.67),
+        Point3D(0.00, 3.33, 3.33),
+        Point3D(1.67, 1.67, 0.00),
+        Point3D(3.33, 3.33, 0.00),
+        Point3D(1.67, 1.67, 5.00),
+        Point3D(3.33, 3.33, 5.00),
+        Point3D(3.33, 0.00, 1.67)
+    ]
+    for count, cent in enumerate(mesh.face_centroids):
+        assert cent.distance_to_point(centroids[count]) <= 0.01
+
+    new_folder, new_name = 'tests/stl/', 'cube_ascii_new.stl'
+    new_file = mesh.to_stl(new_folder, new_name)
+    assert os.path.isfile(new_file)
+    Mesh3D.from_stl(new_file)
+    os.remove(new_file)
+
+
+def test_from_stl_binary():
+    """Test from_stl method with a binary STL file."""
+    file_path = 'tests/stl/cube_binary.stl'
+    mesh = Mesh3D.from_stl(file_path)
+    centroids = [
+        Point3D(3.33, 0.00, 1.67),
+        Point3D(1.67, 0.00, 3.33),
+        Point3D(5.00, 3.33, 1.67),
+        Point3D(5.00, 1.67, 3.33),
+        Point3D(1.67, 5.00, 1.67),
+        Point3D(3.33, 5.00, 3.33),
+        Point3D(0.00, 1.67, 1.67),
+        Point3D(0.00, 3.33, 3.33),
+        Point3D(1.67, 1.67, 0.00),
+        Point3D(3.33, 3.33, 0.00),
+        Point3D(1.67, 1.67, 5.00),
+        Point3D(3.33, 3.33, 5.00)
+    ]
+    for count, cent in enumerate(mesh.face_centroids):
+        assert cent.distance_to_point(centroids[count]) <= 0.01

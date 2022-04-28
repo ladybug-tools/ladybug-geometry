@@ -4,7 +4,6 @@ from __future__ import division
 
 from .._mesh import MeshBase
 from ..geometry2d.mesh import Mesh2D
-
 from .pointvector import Point3D, Vector3D
 from .plane import Plane
 
@@ -35,6 +34,7 @@ class Mesh3D(MeshBase):
         * area
         * face_areas
         * face_centroids
+        * face_vertices
         * face_normals
         * vertex_normals
         * vertex_connected_faces
@@ -117,6 +117,18 @@ class Mesh3D(MeshBase):
             assert isinstance(plane, Plane), 'Expected Plane. Got {}'.format(type(plane))
             _verts3d = tuple(plane.xy_to_xyz(_v) for _v in mesh_2d.vertices)
             return cls(_verts3d, mesh_2d.faces, mesh_2d.colors)
+
+    @classmethod
+    def from_stl(cls, file_path):
+        """Create a Mesh3D from an STL file.
+
+        Args:
+            file_path: Path to an STL file as a text string. The STL file can be
+                in either ASCII or binary format.
+        """
+        from ladybug_geometry.interop.stl import STL  # avoid circular import
+        face_vertices = STL.from_file(file_path).face_vertices
+        return cls.from_face_vertices(face_vertices)
 
     @property
     def min(self):
@@ -351,6 +363,17 @@ class Mesh3D(MeshBase):
         if self.colors is not None:
             base['colors'] = [col.to_dict() for col in self.colors]
         return base
+
+    def to_stl(self, folder, name=None):
+        """Write the Mesh3D to an ASCII STL file.
+
+        Args:
+            folder: A text string for the direcotry where the STL will be written.
+            name: A text string for the name of the STL file.
+        """
+        from ladybug_geometry.interop.stl import STL  # avoid circular import
+        stl_obj = STL(self.face_vertices, self.face_normals)
+        return stl_obj.to_file(folder, name)
 
     @staticmethod
     def join_meshes(meshes):

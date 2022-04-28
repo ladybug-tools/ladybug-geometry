@@ -1713,6 +1713,21 @@ class Face3D(Base2DIn3D):
                              for hole in self.holes]
         return base
 
+    @staticmethod
+    def extract_all_from_stl(file_path):
+        """Get a list of Face3Ds imported from all of the triangles in an STL file.
+
+        Args:
+            file_path: Path to an STL file as a text string. The STL file can be
+                in either ASCII or binary format.
+        """
+        from ladybug_geometry.interop.stl import STL  # avoid circular import
+        stl_obj = STL.from_file(file_path)
+        all_faces = []
+        for verts, normal in zip(stl_obj.face_vertices, stl_obj.face_normals):
+            all_faces.append(Face3D(verts, plane=Plane(normal, verts[0])))
+        return all_faces
+
     def _check_vertices_input(self, vertices, loop_name='boundary'):
         if not isinstance(vertices, tuple):
             vertices = tuple(vertices)
