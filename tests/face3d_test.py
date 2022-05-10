@@ -1416,6 +1416,26 @@ def test_sub_faces_by_dimension_rectangle():
     assert segs_2[1].length == sub_face_height
 
 
+def test_sub_faces_by_ratio_sub_rectangle_tol_issue():
+    """Test the Face3D sub_faces_by_ratio_sub_rectangle method."""
+    geo_file = './tests/json/face_tolerance_by_ratio.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    face_1 = Face3D.from_dict(geo_dict)
+    window_height = 10
+    sill_height = 3
+    horiz_separation = 9
+    vert_separation = 0
+
+    sub_faces = face_1.sub_faces_by_ratio_sub_rectangle(
+        0.4, window_height, sill_height, horiz_separation, vert_separation, 0.0001)
+    assert len(sub_faces) == 9
+    areas = [srf.area for srf in sub_faces]
+    assert sum(areas) == pytest.approx(face_1.area * 0.4, rel=1e-3)
+    for sf in sub_faces:
+        assert face_1.is_sub_face(sf, 0.01, 1)
+
+
 def test_extract_all_from_stl():
     file_path = 'tests/stl/cube_binary.stl'
     faces = Face3D.extract_all_from_stl(file_path)
