@@ -198,6 +198,8 @@ class LineSegment3D(Base1DIn3D):
         while parameter <= 1:
             sub_pts.append(self.point_at(parameter))
             parameter += interval
+        if len(sub_pts) != number + 1:  # tolerance issue with last point
+            sub_pts.append(self.p2)
         return sub_pts
 
     def point_at(self, parameter):
