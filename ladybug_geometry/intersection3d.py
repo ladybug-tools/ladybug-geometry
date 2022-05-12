@@ -68,7 +68,8 @@ def closest_point3d_on_line3d(point, line_ray):
         Point3D for the closest point on line_ray to point.
     """
     d = line_ray.v.magnitude_squared
-    assert d != 0, 'Length of LineSegment3D must be greater than 0.'
+    if d == 0:  # zero-length segment; just return the end point
+        return line_ray.p
     u = ((point.x - line_ray.p.x) * line_ray.v.x +
          (point.y - line_ray.p.y) * line_ray.v.y +
          (point.z - line_ray.p.z) * line_ray.v.z) / d
@@ -91,7 +92,8 @@ def closest_point3d_on_line3d_infinite(point, line_ray):
         Point3D for the closest point on the line_ray to the point.
     """
     d = line_ray.v.magnitude_squared
-    assert d != 0, 'Length of LineSegment3D must be greater than 0.'
+    if d == 0:  # zero-length segment; just return the end point
+        return line_ray.p
     u = ((point.x - line_ray.p.x) * line_ray.v.x +
          (point.y - line_ray.p.y) * line_ray.v.y +
          (point.z - line_ray.p.z) * line_ray.v.z) / d

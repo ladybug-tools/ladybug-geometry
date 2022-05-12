@@ -193,7 +193,8 @@ def closest_point2d_on_line2d(point, line_ray):
         Point2D for the closest point on the line_ray to point.
     """
     d = line_ray.v.magnitude_squared
-    assert d != 0, '{} length must not equal 0.'.format(line_ray.__class__.__name__)
+    if d == 0:  # zero-length segment; just return the end point
+        return line_ray.p
     u = ((point.x - line_ray.p.x) * line_ray.v.x +
          (point.y - line_ray.p.y) * line_ray.v.y) / d
     if not line_ray._u_in(u):
