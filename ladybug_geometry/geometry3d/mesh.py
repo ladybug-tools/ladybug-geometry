@@ -368,7 +368,7 @@ class Mesh3D(MeshBase):
         """Write the Mesh3D to an ASCII STL file.
 
         Args:
-            folder: A text string for the direcotry where the STL will be written.
+            folder: A text string for the directory where the STL will be written.
             name: A text string for the name of the STL file.
         """
         from ladybug_geometry.interop.stl import STL  # avoid circular import
