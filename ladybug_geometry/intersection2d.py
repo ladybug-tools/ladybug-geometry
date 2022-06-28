@@ -202,6 +202,25 @@ def closest_point2d_on_line2d(point, line_ray):
     return Point2D(line_ray.p.x + u * line_ray.v.x, line_ray.p.y + u * line_ray.v.y)
 
 
+def closest_point2d_on_line2d_infinite(point, line_ray):
+    """Get the closest Point2D on a Ray2D/LineSegment2D extended infinitely.
+
+    Args:
+        point: A Point2D object.
+        line_ray: A LineSegment2D or Ray2D object that will be extended infinitely
+            to determine where the closest point lies.
+
+    Returns:
+        Point2D for the closest point on the line_ray to point.
+    """
+    d = line_ray.v.magnitude_squared
+    if d == 0:  # zero-length segment; just return the end point
+        return line_ray.p
+    u = ((point.x - line_ray.p.x) * line_ray.v.x +
+         (point.y - line_ray.p.y) * line_ray.v.y) / d
+    return Point2D(line_ray.p.x + u * line_ray.v.x, line_ray.p.y + u * line_ray.v.y)
+
+
 def closest_point2d_between_line2d(line_ray_a, line_ray_b):
     """Get the two closest Point2D between two LineSegment2D objects.
 

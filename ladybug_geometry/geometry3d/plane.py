@@ -19,7 +19,7 @@ class Plane(object):
         n: A Vector3D representing the normal of the plane.
         o: A Point3D representing the origin point of the plane.
         x: An optional Vector3D for the X-Axis of the Plane.
-            Note that this vector must be orthagonal to the input normal vector.
+            Note that this vector must be orthogonal to the input normal vector.
             If None, the default will find an X-Axis in the world XY plane.
 
     Properties:
