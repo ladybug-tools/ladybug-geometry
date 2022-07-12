@@ -536,6 +536,8 @@ def test_distance_to_point():
     assert polygon.distance_to_point(Point2D(3, 3)) == 1
     assert polygon.distance_to_point(Point2D(1, 1)) == 0
 
+    assert polygon.distance_from_edge_to_point(Point2D(1, 1)) != 0
+
 
 def test_intersect_segments():
     """Tests that polygons within tolerance distance have vertices updated."""
@@ -652,7 +654,7 @@ def test_intersect_polygon_segments_with_3_rectangles():
 def test_intersect_polygon_segments_with_3_angled_rectangles():
     """Tests that a vertex shared by 2 polygons is added only once to a 3rd polygon
 
-    Make sure the addedvertex is which is colinear within tolerance.
+    Make sure the added vertex is which is colinear within tolerance.
     The polygons are rotated 45 degrees counter-clockwise to introduce floating-point
     closeness considerations.
     """

@@ -465,7 +465,7 @@ class Polygon2D(Base2DIn2D):
         return intersections
 
     def intersect_line_infinite(self, ray):
-        """Get the intersections between this polygon and a Ray2D extended infintiely.
+        """Get the intersections between this polygon and a Ray2D extended infinitely.
 
         Args:
             ray: A Ray2D or to intersect. This will be extended in both
@@ -698,6 +698,10 @@ class Polygon2D(Base2DIn2D):
     def distance_to_point(self, point):
         """Get the minimum distance between this shape and the input point.
 
+        Points that are inside the Polygon2D will return a distance of zero.
+        If the distance of an interior point to an edge is needed, the
+        distance_from_edge_to_point method should be used.
+
         Args:
             point: A Point2D object to which the minimum distance will be computed.
 
@@ -707,6 +711,18 @@ class Polygon2D(Base2DIn2D):
         """
         if self.is_point_inside_bound_rect(point):
             return 0
+        return min(seg.distance_to_point(point) for seg in self.segments)
+
+    def distance_from_edge_to_point(self, point):
+        """Get the minimum distance between the edge of this shape and the input point.
+
+        Args:
+            point: A Point2D object to which the minimum distance will be computed.
+
+        Returns:
+            The distance to the input point. Will be zero if the point is
+            inside the Polygon2D.
+        """
         return min(seg.distance_to_point(point) for seg in self.segments)
 
     def to_dict(self):
