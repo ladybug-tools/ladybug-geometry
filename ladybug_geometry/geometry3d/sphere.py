@@ -17,7 +17,7 @@ class Sphere(object):
 
     Args:
         center: A Point3D representing the center of the arc.
-        radius: A number representing the radius of the arc.
+        radius: A number representing the radius of the sphere.
 
     Properties:
         * center

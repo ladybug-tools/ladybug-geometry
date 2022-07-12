@@ -1027,7 +1027,7 @@ class Face3D(Base2DIn3D):
                 within the plane of this Face. (0, 1) will usually generate
                 horizontal contours in 3D space, (1, 0) will generate vertical
                 contours, and (1, 1) will generate diagonal contours. Recommended
-                value is Vactor2D(0, 1).
+                value is Vector2D(0, 1).
             flip_side: Boolean to note whether the side the contours start from
                 should be flipped. Recommended value is False to have contours
                 on top or right.
