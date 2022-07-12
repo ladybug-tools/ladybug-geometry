@@ -272,7 +272,8 @@ class Polyline3D(Base2DIn3D):
 
     def to_polyline2d(self):
         """Get a Polyline2D in the XY plane derived from this 3D polyline."""
-        return Polyline2D((Point2D(pt.x, pt.y) for pt in self.vertices), self.interpolated)
+        return Polyline2D(
+            (Point2D(pt.x, pt.y) for pt in self.vertices), self.interpolated)
 
     @staticmethod
     def join_segments(segments, tolerance):
@@ -281,7 +282,7 @@ class Polyline3D(Base2DIn3D):
         Args:
             segments: An array of LineSegment3D objects.
             tolerance: The minimum difference in X, Y, and Z values at which Point2Ds
-                are considred equivalent. Segments with points that match within the
+                are considered equivalent. Segments with points that match within the
                 tolerance will be joined.
 
         Returns:

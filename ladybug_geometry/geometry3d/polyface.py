@@ -9,7 +9,6 @@ from .plane import Plane
 from .face import Face3D
 from ._2d import Base2DIn3D
 
-import math
 try:
     from itertools import izip as zip  # python 2
 except ImportError:
@@ -123,8 +122,10 @@ class Polyface3D(Base2DIn3D):
                 "type": "Polyface3D",
                 "vertices": [(0, 0, 0), (10, 0, 0), (10, 10, 0), (0, 10, 0)],
                 "face_indices": [[(0, 1, 2)], [(3, 0, 1)]],
-                "edge_information": {"edge_indices":[(0, 1), (1, 2), (2, 0), (2, 3), (3, 0)],
-                                    "edge_types":[0, 0, 1, 0, 0]}
+                "edge_information": {
+                    "edge_indices":[(0, 1), (1, 2), (2, 0), (2, 3), (3, 0)],
+                    "edge_types":[0, 0, 1, 0, 0]
+                }
             }
         """
         if 'edge_information' in data and data['edge_information'] is not None:
@@ -226,7 +227,7 @@ class Polyface3D(Base2DIn3D):
         the face normal.
 
         When a polyface is initialized this way, the first face of the
-        Polysurface3D.faces will always be the input face used to create the
+        Polyface3D.faces will always be the input face used to create the
         object, the last face will be the offset version of the face, and all
         other faces will form the extrusion connecting the two.
 
@@ -270,7 +271,7 @@ class Polyface3D(Base2DIn3D):
             face_ind_top = [tuple(verts.index(pt) for pt in loop)
                             for loop in face_verts_top]
         faces_ind = [face_ind_bottom] + face_ind_extru + [face_ind_top]
-        # create the polysurface and assign known properties.
+        # create the polyface and assign known properties.
         polyface = cls(verts, faces_ind, {'edge_indices': edge_indices,
                                           'edge_types': [1] * len(edge_indices)})
         polyface._volume = face.area * offset
@@ -691,7 +692,7 @@ class Polyface3D(Base2DIn3D):
         """Check if the bounding boxes of two polyfaces overlap within a tolerance.
 
         This is particularly useful as a check before performing computationally
-        intenseprocesses between two polyfaces like intersection or checking for
+        intense processes between two polyfaces like intersection or checking for
         adjacency. Checking the overlap of the bounding boxes is extremely quick
         given this method's use of the Separating Axis Theorem.
 
