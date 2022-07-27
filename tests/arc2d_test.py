@@ -11,7 +11,7 @@ import math
 
 
 def test_arc2_init():
-    """Test the initalization of Arc2D objects and basic properties."""
+    """Test the initialization of Arc2D objects and basic properties."""
     pt = Point2D(2, 0)
     arc = Arc2D(pt, 1, 0, math.pi)
     str(arc)  # test the string representation of the arc
@@ -37,9 +37,9 @@ def test_arc2_init():
 
 
 def test_arc2_init_radius():
-    """Test the initalization of Arc2D objects with a non-unit radius."""
+    """Test the initialization of Arc2D objects with a non-unit radius."""
     pt = Point2D(2, 2)
-    arc = Arc2D(pt, 2,  math.pi, 0)
+    arc = Arc2D(pt, 2, math.pi, 0)
 
     assert arc.c == pt
     assert arc.r == 2
@@ -57,8 +57,8 @@ def test_arc2_init_radius():
     assert arc.is_inverted is True
 
 
-def test_arc2_init_reveresed():
-    """Test the initalization of Arc2D objects with reversed direction."""
+def test_arc2_init_reversed():
+    """Test the initialization of Arc2D objects with reversed direction."""
     pt = Point2D(2, 0)
     arc = Arc2D(pt, 1, 1.5 * math.pi, 0.5 * math.pi)
 
@@ -79,7 +79,7 @@ def test_arc2_init_reveresed():
 
 
 def test_arc2_init_circle():
-    """Test the initalization of Arc2D objects as a circle."""
+    """Test the initialization of Arc2D objects as a circle."""
     pt = Point2D(2, 0)
     arc = Arc2D(pt, 3)
 
@@ -93,7 +93,7 @@ def test_arc2_init_circle():
 
 
 def test_arc2_init_from_start_mid_end():
-    """Test the initalization of Arc2D objects from_start_mid_end."""
+    """Test the initialization of Arc2D objects from_start_mid_end."""
     p1 = Point2D(3, 0)
     m = Point2D(2, 1)
     p2 = Point2D(1, 0)
@@ -130,7 +130,7 @@ def test_arc2_init_from_start_mid_end():
 
 
 def test_arc2_to_from_dict():
-    """Test the initalization of Arc2D objects and basic properties."""
+    """Test the initialization of Arc2D objects and basic properties."""
     pt = Point2D(2, 0)
     arc = Arc2D(pt, 1, 0, math.pi)
     arc_dict = arc.to_dict()
@@ -215,7 +215,7 @@ def test_rotate():
     assert test_1.c.y == pytest.approx(2, rel=1e-3)
     assert test_1.r == arc.r
 
-    test_2 = arc.rotate(math.pi/2, origin_1)
+    test_2 = arc.rotate(math.pi / 2, origin_1)
     assert test_2.c.x == pytest.approx(0, rel=1e-3)
     assert test_2.c.y == pytest.approx(4, rel=1e-3)
     assert test_2.r == arc.r

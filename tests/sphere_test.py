@@ -11,7 +11,7 @@ import math
 
 
 def test_sphere_init():
-    """Test the initalization of Sphere objects and basic properties."""
+    """Test the initialization of Sphere objects and basic properties."""
     pt = Point3D(2, 0, 2)
     r = 3
     sp = Sphere(pt, r)

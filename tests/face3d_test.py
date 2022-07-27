@@ -935,7 +935,7 @@ def test_rotate():
     face = Face3D(pts, plane, enforce_right_hand=False)
     test_1 = face.rotate(axis, math.pi, origin)
     assert test_1.is_clockwise is False
-    test_2 = face.rotate(axis, math.pi/2, origin)
+    test_2 = face.rotate(axis, math.pi / 2, origin)
     assert test_2.is_clockwise is False
 
 
@@ -954,7 +954,7 @@ def test_rotate_xy():
     assert test_1[2].y == pytest.approx(0, rel=1e-3)
     assert test_1[2].z == pytest.approx(2, rel=1e-3)
 
-    test_2 = face.rotate_xy(math.pi/2, origin_1)
+    test_2 = face.rotate_xy(math.pi / 2, origin_1)
     assert test_2[0].x == pytest.approx(1, rel=1e-3)
     assert test_2[0].y == pytest.approx(1, rel=1e-3)
     assert test_1[0].z == pytest.approx(2, rel=1e-3)
@@ -965,7 +965,7 @@ def test_rotate_xy():
     face = Face3D(pts, plane, enforce_right_hand=False)
     test_1 = face.rotate_xy(math.pi, origin_1)
     assert test_1.is_clockwise is False
-    test_2 = face.rotate_xy(math.pi/2, origin_1)
+    test_2 = face.rotate_xy(math.pi / 2, origin_1)
     assert test_2.is_clockwise is False
 
 
@@ -1178,7 +1178,7 @@ def test_contour_fins_by_number():
     assert len(fins) == 4
 
     fins = face_1.contour_fins_by_number(
-        4, 0.5, 0.5, math.pi/4, Vector2D(0, 1), False, 0.01)
+        4, 0.5, 0.5, math.pi / 4, Vector2D(0, 1), False, 0.01)
     assert len(fins) == 4
 
 
@@ -1355,7 +1355,7 @@ def test_sub_faces_by_ratio_sub_rectangle_non_rect():
         assert face_1.is_sub_face(sf, 0.01, 1)
 
     pts_2 = [
-        Point3D(34.068566268151841,  18.694085210192, 3.9999999999999987),
+        Point3D(34.068566268151841, 18.694085210192, 3.9999999999999987),
         Point3D(34.068566268151862, 18.694085210192011, 7.0),
         Point3D(34.442641391689776, 21.198643189820409, 7.0000000000000018),
         Point3D(34.442641391689783, 21.198643189820412, 7.4999999999999973),

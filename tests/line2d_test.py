@@ -124,7 +124,7 @@ def test_equivalent():
         Point2D(2.001, 3.00), Vector2D(-1.5, -2.5))
     assert not seg1.is_equivalent(seg2, 1e-10)
 
-     # Test not equal second point
+    # Test not equal second point
     seg2 = LineSegment2D(
         Point2D(0.5001, 0.5), Vector2D(1.5, 2.5))
     assert not seg1.is_equivalent(seg2, 1e-10)
@@ -187,7 +187,7 @@ def test_rotate():
     assert test_1.v.x == pytest.approx(0, rel=1e-3)
     assert test_1.v.y == pytest.approx(-2, rel=1e-3)
 
-    test_2 = seg.rotate(math.pi/2, origin_1)
+    test_2 = seg.rotate(math.pi / 2, origin_1)
     assert test_2.p.x == pytest.approx(0, rel=1e-3)
     assert test_2.p.y == pytest.approx(4, rel=1e-3)
     assert test_2.v.x == pytest.approx(-2, rel=1e-3)

@@ -197,7 +197,7 @@ def test_rotate():
     assert test_1[2].y == pytest.approx(0, rel=1e-3)
     assert pline.length == pytest.approx(test_1.length, rel=1e-3)
 
-    test_2 = pline.rotate(Vector3D(0, 0, 1), math.pi/2, origin_1)
+    test_2 = pline.rotate(Vector3D(0, 0, 1), math.pi / 2, origin_1)
     assert test_2[0].x == pytest.approx(1, rel=1e-3)
     assert test_2[0].y == pytest.approx(1, rel=1e-3)
     assert test_2[2].x == pytest.approx(0, rel=1e-3)
@@ -217,7 +217,7 @@ def test_rotate_xy():
     assert test_1[2].y == pytest.approx(0, rel=1e-3)
     assert pline.length == pytest.approx(test_1.length, rel=1e-3)
 
-    test_2 = pline.rotate_xy(math.pi/2, origin_1)
+    test_2 = pline.rotate_xy(math.pi / 2, origin_1)
     assert test_2[0].x == pytest.approx(1, rel=1e-3)
     assert test_2[0].y == pytest.approx(1, rel=1e-3)
     assert test_2[2].x == pytest.approx(0, rel=1e-3)
@@ -231,7 +231,6 @@ def test_reflect():
 
     origin_1 = Point3D(1, 0)
     normal_1 = Vector3D(1, 0)
-    normal_2 = Vector3D(-1, -1).normalize()
 
     test_1 = pline.reflect(normal_1, origin_1)
     assert test_1[0].x == pytest.approx(1, rel=1e-3)
@@ -281,30 +280,36 @@ def test_split_with_plane():
 def test_join_segments():
     """Test the join_segments method."""
     pts = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 2), Point3D(0, 2))
-    l_segs = (LineSegment3D.from_end_points(pts[0], pts[1]),
-            LineSegment3D.from_end_points(pts[1], pts[2]),
-            LineSegment3D.from_end_points(pts[2], pts[3]),
-            LineSegment3D.from_end_points(pts[3], pts[0]))
+    l_segs = (
+        LineSegment3D.from_end_points(pts[0], pts[1]),
+        LineSegment3D.from_end_points(pts[1], pts[2]),
+        LineSegment3D.from_end_points(pts[2], pts[3]),
+        LineSegment3D.from_end_points(pts[3], pts[0])
+    )
     p_lines = Polyline3D.join_segments(l_segs, 0.01)
     assert len(p_lines) == 1
     assert isinstance(p_lines[0], Polyline3D)
     assert len(p_lines[0]) == 5
     assert p_lines[0].is_closed(0.01)
 
-    l_segs = (LineSegment3D.from_end_points(pts[0], pts[1]),
-            LineSegment3D.from_end_points(pts[2], pts[3]),
-            LineSegment3D.from_end_points(pts[1], pts[2]),
-            LineSegment3D.from_end_points(pts[3], pts[0]))
+    l_segs = (
+        LineSegment3D.from_end_points(pts[0], pts[1]),
+        LineSegment3D.from_end_points(pts[2], pts[3]),
+        LineSegment3D.from_end_points(pts[1], pts[2]),
+        LineSegment3D.from_end_points(pts[3], pts[0])
+    )
     p_lines = Polyline3D.join_segments(l_segs, 0.01)
     assert len(p_lines) == 1
     assert isinstance(p_lines[0], Polyline3D)
     assert len(p_lines[0]) == 5
     assert p_lines[0].is_closed(0.01)
 
-    l_segs = (LineSegment3D.from_end_points(pts[0], pts[1]),
-            LineSegment3D.from_end_points(pts[1], pts[2]),
-            LineSegment3D.from_end_points(pts[0], pts[3]),
-            LineSegment3D.from_end_points(pts[3], pts[2]))
+    l_segs = (
+        LineSegment3D.from_end_points(pts[0], pts[1]),
+        LineSegment3D.from_end_points(pts[1], pts[2]),
+        LineSegment3D.from_end_points(pts[0], pts[3]),
+        LineSegment3D.from_end_points(pts[3], pts[2])
+    )
     p_lines = Polyline3D.join_segments(l_segs, 0.01)
     assert len(p_lines) == 1
     assert isinstance(p_lines[0], Polyline3D)
@@ -341,7 +346,7 @@ def test_join_segments_multiple_pline():
 
 
 def test_join_segments_disconnected():
-    """Test the join_segments method with diconnected polylines."""
+    """Test the join_segments method with disconnected polylines."""
     pts = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 2), Point3D(0, 2))
     extra_pts = (Point3D(3, 3), Point3D(4, 3), Point3D(4, 4), Point3D(3, 4))
 

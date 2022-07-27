@@ -168,8 +168,10 @@ def test_mesh2d_init_from_face_vertices():
     assert mesh_1.face_areas[1] == mesh_2.face_areas[1] == 2
     assert len(mesh_1.face_centroids) == len(mesh_2.face_centroids) == 2
     assert mesh_1.face_centroids[0] == mesh_2.face_centroids[0] == Point2D(1, 1)
-    assert mesh_1.face_centroids[1].x == mesh_2.face_centroids[1].x == pytest.approx(2.67, rel=1e-2)
-    assert mesh_1.face_centroids[1].y == mesh_2.face_centroids[1].y == pytest.approx(0.67, rel=1e-2)
+    assert mesh_1.face_centroids[1].x == mesh_2.face_centroids[1].x == \
+        pytest.approx(2.67, rel=1e-2)
+    assert mesh_1.face_centroids[1].y == mesh_2.face_centroids[1].y == \
+        pytest.approx(0.67, rel=1e-2)
 
     assert mesh_1._is_color_by_face is mesh_1._is_color_by_face is False
     assert mesh_1.colors is mesh_1.colors is None

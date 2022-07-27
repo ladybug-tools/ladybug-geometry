@@ -598,9 +598,11 @@ def test_intersect_segments_zero_tolerance():
     polygon2, polygon3 = Polygon2D.intersect_segments(polygon0, polygon1, 0)
 
     assert len(polygon2.segments) == 4  # No new points
-    assert all([polygon0.vertices[i] == polygon2.vertices[i] for i in range(len(polygon0.vertices))])
+    assert all([polygon0.vertices[i] == polygon2.vertices[i]
+                for i in range(len(polygon0.vertices))])
     assert len(polygon3.segments) == 4  # No new points
-    assert all([polygon1.vertices[i] == polygon3.vertices[i] for i in range(len(polygon1.vertices))])
+    assert all([polygon1.vertices[i] == polygon3.vertices[i]
+                for i in range(len(polygon1.vertices))])
 
     polygon2, polygon3 = Polygon2D.intersect_segments(polygon0, polygon1, 0.02)
 
@@ -609,7 +611,7 @@ def test_intersect_segments_zero_tolerance():
 
 
 def test_intersect_segments_with_colinear_edges():
-    """Tests that the default tolerance of 0 updates polygons which share part of an edge segment."""
+    """Test tolerance of 0 updates polygons which share part of an edge segment."""
     pts0 = (Point2D(1, 0), Point2D(4, 0), Point2D(4, 2), Point2D(1, 2))
     polygon0 = Polygon2D(pts0)
     pts1 = (Point2D(0, 2), Point2D(3, 2), Point2D(3, 4), Point2D(0, 4))
@@ -631,7 +633,7 @@ def test_intersect_segments_with_colinear_edges():
 
 
 def test_intersect_polygon_segments_with_3_rectangles():
-    """Tests that a vertex shared by 2 polygons is added only once to a 3rd polygon which is colinear."""
+    """Test vertex shared by 2 polygons is added only once to a 3rd polygon."""
     pts0 = (Point2D(0, 2), Point2D(4, 2), Point2D(4, 4), Point2D(0, 4))
     polygon0 = Polygon2D(pts0)
     pts1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
@@ -661,14 +663,18 @@ def test_intersect_polygon_segments_with_3_angled_rectangles():
     r2 = math.sqrt(2.0)
     tolerance = 0.02
     expected_point = Point2D(r2, 0)
-    pts0 = (Point2D(0, 0), Point2D(0.5 * r2 * 0.99, -0.5 * r2 * 0.99), Point2D(1.5 * r2 * 0.99, 0.5 * r2 * 0.99), Point2D(r2, r2))
+    pts0 = (Point2D(0, 0), Point2D(0.5 * r2 * 0.99, -0.5 * r2 * 0.99),
+            Point2D(1.5 * r2 * 0.99, 0.5 * r2 * 0.99), Point2D(r2, r2))
     polygon0 = Polygon2D(pts0)
-    pts1 = (Point2D(0.5 * r2, -0.5 * r2), Point2D(r2, -r2), Point2D(1.5 * r2, -0.5 * r2), expected_point)
+    pts1 = (Point2D(0.5 * r2, -0.5 * r2), Point2D(r2, -r2),
+            Point2D(1.5 * r2, -0.5 * r2), expected_point)
     polygon1 = Polygon2D(pts1)
-    pts2 = (expected_point, Point2D(1.5 * r2, -0.5 * r2), Point2D(2 * r2, 0), Point2D(1.5 * r2, 0.5 * r2))
+    pts2 = (expected_point, Point2D(1.5 * r2, -0.5 * r2),
+            Point2D(2 * r2, 0), Point2D(1.5 * r2, 0.5 * r2))
     polygon2 = Polygon2D(pts2)
 
-    polygons = Polygon2D.intersect_polygon_segments([polygon0, polygon1, polygon2], tolerance)
+    polygons = Polygon2D.intersect_polygon_segments(
+        [polygon0, polygon1, polygon2], tolerance)
 
     # Extra vertex added to largest polygon, as expected
     assert len(polygons[0].segments) == 5

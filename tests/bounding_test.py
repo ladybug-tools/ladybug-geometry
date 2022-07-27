@@ -96,7 +96,7 @@ def test_bounding_rectangle_angle_2d():
     pt3 = Point2D(2, 2)
     polyface1 = Polygon2D.from_rectangle(pt1, Vector2D(0, 1), 2, 4)
     polyface2 = Polygon2D.from_rectangle(pt2, Vector2D(0, 1), 2, 4)
-    polyface3 = Polygon2D.from_rectangle(pt3, Vector2D(0, 1),2, 4)
+    polyface3 = Polygon2D.from_rectangle(pt3, Vector2D(0, 1), 2, 4)
 
     min_pt, max_pt = bounding_rectangle([polyface1, polyface2, polyface3], 45)
     assert min_pt.x == pytest.approx(1.45, rel=1e-2)

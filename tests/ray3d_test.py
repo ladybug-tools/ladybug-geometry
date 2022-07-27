@@ -8,7 +8,7 @@ import math
 
 
 def test_ray3d_init():
-    """Test the initalization of Ray3D objects and basic properties."""
+    """Test the initialization of Ray3D objects and basic properties."""
     pt = Point3D(2, 0, 2)
     vec = Vector3D(0, 2, 0)
     ray = Ray3D(pt, vec)

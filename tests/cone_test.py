@@ -8,7 +8,7 @@ import math
 
 
 def test_cone_init():
-    """Test the initalization of Cone objects and basic properties."""
+    """Test the initialization of Cone objects and basic properties."""
     vertex = Point3D(2, 0, 2)
     axis = Vector3D(0, 2, 2)
     angle = 0.7
