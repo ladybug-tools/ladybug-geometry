@@ -8,7 +8,7 @@ import math
 
 
 def test_cylinder_init():
-    """Test the initalization of Cylinder objects and basic properties."""
+    """Test the initialization of Cylinder objects and basic properties."""
     center = Point3D(2, 0, 2)
     axis = Vector3D(0, 2, 2)
     radius = 0.7

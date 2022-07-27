@@ -188,7 +188,7 @@ def test_rotate():
     assert test_1.v.y == pytest.approx(-2, rel=1e-3)
     assert test_1.v.z == pytest.approx(0, rel=1e-3)
 
-    test_2 = seg.rotate(axis_1, math.pi/2, origin_1)
+    test_2 = seg.rotate(axis_1, math.pi / 2, origin_1)
     assert test_2.p.x == pytest.approx(2, rel=1e-3)
     assert test_2.p.y == pytest.approx(-2, rel=1e-3)
     assert test_2.p.z == pytest.approx(2, rel=1e-3)
@@ -210,7 +210,7 @@ def test_rotate_xy():
     assert test_1.v.x == pytest.approx(0, rel=1e-3)
     assert test_1.v.y == pytest.approx(-2, rel=1e-3)
 
-    test_2 = seg.rotate_xy(math.pi/2, origin_1)
+    test_2 = seg.rotate_xy(math.pi / 2, origin_1)
     assert test_2.p.x == pytest.approx(0, rel=1e-3)
     assert test_2.p.y == pytest.approx(4, rel=1e-3)
     assert test_2.v.x == pytest.approx(-2, rel=1e-3)

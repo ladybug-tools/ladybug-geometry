@@ -145,10 +145,10 @@ def test_vector3_angle():
     vec_4 = Vector3D(-2, 0, 0)
     vec_5 = Vector3D(0, 0, 2)
     vec_6 = Vector3D(0, 0, -2)
-    assert vec_1.angle(vec_2) == pytest.approx(math.pi/2, rel=1e-3)
+    assert vec_1.angle(vec_2) == pytest.approx(math.pi / 2, rel=1e-3)
     assert vec_1.angle(vec_3) == pytest.approx(math.pi, rel=1e-3)
-    assert vec_1.angle(vec_4) == pytest.approx(math.pi/2, rel=1e-3)
-    assert vec_1.angle(vec_5) == pytest.approx(math.pi/2, rel=1e-3)
+    assert vec_1.angle(vec_4) == pytest.approx(math.pi / 2, rel=1e-3)
+    assert vec_1.angle(vec_5) == pytest.approx(math.pi / 2, rel=1e-3)
     assert vec_5.angle(vec_6) == pytest.approx(math.pi, rel=1e-3)
     assert vec_1.angle(vec_1) == pytest.approx(0, rel=1e-3)
 
@@ -241,7 +241,7 @@ def test_rotate():
     assert test_1.y == pytest.approx(2, rel=1e-3)
     assert test_1.z == pytest.approx(-2, rel=1e-3)
 
-    test_2 = pt_1.rotate(axis_1, math.pi/2, origin_1)
+    test_2 = pt_1.rotate(axis_1, math.pi / 2, origin_1)
     assert test_2.x == pytest.approx(2, rel=1e-3)
     assert test_2.y == pytest.approx(4, rel=1e-3)
     assert test_2.z == pytest.approx(0, rel=1e-3)
@@ -251,7 +251,7 @@ def test_rotate():
     assert test_3.y == pytest.approx(2, rel=1e-3)
     assert test_3.z == pytest.approx(-2, rel=1e-3)
 
-    test_4 = pt_1.rotate(axis_2, math.pi/2, origin_2)
+    test_4 = pt_1.rotate(axis_2, math.pi / 2, origin_2)
     assert test_4.x == pytest.approx(0.59, rel=1e-2)
     assert test_4.y == pytest.approx(3.41, rel=1e-2)
     assert test_4.z == pytest.approx(0, rel=1e-2)
@@ -268,7 +268,7 @@ def test_rotate_xy():
     assert test_1.y == pytest.approx(2, rel=1e-3)
     assert test_1.z == -2
 
-    test_2 = pt_1.rotate_xy(math.pi/2, origin_1)
+    test_2 = pt_1.rotate_xy(math.pi / 2, origin_1)
     assert test_2.x == pytest.approx(0, rel=1e-3)
     assert test_2.y == pytest.approx(4, rel=1e-3)
     assert test_1.z == -2
@@ -278,7 +278,7 @@ def test_rotate_xy():
     assert test_3.y == pytest.approx(0, rel=1e-3)
     assert test_1.z == -2
 
-    test_4 = pt_1.rotate_xy(math.pi/2, origin_2)
+    test_4 = pt_1.rotate_xy(math.pi / 2, origin_2)
     assert test_4.x == pytest.approx(0, rel=1e-3)
     assert test_4.y == pytest.approx(2, rel=1e-3)
     assert test_1.z == -2

@@ -225,7 +225,7 @@ def test_rotate():
     assert test_1[2].y == pytest.approx(0, rel=1e-3)
     assert pline.length == pytest.approx(test_1.length, rel=1e-3)
 
-    test_2 = pline.rotate(math.pi/2, origin_1)
+    test_2 = pline.rotate(math.pi / 2, origin_1)
     assert test_2[0].x == pytest.approx(1, rel=1e-3)
     assert test_2[0].y == pytest.approx(1, rel=1e-3)
     assert test_2[2].x == pytest.approx(0, rel=1e-3)
@@ -239,7 +239,6 @@ def test_reflect():
 
     origin_1 = Point2D(1, 0)
     normal_1 = Vector2D(1, 0)
-    normal_2 = Vector2D(-1, -1).normalize()
 
     test_1 = pline.reflect(normal_1, origin_1)
     assert test_1[0].x == pytest.approx(1, rel=1e-3)
@@ -294,33 +293,40 @@ def test_intersect_line_infinite():
     assert len(pline.intersect_line_infinite(ray_5)) == 0
     assert len(pline.intersect_line_infinite(ray_6)) > 0
 
+
 def test_join_segments():
     """Test the join_segments method."""
     pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
-    l_segs = (LineSegment2D.from_end_points(pts[0], pts[1]),
-            LineSegment2D.from_end_points(pts[1], pts[2]),
-            LineSegment2D.from_end_points(pts[2], pts[3]),
-            LineSegment2D.from_end_points(pts[3], pts[0]))
+    l_segs = (
+        LineSegment2D.from_end_points(pts[0], pts[1]),
+        LineSegment2D.from_end_points(pts[1], pts[2]),
+        LineSegment2D.from_end_points(pts[2], pts[3]),
+        LineSegment2D.from_end_points(pts[3], pts[0])
+    )
     p_lines = Polyline2D.join_segments(l_segs, 0.01)
     assert len(p_lines) == 1
     assert isinstance(p_lines[0], Polyline2D)
     assert len(p_lines[0]) == 5
     assert p_lines[0].is_closed(0.01)
 
-    l_segs = (LineSegment2D.from_end_points(pts[0], pts[1]),
-            LineSegment2D.from_end_points(pts[2], pts[3]),
-            LineSegment2D.from_end_points(pts[1], pts[2]),
-            LineSegment2D.from_end_points(pts[3], pts[0]))
+    l_segs = (
+        LineSegment2D.from_end_points(pts[0], pts[1]),
+        LineSegment2D.from_end_points(pts[2], pts[3]),
+        LineSegment2D.from_end_points(pts[1], pts[2]),
+        LineSegment2D.from_end_points(pts[3], pts[0])
+    )
     p_lines = Polyline2D.join_segments(l_segs, 0.01)
     assert len(p_lines) == 1
     assert isinstance(p_lines[0], Polyline2D)
     assert len(p_lines[0]) == 5
     assert p_lines[0].is_closed(0.01)
 
-    l_segs = (LineSegment2D.from_end_points(pts[0], pts[1]),
-            LineSegment2D.from_end_points(pts[1], pts[2]),
-            LineSegment2D.from_end_points(pts[0], pts[3]),
-            LineSegment2D.from_end_points(pts[3], pts[2]))
+    l_segs = (
+        LineSegment2D.from_end_points(pts[0], pts[1]),
+        LineSegment2D.from_end_points(pts[1], pts[2]),
+        LineSegment2D.from_end_points(pts[0], pts[3]),
+        LineSegment2D.from_end_points(pts[3], pts[2])
+    )
     p_lines = Polyline2D.join_segments(l_segs, 0.01)
     assert len(p_lines) == 1
     assert isinstance(p_lines[0], Polyline2D)

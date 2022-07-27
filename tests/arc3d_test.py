@@ -12,7 +12,7 @@ import math
 
 
 def test_arc3_init():
-    """Test the initalization of Arc3D objects and basic properties."""
+    """Test the initialization of Arc3D objects and basic properties."""
     pt = Point3D(2, 0, 2)
     arc = Arc3D(Plane(o=pt), 1, 0, math.pi)
     str(arc)  # test the string representation of the arc
@@ -40,7 +40,7 @@ def test_arc3_init():
 
 
 def test_arc3_init_radius():
-    """Test the initalization of Arc3D objects with a non-unit radius."""
+    """Test the initialization of Arc3D objects with a non-unit radius."""
     pt = Point3D(2, 2, 2)
     n = Vector3D(0, 1, 0)
     arc = Arc3D(Plane(n=n, o=pt), 2, math.pi, 0)
@@ -62,7 +62,7 @@ def test_arc3_init_radius():
 
 
 def test_arc3_init_reveresed():
-    """Test the initalization of Arc3D objects with reversed direction."""
+    """Test the initialization of Arc3D objects with reversed direction."""
     pt = Point3D(2, 0, 2)
     arc = Arc3D(Plane(o=pt), 1, 1.5 * math.pi, 0.5 * math.pi)
 
@@ -85,7 +85,7 @@ def test_arc3_init_reveresed():
 
 
 def test_arc3_init_circle():
-    """Test the initalization of Arc3D objects as a circle."""
+    """Test the initialization of Arc3D objects as a circle."""
     pt = Point3D(2, 0, 2)
     arc = Arc3D(Plane(o=pt), 3)
 
@@ -99,7 +99,7 @@ def test_arc3_init_circle():
 
 
 def test_arc3_init_from_start_mid_end():
-    """Test the initalization of Arc3D objects from_start_mid_end."""
+    """Test the initialization of Arc3D objects from_start_mid_end."""
     p1 = Point3D(3, 0, 2)
     m = Point3D(2, 1, 2)
     p2 = Point3D(1, 0, 2)
@@ -135,6 +135,7 @@ def test_arc3_init_from_start_mid_end():
     with pytest.raises(Exception):
         arc = Arc3D.from_start_mid_end(p1, m, p2)
 
+
 def test_arc3_init_from_start_mid_end_flipped():
     """Test the init of Arc3D objects from_start_mid_end using a flipped plane."""
     p1 = Point3D(-91.47, 40.40, 0.76)
@@ -146,7 +147,7 @@ def test_arc3_init_from_start_mid_end_flipped():
 
 
 def test_arc3_to_from_dict():
-    """Test the initalization of Arc3D objects and basic properties."""
+    """Test the initialization of Arc3D objects and basic properties."""
     pt = Point3D(2, 0, 2)
     arc = Arc3D(Plane(o=pt), 1, 0, math.pi)
     arc_dict = arc.to_dict()
@@ -232,7 +233,7 @@ def test_rotate():
     assert test_1.c.z == pytest.approx(2, rel=1e-3)
     assert test_1.radius == arc.radius
 
-    test_2 = arc.rotate(axis_1, math.pi/2, origin_1)
+    test_2 = arc.rotate(axis_1, math.pi / 2, origin_1)
     assert test_2.c.x == pytest.approx(0, rel=1e-3)
     assert test_2.c.z == pytest.approx(0, rel=1e-3)
     assert test_2.radius == arc.radius
@@ -249,7 +250,7 @@ def test_rotate_xy():
     assert test_1.c.y == pytest.approx(2, rel=1e-3)
     assert test_1.radius == arc.radius
 
-    test_2 = arc.rotate_xy(math.pi/2, origin_1)
+    test_2 = arc.rotate_xy(math.pi / 2, origin_1)
     assert test_2.c.x == pytest.approx(0, rel=1e-3)
     assert test_2.c.y == pytest.approx(4, rel=1e-3)
     assert test_2.radius == arc.radius
