@@ -19,6 +19,7 @@ class LineSegment3D(Base1DIn3D):
         * p1
         * p2
         * midpoint
+        * endpoints
         * length
         * vertices
     """
@@ -70,9 +71,26 @@ class LineSegment3D(Base1DIn3D):
         return Point3D(self.p.x + self.v.x, self.p.y + self.v.y, self.p.z + self.v.z)
 
     @property
+    def min(self):
+        """A Point3D for the minimum bounding box vertex around this geometry."""
+        p1, p2 = self.endpoints
+        return Point3D(min(p1.x, p2.x), min(p1.y, p2.y), min(p1.z, p2.z))
+
+    @property
+    def max(self):
+        """A Point3D for the maximum bounding box vertex around this geometry."""
+        p1, p2 = self.endpoints
+        return Point3D(max(p1.x, p2.x), max(p1.y, p2.y), max(p1.z, p2.z))
+
+    @property
     def midpoint(self):
         """Midpoint."""
         return self.point_at(0.5)
+
+    @property
+    def endpoints(self):
+        """Tuple of endpoints """
+        return (self.p1, self.p2)
 
     @property
     def length(self):

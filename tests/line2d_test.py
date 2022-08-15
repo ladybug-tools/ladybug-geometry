@@ -18,6 +18,8 @@ def test_linesegment2_init():
     assert seg.v == Vector2D(0, 2)
     assert seg.p1 == Point2D(2, 0)
     assert seg.p2 == Point2D(2, 2)
+    assert seg.min == Point2D(2, 0)
+    assert seg.max == Point2D(2, 2)
     assert seg.midpoint == Point2D(2, 1)
     assert seg.point_at(0.25) == Point2D(2, 0.5)
     assert seg.point_at_length(1) == Point2D(2, 1)
