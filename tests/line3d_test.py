@@ -19,6 +19,8 @@ def test_linesegment3d_init():
     assert seg.v == Vector3D(0, 2, 0)
     assert seg.p1 == Point3D(2, 0, 2)
     assert seg.p2 == Point3D(2, 2, 2)
+    assert seg.min == Point3D(2, 0, 2)
+    assert seg.max == Point3D(2, 2, 2)
     assert seg.midpoint == Point3D(2, 1, 2)
     assert seg.point_at(0.25) == Point3D(2, 0.5, 2)
     assert seg.point_at_length(1) == Point3D(2, 1, 2)
