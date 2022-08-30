@@ -66,6 +66,35 @@ def bounding_domain_z(geometries):
     return min_z, max_z
 
 
+def bounding_domain_z_2d_safe(geometries):
+    """Get minimum and maximum Z coordinates in a manner that is safe for 2D geometries.
+
+    Args:
+        geometries: An array of any ladybug_geometry objects for which the extents
+            of the Z domain will be computed. Any 2D objects within this list will
+            be assumed to have a Z-value of zero.
+
+    Returns:
+        A tuple with the min and the max Z coordinates around the geometry.
+    """
+    try:
+        min_z, max_z = geometries[0].min.z, geometries[0].max.z
+    except AttributeError:
+        min_z, max_z = 0, 0
+    for geom in geometries:
+        try:
+            if geom.max.z > max_z:
+                max_z = geom.max.z
+            if geom.min.z < min_z:
+                min_z = geom.min.z
+        except AttributeError:
+            if 0 > max_z:
+                max_z = 0
+            if 0 < min_z:
+                min_z = 0
+    return min_z, max_z
+
+
 def _orient_geometry(geometries, axis_angle, center):
     """Orient both 2D and 3D geometry to a given axis angle and center point.
 
@@ -146,7 +175,7 @@ def bounding_box(geometries, axis_angle=0):
         geometries = [geom.rotate_xy(-axis_angle, cpt) for geom in geometries]
     xx = bounding_domain_x(geometries)
     yy = bounding_domain_y(geometries)
-    zz = bounding_domain_z(geometries)
+    zz = bounding_domain_z_2d_safe(geometries)
     min_pt = Point3D(xx[0], yy[0], zz[0])
     max_pt = Point3D(xx[1], yy[1], zz[1])
     if axis_angle != 0:  # rotate the points back
@@ -173,5 +202,5 @@ def bounding_box_extents(geometries, axis_angle=0):
         geometries = [geom.rotate_xy(-axis_angle, cpt) for geom in geometries]
     xx = bounding_domain_x(geometries)
     yy = bounding_domain_y(geometries)
-    zz = bounding_domain_z(geometries)
+    zz = bounding_domain_z_2d_safe(geometries)
     return xx[1] - xx[0], yy[1] - yy[0], zz[1] - zz[0]

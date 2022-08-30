@@ -16,6 +16,8 @@ class Ray3D(Base1DIn3D):
     Properties:
         * p
         * v
+        * min
+        * max
     """
     __slots__ = ()
 

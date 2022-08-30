@@ -22,6 +22,12 @@ def test_cone_init():
     assert isinstance(c.slant_height, float)
     assert isinstance(c.area, float)
     assert isinstance(c.volume, float)
+    assert c.min.x == pytest.approx(-0.38, rel=1e-2)
+    assert c.min.y == 0
+    assert c.min.z == pytest.approx(2.0, rel=1e-2)
+    assert c.max.x == pytest.approx(4.38, rel=1e-2)
+    assert c.max.y == pytest.approx(3.68, rel=1e-2)
+    assert c.max.z == pytest.approx(5.68, rel=1e-2)
 
 
 def test_equality():

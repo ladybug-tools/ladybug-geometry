@@ -77,6 +77,22 @@ class Vector2D(object):
         """Get the magnitude squared of the vector."""
         return self.x ** 2 + self.y ** 2
 
+    @property
+    def min(self):
+        """Always equal to (0, 0).
+
+        This property exists to help with bounding box calculations.
+        """
+        return Point2D(0, 0)
+
+    @property
+    def max(self):
+        """Always equal to (0, 0).
+
+        This property exists to help with bounding box calculations.
+        """
+        return Point2D(0, 0)
+
     def is_zero(self, tolerance):
         """Boolean to note whether the vector is within a given zero tolerance.
 
@@ -352,6 +368,22 @@ class Point2D(Vector2D):
         * y
     """
     __slots__ = ()
+
+    @property
+    def min(self):
+        """Always equal to the point itself.
+
+        This property exists to help with bounding box calculations.
+        """
+        return self
+
+    @property
+    def max(self):
+        """Always equal to the point itself.
+
+        This property exists to help with bounding box calculations.
+        """
+        return self
 
     def move(self, moving_vec):
         """Get a point that has been moved along a vector.

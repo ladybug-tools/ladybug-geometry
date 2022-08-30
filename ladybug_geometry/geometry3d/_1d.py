@@ -17,6 +17,8 @@ class Base1DIn3D(object):
     Properties:
         * p
         * v
+        * min
+        * max
     """
     __slots__ = ('_p', '_v')
 
@@ -54,11 +56,25 @@ class Base1DIn3D(object):
         """Direction vector."""
         return self._v
 
+    @property
+    def min(self):
+        """A Point3D for the minimum bounding box vertex around this geometry."""
+        p = self._p
+        return Point3D(
+            min(p.x, p.x + self.v.x), min(p.y, p.y + self.v.y), min(p.z, p.z + self.v.z))
+
+    @property
+    def max(self):
+        """A Point3D for the maximum bounding box vertex around this geometry."""
+        p = self._p
+        return Point3D(
+            max(p.x, p.x + self.v.x), max(p.y, p.y + self.v.y), max(p.z, p.z + self.v.z))
+
     def is_parallel(self, line_ray, angle_tolerance):
         """Test whether this object is parallel to another LineSegment3D or Ray3D.
 
         Args:
-            line_ray: Another LineSegment3D or Ray3D for which parallel-ization
+            line_ray: Another LineSegment3D or Ray3D for which parallelization
                 with this objects will be tested.
             angle_tolerance: The max angle in radians that the direction between
                 this object and another can vary for them to be considered

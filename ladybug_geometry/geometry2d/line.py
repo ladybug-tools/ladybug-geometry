@@ -75,18 +75,6 @@ class LineSegment2D(Base1DIn2D):
         return Point2D(self.p.x + self.v.x, self.p.y + self.v.y)
 
     @property
-    def min(self):
-        """A Point2D for the minimum bounding rectangle vertex around this geometry."""
-        p1, p2 = self.endpoints
-        return Point2D(min(p1.x, p2.x), min(p1.y, p2.y))
-
-    @property
-    def max(self):
-        """A Point2D for the maximum bounding rectangle vertex around this geometry."""
-        p1, p2 = self.endpoints
-        return Point2D(max(p1.x, p2.x), max(p1.y, p2.y))
-
-    @property
     def midpoint(self):
         """Midpoint."""
         return self.point_at(0.5)

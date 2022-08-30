@@ -16,6 +16,8 @@ class Base1DIn2D(object):
     Properties:
         * p
         * v
+        * min
+        * max
     """
     __slots__ = ('_p', '_v')
 
@@ -52,6 +54,18 @@ class Base1DIn2D(object):
     def v(self):
         """Direction vector."""
         return self._v
+
+    @property
+    def min(self):
+        """A Point2D for the minimum bounding rectangle vertex around this geometry."""
+        p = self._p
+        return Point2D(min(p.x, p.x + self.v.x), min(p.y, p.y + self.v.y))
+
+    @property
+    def max(self):
+        """A Point2D for the maximum bounding rectangle vertex around this geometry."""
+        p = self._p
+        return Point2D(max(p.x, p.x + self.v.x), max(p.y, p.y + self.v.y))
 
     def closest_point(self, point):
         """Get the closest Point2D on this object to another Point2D.

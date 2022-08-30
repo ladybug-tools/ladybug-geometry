@@ -3,6 +3,8 @@
 from __future__ import division
 
 from .pointvector import Point3D, Vector3D
+from .plane import Plane
+from .arc import Arc3D
 
 import math
 
@@ -25,8 +27,13 @@ class Cylinder(object):
         * height
         * area
         * volume
+        * min
+        * max
+        * base_bottom
+        * base_top
     """
-    __slots__ = ('_center', '_axis', '_radius')
+    __slots__ = ('_center', '_axis', '_radius',
+                 '_base_bottom', '_base_top', '_min', '_max')
 
     def __init__(self, center, axis, radius):
         """Initialize Cylinder."""
@@ -39,6 +46,10 @@ class Cylinder(object):
         self._center = center
         self._axis = axis
         self._radius = radius
+        self._base_bottom = None
+        self._base_top = None
+        self._min = None
+        self._max = None
 
     @classmethod
     def from_start_end(cls, p1, p2, radius):
@@ -114,6 +125,35 @@ class Cylinder(object):
         """Volume of a Cylinder"""
         return math.pi * self.radius ** 2 * self.height
 
+    @property
+    def base_bottom(self):
+        """Get an Arc3D representing the bottom circular base of the cylinder."""
+        if self._base_bottom is None:
+            self._base_bottom = Arc3D(Plane(self.axis, self.center), self.radius)
+        return self._base_bottom
+
+    @property
+    def base_top(self):
+        """Get an Arc3D representing the top  circular base of the cylinder."""
+        if self._base_top is None:
+            plane = Plane(self.axis, self.center + self.axis)
+            self._base_top = Arc3D(plane, self.radius)
+        return self._base_top
+
+    @property
+    def min(self):
+        """A Point3D for the minimum bounding box vertex around this geometry."""
+        if self._min is None:
+            self._calculate_min_max()
+        return self._min
+
+    @property
+    def max(self):
+        """A Point3D for the maximum bounding box vertex around this geometry."""
+        if self._max is None:
+            self._calculate_min_max()
+        return self._max
+
     def move(self, moving_vec):
         """Get a Cylinder that has been moved along a vector.
 
@@ -179,8 +219,21 @@ class Cylinder(object):
 
     def to_dict(self):
         """Get Cylinder as a dictionary."""
-        return {'type': 'Cylinder', 'center': self.center.to_array(),
-                'axis': self.axis.to_array(), 'radius': self.radius}
+        return {
+            'type': 'Cylinder',
+            'center': self.center.to_array(),
+            'axis': self.axis.to_array(),
+            'radius': self.radius
+        }
+
+    def _calculate_min_max(self):
+        """Calculate maximum and minimum Point3D for this object."""
+        base1, base2 = self.base_bottom, self.base_top
+        b1mn, b1mx, b2mn, b2mx = base1.min, base1.max, base2.min, base2.max
+        self._min = Point3D(
+            min(b1mn.x, b2mn.x), min(b1mn.y, b2mn.y), min(b1mn.z, b2mn.z))
+        self._max = Point3D(
+            max(b1mx.x, b2mx.x), max(b1mx.y, b2mx.y), max(b1mx.z, b2mx.z))
 
     def __copy__(self):
         return Cylinder(self.center, self.axis, self.radius)

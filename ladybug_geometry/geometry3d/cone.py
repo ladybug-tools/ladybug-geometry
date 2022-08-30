@@ -3,6 +3,8 @@
 from __future__ import division
 
 from .pointvector import Point3D, Vector3D
+from .plane import Plane
+from .arc import Arc3D
 
 import math
 
@@ -26,8 +28,11 @@ class Cone(object):
         * radius
         * area
         * volume
+        * min
+        * max
+        * base
     """
-    __slots__ = ('_vertex', '_axis', '_angle')
+    __slots__ = ('_vertex', '_axis', '_angle', '_base', '_min', '_max')
 
     def __init__(self, vertex, axis, angle):
         """Initialize Cone."""
@@ -39,6 +44,9 @@ class Cone(object):
         self._vertex = vertex
         self._axis = axis
         self._angle = angle
+        self._base = None
+        self._min = None
+        self._max = None
 
     @classmethod
     def from_dict(cls, data):
@@ -99,6 +107,28 @@ class Cone(object):
     def volume(self):
         """Volume of a cone"""
         return 1 / 3 * math.pi * self.radius ** 2 * self.height
+
+    @property
+    def base(self): 
+        """Get an Arc3D representing the circular base of the cone."""
+        if self._base is None:
+            plane = Plane(self.axis.reverse(), self.vertex + self.axis)
+            self._base = Arc3D(plane, self.radius)
+        return self._base
+
+    @property
+    def min(self):
+        """A Point3D for the minimum bounding box vertex around this geometry."""
+        if self._min is None:
+            self._calculate_min_max()
+        return self._min
+
+    @property
+    def max(self):
+        """A Point3D for the maximum bounding box vertex around this geometry."""
+        if self._max is None:
+            self._calculate_min_max()
+        return self._max
 
     def move(self, moving_vec):
         """Get a cone that has been moved along a vector.
@@ -165,8 +195,19 @@ class Cone(object):
 
     def to_dict(self):
         """Get Cone as a dictionary."""
-        return {'type': 'Cone', 'vertex': self.vertex.to_array(),
-                'axis': self.axis.to_array(), 'angle': self.angle}
+        return {
+            'type': 'Cone',
+            'vertex': self.vertex.to_array(),
+            'axis': self.axis.to_array(),
+            'angle': self.angle
+        }
+
+    def _calculate_min_max(self):
+        """Calculate maximum and minimum Point3D for this object."""
+        base = self.base
+        bmn, bmx, ver = base.min, base.max, self.vertex
+        self._min = Point3D(min(bmn.x, ver.x), min(bmn.y, ver.y), min(bmn.z, ver.z))
+        self._max = Point3D(max(bmx.x, ver.x), max(bmx.y, ver.y), max(bmx.z, ver.z))
 
     def __copy__(self):
         return Cone(self.vertex, self.axis, self.angle)

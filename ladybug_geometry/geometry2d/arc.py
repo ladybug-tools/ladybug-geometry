@@ -17,7 +17,9 @@ class Arc2D(object):
         c: A Point2D representing the center of the arc.
         r: A number representing the radius of the arc.
         a1: A number between 0 and 2 * pi for the start angle of the arc.
+            Note that the direction of the arc is always counterclockwise.
         a2: A number between 0 and 2 * pi for the end angle of the arc.
+            Note that the direction of the arc is always counterclockwise.
 
     Properties:
         * c
@@ -27,11 +29,16 @@ class Arc2D(object):
         * p1
         * p2
         * midpoint
+        * min
+        * max
         * length
         * angle
         * is_circle
+        * is_inverted
     """
-    __slots__ = ('_c', '_r', '_a1', '_a2', '_cos_a1', '_sin_a1', '_cos_a2', '_sin_a2')
+    __slots__ = (
+        '_c', '_r', '_a1', '_a2', '_cos_a1', '_sin_a1', '_cos_a2', '_sin_a2',
+        '_min', '_max')
 
     def __init__(self, c, r, a1=0, a2=2 * math.pi):
         """Initialize Arc2D."""
@@ -49,6 +56,8 @@ class Arc2D(object):
         self._sin_a1 = math.sin(a1)
         self._cos_a2 = math.cos(a2)
         self._sin_a2 = math.sin(a2)
+        self._min = None
+        self._max = None
 
     @classmethod
     def from_dict(cls, data):
@@ -140,6 +149,20 @@ class Arc2D(object):
     def midpoint(self):
         """Midpoint."""
         return self.point_at(0.5)
+
+    @property
+    def min(self):
+        """A Point2D for the minimum bounding rectangle vertex around this geometry."""
+        if self._min is None:
+            self._calculate_min_max()
+        return self._min
+
+    @property
+    def max(self):
+        """A Point2D for the maximum bounding rectangle vertex around this geometry."""
+        if self._max is None:
+            self._calculate_min_max()
+        return self._max
 
     @property
     def length(self):
@@ -408,6 +431,43 @@ class Arc2D(object):
         """Get counterclockwise different between an angle and the start of this arc."""
         _diff = angle - self.a1
         return _diff if not angle < self.a1 else 2 * math.pi + _diff
+
+    def _calculate_min_max(self):
+        """Calculate maximum and minimum Point2D for this object."""
+        # get the quadrants of the start and end of the arc
+        start_quad = self._angle_quadrant(self._a1)
+        end_quad = self._angle_quadrant(self._a2)
+        # get the min and max of the start and end points
+        x_cor = (self._cos_a1 * self.r, self._cos_a2 * self.r)
+        y_cor = (self._sin_a1 * self.r, self._sin_a2 * self.r)
+        mnx, mny = min(x_cor), min(y_cor)
+        mxx, mxy = max(x_cor), max(y_cor)
+        # build extremum matrices
+        r = self.r
+        x_max = ((mxx, r, r, r), (mxx, mxx, r, r),
+                 (mxx, mxx, mxx, r), (mxx, mxx, mxx, mxx))
+        y_max = ((mxy, mxy, mxy, mxy), (r, mxy, r, r),
+                 (r, mxy, mxy, r), (r, mxy, mxy, mxy))
+        x_min = ((mnx, -r, mnx, mnx), (mnx, mnx, mnx, mnx),
+                 (-r, -r, mnx, -r), (-r, -r, mnx, mnx))
+        y_min = ((mny, -r, -r, mny), (mny, mny, -r, mny),
+                 (mny, mny, mny, mny), (-r, -r, -r, mny))
+        # select the desired values from the extremum matrices
+        min_pt = (x_min[end_quad][start_quad], y_min[end_quad][start_quad])
+        max_pt = (x_max[end_quad][start_quad], y_max[end_quad][start_quad])
+        self._min = Point2D(min_pt[0] + self.c.x, min_pt[1] + self.c.y)
+        self._max = Point2D(max_pt[0] + self.c.x, max_pt[1] + self.c.y)
+
+    @staticmethod
+    def _angle_quadrant(angle):
+        """Get the quadrant of a given angle in radians."""
+        if angle < math.pi / 2:
+            return 0
+        elif angle < math.pi:
+            return 1
+        elif angle < math.pi * (3 / 2):
+            return 2
+        return 3
 
     def __copy__(self):
         return Arc2D(self.c, self.r, self.a1, self.a2)
