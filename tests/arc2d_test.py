@@ -24,6 +24,8 @@ def test_arc2_init():
     assert arc.p2.x == pytest.approx(1, rel=1e-3)
     assert arc.p2.y == pytest.approx(0, rel=1e-3)
     assert arc.midpoint == Point2D(2, 1)
+    assert arc.min == Point2D(1, 0)
+    assert arc.max == Point2D(3, 1)
     assert arc.length == pytest.approx(math.pi, rel=1e-3)
     assert arc.angle == pytest.approx(math.pi, rel=1e-3)
     assert arc.is_circle is False
@@ -72,6 +74,10 @@ def test_arc2_init_reversed():
     assert arc.p2.y == pytest.approx(1, rel=1e-3)
     assert arc.midpoint.x == pytest.approx(3, rel=1e-3)
     assert arc.midpoint.y == pytest.approx(0, rel=1e-3)
+    assert arc.min.x == pytest.approx(2, rel=1e-3)
+    assert arc.min.y == pytest.approx(-1, rel=1e-3)
+    assert arc.max.x == pytest.approx(3, rel=1e-3)
+    assert arc.max.y == pytest.approx(1, rel=1e-3)
     assert arc.length == pytest.approx(math.pi, rel=1e-3)
     assert arc.angle == pytest.approx(math.pi, rel=1e-3)
     assert arc.is_circle is False

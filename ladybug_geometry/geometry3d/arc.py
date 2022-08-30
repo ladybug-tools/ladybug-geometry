@@ -7,6 +7,7 @@ from .plane import Plane
 from ..geometry2d.pointvector import Point2D, Vector2D
 from ..geometry2d.ray import Ray2D
 from ..geometry2d.arc import Arc2D
+from .pointvector import Vector3D, Point3D
 from .polyline import Polyline3D
 
 import math
@@ -31,18 +32,23 @@ class Arc3D(object):
         * p2
         * midpoint
         * c
+        * min
+        * max
         * length
         * angle
         * is_circle
+        * is_inverted
         * arc2d
     """
-    __slots__ = ('_plane', '_arc2d')
+    __slots__ = ('_plane', '_arc2d', '_min', '_max')
 
     def __init__(self, plane, radius, a1=0, a2=2 * math.pi):
         """Initialize Arc3D."""
         assert isinstance(plane, Plane), "Expected Plane. Got {}.".format(type(plane))
         self._plane = plane
         self._arc2d = Arc2D(Point2D(0, 0), radius, a1, a2)
+        self._min = None
+        self._max = None
 
     @classmethod
     def from_dict(cls, data):
@@ -123,6 +129,20 @@ class Arc3D(object):
     def c(self):
         """Center point of the circle on which the arc lies."""
         return self.plane.o
+
+    @property
+    def min(self):
+        """A Point3D for the minimum bounding box vertex around this geometry."""
+        if self._min is None:
+            self._calculate_min_max()
+        return self._min
+
+    @property
+    def max(self):
+        """A Point3D for the maximum bounding box vertex around this geometry."""
+        if self._max is None:
+            self._calculate_min_max()
+        return self._max
 
     @property
     def length(self):
@@ -346,6 +366,23 @@ class Arc3D(object):
     def duplicate(self):
         """Get a copy of this object."""
         return self.__copy__()
+
+    def _calculate_min_max(self):
+        """Calculate maximum and minimum Point3D for this object.
+
+        At this point in time, this method only calculates the bounding box
+        around the circle of the arc using the formula here.
+        https://stackoverflow.com/questions/2592011/\
+        bounding-boxes-for-circle-and-arcs-in-3d
+        """
+        # TODO: get this method to respect the start and end points of the arc
+        o, r = self._plane.o, self.radius
+        ax = self._plane.n.angle(Vector3D(1, 0, 0))
+        ay = self._plane.n.angle(Vector3D(0, 1, 0))
+        az = self._plane.n.angle(Vector3D(0, 0, 1))
+        r_vec = (math.sin(ax) * r, math.sin(ay) * r, math.sin(az) * r)
+        self._min = Point3D(o.x - r_vec[0], o.y - r_vec[1], o.z - r_vec[2])
+        self._max = Point3D(o.x + r_vec[0], o.y + r_vec[1], o.z + r_vec[2])
 
     @staticmethod
     def _plane_from_vertices(pt1, pt2, pt3):

@@ -27,6 +27,8 @@ def test_arc3_init():
     assert arc.p2.y == pytest.approx(0, rel=1e-3)
     assert arc.p2.z == pytest.approx(2, rel=1e-3)
     assert arc.midpoint == Point3D(2, 1, 2)
+    assert arc.min == Point3D(1, -1, 2)
+    assert arc.max == Point3D(3, 1, 2)
     assert arc.length == pytest.approx(math.pi, rel=1e-3)
     assert arc.angle == pytest.approx(math.pi, rel=1e-3)
     assert arc.is_circle is False
@@ -78,6 +80,10 @@ def test_arc3_init_reveresed():
     assert arc.p2.z == pytest.approx(2, rel=1e-3)
     assert arc.midpoint.x == pytest.approx(3, rel=1e-3)
     assert arc.midpoint.y == pytest.approx(0, rel=1e-3)
+    assert arc.min.x == pytest.approx(1, rel=1e-3)
+    assert arc.min.y == pytest.approx(-1, rel=1e-3)
+    assert arc.max.x == pytest.approx(3, rel=1e-3)
+    assert arc.max.y == pytest.approx(1, rel=1e-3)
     assert arc.length == pytest.approx(math.pi, rel=1e-3)
     assert arc.angle == pytest.approx(math.pi, rel=1e-3)
     assert arc.is_circle is False

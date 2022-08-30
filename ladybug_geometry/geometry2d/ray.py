@@ -16,6 +16,8 @@ class Ray2D(Base1DIn2D):
     Properties:
         * p
         * v
+        * min
+        * max
     """
     __slots__ = ()
 

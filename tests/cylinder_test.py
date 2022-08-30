@@ -23,6 +23,12 @@ def test_cylinder_init():
     assert c.diameter == c.radius * 2
     assert isinstance(c.area, float)
     assert isinstance(c.volume, float)
+    assert c.min.x == pytest.approx(1.30, rel=1e-2)
+    assert c.min.y == pytest.approx(-0.49497, rel=1e-2)
+    assert c.min.z == pytest.approx(1.51, rel=1e-2)
+    assert c.max.x == pytest.approx(2.70, rel=1e-2)
+    assert c.max.y == pytest.approx(2.49, rel=1e-2)
+    assert c.max.z == pytest.approx(4.49, rel=1e-2)
 
     p1 = Point3D(1, 1, 0)
     p2 = Point3D(1, 1, 5)
@@ -36,6 +42,12 @@ def test_cylinder_init():
     assert c2.diameter == c2.radius * 2
     assert isinstance(c2.area, float)
     assert isinstance(c2.volume, float)
+    assert c2.min.x == pytest.approx(-0.20, rel=1e-2)
+    assert c2.min.y == pytest.approx(-0.20, rel=1e-2)
+    assert c2.min.z == 0
+    assert c2.max.x == pytest.approx(2.20, rel=1e-2)
+    assert c2.max.y == pytest.approx(2.20, rel=1e-2)
+    assert c2.max.z == pytest.approx(5.0, rel=1e-2)
 
 
 def test_equality():
