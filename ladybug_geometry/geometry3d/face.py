@@ -777,12 +777,6 @@ class Face3D(Base2DIn3D):
             tolerance: The minimum distance between a vertex and the boundary segments
                 at which point the vertex is considered colinear.
         """
-        if len(self.vertices) == 3:
-            valid_pts = [pt for i, pt in enumerate(self.vertices)
-                         if not pt.is_equivalent(self.vertices[i - 1], tolerance)]
-            assert len(valid_pts) == 3, 'There must be at least 3 vertices for ' \
-                'a Face3D. Got {}'.format(len(valid_pts))
-            return self
         if not self.has_holes:  # we only need to evaluate one list of vertices
             new_vertices = self._remove_colinear(
                 self._vertices, self.polygon2d, tolerance)
