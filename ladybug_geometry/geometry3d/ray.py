@@ -34,6 +34,18 @@ class Ray3D(Base1DIn3D):
         """
         return Ray3D(Point3D(*ray_array[0]), Vector3D(*ray_array[1]))
 
+    @classmethod
+    def from_ray2d(cls, ray2d, z=0):
+        """Initialize a new Ray3D from an Ray2D and a z value.
+
+        Args:
+            line2d: A Ray2D to be used to generate the Ray3D.
+            z: A number for the Z coordinate value of the line.
+        """
+        base_p = Point3D(ray2d.p.x, ray2d.p.y, z)
+        base_v = Vector3D(ray2d.v.x, ray2d.v.y, 0)
+        return cls(base_p, base_v)
+
     def reverse(self):
         """Get a copy of this ray that is reversed."""
         return Ray3D(self.p, self.v.reverse())

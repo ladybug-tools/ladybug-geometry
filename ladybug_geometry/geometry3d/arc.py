@@ -90,6 +90,17 @@ class Arc3D(object):
         return cls(Plane(plane.n, plane.xy_to_xyz(arc_2d.c), plane.x),
                    arc_2d.r, arc_2d.a1, arc_2d.a2)
 
+    @classmethod
+    def from_arc2d(cls, arc2d, z=0):
+        """Initialize a new Arc3D from an Arc2D and a z value.
+
+        Args:
+            arc2d: An Arc2D to be used to generate the Arc3D.
+            z: A number for the Z coordinate value of the arc.
+        """
+        plane = Plane(o=Point3D(arc2d.c.x, arc2d.c.y, z))
+        return cls(plane, arc2d.r, arc2d.a1, arc2d.a2)
+
     @property
     def plane(self):
         """A Plane in which the arc lies with an origin for the center of the arc."""
@@ -375,14 +386,18 @@ class Arc3D(object):
         https://stackoverflow.com/questions/2592011/\
         bounding-boxes-for-circle-and-arcs-in-3d
         """
-        # TODO: get this method to respect the start and end points of the arc
-        o, r = self._plane.o, self.radius
-        ax = self._plane.n.angle(Vector3D(1, 0, 0))
-        ay = self._plane.n.angle(Vector3D(0, 1, 0))
-        az = self._plane.n.angle(Vector3D(0, 0, 1))
-        r_vec = (math.sin(ax) * r, math.sin(ay) * r, math.sin(az) * r)
-        self._min = Point3D(o.x - r_vec[0], o.y - r_vec[1], o.z - r_vec[2])
-        self._max = Point3D(o.x + r_vec[0], o.y + r_vec[1], o.z + r_vec[2])
+        if self.is_circle:
+            o, r = self._plane.o, self.radius
+            ax = self._plane.n.angle(Vector3D(1, 0, 0))
+            ay = self._plane.n.angle(Vector3D(0, 1, 0))
+            az = self._plane.n.angle(Vector3D(0, 0, 1))
+            r_vec = (math.sin(ax) * r, math.sin(ay) * r, math.sin(az) * r)
+            self._min = Point3D(o.x - r_vec[0], o.y - r_vec[1], o.z - r_vec[2])
+            self._max = Point3D(o.x + r_vec[0], o.y + r_vec[1], o.z + r_vec[2])
+        else:  # get the min and max of the Arc2D
+            min_pt2d, max_pt2d = self._arc2d.min, self._arc2d.max
+            self._min = self.plane.xy_to_xyz(min_pt2d)
+            self._max = self.plane.xy_to_xyz(max_pt2d)
 
     @staticmethod
     def _plane_from_vertices(pt1, pt2, pt3):

@@ -30,6 +30,8 @@ class Plane(object):
         * y
         * altitude
         * azimuth
+        * min
+        * max
     """
     __slots__ = ('_n', '_o', '_k', '_x', '_y', '_altitude', '_azimuth')
 
@@ -154,6 +156,16 @@ class Plane(object):
         if self._altitude is None:
             self._altitude = self.n.angle(Vector3D(0, 0, -1)) - math.pi / 2
         return self._altitude
+
+    @property
+    def min(self):
+        """Returns the Plane origin."""
+        return self._o
+
+    @property
+    def max(self):
+        """Returns the Plane origin."""
+        return self._o
 
     def flip(self):
         """Get a flipped version of this plane (facing the opposite direction)."""
