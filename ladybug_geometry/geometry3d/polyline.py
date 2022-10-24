@@ -71,13 +71,15 @@ class Polyline3D(Base2DIn3D):
         return Polyline3D(Point3D(*point) for point in point_array)
 
     @classmethod
-    def from_polyline2d(cls, polyline2d, plane=Plane()):
+    def from_polyline2d(cls, polyline2d, plane=None):
         """Create a closed Polyline3D from a Polyline2D and a plane.
 
         Args:
             polyline2d: A Polyline2D object to be converted to a Polyline3D.
-            plane: A Plane in which the Polyline2D sits.
+            plane: A Plane in which the Polyline2D sits. If None, the WorldXY
+                plane will be used.
         """
+        plane = Plane() if plane is None else plane
         return Polyline3D((plane.xy_to_xyz(pt) for pt in polyline2d.vertices),
                           polyline2d.interpolated)
 

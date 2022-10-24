@@ -2,7 +2,7 @@
 """3D Line Segment"""
 from __future__ import division
 
-from .pointvector import Point3D
+from .pointvector import Point3D, Vector3D
 from ._1d import Base1DIn3D
 
 
@@ -61,6 +61,18 @@ class LineSegment3D(Base1DIn3D):
                 where pt1 and pt2 represent the endpoints of the line segment.
         """
         return LineSegment3D.from_end_points(*tuple(Point3D(*pt) for pt in line_array))
+
+    @classmethod
+    def from_line_segment2d(cls, line2d, z=0):
+        """Initialize a new LineSegment3D from an LineSegment2D and a z value.
+
+        Args:
+            line2d: A LineSegment2D to be used to generate the LineSegment3D.
+            z: A number for the Z coordinate value of the line.
+        """
+        base_p = Point3D(line2d.p.x, line2d.p.y, z)
+        base_v = Vector3D(line2d.v.x, line2d.v.y, 0)
+        return cls(base_p, base_v)
 
     @property
     def p1(self):

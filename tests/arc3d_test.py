@@ -27,7 +27,8 @@ def test_arc3_init():
     assert arc.p2.y == pytest.approx(0, rel=1e-3)
     assert arc.p2.z == pytest.approx(2, rel=1e-3)
     assert arc.midpoint == Point3D(2, 1, 2)
-    assert arc.min == Point3D(1, -1, 2)
+    assert arc.min.x == pytest.approx(1, rel=1e-3)
+    assert arc.min.z == pytest.approx(2, rel=1e-3)
     assert arc.max == Point3D(3, 1, 2)
     assert arc.length == pytest.approx(math.pi, rel=1e-3)
     assert arc.angle == pytest.approx(math.pi, rel=1e-3)
@@ -63,7 +64,7 @@ def test_arc3_init_radius():
     assert arc.is_inverted is True
 
 
-def test_arc3_init_reveresed():
+def test_arc3_init_reversed():
     """Test the initialization of Arc3D objects with reversed direction."""
     pt = Point3D(2, 0, 2)
     arc = Arc3D(Plane(o=pt), 1, 1.5 * math.pi, 0.5 * math.pi)
@@ -80,8 +81,7 @@ def test_arc3_init_reveresed():
     assert arc.p2.z == pytest.approx(2, rel=1e-3)
     assert arc.midpoint.x == pytest.approx(3, rel=1e-3)
     assert arc.midpoint.y == pytest.approx(0, rel=1e-3)
-    assert arc.min.x == pytest.approx(1, rel=1e-3)
-    assert arc.min.y == pytest.approx(-1, rel=1e-3)
+    assert arc.min.x == pytest.approx(2, rel=1e-3)
     assert arc.max.x == pytest.approx(3, rel=1e-3)
     assert arc.max.y == pytest.approx(1, rel=1e-3)
     assert arc.length == pytest.approx(math.pi, rel=1e-3)

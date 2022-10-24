@@ -59,6 +59,16 @@ class Vector3D(object):
         """
         return cls(array[0], array[1], array[2])
 
+    @classmethod
+    def from_vector2d(cls, vector2d, z=0):
+        """Initialize a new Vector3D from an Vector2D and a z value.
+
+        Args:
+            line2d: A Vector2D to be used to generate the Vector3D.
+            z: A number for the Z coordinate value of the line.
+        """
+        return cls(vector2d.x, vector2d.y, z)
+
     @property
     def x(self):
         """Get the X coordinate."""
@@ -394,6 +404,16 @@ class Point3D(Vector3D):
         * z
     """
     __slots__ = ()
+
+    @classmethod
+    def from_point2d(cls, point2d, z=0):
+        """Initialize a new Point3D from an Point2D and a z value.
+
+        Args:
+            line2d: A Point2D to be used to generate the Point3D.
+            z: A number for the Z coordinate value of the line.
+        """
+        return cls(point2d.x, point2d.y, z)
 
     @property
     def min(self):
