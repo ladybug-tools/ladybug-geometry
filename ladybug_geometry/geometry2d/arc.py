@@ -266,7 +266,7 @@ class Arc2D(object):
         interval = 1 / number
         parameter = interval
         sub_pts = [self.p1]
-        while parameter <= 1:
+        while parameter <= 1.000000001:
             sub_pts.append(self.point_at(parameter))
             parameter += interval
         return sub_pts
