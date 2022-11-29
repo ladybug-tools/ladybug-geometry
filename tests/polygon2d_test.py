@@ -274,6 +274,18 @@ def test_reverse():
     assert polygon.is_self_intersecting == new_polygon.is_self_intersecting
 
 
+def test_offset():
+    """Test the offset method."""
+    pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+    polygon = Polygon2D(pts_1)
+    new_polygon = polygon.offset(0.5)
+
+    assert 0.99 < new_polygon.area < 1.01
+    assert not new_polygon.is_clockwise
+    assert polygon.is_convex == new_polygon.is_convex
+    assert polygon.is_self_intersecting == new_polygon.is_self_intersecting
+
+
 def test_move():
     """Test the Polygon2D move method."""
     pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))

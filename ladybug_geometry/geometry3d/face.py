@@ -605,6 +605,7 @@ class Face3D(Base2DIn3D):
             face: Another face for which geometric equivalency will be tested.
             tolerance: The minimum difference between the coordinate values of two
                 vertices at which they can be considered geometrically equivalent.
+
         Returns:
             True if geometrically equivalent. False if not geometrically equivalent.
         """

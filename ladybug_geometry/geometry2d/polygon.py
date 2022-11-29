@@ -447,6 +447,60 @@ class Polygon2D(Base2DIn2D):
         else:
             return Polygon2D(tuple(pt.scale(factor, origin) for pt in self.vertices))
 
+    def offset(self, distance, check_intersection=False):
+        """Offset the polygon by a given distance inwards or outwards.
+
+        Note that the resulting shape may be self-intersecting if the distance
+        is large enough and the is_self_intersecting property may be used to identify
+        these shapes.
+
+        Args:
+            distance: The distance inwards that the polygon will be offset.
+                Positive values will be offset inwards while negative ones
+                will be offset outwards.
+            check_intersection: A boolean to note whether the resulting operation
+                should be checked for self intersection and, if so, None will be
+                returned instead of the mis-shaped polygon.
+        """
+        # make sure the offset is not zero
+        if distance == 0:
+            return self
+
+        # loop through the vertices and get the new offset vectors
+        move_vecs, max_i = [], len(self._vertices) - 1
+        for i, pt in enumerate(self._vertices):
+            v1 = self._vertices[i - 1] - pt
+            end_i = i + 1 if i != max_i else 0
+            v2 = self._vertices[end_i] - pt
+            ang = v1.angle_clockwise(v2) / 2 if not self.is_clockwise \
+                else v1.angle_counterclockwise(v2) / 2
+            m_vec = v1.rotate(-ang).normalize() if not self.is_clockwise \
+                else v1.rotate(ang).normalize()
+            m_dist = distance / math.sin(ang)
+            m_vec = m_vec * m_dist
+            move_vecs.append(m_vec)
+
+        # move the vertices by the offset to create the new Polygon2D
+        new_pts = tuple(pt.move(m_vec) for pt, m_vec in zip(self._vertices, move_vecs))
+        new_poly = Polygon2D(new_pts)
+
+        # check for self intersection between the moving vectors if requested
+        if check_intersection:
+            poly_segs = new_poly.segments
+            _segs = [LineSegment2D(p, v) for p, v in zip(self._vertices, move_vecs)]
+            _skip = (0, len(_segs) - 1)
+            _other_segs = [x for j, x in enumerate(poly_segs) if j not in _skip]
+            for _oth_s in _other_segs:
+                if _segs[0].intersect_line_ray(_oth_s) is not None:  # intersection!
+                    return None
+            for i, _s in enumerate(_segs[1 : len(_segs)]):
+                _skip = (i, i + 1)
+                _other_segs = [x for j, x in enumerate(poly_segs) if j not in _skip]
+                for _oth_s in _other_segs:
+                    if _s.intersect_line_ray(_oth_s) is not None:  # intersection!
+                        return None
+        return new_poly
+
     def intersect_line_ray(self, line_ray):
         """Get the intersections between this polygon and a Ray2D or LineSegment2D.
 

@@ -109,7 +109,7 @@ class Cone(object):
         return 1 / 3 * math.pi * self.radius ** 2 * self.height
 
     @property
-    def base(self): 
+    def base(self):
         """Get an Arc3D representing the circular base of the cone."""
         if self._base is None:
             plane = Plane(self.axis.reverse(), self.vertex + self.axis)

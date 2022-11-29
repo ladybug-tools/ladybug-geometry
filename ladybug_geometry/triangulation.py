@@ -10,12 +10,11 @@ https://github.com/mapbox/earcut
 The version here is based off of the JavaScript earcut 2.1.1 release, and is
 functionally identical.
 """
-import math
 
 
 def earcut(data, hole_indices=None, dim=2):
     """Triangulate a list of vertices that make up a shape, either with or without holes.
-    
+
     Args:
         data: A flat array of vertex coordinates like [x0,y0, x1,y1, x2,y2, ...].
         hole_indices: A flat array of the starting indices for each hole. For example,
@@ -29,7 +28,7 @@ def earcut(data, hole_indices=None, dim=2):
     """
     dim = dim or 2
     hasHoles = hole_indices and len(hole_indices)
-    outerLen =  hole_indices[0] * dim if hasHoles else len(data)
+    outerLen = hole_indices[0] * dim if hasHoles else len(data)
     outerNode = _linked_list(data, 0, outerLen, dim, True)
     triangles = []
 
@@ -161,7 +160,7 @@ def _earcut_linked(ear, triangles, dim, minX, minY, size, _pass=None):
 
             _remove_node(ear)
 
-            # skipping the next vertice leads to less sliver triangles
+            # skipping the next vertex leads to less sliver triangles
             ear = next.next
             stop = next.next
 
@@ -194,7 +193,7 @@ def _is_ear(ear):
     c = ear.next
 
     if _area(a, b, c) >= 0:
-        return False # reflex, can't be an ear
+        return False  # reflex, can't be an ear
 
     # now make sure we don't have other points inside the potential ear
     p = ear.next.next
@@ -215,7 +214,7 @@ def _is_ear_hashed(ear, minX, minY, size):
     c = ear.next
 
     if _area(a, b, c) >= 0:
-        return False # reflex, can't be an ear
+        return False  # reflex, can't be an ear
 
     # triangle bbox; min & max are calculated like this for speed
     minTX = (a.x if a.x < c.x else c.x) if a.x < b.x else (b.x if b.x < c.x else c.x)
@@ -318,7 +317,7 @@ def _eliminate_holes(data, hole_indices, outerNode, dim):
 
     for i in range(len(hole_indices)):
         start = hole_indices[i] * dim
-        end =  hole_indices[i + 1] * dim if i < _len - 1 else len(data)
+        end = hole_indices[i + 1] * dim if i < _len - 1 else len(data)
         _list = _linked_list(data, start, end, dim, False)
 
         if (_list == _list.next):
@@ -338,7 +337,7 @@ def _eliminate_holes(data, hole_indices, outerNode, dim):
 
 def _eliminate_hole(hole, outerNode):
     """Find a bridge between vertices that connects hole with an outer ring.
-    
+
     Return a shape with the hole linked into it."""
     outerNode = _find_hole_bridge(hole, outerNode)
     if outerNode:
@@ -379,7 +378,7 @@ def _find_hole_bridge(hole, outerNode):
         return None
 
     if hx == qx:
-        return m.prev # hole touches outer segment; pick lower endpoint
+        return m.prev  # hole touches outer segment; pick lower endpoint
 
     # check points inside the triangle of hole point, segment intersection and endpoint
     # if there are no points found, we have a valid connection
@@ -400,7 +399,7 @@ def _find_hole_bridge(hole, outerNode):
         if hx >= p.x and p.x >= mx and \
                 _point_in_triangle(hx_or_qx, hy, mx, my, qx_or_hx, hy, p.x, p.y):
             try:
-                tan = abs(hy - p.y) / (hx - p.x) # tangential
+                tan = abs(hy - p.y) / (hx - p.x)  # tangential
             except ZeroDivisionError:
                 break
 
@@ -422,7 +421,7 @@ def _index_curve(start, minX, minY, size):
     while do or p != start:
         do = False
 
-        if p.z == None:
+        if p.z is None:
             p.z = _z_order(p.x, p.y, minX, minY, size)
 
         p.prevZ = p.prev
@@ -585,8 +584,8 @@ def _intersects_polygon(a, b):
 
     while do or p != a:
         do = False
-        if (p.i != a.i and p.next.i != a.i and p.i != b.i and p.next.i != b.i and \
-                _intersects(p, p.next, a, b)):
+        init_int = p.i != a.i and p.next.i != a.i and p.i != b.i and p.next.i != b.i
+        if init_int and _intersects(p, p.next, a, b):
             return True
 
         p = p.next
@@ -691,7 +690,7 @@ class _Node(object):
         self.x = x
         self.y = y
 
-        # previous and next vertice nodes in a polygon ring
+        # previous and next vertex nodes in a polygon ring
         self.prev = None
         self.next = None
 
