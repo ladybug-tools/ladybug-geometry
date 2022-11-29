@@ -57,7 +57,7 @@ class Plane(object):
                 "Expected Vector3D for plane X-axis. Got {}.".format(type(x))
             x = x.normalize()
             assert abs(self._n.x * x.x + self._n.y * x.y + self._n.z * x.z) < 1e-2, \
-                'Plane X-axis and normal vector are not orthagonal. Got angle of {} ' \
+                'Plane X-axis and normal vector are not orthogonal. Got angle of {} ' \
                 'degrees between them.'.format(math.degrees(self._n.angle(x)))
             self._x = x
         self._y = self._n.cross(self._x)
