@@ -472,11 +472,14 @@ class Polygon2D(Base2DIn2D):
             v1 = self._vertices[i - 1] - pt
             end_i = i + 1 if i != max_i else 0
             v2 = self._vertices[end_i] - pt
-            ang = v1.angle_clockwise(v2) / 2 if not self.is_clockwise \
-                else v1.angle_counterclockwise(v2) / 2
-            m_vec = v1.rotate(-ang).normalize() if not self.is_clockwise \
-                else v1.rotate(ang).normalize()
-            m_dist = distance / math.sin(ang)
+            if not self.is_clockwise:
+                ang = v1.angle_clockwise(v2) / 2
+                m_vec = v1.rotate(-ang).normalize()
+                m_dist = distance / math.sin(ang)
+            else:
+                ang = v1.angle_counterclockwise(v2) / 2
+                m_vec = v1.rotate(ang).normalize()
+                m_dist = -distance / math.sin(ang)
             m_vec = m_vec * m_dist
             move_vecs.append(m_vec)
 
@@ -493,7 +496,7 @@ class Polygon2D(Base2DIn2D):
             for _oth_s in _other_segs:
                 if _segs[0].intersect_line_ray(_oth_s) is not None:  # intersection!
                     return None
-            for i, _s in enumerate(_segs[1 : len(_segs)]):
+            for i, _s in enumerate(_segs[1: len(_segs)]):
                 _skip = (i, i + 1)
                 _other_segs = [x for j, x in enumerate(poly_segs) if j not in _skip]
                 for _oth_s in _other_segs:
