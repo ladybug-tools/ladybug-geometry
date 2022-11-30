@@ -106,10 +106,12 @@ class LineSegment2D(Base1DIn2D):
         Returns:
             True if equivalent else False
         """
-        return (self.p1.is_equivalent(other.p1, tolerance) and
-                self.p2.is_equivalent(other.p2, tolerance)) or \
-               (self.p1.is_equivalent(other.p2, tolerance) and
-                self.p2.is_equivalent(other.p1, tolerance))
+        tol = tolerance
+        return (
+            self.p1.is_equivalent(other.p1, tol) and self.p2.is_equivalent(other.p2, tol)
+        ) or (
+            self.p1.is_equivalent(other.p2, tol) and self.p2.is_equivalent(other.p1, tol)
+        )
 
     def flip(self):
         """Get a copy of this line segment that is flipped."""
