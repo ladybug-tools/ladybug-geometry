@@ -48,6 +48,19 @@ def test_face3d_init():
     assert face.vertices[0] == face[0]
 
 
+def test_face3d_pole_of_inaccessibility():
+    """Test the Face3D.pole_of_inaccessibility method."""
+    pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
+    plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+    face = Face3D(pts, plane)
+
+    pole = face.pole_of_inaccessibility(0.01)
+    assert isinstance(pole, Point3D)
+    assert pole.x == pytest.approx(1.0, rel=1e-3)
+    assert pole.y == pytest.approx(1.0, rel=1e-3)
+    assert pole.z == pytest.approx(2.0, rel=1e-3)
+
+
 def test_equality():
     """Test the equality of Face3D objects."""
     pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))

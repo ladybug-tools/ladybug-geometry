@@ -574,6 +574,21 @@ class Face3D(Base2DIn3D):
         verts3d, verts2d = self._counter_clockwise_verts(polygon)
         return self._corner_pt_verts(corner_pt, verts3d, verts2d)
 
+    def pole_of_inaccessibility(self, tolerance):
+        """Get the pole of inaccessibility for the Face3D.
+
+        The pole of inaccessibility is the most distant internal point from the
+        Face3D outline. It is not to be confused with the centroid, which
+        represents the "center of mass" of the shape and may be outside of
+        the Face3D if the shape is concave. The poly of inaccessibility is
+        useful for optimal placement of a text label on the Face3D.
+
+        Args:
+            tolerance: The precision to which the pole of inaccessibility
+                will be computed.
+        """
+        return self.plane.xy_to_xyz(self.polygon2d.pole_of_inaccessibility(tolerance))
+
     def is_horizontal(self, tolerance):
         """Check whether a this face is horizontal within a given tolerance.
 
