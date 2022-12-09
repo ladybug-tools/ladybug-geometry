@@ -1833,16 +1833,18 @@ class Face3D(Base2DIn3D):
         This method determines co-linearity by checking whether the area of the
         triangle formed by 3 vertices is less than the tolerance.
         """
-        new_vertices = []
-        skip = 0
+        new_vertices = []  # list to hold the new vertices
+        skip = 0  # track the number of vertices being skipped/removed
+        # loop through vertices and remove all cases of colinear verts
         for i, _v in enumerate(pts_2d):
             _a = pts_2d[i - 2 - skip].determinant(pts_2d[i - 1]) + \
                 pts_2d[i - 1].determinant(_v) + _v.determinant(pts_2d[i - 2 - skip])
-            if abs(_a) >= tolerance:
+            if abs(_a) >= tolerance:  # vertex is not colinear
                 new_vertices.append(pts_3d[i - 1])
                 skip = 0
-            else:
+            else:  # vertex is colinear
                 skip += 1
+        # catch case of last two vertices being equal but distinct from first point
         if skip != 0 and pts_3d[-2].is_equivalent(pts_3d[-1], tolerance):
             _a = pts_2d[-3].determinant(pts_2d[-1]) + \
                 pts_2d[-1].determinant(pts_2d[0]) + pts_2d[0].determinant(pts_2d[-3])
@@ -1980,7 +1982,13 @@ class Face3D(Base2DIn3D):
         return (close_pt_1, close_pt_2, close_pt_3, close_pt_4), other_faces
 
     def _point_on_face(self, tolerance):
-        """Get a point that is always reliably on this face."""
+        """Get a point that is always reliably on this face.
+
+        The point will be close to the edge of the Face but it will always
+        be inside it for all concave and holed geometries. Furthermore, it is
+        relatively fast compared with methods that attempt to find something
+        that approximates a geometric center on a concave geometry.
+        """
         try:
             face = self.remove_colinear_vertices(tolerance)
             move_vec = self._inward_pointing_vec(face)
