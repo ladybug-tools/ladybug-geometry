@@ -1,6 +1,10 @@
 # coding=utf-8
 """2D Mesh"""
 from __future__ import division
+try:
+    from itertools import izip as zip  # python 2
+except ImportError:
+    xrange = range  # python 3
 
 from .._mesh import MeshBase
 from ..triangulation import earcut
@@ -8,11 +12,6 @@ from ..triangulation import earcut
 from .pointvector import Point2D, Vector2D
 from .line import LineSegment2D
 from .polygon import Polygon2D
-
-try:
-    from itertools import izip as zip  # python 2
-except ImportError:
-    xrange = range  # python 3
 
 
 class Mesh2D(MeshBase):

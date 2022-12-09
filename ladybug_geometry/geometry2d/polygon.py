@@ -1,6 +1,14 @@
 # coding=utf-8
 """2D Polygon"""
 from __future__ import division
+import math
+import time
+from collections import deque
+
+try:  # Python3
+    from queue import PriorityQueue
+except ImportError:  # Python2
+    from Queue import PriorityQueue
 
 from .pointvector import Point2D, Vector2D
 from .line import LineSegment2D
@@ -9,8 +17,7 @@ from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
     does_intersection_exist_line2d, closest_point2d_on_line2d
 from ._2d import Base2DIn2D
 
-from collections import deque
-import math
+inf = float("inf")
 
 
 class Polygon2D(Base2DIn2D):
@@ -362,6 +369,75 @@ class Polygon2D(Base2DIn2D):
         for pt, other_pt in zip(vertices[1:], other.vertices[1:]):
             is_equivalent = is_equivalent and pt.is_equivalent(other_pt, tolerance)
         return is_equivalent
+
+    def pole_of_inaccessibility(self, tolerance):
+        """Get the pole of inaccessibility for the polygon.
+
+        The pole of inaccessibility is the most distant internal point from the
+        polygon outline. It is not to be confused with the centroid, which
+        represents the "center of mass" of the polygon and may be outside of
+        the polygon if the shape is concave. The poly of inaccessibility is
+        useful for optimal placement of a text label on a polygon.
+
+        The algorithm here is a port of the polylabel library from MapBox
+        assembled by Michal Hatak. (https://github.com/Twista/python-polylabel).
+
+        Args:
+            tolerance: The precision to which the pole of inaccessibility
+                will be computed.
+        """
+        # compute the cell size from the bounding rectangle
+        min_x, min_y = self.min.x, self.min.y
+        max_x, max_y = self.max.x, self.max.y
+        width = max_x - min_x
+        height = max_y - min_y
+        cell_size = min(width, height)
+        h = cell_size / 2.0
+        if cell_size == 0:  # degenerate polygon; just return the minimum
+            return self.min
+
+        # get an array representation of the polygon and set up the priority queue
+        _polygon = tuple(pt.to_array() for pt in self.vertices)
+        cell_queue = PriorityQueue()
+
+        # cover polygon with initial cells
+        x = min_x
+        while x < max_x:
+            y = min_y
+            while y < max_y:
+                c = _Cell(x + h, y + h, h, _polygon)
+                y += cell_size
+                cell_queue.put((-c.max, time.time(), c))
+            x += cell_size
+
+        best_cell = self._get_centroid_cell(_polygon)
+
+        bbox_cell = _Cell(min_x + width / 2, min_y + height / 2, 0, _polygon)
+        if bbox_cell.d > best_cell.d:
+            best_cell = bbox_cell
+
+        # recursively iterate until we find the pole
+        num_of_probes = cell_queue.qsize()
+        while not cell_queue.empty():
+            _, __, cell = cell_queue.get()
+
+            if cell.d > best_cell.d:
+                best_cell = cell
+
+            if cell.max - best_cell.d <= tolerance:
+                continue
+
+            h = cell.h / 2
+            c = _Cell(cell.x - h, cell.y - h, h, _polygon)
+            cell_queue.put((-c.max, time.time(), c))
+            c = _Cell(cell.x + h, cell.y - h, h, _polygon)
+            cell_queue.put((-c.max, time.time(), c))
+            c = _Cell(cell.x - h, cell.y + h, h, _polygon)
+            cell_queue.put((-c.max, time.time(), c))
+            c = _Cell(cell.x + h, cell.y + h, h, _polygon)
+            cell_queue.put((-c.max, time.time(), c))
+            num_of_probes += 4
+        return Point2D(best_cell.x, best_cell.y)
 
     def remove_colinear_vertices(self, tolerance):
         """Get a version of this polygon without colinear or duplicate vertices.
@@ -911,6 +987,23 @@ class Polygon2D(Base2DIn2D):
         new_polygon._is_clockwise = self._is_clockwise
 
     @staticmethod
+    def _get_centroid_cell(polygon):
+        """Get a Cell object at the centroid of the Polygon2D."""
+        area = 0
+        x = 0
+        y = 0
+        b = polygon[-1]  # prev
+        for a in polygon:
+            f = a[0] * b[1] - b[0] * a[1]
+            x += (a[0] + b[0]) * f
+            y += (a[1] + b[1]) * f
+            area += f * 3
+            b = a
+        if area == 0:
+            return _Cell(polygon[0][0], polygon[0][1], 0, polygon)
+        return _Cell(x / area, y / area, 0, polygon)
+
+    @staticmethod
     def _insert_updates_in_order(polygon, polygon_updates):
         """Insert updates from the intersect_segments method into a polygon.
 
@@ -1025,3 +1118,88 @@ class Polygon2D(Base2DIn2D):
 
     def __repr__(self):
         return 'Polygon2D ({} vertices)'.format(len(self))
+
+
+class _Cell(object):
+    """2D cell object used in certain Polygon computations (eg. pole_of_inaccessibility).
+
+    Args:
+        x: The X coordinate of the cell origin.
+        y: The Y coordinate of the cell origin.
+        h: The dimension of the cell.
+        polygon: An array representation of a Polygon2D.
+
+    Properties:
+        * x
+        * y
+        * h
+        * d
+        * max
+    """
+    __slots__ = ('x', 'y', 'h', 'd', 'max')
+
+    def __init__(self, x, y, h, polygon):
+        self.h = h
+        self.y = y
+        self.x = x
+        self.d = self._point_to_polygon_distance(x, y, polygon)
+        self.max = self.d + self.h * math.sqrt(2)
+
+    def _point_to_polygon_distance(self, x, y, polygon):
+        """Get the distance from an X,Y point to the edge of a Polygon."""
+        inside = False
+        min_dist_sq = inf
+
+        b = polygon[-1]
+        for a in polygon:
+
+            if (a[1] > y) != (b[1] > y) and \
+                    (x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]):
+                inside = not inside
+
+            min_dist_sq = min(min_dist_sq, self._get_seg_dist_sq(x, y, a, b))
+            b = a
+
+        result = math.sqrt(min_dist_sq)
+        if not inside:
+            return -result
+        return result
+
+    @staticmethod
+    def _get_seg_dist_sq(px, py, a, b):
+        """Get the squared distance from a point to a segment."""
+        x = a[0]
+        y = a[1]
+        dx = b[0] - x
+        dy = b[1] - y
+
+        if dx != 0 or dy != 0:
+            t = ((px - x) * dx + (py - y) * dy) / (dx * dx + dy * dy)
+
+            if t > 1:
+                x = b[0]
+                y = b[1]
+
+            elif t > 0:
+                x += dx * t
+                y += dy * t
+
+        dx = px - x
+        dy = py - y
+
+        return dx * dx + dy * dy
+
+    def __lt__(self, other):
+        return self.max < other.max
+
+    def __lte__(self, other):
+        return self.max <= other.max
+
+    def __gt__(self, other):
+        return self.max > other.max
+
+    def __gte__(self, other):
+        return self.max >= other.max
+
+    def __eq__(self, other):
+        return self.max == other.max

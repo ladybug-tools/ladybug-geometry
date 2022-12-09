@@ -44,6 +44,17 @@ def test_polygon2d_init():
         assert len(arr) == 2
 
 
+def test_polygon2d_pole_of_inaccessibility():
+    """Test the Polygon2D.pole_of_inaccessibility method."""
+    pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+    polygon = Polygon2D(pts)
+
+    pole = polygon.pole_of_inaccessibility(0.01)
+    assert isinstance(pole, Point2D)
+    assert pole.x == pytest.approx(1.0, rel=1e-3)
+    assert pole.y == pytest.approx(1.0, rel=1e-3)
+
+
 def test_equality():
     """Test the equality of Polygon2D objects."""
     pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
@@ -699,18 +710,20 @@ def test_intersect_polygon_segments_with_3_angled_rectangles():
 
 def test_intersect_polygon_segments_abraham_bug():
     """"Test the polygon intersection with the bug found by Abraham."""
-    pts1 = [Point2D(-154.33, -272.63), Point2D(-155.30, -276.70), Point2D(-151.23, -277.68),
-            Point2D(-150.26, -273.61), Point2D(-146.19, -274.58), Point2D(-145.22, -270.51),
-            Point2D(-149.29, -269.54), Point2D(-148.31, -265.47), Point2D(-152.38, -264.50),
-            Point2D(-153.35, -268.57), Point2D(-157.42, -267.59), Point2D(-158.39, -271.66)]
-    pts2 = [Point2D(-161.49, -266.62), Point2D(-153.35, -268.57), Point2D(-151.41, -260.43),
-            Point2D(-159.54, -258.49)]
-    pts3 = [Point2D(-164.41, -278.82), Point2D(-156.27, -280.77), Point2D(-154.33, -272.63),
-            Point2D(-162.46, -270.69)]
-    pts4 = [Point2D(-149.29, -269.54), Point2D(-141.15, -271.49), Point2D(-139.20, -263.35),
-            Point2D(-147.34, -261.41)]
-    pts5 = [Point2D(-152.21, -281.74), Point2D(-144.07, -283.69), Point2D(-142.12, -275.55),
-            Point2D(-150.26, -273.61)]
+    pts1 = [Point2D(-154.33, -272.63), Point2D(-155.30, -276.70),
+            Point2D(-151.23, -277.68), Point2D(-150.26, -273.61),
+            Point2D(-146.19, -274.58), Point2D(-145.22, -270.51),
+            Point2D(-149.29, -269.54), Point2D(-148.31, -265.47),
+            Point2D(-152.38, -264.50), Point2D(-153.35, -268.57),
+            Point2D(-157.42, -267.59), Point2D(-158.39, -271.66)]
+    pts2 = [Point2D(-161.49, -266.62), Point2D(-153.35, -268.57),
+            Point2D(-151.41, -260.43), Point2D(-159.54, -258.49)]
+    pts3 = [Point2D(-164.41, -278.82), Point2D(-156.27, -280.77),
+            Point2D(-154.33, -272.63), Point2D(-162.46, -270.69)]
+    pts4 = [Point2D(-149.29, -269.54), Point2D(-141.15, -271.49),
+            Point2D(-139.20, -263.35), Point2D(-147.34, -261.41)]
+    pts5 = [Point2D(-152.21, -281.74), Point2D(-144.07, -283.69),
+            Point2D(-142.12, -275.55), Point2D(-150.26, -273.61)]
 
     polygon1 = Polygon2D(pts1)
     polygon2 = Polygon2D(pts2)

@@ -1,13 +1,12 @@
 # coding=utf-8
 """2D Arc"""
 from __future__ import division
+import math
 
 from .pointvector import Point2D, Vector2D
 from .polyline import Polyline2D
 from ..intersection2d import closest_point2d_on_arc2d, intersect_line2d_arc2d, \
     intersect_line2d_infinite_arc2d
-
-import math
 
 
 class Arc2D(object):
