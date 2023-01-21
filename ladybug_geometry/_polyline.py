@@ -7,7 +7,7 @@ def _group_vertices(segments, tolerance):
     Args:
         segments: An array of LineSegment objects.
         tolerance: The minimum difference in X, Y, and Z values at which Points
-            are considred equivalent. Segments with points that match within the
+            are considered equivalent. Segments with points that match within the
             tolerance will be joined.
 
     Returns:
