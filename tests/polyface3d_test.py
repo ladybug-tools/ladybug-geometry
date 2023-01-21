@@ -1,5 +1,7 @@
 # coding=utf-8
 import pytest
+import json
+import math
 
 from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
 from ladybug_geometry.geometry3d.plane import Plane
@@ -7,8 +9,6 @@ from ladybug_geometry.geometry3d.ray import Ray3D
 from ladybug_geometry.geometry3d.line import LineSegment3D
 from ladybug_geometry.geometry3d.face import Face3D
 from ladybug_geometry.geometry3d.polyface import Polyface3D
-
-import math
 
 
 def test_polyface3d_init_solid():
@@ -740,3 +740,15 @@ def test_overlapping_bounding_boxes():
     assert Polyface3D.overlapping_bounding_boxes(polyface_1, polyface_3, 0.01)
     assert Polyface3D.overlapping_bounding_boxes(polyface_1, polyface_4, 0.01)
     assert not Polyface3D.overlapping_bounding_boxes(polyface_1, polyface_5, 0.01)
+
+
+def test_polyface3d_merge_overlap():
+    """Test Polyface3D merge_overlapping_edges method."""
+    geo_file = './tests/json/closed_polyface.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    polyface = Polyface3D.from_dict(geo_dict)
+
+    merged_polyface = polyface.merge_overlapping_edges(0.1, math.radians(1))
+    assert len(merged_polyface.naked_edges) == 0
+    assert merged_polyface.is_solid

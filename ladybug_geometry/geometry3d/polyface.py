@@ -465,7 +465,7 @@ class Polyface3D(Base2DIn3D):
             # get all of the edges that are colinear with the first edge
             coll_edges = list(naked_edge_ind[0])
             coll_i = [naked_edge_i[0]]
-            kept_i = []
+            kept_i, maybe_kept_i = [], []
             for edge, ind, nei, i in zip(
                     naked_edges[1:], naked_edge_ind[1:], naked_edge_i[1:],
                     xrange(1, len(naked_edges))):
@@ -473,24 +473,56 @@ class Polyface3D(Base2DIn3D):
                     if edge.is_colinear(naked_edges[0], tolerance, angle_tolerance):
                         coll_edges.extend(ind)
                         coll_i.append(nei)
+                        maybe_kept_i.append(i)
                     else:
                         kept_i.append(i)
                 except ZeroDivisionError:  # duplicate vertices resulted in 0 length edge
                     coll_edges.extend(ind)
                     coll_i.append(nei)
+                    maybe_kept_i.append(i)
 
             # determine if  colinear edges create a full double line along the edge
-            if len(coll_edges) == 1:
+            if len(coll_edges) == 1:  # definitely a naked edge
                 overlapping = False
-            else:
+            else:  # all colinear edges are likely a part of the same loop
                 final_vi = []
-                coll_edges.sort()
+                coll_edges_sort = sorted(coll_edges)
                 overlapping = True
-                for i in range(0, len(coll_edges), 2):
-                    final_vi.append(coll_edges[i])
-                    if not coll_edges[i] == coll_edges[i + 1]:
+                for i in range(0, len(coll_edges_sort), 2):
+                    final_vi.append(coll_edges_sort[i])
+                    if coll_edges_sort[i] != coll_edges_sort[i + 1]:
                         overlapping = False
                         break
+                # there's still a chance we have multiple colinear loops
+                if not overlapping:
+                    dup = {x for x in coll_edges if coll_edges.count(x) > 1}
+                    if coll_edges[0] in dup and coll_edges[1] in dup:
+                        rebuilt_edges = [(coll_edges[i], coll_edges[i + 1])
+                                         for i in range(0, len(coll_edges), 2)]
+                        loop_i = set(rebuilt_edges[0])
+                        edge_to_check = rebuilt_edges[1:]
+                        more_to_check = True
+                        while more_to_check:
+                            for i, r_seg in enumerate(edge_to_check):
+                                if (r_seg[0] in loop_i or r_seg[1] in loop_i):
+                                    loop_i.add(r_seg[0])
+                                    loop_i.add(r_seg[1])
+                                    del edge_to_check[i]
+                                    break
+                            else:
+                                more_to_check = False
+                        if all(li in dup for li in loop_i):  # we have found a loop!
+                            final_vi = list(loop_i)
+                            new_coll_i = [coll_i[0]]
+                            zip_obj = zip(rebuilt_edges[1:], coll_i[1:], maybe_kept_i)
+                            for ind, nei, i in zip_obj:
+                                if ind[0] in loop_i:
+                                    new_coll_i.append(nei)
+                                else:
+                                    kept_i.append(i)
+                            kept_i.sort()
+                            coll_i = new_coll_i
+                            overlapping = True
 
             # if fully overlapping edges have been found, remake them into one
             if overlapping:
