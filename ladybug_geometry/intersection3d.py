@@ -15,7 +15,7 @@ def intersect_line3d_plane(line_ray, plane):
         plane: A Plane object to intersect.
 
     Returns:
-        Point2D of intersection if it exists. None if no intersection exists.
+        Point3D of intersection if it exists. None if no intersection exists.
     """
     d = plane.n.dot(line_ray.v)
     if not d:  # parallel
@@ -23,6 +23,26 @@ def intersect_line3d_plane(line_ray, plane):
     u = (plane.k - plane.n.dot(line_ray.p)) / d
     if not line_ray._u_in(u):  # line or ray does not have its domain in the plane
         return None
+    return Point3D(line_ray.p.x + u * line_ray.v.x,
+                   line_ray.p.y + u * line_ray.v.y,
+                   line_ray.p.z + u * line_ray.v.z)
+
+
+def intersect_line3d_plane_infinite(line_ray, plane):
+    """Get the intersection between a Plane and Ray2D/LineSegment2D extended infinitely.
+
+    Args:
+        line_ray: ALineSegment2D or Ray2D that will be extended infinitely
+            for intersection.
+        plane: A Plane object to intersect.
+
+    Returns:
+        Point3D of intersection if it exists. None if no intersection exists.
+    """
+    d = plane.n.dot(line_ray.v)
+    if not d:  # parallel
+        return None
+    u = (plane.k - plane.n.dot(line_ray.p)) / d
     return Point3D(line_ray.p.x + u * line_ray.v.x,
                    line_ray.p.y + u * line_ray.v.y,
                    line_ray.p.z + u * line_ray.v.z)
