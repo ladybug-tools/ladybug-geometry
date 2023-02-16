@@ -4,8 +4,9 @@ from __future__ import division
 
 from .pointvector import Point3D, Vector3D
 from .ray import Ray3D
-from ..intersection3d import intersect_line3d_plane, intersect_plane_plane, \
-    closest_point3d_on_plane, closest_point3d_between_line3d_plane
+from ..intersection3d import intersect_line3d_plane, intersect_line3d_plane_infinite, \
+    intersect_plane_plane, closest_point3d_on_plane, \
+    closest_point3d_between_line3d_plane
 from ..geometry2d.pointvector import Point2D, Vector2D
 from ..geometry2d.ray import Ray2D
 
@@ -318,6 +319,23 @@ class Plane(object):
             return 0
         else:
             return result[0].distance_to_point(result[1])
+
+    def project_point(self, point, projection_direction=None):
+        """Project a point onto this Plane given a certain projection direction.
+
+        Args:
+            point: A Point3D to be projected onto the plane
+            projection_direction: A Line3D or Ray3D object to set the direction
+                of projection. If None, this Plane's normal will be
+                used. (Default: None).
+
+        Returns:
+            Point3D for the projected point. Will be None if the projection_direction
+            is parallel to the plane.
+        """
+        int_ray = Ray3D(point, self.n) if projection_direction is None \
+            else Ray3D(point, projection_direction)
+        return intersect_line3d_plane_infinite(int_ray, self)
 
     def intersect_line_ray(self, line_ray):
         """Get the intersection between this plane and the input Line3D or Ray3D.
