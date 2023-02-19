@@ -898,6 +898,28 @@ class Face3D(Base2DIn3D):
                                      for hole in self._holes)
         return _new_face
 
+    def split_through_holes(self):
+        """Get this Face3D split in two through its holes to get shapes without holes.
+
+        Will be None if this Face3D has not holes.
+        """
+        if not self.has_holes:
+            return None
+        # check that the direction of vertices for the hole is opposite the boundary
+        boundary = list(self.boundary_polygon2d.vertices)
+        holes = [list(hole.vertices) for hole in self.hole_polygon2d]
+        bound_direction = Polygon2D._are_clockwise(boundary)
+        for hole in holes:
+            if Polygon2D._are_clockwise(hole) is bound_direction:
+                hole.reverse()
+        # split the polygon through the holes
+        poly_1, poly_2 = Polygon2D._merge_boundary_and_holes(boundary, holes, split=True)
+        vert_1 = tuple(self.plane.xy_to_xyz(pt) for pt in poly_1)
+        vert_2 = tuple(self.plane.xy_to_xyz(pt) for pt in poly_2)
+        face_1 = Face3D(vert_1, plane=self.plane)
+        face_2 = Face3D(vert_2, plane=self.plane)
+        return face_1, face_2
+
     def intersect_line_ray(self, line_ray):
         """Get the intersection between this face and the input Line3D or Ray3D.
 
