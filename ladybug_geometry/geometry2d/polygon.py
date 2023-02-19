@@ -224,8 +224,7 @@ class Polygon2D(Base2DIn2D):
                 hole.reverse()
 
         # recursively add the nearest hole to the boundary until there are none left.
-        while len(holes) > 0:
-            boundary, holes = cls._merge_boundary_and_closest_hole(boundary, holes)
+        boundary = cls._merge_boundary_and_holes(boundary, holes)
 
         # return the polygon with some properties set based on what we know
         _new_poly = cls(boundary)
@@ -1045,6 +1044,134 @@ class Polygon2D(Base2DIn2D):
             _segs.append(_seg)
         _segs.append(_segs.pop(0))  # segments will start from the first point
         return _segs
+
+    @staticmethod
+    def _merge_boundary_and_holes(boundary, holes, split=False):
+        """Return a list of points for a boundary merged with all holes.
+
+        The holes are merged one-by-one using the shortest distance from all of
+        the holes to the boundary to ensure one hole's seam does not cross another.
+        This run time of this method scales linearly with the number of hole
+        vertices, which makes it significantly better for shapes with many holes
+        compared to recursively calling the _merge_boundary_and_closest_hole
+        method.
+
+        Args:
+            boundary: A list of Point2D objects for the outer boundary inside of
+                which the hole is contained.
+            hole: A list of lists where each sub-list represents a hole and contains
+                several Point2D objects that represent the hole.
+            split: A boolean to note whether the last hole should be merged into
+                the boundary for a second time, effectively splitting the shape
+                into two lists of vertices instead of a single list. It is useful
+                to set this tro True when trying to translate a shape with holes
+                to a platform that does not support holes and also struggles with
+                single lists of vertices that wind inward to cut out the holes
+                since this option typically returns two "normal" concave
+                polygons. (Default: False).
+
+        Returns:
+            A single list of vertices with the holes merged into the boundary. When
+            split is True, this will be two lists of vertices for the two split shapes.
+        """
+        # compute the initial distances between the holes and the boundary
+        hole_dicts = []
+        min_dists = []
+        for hole in holes:
+            dist_dict = {}
+            for i, b_pt in enumerate(boundary):
+                for j, h_pt in enumerate(hole):
+                    dist_dict[b_pt.distance_to_point(h_pt)] = [i, j]
+            hole_dicts.append(dist_dict)
+            min_dists.append(min(dist_dict.keys()))
+        # merge each hole into the boundary, moving progressively by minimum distance
+        final_hole_count = 0 if not split else 1
+        while len(holes) > final_hole_count:
+            # merge the hole into the boundary
+            hole_index = min_dists.index(min(min_dists))
+            boundary, old_hole, b_ind = Polygon2D._merge_boundary_and_hole_detailed(
+                boundary, holes[hole_index], hole_dicts[hole_index])
+            # remove the hole from the older lists
+            hole_dicts.pop(hole_index)
+            holes.pop(hole_index)
+            # update the hole_dicts based on the new boundary
+            add_ind = len(old_hole)
+            for hd in hole_dicts:
+                for ind_list in hd.values():
+                    if ind_list[0] > b_ind:
+                        ind_list[0] += add_ind
+            # add the distances from the old hole to the remaining holes to hole_dicts
+            old_hole_ind = [b_ind + i for i in range(add_ind)]
+            for hole, dist_dict in zip(holes, hole_dicts):
+                for bi, b_pt in zip(old_hole_ind, old_hole):
+                    for j, h_pt in enumerate(hole):
+                        dist_dict[b_pt.distance_to_point(h_pt)] = [bi, j]
+            # generated an updated min_dists list
+            min_dists = [min(dist_dict.keys()) for dist_dict in hole_dicts]
+        if not split:
+            return boundary
+
+        # sort the distances to find the first and second most distant points
+        last_hd = hole_dicts[0]
+        sort_dist = sorted(last_hd.keys())
+        p1_dist, p2_dist = sort_dist[0], sort_dist[1]
+        p1_indices, p2_indices = dist_dict[p1_dist], dist_dict[p2_dist]
+        # keep track of the second most distant points for later
+        p2_bound_pt = boundary[p2_indices[0]]
+        p2_hole_pt = hole[p2_indices[1]]
+        # merge the hole into the boundary
+        hole_deque = deque(hole)
+        hole_deque.rotate(-p1_indices[1])
+        hole_insert = [boundary[p1_indices[0]]] + list(hole_deque) + \
+            [hole[p1_indices[1]]]
+        boundary[p1_indices[0]:p1_indices[0]] = hole_insert
+        # use the second most distant points to split the shape\
+        p2_bound_i = boundary.index(p2_bound_pt)
+        p2_hole_i = boundary.index(p2_hole_pt)
+        if p2_hole_i < p2_bound_i:
+            boundary_1 = boundary[p2_hole_i:p2_bound_i + 1]
+            boundary_2 = boundary[:p2_hole_i + 1] + boundary[p2_bound_i:]
+        else:
+            boundary_1 = boundary[p2_bound_i:p2_hole_i + 1]
+            boundary_2 = boundary[:p2_bound_i + 1] + boundary[p2_hole_i:]
+        return boundary_1, boundary_2
+
+    @staticmethod
+    def _merge_boundary_and_hole_detailed(boundary, hole, dist_dict):
+        """Create a single list of points with a hole and boundary.
+
+        This method will also return the newly-added vertices of the hole as
+        well as the index of where the hole was inserted in the larger boundary.
+
+        Args:
+            boundary: A list of Point2D objects for the outer boundary inside of
+                which the hole is contained.
+            hole: A list of Point2D objects for the hole.
+            dist_dict: A dictionary with keys of distances between each of the points
+                in the boundary and hole lists and values as tuples with two values:
+                (the index of the boundary point, the index of the hole point)
+
+        Returns:
+            A tuple with three values
+
+            -   boundary: A single list of vertices with the input hole merged
+                into the boundary.
+
+            -   hole_insert: A list of vertices representing the hole that has
+                been inserted into the boundary.
+
+            -   insert_index: An integer for where the hole was inserted in the
+                boundary.
+        """
+        min_dist = min(dist_dict.keys())
+        min_indexes = dist_dict[min_dist]
+        hole_deque = deque(hole)
+        hole_deque.rotate(-min_indexes[1])
+        hole_insert = [boundary[min_indexes[0]]] + list(hole_deque) + \
+            [hole[min_indexes[1]]]
+        boundary[min_indexes[0]:min_indexes[0]] = hole_insert
+        insert_index = min_indexes[0]
+        return boundary, hole_insert, insert_index
 
     @staticmethod
     def _merge_boundary_and_closest_hole(boundary, holes):

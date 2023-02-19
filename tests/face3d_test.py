@@ -347,6 +347,34 @@ def test_face3d_init_from_punched_geometry():
     assert face.is_self_intersecting is False
 
 
+def test_face3d_split_through_holes():
+    """Test the Face3D split_through_holes method."""
+    bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
+    hole_pts = [Point3D(1, 1), Point3D(2, 1), Point3D(2, 2), Point3D(1, 2)]
+    face = Face3D(bound_pts, None, [hole_pts])
+
+    face_1, face_2 = face.split_through_holes()
+    assert len(face_1.vertices) in (4, 8)
+    assert len(face_2.vertices) in (4, 8)
+
+    bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
+    hole_pts = [Point3D(2, 2), Point3D(3, 2), Point3D(3, 3), Point3D(2, 3)]
+    face = Face3D(bound_pts, None, [hole_pts])
+
+    face_1, face_2 = face.split_through_holes()
+    assert len(face_1.vertices) in (4, 8)
+    assert len(face_2.vertices) in (4, 8)
+
+    bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
+    hole_pts_1 = [Point3D(1, 1), Point3D(1.5, 1), Point3D(1.5, 1.5), Point3D(1, 1.5)]
+    hole_pts_2 = [Point3D(2, 2), Point3D(3, 2), Point3D(3, 3), Point3D(2, 3)]
+    face = Face3D(bound_pts, None, [hole_pts_1, hole_pts_2])
+
+    face_1, face_2 = face.split_through_holes()
+    assert len(face_1.vertices) in (7, 11)
+    assert len(face_2.vertices) in (7, 11)
+
+
 def test_face3d_init_h_shape():
     """Test the initialization of Face3D that is H-shaped."""
     geo_file = './tests/json/h_shaped_face.json'
