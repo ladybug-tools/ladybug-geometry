@@ -16,6 +16,9 @@ def intersect_line2d(line_ray_a, line_ray_b):
 
     The derivation of ua is achieved by crossing both sides of the above equation
     with the direction vector of B, and rearranging the formula:
+    
+    .. code-block:: python
+
         A.p + ua * A.v = B.p + ub * B.v
         (A.p + ua * A.v) x B.v = (B.p + ub * B.v) x B.v # Cross both sides with B.v
         (A.p x B.v) + (ua * A.v x B.v) = (B.p x B.v) + (ub * B.v x B.v) # B.v x B.v = 0

@@ -318,7 +318,7 @@ def create_cli_files():
 
 
 def get_cli_data(project_folder):
-    """Retrieve CLI data found inside a specified respository.
+    """Retrieve CLI data found inside a specified repository.
 
     Args:
         project_folder: the documentation path that contains the files to
@@ -336,7 +336,7 @@ def get_cli_data(project_folder):
         -   tool_name: The name of the command line tool that is used for this
             library.
     """
-    print("[CLI data]: Retrieveing CLI data from {}".format(project_folder))
+    print("[CLI data]: Retrieving CLI data from {}".format(project_folder))
 
     # Check in hash table for a library name based on repository name.
     repo_path = os.path.abspath(os.path.join(project_folder, os.pardir))
