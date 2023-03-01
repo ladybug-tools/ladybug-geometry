@@ -751,7 +751,7 @@ class Face3D(Base2DIn3D):
             return False
         # if it is, convert the point into this face's plane
         vert2d = self.plane.xyz_to_xy(point)
-        return self.polygon2d.is_point_inside(vert2d, Vector2D(1, 0.00001))
+        return self.polygon2d.is_point_inside(vert2d)
 
     def check_planar(self, tolerance, raise_exception=True):
         """Check that all of the face's vertices lie within the face's plane.
@@ -932,7 +932,7 @@ class Face3D(Base2DIn3D):
         _plane_int = self._plane.intersect_line_ray(line_ray)
         if _plane_int is not None:
             _int2d = self._plane.xyz_to_xy(_plane_int)
-            if self.polygon2d.is_point_inside_bound_rect(_int2d, Vector2D(1, 0.00001)):
+            if self.polygon2d.is_point_inside_bound_rect(_int2d):
                 return _plane_int
         return None
 
@@ -981,7 +981,7 @@ class Face3D(Base2DIn3D):
         """
         _plane_int = point.project(self._plane.n, self._plane.o)
         _plane_int2d = self._plane.xyz_to_xy(_plane_int)
-        if self.polygon2d.is_point_inside_bound_rect(_plane_int2d, Vector2D(1, 0.00001)):
+        if self.polygon2d.is_point_inside_bound_rect(_plane_int2d):
             return _plane_int
         return None
 
@@ -2035,7 +2035,7 @@ class Face3D(Base2DIn3D):
         move_vec = move_vec * (tolerance + 0.00001)
         point_on_face = face.boundary[0] + move_vec
         vert2d = face.plane.xyz_to_xy(point_on_face)
-        if not face.polygon2d.is_point_inside(vert2d, Vector2D(1, 0.00001)):
+        if not face.polygon2d.is_point_inside(vert2d):
             point_on_face = face.boundary[0] - move_vec
         return point_on_face
 

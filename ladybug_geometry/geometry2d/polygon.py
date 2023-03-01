@@ -617,9 +617,8 @@ class Polygon2D(Base2DIn2D):
     def point_relationship(self, point, tolerance):
         """Test whether a Point2D lies inside, outside or on the boundary of the polygon.
 
-        This is the slowest of the methods for understanding the relationship
-        of a given point to a polygon. However, it covers all edge cases, including
-        the literal edge of the polygon.
+        Compared to other methods like is_point_inside this method is slow. However,
+        it covers all edge cases, including the literal edge of the polygon.
 
         Args:
             point: A Point2D for which the relationship to the polygon will be tested.
@@ -637,7 +636,7 @@ class Polygon2D(Base2DIn2D):
         """
         if self.is_point_on_edge(point, tolerance):
             return 0
-        if self.is_point_inside_check(point):
+        if self.is_point_inside_bound_rect(point):
             return 1
         return -1
 
@@ -722,7 +721,7 @@ class Polygon2D(Base2DIn2D):
             return False
         return True
 
-    def is_point_inside(self, point, test_vector=Vector2D(1, 0)):
+    def is_point_inside(self, point, test_vector=Vector2D(1, 0.00001)):
         """Test whether a Point2D lies inside or outside the polygon.
 
         This method is the fastest way to tell if a point is inside a polygon when
@@ -734,7 +733,7 @@ class Polygon2D(Base2DIn2D):
         .. code-block:: shell
 
             1 - When the test_ray intersects perfectly with a polygon vertex.
-                For example, this case with an X-unit test_vector:
+                For example, this case with an X-unit (1, 0) test_vector:
                                     _____________
                                    |      .      |
                                    |            /
@@ -746,13 +745,17 @@ class Polygon2D(Base2DIn2D):
                                      |__________|
 
         Use the `is_point_inside_check` method if a result that covers these fringe
-        cases is needed.
+        cases is needed. Oftentimes, it is more practical to use a test_vector
+        with a low probability of encountering the fringe cases than to use the
+        (much longer) `is_point_inside_check` method.
 
         Args:
             point: A Point2D for which the inside/outside relationship will be tested.
             test_vector: Optional vector to set the direction in which intersections
                 with the polygon edges will be evaluated to determine if the
-                point is inside. Default is the X-unit vector.
+                point is inside. Default is a slight variation of the X-unit
+                vector with a low probability of encountering the unsupported
+                fringe cases.
 
         Returns:
             A boolean denoting whether the point lies inside (True) or outside (False).
@@ -766,7 +769,7 @@ class Polygon2D(Base2DIn2D):
             return False
         return True
 
-    def is_point_inside_bound_rect(self, point, test_vector=Vector2D(1, 0)):
+    def is_point_inside_bound_rect(self, point, test_vector=Vector2D(1, 0.00001)):
         """Test whether a Point2D lies roughly inside or outside the polygon.
 
         This function is virtually identical to the `is_point_inside`
@@ -826,6 +829,41 @@ class Polygon2D(Base2DIn2D):
                 if does_intersection_exist_line2d(seg, _s):
                     return False
         return True
+
+    def polygon_relationship(self, polygon, tolerance):
+        """Test whether another Polygon2D lies inside, outside or intersects this one.
+
+        This method is not usually the fastest for understanding the relationship
+        between polygons but it accurately accounts for tolerance such that the
+        case of the two polygons sharing an edge will not determine the outcome.
+        Only when the polygon has vertices that are truly outside this polygon
+        within the tolerance will the relationship become outside (or intersecting
+        if one of the vertices is already inside within the tolerance).
+
+        In the case of the input polygon being identical to the current polygon,
+        the relationship will be Inside.
+
+        Args:
+            polygon: A Polygon2D for which the relationship to the current polygon
+                will be tested.
+            tolerance: The minimum distance from the edge at which a point is
+                considered to lie on the edge.
+
+        Returns:
+            An integer denoting the relationship of the polygon.
+
+            This will be one of the following:
+
+            * -1 = Outside polygon
+            *  0 = Intersects the polygon
+            * +1 = Inside polygon
+        """
+        pt_rels = [self.point_relationship(pt, tolerance) for pt in polygon]
+        if all(rel >= 0 for rel in pt_rels):
+            return 1
+        if all(rel <= 0 for rel in pt_rels):
+            return -1
+        return 0
 
     def distance_to_point(self, point):
         """Get the minimum distance between this shape and the input point.
