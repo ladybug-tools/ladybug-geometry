@@ -89,6 +89,7 @@ class Face3D(Base2DIn3D):
                  '_boundary_polygon2d', '_hole_polygon2d',
                  '_perimeter', '_area', '_centroid',
                  '_is_convex', '_is_self_intersecting')
+    HOLE_VERTEX_THRESHOLD = 100  # threshold at which faster hole merging method is used
 
     def __init__(self, boundary, plane=None, holes=None, enforce_right_hand=True):
         """Initialize Face3D."""
@@ -110,7 +111,12 @@ class Face3D(Base2DIn3D):
             # create a Polygon2D from the vertices
             _boundary2d = [self._plane.xyz_to_xy(_v) for _v in boundary]
             _holes2d = [[self._plane.xyz_to_xy(_v) for _v in hole] for hole in holes]
-            _polygon2d = Polygon2D.from_shape_with_holes(_boundary2d, _holes2d)
+            v_count = len(_boundary2d)  # count the vertices for hole merging method
+            for h in _holes2d:
+                v_count += len(h)
+            _polygon2d = Polygon2D.from_shape_with_holes_fast(_boundary2d, _holes2d) \
+                if v_count > self.HOLE_VERTEX_THRESHOLD else \
+                Polygon2D.from_shape_with_holes(_boundary2d, _holes2d)
             # convert Polygon2D vertices to 3D to become the vertices of the face.
             self._vertices = tuple(self._plane.xy_to_xyz(_v)
                                    for _v in _polygon2d.vertices)

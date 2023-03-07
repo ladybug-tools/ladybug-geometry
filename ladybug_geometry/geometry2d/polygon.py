@@ -15,6 +15,7 @@ from .line import LineSegment2D
 from .ray import Ray2D
 from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
     does_intersection_exist_line2d, closest_point2d_on_line2d
+from ..triangulation import _linked_list, _eliminate_holes
 from ._2d import Base2DIn2D
 
 inf = float("inf")
@@ -228,6 +229,58 @@ class Polygon2D(Base2DIn2D):
 
         # return the polygon with some properties set based on what we know
         _new_poly = cls(boundary)
+        _new_poly._is_clockwise = bound_direction
+        _new_poly._is_convex = False
+        _new_poly._is_self_intersecting = False
+        return _new_poly
+
+    @classmethod
+    def from_shape_with_holes_fast(cls, boundary, holes):
+        """Initialize a Polygon2D from a boundary shape with holes using a fast method.
+
+        This method is similar in principle to the from_shape_with_holes method
+        but it uses David Eberly's algorithm for finding a bridge between the holes
+        and outer polygon. This is extremely fast in comparison to the methods used
+        by from_shape_with_holes but is not always the prettiest or the shortest
+        pathway through the holes. Granted, it is very practical for shapes with
+        lots of holes (eg. 100 holes) and will run in a fraction of the time for
+        this case.
+
+        Args:
+            boundary: A list of Point2D objects for the outer boundary of the polygon
+                inside of which all of the holes are contained.
+            holes: A list of lists with one list for each hole in the shape. Each hole
+                should be a list of at least 3 Point2D objects.
+        """
+        # check the initial direction of the boundary vertices
+        bound_direction = cls._are_clockwise(boundary)
+        # format the coordinates for input to the earcut methods
+        vert_coords, hole_indices = [], None
+        for pt in boundary:
+            vert_coords.append(pt.x)
+            vert_coords.append(pt.y)
+        hole_indices = []
+        for hole in holes:
+            hole_indices.append(int(len(vert_coords) / 2))
+            for pt in hole:
+                vert_coords.append(pt.x)
+                vert_coords.append(pt.y)
+
+        # eliminate the holes within the list
+        outer_len = hole_indices[0] * 2
+        outer_node = _linked_list(vert_coords, 0, outer_len, 2, True)
+        outer_node = _eliminate_holes(vert_coords, hole_indices, outer_node, 2)
+
+        # loop through the chain of nodes and translate them to Point2D
+        start_i = outer_node.i
+        vertices = [Point2D(outer_node.x, outer_node.y)]
+        node = outer_node.next
+        while node.i != start_i:
+            vertices.append(Point2D(node.x, node.y))
+            node = node.next
+
+        # return the polygon with some properties set based on what we know
+        _new_poly = cls(vertices)
         _new_poly._is_clockwise = bound_direction
         _new_poly._is_convex = False
         _new_poly._is_self_intersecting = False
