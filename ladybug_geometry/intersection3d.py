@@ -1,5 +1,8 @@
 # coding=utf-8
-"""Utility functions for computing intersections between geometry in 3D space."""
+"""Utility functions for computing intersections between geometry in 3D space.
+
+Taken mostly from the euclid.py package.
+"""
 from __future__ import division
 
 from .geometry3d.pointvector import Point3D

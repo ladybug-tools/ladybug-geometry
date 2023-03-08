@@ -1,3 +1,4 @@
+# coding=utf-8
 """Core triangulation functions used by various geometry modules.
 
 The functions here are derived from the earcut-python library available at
@@ -10,6 +11,7 @@ https://github.com/mapbox/earcut
 The version here is based off of the JavaScript earcut 2.1.1 release, and is
 functionally identical.
 """
+from __future__ import division
 
 
 def earcut(data, hole_indices=None, dim=2):
