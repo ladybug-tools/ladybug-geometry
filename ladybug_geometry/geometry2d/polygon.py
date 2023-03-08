@@ -13,10 +13,11 @@ except ImportError:  # Python2
 from .pointvector import Point2D, Vector2D
 from .line import LineSegment2D
 from .ray import Ray2D
+from ..triangulation import _linked_list, _eliminate_holes
 from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
     does_intersection_exist_line2d, closest_point2d_on_line2d
-from ..triangulation import _linked_list, _eliminate_holes
 from ._2d import Base2DIn2D
+import ladybug_geometry.boolean as pb
 
 inf = float("inf")
 
@@ -957,6 +958,172 @@ class Polygon2D(Base2DIn2D):
         """Get a list of lists where each sub-list represents a Point2D vertex."""
         return tuple(pt.to_array() for pt in self.vertices)
 
+    def boolean_union(self, polygon, tolerance):
+        """Get a list of Polygon2D for the union of this Polygon and another.
+
+        Note that the result will not differentiate hole polygons from boundary
+        polygons and so it may be desirable to use the Polygon2D.is_polygon_inside
+        method to distinguish whether a given polygon in the result represents
+        a hole in another polygon in the result.
+
+        Also note that this method will return the original polygons when there
+        is no overlap in the two.
+
+        Args:
+            polygon: A Polygon2D for which the union with the current polygon
+                will be computed.
+            tolerance: The minimum distance between points before they are
+                considered distinct from one another.
+
+        Returns:
+            A list of Polygon2D representing the union of the two polygons.
+        """
+        result = pb.union(
+            pb.BooleanPolygon([list(self.to_array())]),
+            pb.BooleanPolygon([list(polygon.to_array())]),
+            tolerance)
+        if result is not None:
+            return [Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
+                    for new_poly in result.regions]
+
+    def boolean_intersect(self, polygon, tolerance):
+        """Get a list of Polygon2D for the intersection of this Polygon and another.
+
+        Args:
+            polygon: A Polygon2D for which the intersection with the current polygon
+                will be computed.
+            tolerance: The minimum distance between points before they are
+                considered distinct from one another.
+
+        Returns:
+            A list of Polygon2D representing the intersection of the two polygons.
+            Will be an empty list if no overlap exists between the polygons.
+        """
+        result = pb.intersect(
+            pb.BooleanPolygon([list(self.to_array())]),
+            pb.BooleanPolygon([list(polygon.to_array())]),
+            tolerance)
+        if result is not None:
+            return [Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
+                    for new_poly in result.regions]
+
+    def boolean_difference(self, polygon, tolerance):
+        """Get a list of Polygon2D for the subtraction of another polygon from this one.
+
+        Args:
+            polygon: A Polygon2D for which the difference with the current polygon
+                will be computed.
+            tolerance: The minimum distance between points before they are
+                considered distinct from one another.
+
+        Returns:
+            A list of Polygon2D representing the difference of the two polygons.
+            Will be an empty list if subtracting the polygons results in the complete
+            elimination of this polygon. Will be the original polygon when there
+            is no overlap between the polygons.
+        """
+        result = pb.difference(
+            pb.BooleanPolygon([list(self.to_array())]),
+            pb.BooleanPolygon([list(polygon.to_array())]),
+            tolerance)
+        if result is not None:
+            return [Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
+                    for new_poly in result.regions]
+
+    def boolean_xor(self, polygon, tolerance):
+        """Get Polygon2D list for the exclusive disjunction of this polygon and another.
+
+        Note that this method is prone to merging holes that may exist in the
+        result into the boundary to create a single list of joined vertices,
+        which may not always be desirable. In this case, it may be desirable
+        to do two separate boolean_difference calculations instead.
+
+        Also note that, when the result includes separate polygons for holes,
+        it will not differentiate hole polygons from boundary polygons
+        and so it may be desirable to use the Polygon2D.is_polygon_inside
+        method to distinguish whether a given polygon in the result represents
+        a hole within another polygon in the result.
+
+        Args:
+            polygon: A Polygon2D for which the exclusive disjunction with the
+                current polygon will be computed.
+            tolerance: The minimum distance between points before they are
+                considered distinct from one another.
+
+        Returns:
+            A list of Polygon2D representing the exclusive disjunction of the
+            two polygons. Will be the original polygons when there is no overlap
+            in the two.
+        """
+        result = pb.xor(
+            pb.BooleanPolygon([list(self.to_array())]),
+            pb.BooleanPolygon([list(polygon.to_array())]),
+            tolerance)
+        if result is not None:
+            return [Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
+                    for new_poly in result.regions]
+
+    @staticmethod
+    def boolean_union_all(polygons, tolerance):
+        """Get a list of Polygon2D for the union of several Polygon2D.
+
+        Using this method is more computationally efficient than calling the
+        Polygon2D.boolean_union() method multiple times as this method will 
+        only compute the intersection of the segments once.
+
+        Note that the result will not differentiate hole polygons from boundary
+        polygons and so it may be desirable to use the Polygon2D.is_polygon_inside
+        method to distinguish whether a given polygon in the result represents
+        a hole in another polygon in the result.
+
+        Also note that this method will return the original polygons when there
+        is no overlap in the two.
+
+        Args:
+            polygons: An array of Polygon2D for which the union will be computed.
+            tolerance: The minimum distance between points before they are
+                considered distinct from one another.
+
+        Returns:
+            A list of Polygon2D representing the union of all the polygons.
+        """
+        bool_polys = [pb.BooleanPolygon([list(poly.to_array())]) for poly in polygons]
+        result = pb.union_all(bool_polys, tolerance)
+        if result is not None:
+            return [Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
+                    for new_poly in result.regions]
+
+    @staticmethod
+    def boolean_intersect_all(polygons, tolerance):
+        """Get a list of Polygon2D for the intersection of several Polygon2D.
+
+        Using this method is more computationally efficient than calling the
+        Polygon2D.boolean_intersect() method multiple times as this method will 
+        only compute the intersection of the segments once.
+
+        Note that the result will not differentiate hole polygons from boundary
+        polygons and so it may be desirable to use the Polygon2D.is_polygon_inside
+        method to distinguish whether a given polygon in the result represents
+        a hole in another polygon in the result.
+
+        Also note that this method will return the original polygons when there
+        is no overlap in the two.
+
+        Args:
+            polygons: An array of Polygon2D for which the intersection will be computed.
+            tolerance: The minimum distance between points before they are
+                considered distinct from one another.
+
+        Returns:
+            A list of Polygon2D representing the intersection of all the polygons.
+            Will be an empty list if no overlap exists between the polygons.
+        """
+        bool_polys = [pb.BooleanPolygon([list(poly.to_array())]) for poly in polygons]
+        result = pb.intersect_all(bool_polys, tolerance)
+        if result is not None:
+            return [Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
+                    for new_poly in result.regions]
+
     @staticmethod
     def intersect_polygon_segments(polygon_list, tolerance):
         """Intersect the line segments of a Polygon2D array to ensure matching segments.
@@ -1040,9 +1207,9 @@ class Polygon2D(Base2DIn2D):
         """Check if the bounding rectangles of two polygons overlap within a tolerance.
 
         This is particularly useful as a check before performing computationally intense
-        processes between two polygons like intersection or checking for adjacency.
-        Checking the overlap of the bounding boxes is extremely quick given this
-        method's use of the Separating Axis Theorem.
+        processes between two polygons like intersection or boolean operations.
+        Checking the overlap of the bounding boxes is extremely quick with this
+        method's use of the the Separating Axis Theorem.
 
         Args:
             polygon1: The first polygon to check.

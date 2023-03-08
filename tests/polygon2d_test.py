@@ -738,7 +738,7 @@ def test_intersect_polygon_segments_abraham_bug():
 
 
 def test_polygon_is_equivalent():
-    """ Test if polygons are equivalent based on point equivalence"""
+    """Test if polygons are equivalent based on point equivalence."""
 
     tol = 1e-10
     p1 = Polygon2D.from_array([[0, 0], [6, 0], [7, 3], [0, 4]])
@@ -762,3 +762,141 @@ def test_polygon_is_equivalent():
     # Test equal condition different order 2
     p2 = Polygon2D.from_array([[0, 4], [0, 0], [6, 0], [7, 3]])
     assert p1.is_equivalent(p2, tol)
+
+
+def test_boolean_union():
+    """Test the boolean_union method."""
+    polygon_a = Polygon2D.from_array((
+        (174.731903, -72.989276),
+        (-70.77748, -53.08311),
+        (-72.252011, 215.281501),
+        (129.021448, 126.809651),
+        (106.16622, 28.016086),
+        (216.756032, 22.117962),
+        (174.731903, -72.989276),
+    ))
+    polygon_b = Polygon2D.from_array((
+        (-169.571046, -98.793566),
+        (-145.241287, 63.404826),
+        (11.796247, 34.651475),
+        (8.10992, -129.758713),
+        (-76.675603, -216.018767),
+        (-169.571046, -98.793566),
+    ))
+
+    polygon_union = polygon_a.boolean_union(polygon_b, 0.01)
+    assert len(polygon_union) == 1
+    assert len(polygon_union[0].vertices) == 11
+
+    polygon_union = Polygon2D.boolean_union_all([polygon_a, polygon_b], 0.01)
+    assert len(polygon_union) == 1
+    assert len(polygon_union[0].vertices) == 11
+
+
+def test_boolean_intersect():
+    """Test the boolean_intersect method."""
+    polygon_a = Polygon2D.from_array((
+        (174.731903, -72.989276),
+        (-70.77748, -53.08311),
+        (-72.252011, 215.281501),
+        (129.021448, 126.809651),
+        (106.16622, 28.016086),
+        (216.756032, 22.117962),
+        (174.731903, -72.989276),
+    ))
+    polygon_b = Polygon2D.from_array((
+        (-169.571046, -98.793566),
+        (-145.241287, 63.404826),
+        (11.796247, 34.651475),
+        (8.10992, -129.758713),
+        (-76.675603, -216.018767),
+        (-169.571046, -98.793566),
+    ))
+
+    polygon_intersect = polygon_a.boolean_intersect(polygon_b, 0.01)
+    assert len(polygon_intersect) == 1
+    assert len(polygon_intersect[0].vertices) == 4
+
+    polygon_intersect = Polygon2D.boolean_intersect_all([polygon_a, polygon_b], 0.01)
+    assert len(polygon_intersect) == 1
+    assert len(polygon_intersect[0].vertices) == 4
+
+
+def test_boolean_xor():
+    """Test the boolean_xor method."""
+    polygon_a = Polygon2D.from_array((
+        (174.731903, -72.989276),
+        (-70.77748, -53.08311),
+        (-72.252011, 215.281501),
+        (129.021448, 126.809651),
+        (106.16622, 28.016086),
+        (216.756032, 22.117962),
+        (174.731903, -72.989276),
+    ))
+    polygon_b = Polygon2D.from_array((
+        (-169.571046, -98.793566),
+        (-145.241287, 63.404826),
+        (11.796247, 34.651475),
+        (8.10992, -129.758713),
+        (-76.675603, -216.018767),
+        (-169.571046, -98.793566),
+    ))
+
+    polygon_xor = polygon_a.boolean_xor(polygon_b, 0.01)
+    assert len(polygon_xor) == 1
+    assert len(polygon_xor[0].vertices) == 15
+
+
+def test_boolean_difference():
+    """Test the boolean_difference method."""
+    polygon_a = Polygon2D.from_array((
+        (704.237624, 311.067429),
+        (585.714469, 165.25985),
+        (580.737459, -21.556226),
+        (825.140768, -42.669151),
+        (939.27375, 202.801646),
+        (907.837171, 299.649899),
+        (704.237624, 311.067429),
+    ))
+    polygon_b = Polygon2D.from_array((
+        (594.128232, 182.178958),
+        (756.152613, 106.844841),
+        (746.79128, 86.711012),
+        (578.739333, 91.188122),
+        (578.55291, 84.190605),
+        (675.400366, 81.61047),
+        (672.301879, -34.693726),
+        (679.299396, -34.880148),
+        (682.397883, 81.424047),
+        (743.575274, 79.794206),
+        (690.277317, -34.836039),
+        (696.624755, -37.787315),
+        (734.822854, 44.367006),
+        (846.894657, -7.741389),
+        (849.845932, -1.393951),
+        (737.77413, 50.714444),
+        (762.500051, 103.893565),
+        (874.571854, 51.78517),
+        (877.52313, 58.132608),
+        (783.385268, 101.90252),
+        (829.5314, 201.151025),
+        (923.669263, 157.381114),
+        (926.620539, 163.728552),
+        (832.482676, 207.498464),
+        (877.836304, 305.042494),
+        (871.488866, 307.99377),
+        (826.135238, 210.449739),
+        (764.596157, 239.06267),
+        (797.371861, 309.554808),
+        (791.024422, 312.506084),
+        (743.402652, 210.083859),
+        (649.930725, 253.54414),
+        (646.97945, 247.196702),
+        (740.451376, 203.736421),
+        (709.151311, 136.418002),
+        (597.079508, 188.526396),
+        (594.128232, 182.178958),
+    ))
+
+    polygon_difference = polygon_a.boolean_difference(polygon_b, 0.01)
+    assert len(polygon_difference) == 10
