@@ -900,3 +900,35 @@ def test_boolean_difference():
 
     polygon_difference = polygon_a.boolean_difference(polygon_b, 0.01)
     assert len(polygon_difference) == 10
+
+
+def test_boolean_split():
+    """Test the boolean_split method."""
+    polygon_a = Polygon2D.from_array((
+        (174.731903, -72.989276),
+        (-70.77748, -53.08311),
+        (-72.252011, 215.281501),
+        (129.021448, 126.809651),
+        (106.16622, 28.016086),
+        (216.756032, 22.117962),
+        (174.731903, -72.989276),
+    ))
+    polygon_b = Polygon2D.from_array((
+        (-169.571046, -98.793566),
+        (-145.241287, 63.404826),
+        (11.796247, 34.651475),
+        (8.10992, -129.758713),
+        (-76.675603, -216.018767),
+        (-169.571046, -98.793566),
+    ))
+
+    poly_int, poly1_dif, poly2_dif = \
+        Polygon2D.boolean_split(polygon_a, polygon_b, 0.01)
+    assert len(poly_int) == 1
+    assert len(poly_int[0].vertices) == 4
+
+    assert len(poly1_dif) == 1
+    assert len(poly1_dif[0].vertices) == 8
+
+    assert len(poly2_dif) == 1
+    assert len(poly2_dif[0].vertices) == 7

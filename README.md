@@ -48,31 +48,32 @@ sphinx-build -b html ./docs ./docs/_build/docs
 
 ## Currently Supported Capabilities of this Library
 
-- Vector Math
-- Calculate Bounding Box (Min, Max, Center)
+- Vector Math (Dot, Cross, Angle, Normalize)
+- Calculate Bounding Box for any Geometry (Min, Max, Center)
 - Compute Area + Perimeter of Planar Geometry
 - Check Concavity and Clockwise Ordering of 2D Geometry
 - Triangulate Planar Geometry
-- Compute Triangle + Quad Areas, Centroids, and Normals
-- Move Geometry
-- Rotate Geometry Around an Axis
-- Mirror Geometry
-- Scale Geometry from a Base Point
-- Is Point Inside 2D Polygon
+- Compute Mesh Face Areas, Centroids, and Normals
+- Move Any Geometry
+- Rotate Any Geometry Around an Axis
+- Mirror (Reflect) Any Geometry Over a Plane
+- Scale Any Geometry from a Base Point
+- Is 2D Point Inside 2D Polygon
+- Compute Pole of Inaccessibility for any 2D Polygon
+- 2D Polygon Boolean Operations (Union, Intersection, Difference)
+- Intersect 2D Colinear Polygon Segments with one Another (for matching lengths)
+- Join Line Segments into Polylines
+- 3D Face Plane and Normal Calculation from Vertices
 - 3D Face Intersection with a Ray or Line
-- Mesh Grid Generation from a 3D Face
-- Windows Based on Ratio with a Face
-- Solve Adjacencies
-- Generate Louvers, Fins and Overhangs from a Face
+- Quad Mesh Grid Generation from a 3D Face
+- Sub-faces Based on Ratio with a Face (used for window generation)
+- Contours and Contour Fins from a Face (used to generate louvers, fins and overhangs)
+- Split 3D Coplanar Faces with one Another (for matching areas)
+- Solve Adjacencies by Matching Face Geometries
+- Join Faces into Polyfaces
 - Check if a 3D PolyFace is a Closed Solid
-- Ensure All Faces of a Solid PolyFace are Point Outwards
-- Join Polylines and Polyfaces
+- Ensure All Faces of a Solid PolyFace Point Outwards
 - Check if a Point is Inside a Closed 3D Polyface
-- Boolean a Set of 2D Curves (joining the naked edges around them)
-
-## Capabilities that should eventually be a part of this library
-
-- [ ] Create Matching Zone Surfaces (intersection of surfaces with one another). OpenStudio's boost geometry has methods for this [as @saeranv shows here](https://github.com/mostaphaRoudsari/honeybee/issues/700)
 
 ## Officially Unsupported Capabilities for which One Must Rely on CAD Interfaces
 

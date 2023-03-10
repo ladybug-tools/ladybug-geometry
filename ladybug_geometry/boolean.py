@@ -5,8 +5,7 @@ The functions here are derived from the pypolybool python library available at
 https://github.com/KaivnD/pypolybool
 
 The pypolybool library is, itself, a pure Python port of the polybooljs JavaScript
-library maintained by Sean Mconnelly available at
-https://github.com/velipso/polybooljs
+library maintained by Sean Mconnelly available at https://github.com/velipso/polybooljs
 
 Full documentation of the method is available at
 https://sean.cm/a/polygon-clipping-pt2
@@ -24,20 +23,21 @@ from __future__ import division
 """____________OBJECTS FOR INPUT/OUTPUT FROM BOOLEAN OPERATIONS____________"""
 
 
-class Point:
-    def __init__(self, x, y):
-        """Point class used in polygon boolean operations.
+class BooleanPoint:
+    """2D Point class used in polygon boolean operations.
 
-        Args:
-            x: Float for X coordinate.
-            y: Float for Y coordinate
-        """
+    Args:
+        x: Float for X coordinate.
+        y: Float for Y coordinate
+    """
+
+    def __init__(self, x, y):
         self.x = x
         self.y = y
 
     def is_equivalent(self, other_pt, tol):
         """Check if this point is equivalent ot another within tolerance."""
-        if not isinstance(other_pt, Point):
+        if not isinstance(other_pt, BooleanPoint):
             return False
         return abs(self.x - other_pt.x) < tol and abs(self.y - other_pt.y) < tol
 
@@ -61,13 +61,13 @@ class Point:
         return -1 if pt1.x < pt2.x else 1
 
     @staticmethod
-    def pointAboveOrOnLine(point, left, right, tolerance):
+    def point_above_or_on_line(point, left, right, tolerance):
         """Get a boolean for whether a point is above or on a line.
 
         Args:
-            point: Point to be evaluated.
-            left: Point for the left of the line segment.
-            right: Point for the right of the line segment
+            point: BooleanPoint to be evaluated.
+            left: BooleanPoint for the left of the line segment.
+            right: BooleanPoint for the right of the line segment
         """
         return (right.x - left.x) * (point.y - left.y) - (right.y - left.y) * (
             point.x - left.x
@@ -78,9 +78,9 @@ class Point:
         """Get a boolean for whether a point is between two points.
 
         Args:
-            point: Point to be evaluated.
-            left: Point for the left.
-            right: Point for the right.
+            point: BooleanPoint to be evaluated.
+            left: BooleanPoint for the left.
+            right: BooleanPoint for the right.
         """
         dPyLy = point.y - left.y
         dRxLx = right.x - left.x
@@ -98,14 +98,14 @@ class Point:
         return True
 
     @staticmethod
-    def linesIntersect(a0, a1, b0, b1, tolerance):
-        """Get an IntersectionPoint object for the intersection of two line segments.
+    def _lines_intersect(a0, a1, b0, b1, tolerance):
+        """Get an _IntersectionPoint object for the intersection of two line segments.
 
         Args:
-            a0: Point for the first point of the first line segment.
-            a1: Point for the second point of the first line segment.
-            b0: Point for the first point of the second line segment.
-            b1: Point for the second point of the second line segment.
+            a0: BooleanPoint for the first point of the first line segment.
+            a1: BooleanPoint for the second point of the first line segment.
+            b0: BooleanPoint for the first point of the second line segment.
+            b1: BooleanPoint for the second point of the second line segment.
         """
         adx = a1.x - a0.x
         ady = a1.y - a0.y
@@ -123,14 +123,14 @@ class Point:
         a = (bdx * dy - bdy * dx) / axb
         b = (adx * dy - ady * dx) / axb
 
-        return IntersectionPoint(
-            Point.__calcAlongUsingValue(a, tolerance),
-            Point.__calcAlongUsingValue(b, tolerance),
-            Point(a0.x + a * adx, a0.y + a * ady),
+        return _IntersectionPoint(
+            BooleanPoint.__calc_along_using_value(a, tolerance),
+            BooleanPoint.__calc_along_using_value(b, tolerance),
+            BooleanPoint(a0.x + a * adx, a0.y + a * ady),
         )
 
     @staticmethod
-    def __calcAlongUsingValue(value, tolerance):
+    def __calc_along_using_value(value, tolerance):
         if value <= -tolerance:
             return -2
         elif value < tolerance:
@@ -153,39 +153,39 @@ class BooleanPolygon:
     """Polygon class used in polygon boolean operations.
 
     Args:
-        regions: A list of lists of tuples representing the 2D points defining
+        regions: A list of lists of BooleanPoints representing the 2D points defining
             the regions of the Polygon. The first sub-list is typically the
             boundary of the polygon and each successive list represents a hole
             within the boundary. It is also permissable for the holes
             to lie outside the first polygon, in which case the shape is
-            interpreted as a MultiPolygon. Each tuple should contain two float
-            values for the X and Y coordinates of each vertex. As an alternative
-            to tuples with two values, BooleanPoints can be used since this is
-            what is used internally in this module.
-        isInverted: A boolean for whether the Polygon is inverted or
-            not. (Default: False)
+            interpreted as a MultiPolygon. As an alternative to BooleanPoints,
+            tuples of two float values are also permissable in which case the
+            values represent the X and Y coordinates of each vertex.
+        is_inverted: A boolean for whether the Polygon is inverted or not. For
+            polygons input to the boolean methods, this value should always be
+            False. (Default: False)
     """
 
-    def __init__(self, regions, isInverted=False):
+    def __init__(self, regions, is_inverted=False):
         _regions = []
         for region in regions:
             tmp = []
             for pt in region:
-                if isinstance(pt, Point):
+                if isinstance(pt, BooleanPoint):
                     tmp.append(pt)
                 elif isinstance(pt, tuple):
                     x, y = pt
-                    tmp.append(Point(x, y))
+                    tmp.append(BooleanPoint(x, y))
             _regions.append(tmp)
 
         self.regions = _regions
-        self.isInverted = isInverted
+        self.is_inverted = is_inverted
 
 
 """____________PRIMARY COMPUTATION CLASSES AND METHODS____________"""
 
 
-class Fill:
+class _Fill:
     def __init__(self, below=None, above=None):
         self.below = below
         self.above = above
@@ -197,7 +197,7 @@ class Fill:
         return "{},{}".format(self.above, self.below)
 
 
-class Segment:
+class _Segment:
     def __init__(self, start, end, myfill=None, otherfill=None):
         self.start = start
         self.end = end
@@ -211,34 +211,34 @@ class Segment:
         return "S: {}, E: {}".format(self.start, self.end)
 
 
-class PolySegments:
-    def __init__(self, segments=None, isInverted=False):
+class _PolySegments:
+    def __init__(self, segments=None, is_inverted=False):
         self.segments = segments
-        self.isInverted = isInverted
+        self.is_inverted = is_inverted
 
 
-class CombinedPolySegments:
-    def __init__(self, combined=None, isInverted1=False, isInverted2=False):
+class _CombinedPolySegments:
+    def __init__(self, combined=None, is_inverted1=False, is_inverted2=False):
         self.combined = combined
-        self.isInverted1 = isInverted1
-        self.isInverted2 = isInverted2
+        self.is_inverted1 = is_inverted1
+        self.is_inverted2 = is_inverted2
 
 
-class Matcher:
+class _Matcher:
     def __init__(self, index, matchesHead, matchesPt1):
         self.index = index
         self.matchesHead = matchesHead
         self.matchesPt1 = matchesPt1
 
 
-class IntersectionPoint:
+class _IntersectionPoint:
     def __init__(self, alongA, alongB, pt):
         self.alongA = alongA
         self.alongB = alongB
         self.pt = pt
 
 
-class Node:
+class _Node:
     def __init__(
         self, isRoot=False, isStart=False, pt=None, seg=None, primary=False,
         next=None, previous=None, other=None, ev=None, status=None, remove=None,
@@ -256,16 +256,16 @@ class Node:
         self.primary = primary
 
 
-class Transition:
+class _Transition:
     def __init__(self, after, before, insert):
         self.after = after
         self.before = before
         self.insert = insert
 
 
-class LinkedList:
+class _LinkedList:
     def __init__(self):
-        self.__root = Node(isRoot=True)
+        self.__root = _Node(isRoot=True)
 
     def exists(self, node):
         if node is None or node is self.__root:
@@ -313,7 +313,7 @@ class LinkedList:
                 here.previous = node
             return node
 
-        return Transition(
+        return _Transition(
             before=(None if previous is self.__root else previous),
             after=here,
             insert=insert_func,
@@ -335,24 +335,24 @@ class LinkedList:
         return data
 
 
-class Intersecter:
+class _Intersecter:
     """Primary intersection class."""
 
     def __init__(self, selfIntersection, tol):
         self.selfIntersection = selfIntersection
         self.tol = tol
-        self.__eventRoot = LinkedList()
+        self.__eventRoot = _LinkedList()
 
     def newsegment(self, start, end):
-        return Segment(start=start, end=end, myfill=Fill())
+        return _Segment(start=start, end=end, myfill=_Fill())
 
     def segmentCopy(self, start, end, seg):
-        return Segment(
-            start=start, end=end, myfill=Fill(seg.myfill.below, seg.myfill.above)
+        return _Segment(
+            start=start, end=end, myfill=_Fill(seg.myfill.below, seg.myfill.above)
         )
 
     def __eventCompare(self, p1IsStart, p11, p12, p2IsStart, p21, p22):
-        comp = Point.compare(p11, p21, self.tol)
+        comp = BooleanPoint.compare(p11, p21, self.tol)
         if comp != 0:
             return comp
 
@@ -364,7 +364,7 @@ class Intersecter:
 
         return (
             1
-            if Point.pointAboveOrOnLine(
+            if BooleanPoint.point_above_or_on_line(
                 p12, p21 if p2IsStart else p22, p22 if p2IsStart else p21, self.tol
             )
             else -1
@@ -380,8 +380,8 @@ class Intersecter:
         self.__eventRoot.insertBefore(ev, check_func)
 
     def __eventAddSegmentStart(self, segment, primary):
-        evStart = LinkedList.node(
-            Node(
+        evStart = _LinkedList.node(
+            _Node(
                 isStart=True,
                 pt=segment.start,
                 seg=segment,
@@ -392,8 +392,8 @@ class Intersecter:
         return evStart
 
     def __eventAddSegmentEnd(self, evStart, segment, primary):
-        evEnd = LinkedList.node(
-            Node(
+        evEnd = _LinkedList.node(
+            _Node(
                 isStart=False,
                 pt=segment.end,
                 seg=segment,
@@ -426,11 +426,11 @@ class Intersecter:
         b1 = ev2.seg.start
         b2 = ev2.seg.end
 
-        if Point.collinear(a1, b1, b2, self.tol):
-            if Point.collinear(a2, b1, b2, self.tol):
+        if BooleanPoint.collinear(a1, b1, b2, self.tol):
+            if BooleanPoint.collinear(a2, b1, b2, self.tol):
                 return 1
-            return 1 if Point.pointAboveOrOnLine(a2, b1, b2, self.tol) else -1
-        return 1 if Point.pointAboveOrOnLine(a1, b1, b2, self.tol) else -1
+            return 1 if BooleanPoint.point_above_or_on_line(a2, b1, b2, self.tol) else -1
+        return 1 if BooleanPoint.point_above_or_on_line(a1, b1, b2, self.tol) else -1
 
     def __statusFindSurrounding(self, statusRoot, ev):
         def check_func(here):
@@ -446,9 +446,9 @@ class Intersecter:
         b1 = seg2.start
         b2 = seg2.end
 
-        i = Point.linesIntersect(a1, a2, b1, b2, self.tol)
+        i = BooleanPoint._lines_intersect(a1, a2, b1, b2, self.tol)
         if i is None:
-            if not Point.collinear(a1, a2, b1, self.tol):
+            if not BooleanPoint.collinear(a1, a2, b1, self.tol):
                 return None
             if a1.is_equivalent(b2, self.tol) or a2.is_equivalent(b1, self.tol):
                 return None
@@ -457,8 +457,8 @@ class Intersecter:
             if a1EquB1 and a2EquB2:
                 return ev2
 
-            a1Between = not a1EquB1 and Point.between(a1, b1, b2, self.tol)
-            a2Between = not a2EquB2 and Point.between(a2, b1, b2, self.tol)
+            a1Between = not a1EquB1 and BooleanPoint.between(a1, b1, b2, self.tol)
+            a2Between = not a2EquB2 and BooleanPoint.between(a2, b1, b2, self.tol)
 
             if a1EquB1:
                 if a2Between:
@@ -502,7 +502,7 @@ class Intersecter:
         return None
 
     def calculate(self, primaryPolyInverted, secondaryPolyInverted):
-        statusRoot = LinkedList()
+        statusRoot = _LinkedList()
         segments = []
 
         cnt = 0
@@ -566,8 +566,8 @@ class Intersecter:
                                 inside = below.seg.otherfill.above
                             else:
                                 inside = below.seg.myfill.above
-                        ev.seg.otherfill = Fill(inside, inside)
-                ev.other.status = surrounding.insert(LinkedList.node(Node(ev=ev)))
+                        ev.seg.otherfill = _Fill(inside, inside)
+                ev.other.status = surrounding.insert(_LinkedList.node(_Node(ev=ev)))
             else:
                 st = ev.status
                 if st is None:
@@ -588,16 +588,16 @@ class Intersecter:
         return segments
 
 
-class RegionIntersecter(Intersecter):
+class _RegionIntersecter(_Intersecter):
     def __init__(self, tol):
-        Intersecter.__init__(self, True, tol)
+        _Intersecter.__init__(self, True, tol)
 
     def addRegion(self, region):
         pt2 = region[-1]
         for i in range(len(region)):
             pt1 = pt2
             pt2 = region[i]
-            forward = Point.compare(pt1, pt2, self.tol)
+            forward = BooleanPoint.compare(pt1, pt2, self.tol)
 
             if forward == 0:
                 continue
@@ -609,15 +609,15 @@ class RegionIntersecter(Intersecter):
             self.eventAddSegment(seg, True)
 
     def calculate(self, inverted):
-        return Intersecter.calculate(self, inverted, False)
+        return _Intersecter.calculate(self, inverted, False)
 
 
-class SegmentIntersecter(Intersecter):
+class _SegmentIntersecter(_Intersecter):
     def __init__(self, tol):
-        Intersecter.__init__(self, False, tol)
+        _Intersecter.__init__(self, False, tol)
 
     def calculate(
-        self, segments1, isInverted1, segments2, isInverted2
+        self, segments1, is_inverted1, segments2, is_inverted2
     ):
         for seg in segments1:
             self.eventAddSegment(self.segmentCopy(seg.start, seg.end, seg), True)
@@ -625,13 +625,13 @@ class SegmentIntersecter(Intersecter):
         for seg in segments2:
             self.eventAddSegment(self.segmentCopy(seg.start, seg.end, seg), False)
 
-        return Intersecter.calculate(self, isInverted1, isInverted2)
+        return _Intersecter.calculate(self, is_inverted1, is_inverted2)
 
 
-class SegmentChainerMatcher:
+class _SegmentChainerMatcher:
     def __init__(self):
-        self.firstMatch = Matcher(0, False, False)
-        self.secondMatch = Matcher(0, False, False)
+        self.firstMatch = _Matcher(0, False, False)
+        self.secondMatch = _Matcher(0, False, False)
 
         self.nextMatch = self.firstMatch
 
@@ -646,23 +646,23 @@ class SegmentChainerMatcher:
         return True
 
 
-def list_shift(list):
+def _list_shift(list):
     list.pop(0)
 
 
-def list_pop(list):
+def _list_pop(list):
     list.pop()
 
 
-def list_splice(list, index, count):
+def _list_splice(list, index, count):
     del list[index: index + count]
 
 
-def list_unshift(list, element):
+def _list_unshift(list, element):
     list.insert(0, element)
 
 
-def segmentChainer(segments, tol):
+def _segmentChainer(segments, tol):
     regions = []
     chains = []
 
@@ -672,7 +672,7 @@ def segmentChainer(segments, tol):
         if pt1.is_equivalent(pt2, tol):
             continue
 
-        scm = SegmentChainerMatcher()
+        scm = _SegmentChainerMatcher()
 
         for i in range(len(chains)):
             chain = chains[i]
@@ -707,23 +707,23 @@ def segmentChainer(segments, tol):
             oppo = chain[-1] if addToHead else chain[0]
             oppo2 = chain[-2] if addToHead else chain[1]
 
-            if Point.collinear(grow2, grow, pt, tol):
+            if BooleanPoint.collinear(grow2, grow, pt, tol):
                 if addToHead:
-                    list_shift(chain)
+                    _list_shift(chain)
                 else:
-                    list_pop(chain)
+                    _list_pop(chain)
                 grow = grow2
             if oppo.is_equivalent(pt, tol):
-                list_splice(chains, index, 1)
-                if Point.collinear(oppo2, oppo, grow, tol):
+                _list_splice(chains, index, 1)
+                if BooleanPoint.collinear(oppo2, oppo, grow, tol):
                     if addToHead:
-                        list_pop(chain)
+                        _list_pop(chain)
                     else:
-                        list_shift(chain)
+                        _list_shift(chain)
                 regions.append(chain)
                 continue
             if addToHead:
-                list_unshift(chain, pt)
+                _list_unshift(chain, pt)
             else:
                 chain.append(pt)
             continue
@@ -739,14 +739,14 @@ def segmentChainer(segments, tol):
             head = chain2[0]
             head2 = chain2[1]
 
-            if Point.collinear(tail2, tail, head, tol):
-                list_pop(chain1)
+            if BooleanPoint.collinear(tail2, tail, head, tol):
+                _list_pop(chain1)
                 tail = tail2
-            if Point.collinear(tail, head, head2, tol):
-                list_shift(chain2)
+            if BooleanPoint.collinear(tail, head, head2, tol):
+                _list_shift(chain2)
 
             chains[index1] = chain1 + chain2
-            list_splice(chains, index2, 1)
+            _list_splice(chains, index2, 1)
 
         f = scm.firstMatch.index
         s = scm.secondMatch.index
@@ -788,10 +788,10 @@ def __select(segments, selection):
 
         if selection[index] != 0:
             result.append(
-                Segment(
+                _Segment(
                     start=seg.start,
                     end=seg.end,
-                    myfill=Fill(selection[index] == 2, above=selection[index] == 1),
+                    myfill=_Fill(selection[index] == 2, above=selection[index] == 1),
                 )
             )
     return result
@@ -800,30 +800,41 @@ def __select(segments, selection):
 """____________CORE INTERFACE FOR MANAGING INTERSECTIONS____________"""
 
 
-def segments(poly, tol):
-    """Get the intersected segments of a BooleanPolygon."""
-    i = RegionIntersecter(tol)
+def _segments(poly, tol):
+    """Get the intersected PolySegments of a BooleanPolygon.
+
+    Args:
+        poly: A BooleanPolygon for which PolySegments will be computed.
+        tol: The intersection tolerance.
+    """
+    i = _RegionIntersecter(tol)
     for region in poly.regions:
         i.addRegion(region)
-    return PolySegments(i.calculate(poly.isInverted), poly.isInverted)
+    return _PolySegments(i.calculate(poly.is_inverted), poly.is_inverted)
 
 
-def combine(segments1, segments2, tol):
-    """Combine intersected segments."""
-    i = SegmentIntersecter(tol)
-    return CombinedPolySegments(
+def _combine(segments1, segments2, tol):
+    """Combine intersected PolySegments into a CombinedPolySegments object.
+
+    Args:
+        segments1: The first PolySegments object to be combined.
+        segments2: The second PolySegments to be combined.
+        tol: The intersection tolerance.
+    """
+    i = _SegmentIntersecter(tol)
+    return _CombinedPolySegments(
         i.calculate(
             segments1.segments,
-            segments1.isInverted,
+            segments1.is_inverted,
             segments2.segments,
-            segments2.isInverted,
+            segments2.is_inverted,
         ),
-        segments1.isInverted,
-        segments2.isInverted,
+        segments1.is_inverted,
+        segments2.is_inverted,
     )
 
 
-def selectUnion(polyseg):
+def _select_union(polyseg):
     """Select the union from the PolySegments.
 
     above1 below1 above2 below2    Keep?               Value
@@ -844,7 +855,7 @@ def selectUnion(polyseg):
       1      1      1      0   =>   no                  0
       1      1      1      1   =>   no                  0
     """
-    return PolySegments(
+    return _PolySegments(
         segments=__select(
             # fmt:off
             polyseg.combined, [
@@ -855,11 +866,11 @@ def selectUnion(polyseg):
             ]
             # fmt:on
         ),
-        isInverted=(polyseg.isInverted1 or polyseg.isInverted2),
+        is_inverted=(polyseg.is_inverted1 or polyseg.is_inverted2),
     )
 
 
-def selectIntersect(polyseg):
+def _select_intersect(polyseg):
     """Select the intersection from the PolySegments.
 
     above1 below1 above2 below2    Keep?               Value
@@ -880,7 +891,7 @@ def selectIntersect(polyseg):
       1      1      1      0   =>   yes filled above    1
       1      1      1      1   =>   no                  0
     """
-    return PolySegments(
+    return _PolySegments(
         segments=__select(
             # fmt:off
             polyseg.combined, [
@@ -891,11 +902,11 @@ def selectIntersect(polyseg):
             ]
             # fmt:on
         ),
-        isInverted=(polyseg.isInverted1 and polyseg.isInverted2),
+        is_inverted=(polyseg.is_inverted1 and polyseg.is_inverted2),
     )
 
 
-def selectDifference(polyseg):
+def _select_difference(polyseg):
     """Select the difference from the PolySegments.
 
     above1 below1 above2 below2    Keep?               Value
@@ -916,7 +927,7 @@ def selectDifference(polyseg):
       1      1      1      0   =>   yes filled below    2
       1      1      1      1   =>   no                  0
     """
-    return PolySegments(
+    return _PolySegments(
         segments=__select(
             # fmt:off
             polyseg.combined, [
@@ -927,11 +938,11 @@ def selectDifference(polyseg):
             ]
             # fmt:on
         ),
-        isInverted=(polyseg.isInverted1 and not polyseg.isInverted2),
+        is_inverted=(polyseg.is_inverted1 and not polyseg.is_inverted2),
     )
 
 
-def selectDifferenceRev(polyseg):
+def _select_difference_rev(polyseg):
     """Select the reversed difference from the PolySegments.
 
     above1 below1 above2 below2    Keep?               Value
@@ -952,7 +963,7 @@ def selectDifferenceRev(polyseg):
       1      1      1      0   =>   no                  0
       1      1      1      1   =>   no                  0
     """
-    return PolySegments(
+    return _PolySegments(
         segments=__select(
             # fmt:off
             polyseg.combined, [
@@ -963,11 +974,11 @@ def selectDifferenceRev(polyseg):
             ]
             # fmt:on
         ),
-        isInverted=(not polyseg.isInverted1 and polyseg.isInverted2),
+        is_inverted=(not polyseg.is_inverted1 and polyseg.is_inverted2),
     )
 
 
-def selectXor(polyseg):
+def _select_xor(polyseg):
     """Select the exclusive disjunction from the PolySegments.
 
     above1 below1 above2 below2    Keep?               Value
@@ -988,7 +999,7 @@ def selectXor(polyseg):
       1      1      1      0   =>   yes filled below    2
       1      1      1      1   =>   no                  0
     """
-    return PolySegments(
+    return _PolySegments(
         segments=__select(
             # fmt:off
             polyseg.combined, [
@@ -999,20 +1010,20 @@ def selectXor(polyseg):
             ]
             # fmt:on
         ),
-        isInverted=(polyseg.isInverted1 != polyseg.isInverted2),
+        is_inverted=(polyseg.is_inverted1 != polyseg.is_inverted2),
     )
 
 
-def polygon(segments, tol):
-    return BooleanPolygon(segmentChainer(segments.segments, tol), segments.isInverted)
+def _polygon(segments, tol):
+    return BooleanPolygon(_segmentChainer(segments.segments, tol), segments.is_inverted)
 
 
 def __operate(poly1, poly2, selector, tol):
-    firstPolygonRegions = segments(poly1, tol)
-    secondPolygonRegions = segments(poly2, tol)
-    combinedSegments = combine(firstPolygonRegions, secondPolygonRegions, tol)
+    firstPolygonRegions = _segments(poly1, tol)
+    secondPolygonRegions = _segments(poly2, tol)
+    combinedSegments = _combine(firstPolygonRegions, secondPolygonRegions, tol)
     seg = selector(combinedSegments)
-    return polygon(seg, tol)
+    return _polygon(seg, tol)
 
 
 """____________PUBLIC FUNCTIONS FOR BOOLEAN OPERATIONS____________"""
@@ -1033,12 +1044,12 @@ def union_all(polygons, tolerance):
     Returns:
         A BooleanPolygon for the union across all of the input polygons.
     """
-    seg1 = segments(polygons[0], tolerance)
+    seg1 = _segments(polygons[0], tolerance)
     for i in range(1, len(polygons)):
-        seg2 = segments(polygons[i], tolerance)
-        comb = combine(seg1, seg2, tolerance)
-        seg1 = selectUnion(comb)
-    return polygon(seg1, tolerance)
+        seg2 = _segments(polygons[i], tolerance)
+        comb = _combine(seg1, seg2, tolerance)
+        seg1 = _select_union(comb)
+    return _polygon(seg1, tolerance)
 
 
 def intersect_all(polygons, tolerance):
@@ -1057,12 +1068,50 @@ def intersect_all(polygons, tolerance):
     Returns:
         A BooleanPolygon for the intersection across all of the input polygons.
     """
-    seg1 = segments(polygons[0], tolerance)
+    seg1 = _segments(polygons[0], tolerance)
     for i in range(1, len(polygons)):
-        seg2 = segments(polygons[i], tolerance)
-        comb = combine(seg1, seg2, tolerance)
-        seg1 = selectIntersect(comb)
-    return polygon(seg1, tolerance)
+        seg2 = _segments(polygons[i], tolerance)
+        comb = _combine(seg1, seg2, tolerance)
+        seg1 = _select_intersect(comb)
+    return _polygon(seg1, tolerance)
+
+
+def split(poly1, poly2, tolerance):
+    """Split two BooleanPolygons with one another to get the intersection and difference.
+
+    Using this method is more computationally efficient than calling the intersect()
+    and difference() methods individually as this method will only compute the
+    intersection of the segments once.
+
+    Args:
+        poly1: A BooleanPolygon for the first polygon that will be split with
+            the second polygon.
+        poly2: A BooleanPolygon for the second polygon that will be split with
+            the first polygon.
+        tolerance: The minimum distance between points before they are
+            considered distinct from one another.
+
+    Returns:
+        A tuple with three elements
+
+        -   intersection: A BooleanPolygon for the intersection of the two
+            input polygons.
+
+        -   poly1_difference: A BooleanPolygon for the portion of poly1 that does
+            not overlap with poly2. When combined with the intersection, this
+            makes a split version of poly1.
+
+        -   poly2_difference: A BooleanPolygon for the portion of poly2 that does
+            not overlap with poly1. When combined with the intersection, this
+            makes a split version of poly2.
+    """
+    first_regions = _segments(poly1, tolerance)
+    second_regions = _segments(poly2, tolerance)
+    comb = _combine(first_regions, second_regions, tolerance)
+    intersection = _polygon(_select_intersect(comb), tolerance)
+    poly1_difference = _polygon(_select_difference(comb), tolerance)
+    poly2_difference = _polygon(_select_difference_rev(comb), tolerance)
+    return intersection, poly1_difference, poly2_difference
 
 
 def union(poly1, poly2, tolerance):
@@ -1081,7 +1130,7 @@ def union(poly1, poly2, tolerance):
     Returns:
         A BooleanPolygon for the union of the two polygons.
     """
-    return __operate(poly1, poly2, selectUnion, tolerance)
+    return __operate(poly1, poly2, _select_union, tolerance)
 
 
 def intersect(poly1, poly2, tolerance):
@@ -1098,7 +1147,7 @@ def intersect(poly1, poly2, tolerance):
     Returns:
         A BooleanPolygon for the intersection of the two polygons.
     """
-    return __operate(poly1, poly2, selectIntersect, tolerance)
+    return __operate(poly1, poly2, _select_intersect, tolerance)
 
 
 def difference(poly1, poly2, tolerance):
@@ -1113,7 +1162,7 @@ def difference(poly1, poly2, tolerance):
     Returns:
         A BooleanPolygon for the difference of poly1 - poly2.
     """
-    return __operate(poly1, poly2, selectDifference, tolerance)
+    return __operate(poly1, poly2, _select_difference, tolerance)
 
 
 def difference_reversed(poly1, poly2, tolerance):
@@ -1128,7 +1177,7 @@ def difference_reversed(poly1, poly2, tolerance):
     Returns:
         A BooleanPolygon for the difference of poly2 - poly1.
     """
-    return __operate(poly1, poly2, selectDifferenceRev, tolerance)
+    return __operate(poly1, poly2, _select_difference_rev, tolerance)
 
 
 def xor(poly1, poly2, tolerance):
@@ -1153,4 +1202,4 @@ def xor(poly1, poly2, tolerance):
     Returns:
         A BooleanPolygon for the exclusive disjunction of the two polygons.
     """
-    return __operate(poly1, poly2, selectXor, tolerance)
+    return __operate(poly1, poly2, _select_xor, tolerance)
