@@ -1,6 +1,10 @@
 # coding=utf-8
 """Planar Face in 3D Space"""
 from __future__ import division
+import math
+import sys
+if (sys.version_info > (3, 0)):  # python 3
+    xrange = range
 
 from .pointvector import Point3D, Vector3D
 from .ray import Ray3D
@@ -16,10 +20,7 @@ from ..geometry2d.ray import Ray2D
 from ..geometry2d.polygon import Polygon2D
 from ..geometry2d.mesh import Mesh2D
 
-import math
-import sys
-if (sys.version_info > (3, 0)):  # python 3
-    xrange = range
+import ladybug_geometry.boolean as pb
 
 
 class Face3D(Base2DIn3D):
@@ -613,7 +614,7 @@ class Face3D(Base2DIn3D):
         Geometrical equivalence is defined as being coplanar with this face,
         having the same number of vertices, and having each vertex map-able between
         the faces. Clockwise relationships do not have to match nor does the normal
-        direction of the face.  However, all other properties must be matching to
+        direction of the face. However, all other properties must be matching to
         within the input tolerance.
 
         This is useful for identifying matching surfaces when solving for adjacency
@@ -701,6 +702,7 @@ class Face3D(Base2DIn3D):
                 vertices at which they can be considered equivalent.
             angle_tolerance: The max angle in radians that the plane normals can
                 differ from one another in order for them to be considered coplanar.
+
         Returns:
             True if it can be a valid sub-face. False if it is not a valid sub-face.
         """
@@ -1729,6 +1731,97 @@ class Face3D(Base2DIn3D):
             final_faces = [Face3D((seg.p2, seg.p1, seg.p1 + h_vec, seg.p2 + h_vec),
                                   base_plane)]
         return final_faces
+
+    @staticmethod
+    def coplanar_split(face1, face2, tolerance, angle_tolerance):
+        """Split two coplanar Face3D with one another (ensuring matching overlapped area)
+
+        When the faces are not coplanar or they do not overlap, the original
+        faces will be returned.
+
+        Args:
+            face1: A Face3D for the first face that will be split with the second face.
+            face2: A Face3D for the second face that will be split with the first face.
+            tolerance: The minimum distance between points before they are considered
+                distinct from one another.
+            angle_tolerance: The max angle in radians that the plane normals can
+                differ from one another in order for them to be considered coplanar.
+
+        Returns:
+            A tuple with two elements
+
+        -   face1_split: A list of Face3D for the split version of the input face1.
+
+        -   face2_split: A list of Face3D for the split version of the input face2.
+        """
+        # test whether the faces are coplanar
+        prim_pl = face1.plane
+        if not prim_pl.is_coplanar_tolerance(face2.plane, tolerance, angle_tolerance):
+            return [face1], [face2]
+        # test whether the two polygons have any overlap in 2D space
+        f1_poly = face1.boundary_polygon2d
+        f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
+        if not Polygon2D.overlapping_bounding_rect(f1_poly, f2_poly, tolerance):
+            return [face1], [face2]
+        # get BooleanPolygons of the two faces
+        f1_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f1_poly.vertices)]
+        f2_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f2_poly.vertices)]
+        if face1.has_holes:
+            for hole in face1.hole_polygon2d:
+                f1_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+        if face2.has_holes:
+            for hole in face2.holes:
+                h_pt2d = (prim_pl.xyz_to_xy(pt) for pt in hole)
+                f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in h_pt2d))
+        b_poly1 = pb.BooleanPolygon(f1_polys)
+        b_poly2 = pb.BooleanPolygon(f2_polys)
+        # split the two boolean polygons with one another
+        int_result, poly1_result, poly2_result = pb.split(b_poly1, b_poly2, tolerance)
+        # rebuild the Face3D from the results and return them
+        int_faces = Face3D._from_bool_poly(int_result, prim_pl)
+        poly1_faces = Face3D._from_bool_poly(poly1_result, prim_pl)
+        poly2_faces = Face3D._from_bool_poly(poly2_result, prim_pl)
+        face1_split = poly1_faces + int_faces
+        face2_split = poly2_faces + int_faces
+        return face1_split, face2_split
+
+    @staticmethod
+    def _from_bool_poly(bool_polygon, plane):
+        """Get a list of Face3D from a BooleanPolygon.
+
+        This method will automatically check whether any of the regions is meant
+        to be a hole within the others when it creates the Face3D.
+
+        Args:
+            bool_polygon: A BooleanPolygon to be interpreted to Face3D.
+            plane: The Plane in which the resulting Face3Ds exist.
+        """
+        # serialize the BooleanPolygon into Polygon2D
+        polys = [Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
+                 for new_poly in bool_polygon.regions]
+        if len(polys) == 0:
+            return []
+        if len(polys) == 1:
+            verts_3d = tuple(plane.xy_to_xyz(pt) for pt in polys[0].vertices)
+            return [Face3D(verts_3d, plane)]
+        # sort the polygons by area and check if any are inside the others
+        polys.sort(key=lambda x: x.area, reverse=True)
+        poly_groups = [[polys[0]]]
+        for sub_poly in polys[1:]:
+            for i, pg in enumerate(poly_groups):
+                if pg[0].is_polygon_inside(sub_poly):  # it's a hole
+                    poly_groups[i].append(sub_poly)
+                    break
+            else:  # it's a separate Face3D
+                poly_groups.append([sub_poly])
+        # convert all vertices to 3D and return the Face3D
+        face_3d = []
+        for pg in poly_groups:
+            pg_3d = []
+            for shp in pg:
+                pg_3d.append(tuple(plane.xy_to_xyz(pt) for pt in shp.vertices))
+            face_3d.append(Face3D(pg_3d[0], plane, holes=pg_3d[1:]))
+        return face_3d
 
     def to_dict(self, include_plane=True, enforce_upper_left=False):
         """Get Face3D as a dictionary.

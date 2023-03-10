@@ -1477,6 +1477,27 @@ def test_sub_faces_by_ratio_sub_rectangle_tol_issue():
         assert face_1.is_sub_face(sf, 0.01, 1)
 
 
+def test_coplanar_split():
+    """Test the coplanar_split_method."""
+    b_pts1 = (Point3D(-14.79, -36.61, 0.00), Point3D(6.68, -36.61, 0.00),
+              Point3D(6.68, -10.37, 0.00), Point3D(-14.79, -10.37, 0.00))
+    h_pts1 = (
+        (Point3D(-9.71, -22.66, 0.00), Point3D(-9.71, -16.19, 0.00),
+         Point3D(-5.01, -16.19, 0.00), Point3D(-5.01, -22.66, 0.00)),
+        (Point3D(0.31, -35.20, 0.00), Point3D(0.31, -29.89, 0.00),
+         Point3D(5.15, -29.89, 0.00), Point3D(5.15, -35.20, 0.00))
+    )
+    b_pts2 = (Point3D(-7.02, -32.34, 0.00), Point3D(13.23, -32.34, 0.00),
+              Point3D(13.23, -18.57, 0.00), Point3D(-7.02, -18.57, 0.00))
+    face1 = Face3D(b_pts1, holes=h_pts1)
+    face2 = Face3D(b_pts2)
+
+    split1, split2 = Face3D.coplanar_split(face1, face2, 0.01, 1)
+
+    assert len(split1) == 2
+    assert len(split2) == 4
+
+
 def test_extract_all_from_stl():
     file_path = 'tests/stl/cube_binary.stl'
     faces = Face3D.extract_all_from_stl(file_path)
