@@ -62,12 +62,12 @@ it returns consistent results between them (cPython 2 and 3, IronPython 2).
 This library was built by combining capabilities of several different open-source
 (MIT Licensed) projects, establishing a set of standardized geometry objects that
 allowed them all to talk to one another, and adding several other capabilities
-with new code. We as a community owe a huge amount of thanks to the open projects
+with new code. We as a community owe a huge amount of thanks to the open source projects
 that provided many of the starting capabilities of this package and we are indebted
-to the developers who made their work under an MIT license for the betterment of
-geometry computation everywhere. Where possible, you will find detailed lists of
-references in the docstrings of source code. A summary of the key packages that
-were used to build this library are as follows:
+to the developers who made their work available under an MIT license for the betterment
+of geometry computation everywhere. Where possible, you will find detailed lists of
+references in the docstrings of this package's source code. A summary of the key
+sources that were used to build this library are as follows:
 
 - [euclid](https://pypi.org/project/euclid/)
 - [earcut](https://github.com/mapbox/earcut) and [earcut-python](https://github.com/joshuaskelly/earcut-python)
@@ -86,14 +86,14 @@ in a dedicated core Python library like this one.
 As we developed the core libraries, it became clear that there are large advantages
 to having it in the core including:
 
-- Standardized compatibility of geometry between different CAD plugins (eg. Rhino, Revit) and simulation engines + file formats (eg. E+, Radiance, gbXML).
-- The ability to perform geometry operations from the CLI of the core libraries without the need for any CAD software.
-- Improved performance given that a dedicated library could be tailored to the geometric use cases of Ladybug Tools.
-- Reliability and maintain-ability in the face of changes to CAD environments and changing Python conventions.
+1. Standardized compatibility of geometry between different CAD plugins (eg. Rhino, Revit), simulation engines (eg. E+, Radiance), and file formats (eg. gbXML, GEM).
+2. The ability to perform geometry operations from the core library CLI without the need for CAD software.
+3. Improved performance (since a dedicated library could be tailored to the use cases of Ladybug Tools).
+4. Reliability and maintain-ability in the face of changes to CAD environments and changing Python conventions.
 
-The first and last items above proved to be particularly important and so the
-decision was made that the Ladybug Tools core libraries would have its own
-geometry library that was distinct from CAD plugins.
+Items 1 and 4 above proved to be particularly important and so the decision was made
+that the Ladybug Tools core libraries would have its own geometry library that was
+distinct from CAD plugins.
 
 Before committing to write our own library, we looked into using or tweaking other
 comprehensive open source geometry libraries for the core including:
@@ -103,19 +103,18 @@ comprehensive open source geometry libraries for the core including:
 - [Boost Geometry](https://www.boost.org/doc/libs/1_78_0/libs/geometry/doc/html/index.html)
 - [Topologic](https://topologic.app/Software/)
 
-However, Rhino3dm lacks basic types of computation that would needed in the core (like generating
-a grid of points from a surface). The Blender library had many capabilities that we needed but
-it only works in Python3 and this could break certain CAD workflows that rely on IronPython.
-Boost Geometry (the geometry library used by the OpenStudio SDK) also had a lot of
-functionality but it clearly has C dependencies, making it unusable from IronPython.
-Lastly, Topologic also appeared to have C dependencies, though the more relevant issue was
+However, Rhino3dm lacks basic geometry computation. The Blender library had many capabilities
+but it only works in Python3 and this could break certain CAD workflows that rely on
+IronPython. Boost Geometry (the geometry library used by the OpenStudio SDK) also had a
+lot of functionality but it clearly has C dependencies, making it unusable from IronPython.
+Topologic also appeared to have C dependencies, though the most relevant issue was
 that its dual license could create challenges for certain use cases of Ladybug Tools.
 
 After considering the situation further, we realized that many of the capabilities that
 we needed could be achieved by building off the work of various open source MIT-licensed
 projects as long as we committed to using planar geometry. Since all of the geometry
-ultimately going to the engines (Radiance, E+) is planar format anyway, we made
-the decision that the core libraries will primarily support planar objects with
+ultimately going to the engines (Radiance, E+) is planar, we made the decision that
+the core libraries will primarily support planar objects with no NURBS support and
 very limited support for Arcs, Circles, Spheres, Cylinders and Cones.
 
 Thus this repository was born!
