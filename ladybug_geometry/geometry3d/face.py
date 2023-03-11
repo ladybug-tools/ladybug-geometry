@@ -90,7 +90,7 @@ class Face3D(Base2DIn3D):
                  '_boundary_polygon2d', '_hole_polygon2d',
                  '_perimeter', '_area', '_centroid',
                  '_is_convex', '_is_self_intersecting')
-    HOLE_VERTEX_THRESHOLD = 100  # threshold at which faster hole merging method is used
+    HOLE_VERTEX_THRESHOLD = 400  # threshold at which faster hole merging method is used
 
     def __init__(self, boundary, plane=None, holes=None, enforce_right_hand=True):
         """Initialize Face3D."""

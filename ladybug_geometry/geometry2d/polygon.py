@@ -276,9 +276,17 @@ class Polygon2D(Base2DIn2D):
         start_i = outer_node.i
         vertices = [Point2D(outer_node.x, outer_node.y)]
         node = outer_node.next
+        node_counter, orig_start_i = 0, 0
         while node.i != start_i:
             vertices.append(Point2D(node.x, node.y))
+            node_counter += 1
+            if node.i == 0:
+                orig_start_i = node_counter
             node = node.next
+
+        # ensure that the starting vertex is the same as the input boundary
+        vertices = vertices[orig_start_i:] + vertices[:orig_start_i]
+        vertices[0] = boundary[0]  # this avoids issues of floating point tolerance
 
         # return the polygon with some properties set based on what we know
         _new_poly = cls(vertices)
