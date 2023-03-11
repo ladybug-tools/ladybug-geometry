@@ -313,6 +313,23 @@ def test_face3d_init_from_shape_with_holes():
     assert face.is_self_intersecting is False
 
 
+def test_face3d_shape_with_many_holes():
+    """Test Face3D from_shape_with_holes with a Face3D above the vertex threshold."""
+    geo_file = './tests/json/face_with_200_holes.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    face_geo = Face3D.from_dict(geo_dict)
+
+    v_count = len(face_geo.boundary)  # count the vertices for hole merging method
+    for h in face_geo.holes:
+        v_count += len(h)
+    assert v_count > face_geo.HOLE_VERTEX_THRESHOLD
+    assert len(face_geo.vertices) > v_count + len(face_geo.holes)
+
+    assert face_geo.boundary[0] == face_geo.vertices[0]
+    assert face_geo.area == pytest.approx(62.416884, rel=1e-4)
+
+
 def test_face3d_init_from_punched_geometry():
     """Test the initialization of Face3D from_shape_with_holes."""
     bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]

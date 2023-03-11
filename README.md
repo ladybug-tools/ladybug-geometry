@@ -8,14 +8,117 @@
 
 # ladybug-geometry
 
-Ladybug geometry is a Python library that houses geometry objects used throughout the
-Ladybug Tools core libraries.
+Ladybug geometry is a Python library that houses geometry objects and geometry
+computations methods used throughout the Ladybug Tools core libraries.
+
+The library is designed to work with a wide range of Python environments and
+it returns consistent results between them (cPython 2 and 3, IronPython 2).
 
 ## Installation
 
 `pip install -U ladybug-geometry`
 
 ## [API Documentation](https://www.ladybug.tools/ladybug-geometry/docs/)
+
+## Currently Supported Capabilities of this Library
+
+- Perform Vector Math (Dot, Cross, Angle, Normalize)
+- Calculate Bounding Box for any Geometry (Min, Max, Center)
+- Subdivide Lines and Arcs
+- Compute Perimeter and Area of Planar Geometry
+- Check Concavity and Clockwise Ordering of 2D Geometry
+- Triangulate Planar Geometry
+- Compute Mesh Face Areas, Centroids, and Normals
+- Move Any Geometry
+- Rotate Any Geometry Around an Axis
+- Mirror (Reflect) Any Geometry Over a Plane
+- Scale Any Geometry from a Base Point
+- Check if a 2D Point Inside 2D Polygon
+- Compute [Pole of Inaccessibility](https://en.wikipedia.org/wiki/Pole_of_inaccessibility) for any 2D Polygon
+- Perform 2D Polygon Boolean Operations (Union, Intersection, Difference)
+- Intersect Colinear 2D Polygon Segments with one Another (for matching lengths)
+- Join Line Segments into Polylines
+- Calculate 3D Face Plane and Normal from Vertices
+- Compute 3D Face Intersection with a Ray or Line
+- Generate a Quad Mesh Grid from a 3D Face
+- Generate Sub-faces Based on Ratio with a Face (used for window generation)
+- Generate Contours and Contour Fins from a Face (used to generate louvers, fins and overhangs)
+- Split 3D Coplanar Faces with one Another (for matching areas)
+- Solve Adjacencies by Matching 3D Face Geometries
+- Join 3D Faces into 3D Polyfaces
+- Check if a 3D PolyFace is a Closed Solid
+- Ensure All Faces of a Solid 3D PolyFace Point Outwards
+- Compute the Volume of a Closed 3D Polyface
+- Check if a Point is Inside a Closed 3D Polyface
+
+## Officially Unsupported Capabilities for which One Must Rely on CAD Interfaces
+
+- Conversion of Curved 3D Surfaces to Planar 3D Faces
+- Fancier Meshing (eg. gridded meshing that completely fills the base surface)
+- Solid Boolean Unions (this should not be needed for anything in Ladybug Tools)
+
+## Acknowledgements
+
+This library was built by combining capabilities of several different open-source
+(MIT Licensed) projects, establishing a set of standardized geometry objects that
+allowed them all to talk to one another, and adding several other capabilities
+with new code. We as a community owe a huge amount of thanks to the open projects
+that provided many of the starting capabilities of this package and we are indebted
+to the developers who made their work under an MIT license for the betterment of
+geometry computation everywhere. Where possible, you will find detailed lists of
+references in the docstrings of source code. A summary of the key packages that
+were used to build this library are as follows:
+
+- [euclid](https://pypi.org/project/euclid/)
+- [earcut](https://github.com/mapbox/earcut) and [earcut-python](https://github.com/joshuaskelly/earcut-python)
+- [polybooljs](https://github.com/velipso/polybooljs) and [pypolybool](https://github.com/KaivnD/pypolybool)
+- [polylabel](https://github.com/Twista/python-polylabel)
+- [pySTL](https://github.com/proverbialsunrise/pySTL)
+- A countless number of [StackOverflow](https://stackoverflow.com/) experts who answered various geometry questions
+- A countless number of [Wikipedia](https://www.wikipedia.org/) authors who described various geometry algorithms
+
+## Reasons for this Library
+
+We initially debated whether the burden of geometry computation should be placed largely
+on the CAD environments in which Ladybug Tools operates or whether it should be included
+in a dedicated core Python library like this one.
+
+As we developed the core libraries, it became clear that there are large advantages
+to having it in the core including:
+
+- Standardized compatibility of geometry between different CAD plugins (eg. Rhino, Revit) and simulation engines + file formats (eg. E+, Radiance, gbXML).
+- The ability to perform geometry operations from the CLI of the core libraries without the need for any CAD software.
+- Improved performance given that a dedicated library could be tailored to the geometric use cases of Ladybug Tools.
+- Reliability and maintain-ability in the face of changes to CAD environments and changing Python conventions.
+
+The first and last items above proved to be particularly important and so the
+decision was made that the Ladybug Tools core libraries would have its own
+geometry library that was distinct from CAD plugins.
+
+Before committing to write our own library, we looked into using or tweaking other
+comprehensive open source geometry libraries for the core including:
+
+- [Rhino3dm](https://github.com/mcneel/rhino3dm)
+- [Blender API (bpy)](https://docs.blender.org/api/current/)
+- [Boost Geometry](https://www.boost.org/doc/libs/1_78_0/libs/geometry/doc/html/index.html)
+- [Topologic](https://topologic.app/Software/)
+
+However, Rhino3dm lacks basic types of computation that would needed in the core (like generating
+a grid of points from a surface). The Blender library had many capabilities that we needed but
+it only works in Python3 and this could break certain CAD workflows that rely on IronPython.
+Boost Geometry (the geometry library used by the OpenStudio SDK) also had a lot of
+functionality but it clearly has C dependencies, making it unusable from IronPython.
+Lastly, Topologic also appeared to have C dependencies, though the more relevant issue was
+that its dual license could create challenges for certain use cases of Ladybug Tools.
+
+After considering the situation further, we realized that many of the capabilities that
+we needed could be achieved by building off the work of various open source MIT-licensed
+projects as long as we committed to using planar geometry. Since all of the geometry
+ultimately going to the engines (Radiance, E+) is planar format anyway, we made
+the decision that the core libraries will primarily support planar objects with
+very limited support for Arcs, Circles, Spheres, Cylinders and Cones.
+
+Thus this repository was born!
 
 ## Local Development
 
@@ -45,68 +148,3 @@ python -m pytests tests/
 sphinx-apidoc -f -e -d 4 -o ./docs ./ladybug_geometry
 sphinx-build -b html ./docs ./docs/_build/docs
 ```
-
-## Currently Supported Capabilities of this Library
-
-- Vector Math (Dot, Cross, Angle, Normalize)
-- Calculate Bounding Box for any Geometry (Min, Max, Center)
-- Compute Area + Perimeter of Planar Geometry
-- Check Concavity and Clockwise Ordering of 2D Geometry
-- Triangulate Planar Geometry
-- Compute Mesh Face Areas, Centroids, and Normals
-- Move Any Geometry
-- Rotate Any Geometry Around an Axis
-- Mirror (Reflect) Any Geometry Over a Plane
-- Scale Any Geometry from a Base Point
-- Is 2D Point Inside 2D Polygon
-- Compute Pole of Inaccessibility for any 2D Polygon
-- 2D Polygon Boolean Operations (Union, Intersection, Difference)
-- Intersect 2D Colinear Polygon Segments with one Another (for matching lengths)
-- Join Line Segments into Polylines
-- 3D Face Plane and Normal Calculation from Vertices
-- 3D Face Intersection with a Ray or Line
-- Quad Mesh Grid Generation from a 3D Face
-- Sub-faces Based on Ratio with a Face (used for window generation)
-- Contours and Contour Fins from a Face (used to generate louvers, fins and overhangs)
-- Split 3D Coplanar Faces with one Another (for matching areas)
-- Solve Adjacencies by Matching Face Geometries
-- Join Faces into Polyfaces
-- Check if a 3D PolyFace is a Closed Solid
-- Ensure All Faces of a Solid PolyFace Point Outwards
-- Check if a Point is Inside a Closed 3D Polyface
-
-## Officially Unsupported Capabilities for which One Must Rely on CAD Interfaces
-
-- Conversion of Curved Surfaces to Planar Surfaces (including both single curvature and double curvature)
-- Fancier Meshing (eg. gridded meshing that completely fills the base surface)
-- Solid Boolean Unions (this should not be needed for anything in Ladybug Tools)
-
-## Reasons for this Library
-
-We initially debated whether geometry computation should be placed largely on the CAD plugins or
-whether it should be included in the core.  As we developed the core libraries out, it became clear
-that there are large advantages to having it in the core (ie. cross compatibility between
-the CAD plugins, ability to process more inputs from command line, and shear speed
-since the CAD libraries are made to address many more geometric use cases than are typically needed).
-So we have decided to include geometry computation as part of the Ladybug Tools core.
-
-We looked into using other geometry computation libraries for the core including:
-
-- [Rhino3dm](https://github.com/mcneel/rhino3dm)
-- [Blender API (bpy)](https://docs.blender.org/api/current/)
-- [Topologic](https://topologic.app/Software/)
-
-However, Rhino3dm lacks basic types of computation that is needed in the core (like generating a
-grid of points from a surface).
-Furthermore, Blender library only works in Python3 and this would break our workflows for the
-Grasshopper and Dynamo plugins, where rely on IronPython.
-Topologic seems to have many things that we need but it appears that it has C dependencies, making
-it unusable from IronPython.  Furthermore, its dual license may create some difficulties for certain
-use cases of Ladybug Tools.
-
-After considering it further, we realized that many of the calculations that we need can be done
-fairly easily as long as the geometry is planar.  Since all of the geometry going to the engines (Radiance, E+)
-is eventually converted to a planar format anyway, we made the decision that the core libraries will support
-certain basic types of geometry computation for planar objects only.  We planned to do this by taking the
-most relevant parts of existing open source geometry libraries, including [euclid](https://pypi.org/project/euclid/)
-and OpenStudio. Thus this repository was born!

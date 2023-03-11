@@ -1,7 +1,8 @@
 # coding=utf-8
 """Utility functions for computing intersections between geometry in 3D space.
 
-Taken mostly from the euclid.py package.
+Taken mostly from the euclid package available at
+https://pypi.org/project/euclid/
 """
 from __future__ import division
 
