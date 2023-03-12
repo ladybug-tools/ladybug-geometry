@@ -916,16 +916,35 @@ class Polygon2D(Base2DIn2D):
 
             This will be one of the following:
 
-            * -1 = Outside polygon
-            *  0 = Intersects the polygon
-            * +1 = Inside polygon
+            * -1 = Outside this polygon
+            *  0 = Overlaps (intersects or contains) this polygon
+            * +1 = Inside this polygon
         """
-        pt_rels = [self.point_relationship(pt, tolerance) for pt in polygon]
-        if all(rel >= 0 for rel in pt_rels):
-            return 1
-        if all(rel <= 0 for rel in pt_rels):
-            return -1
-        return 0
+        # first evaluate the point relationships to rule out the inside case
+        pt_rels1 = [self.point_relationship(pt, tolerance) for pt in polygon]
+        pt_rels2 = [polygon.point_relationship(pt, tolerance) for pt in self]
+        if all(r1 >= 0 for r1 in pt_rels1) and all(r2 <= 0 for r2 in pt_rels2):
+            return 1  # definitely inside the polygon
+        if 1 in pt_rels1 or 1 in pt_rels2 or all(r2 == 0 for r2 in pt_rels2):
+            return 0  # definitely overlap in the polygons
+
+        # if two non-colinear edges intersect, we know there must be overlap
+        all_pts = self.vertices + polygon.vertices
+        for seg in self.segments:
+            for _s in polygon.segments:
+                if seg.is_colinear(_s, tolerance):
+                    continue
+                int_pt = intersect_line2d(seg, _s)
+                if int_pt is None:
+                    continue
+                for pt in all_pts:
+                    if int_pt.is_equivalent(pt, tolerance):
+                        break
+                else:  # unique intersection point found; there is overlap
+                    return 0
+
+        # we can reliably say that the polygons have nothing to do with one another
+        return -1
 
     def distance_to_point(self, point):
         """Get the minimum distance between this shape and the input point.

@@ -546,6 +546,57 @@ def test_is_polygon_inside_outside():
     assert polygon.is_polygon_outside(hole_4)
 
 
+def test_polygon_relationship():
+    """Test the polygon_relationship method."""
+    # check polygon with itself
+    bound_pts = [Point2D(0, 0), Point2D(4, 0), Point2D(4, 4), Point2D(0, 4)]
+    polygon = Polygon2D(bound_pts)
+    assert polygon.polygon_relationship(polygon, 0.01) == 1
+
+    # check polygon with various types holes with clearly-defined relationships
+    hole_pts_1 = [Point2D(1, 1), Point2D(1.5, 1), Point2D(1.5, 1.5), Point2D(1, 1.5)]
+    hole_pts_2 = [Point2D(2, 2), Point2D(3, 2), Point2D(3, 3), Point2D(2, 3)]
+    hole_pts_3 = [Point2D(2, 2), Point2D(6, 2), Point2D(6, 6), Point2D(2, 6)]
+    hole_pts_4 = [Point2D(5, 5), Point2D(6, 5), Point2D(6, 6), Point2D(5, 6)]
+    hole_1 = Polygon2D(hole_pts_1)
+    hole_2 = Polygon2D(hole_pts_2)
+    hole_3 = Polygon2D(hole_pts_3)
+    hole_4 = Polygon2D(hole_pts_4)
+    assert polygon.polygon_relationship(hole_1, 0.01) == 1
+    assert polygon.polygon_relationship(hole_2, 0.01) == 1
+    assert polygon.polygon_relationship(hole_3, 0.01) == 0
+    assert polygon.polygon_relationship(hole_4, 0.01) == -1
+
+    # check the polygon with an adjacent one within tolerance
+    adj_pts = [Point2D(3.999, 0), Point2D(5, 0), Point2D(5, 4), Point2D(4, 4)]
+    adj_p = Polygon2D(adj_pts)
+    assert polygon.polygon_relationship(adj_p, 0.01) == -1
+
+    # check the polygon colinear with the other
+    in_pts = [Point2D(0, 0), Point2D(4, 0), Point2D(4, 2), Point2D(0, 2)]
+    in_p = Polygon2D(in_pts)
+    assert polygon.polygon_relationship(in_p, 0.01) == 1
+    assert in_p.polygon_relationship(polygon, 0.01) == 0
+
+    # check the polygon with an overlapping intersection
+    int_pts = [Point2D(-1, 1), Point2D(5, 1), Point2D(5, 3), Point2D(-1, 3)]
+    int_p = Polygon2D(int_pts)
+    assert polygon.polygon_relationship(int_p, 0.01) == 0
+
+    # check the polygon that contains the other
+    cont_pts = [Point2D(-1, -1), Point2D(5, -1), Point2D(5, 5), Point2D(-1, 5)]
+    cont_p = Polygon2D(cont_pts)
+    assert polygon.polygon_relationship(cont_p, 0.01) == 0
+    assert cont_p.polygon_relationship(polygon, 0.01) == 1
+
+    # check the polygon with a concave overlap
+    conc_pts = [Point2D(-1, -1), Point2D(5, -1), Point2D(5, 5), Point2D(3, 5),
+                Point2D(3, 3), Point2D(2, 3), Point2D(2, 5), Point2D(-1, 5)]
+    conc_p = Polygon2D(conc_pts)
+    assert polygon.polygon_relationship(conc_p, 0.01) == 0
+    assert conc_p.polygon_relationship(polygon, 0.01) == 0
+
+
 def test_distance_to_point():
     """Test the distance_to_point method."""
     pts = (Point2D(0, 0), Point2D(4, 0), Point2D(4, 2), Point2D(2, 2),

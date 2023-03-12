@@ -86,7 +86,7 @@ class Base1DIn3D(object):
             return True
         return False
 
-    def is_colinear(self, line_ray, tolerance, angle_tolerance):
+    def is_colinear(self, line_ray, tolerance, angle_tolerance=None):
         """Test whether this object is colinear to another LineSegment3D or Ray3D.
 
         Args:
@@ -96,9 +96,13 @@ class Base1DIn3D(object):
                 extension of this object for them to be considered colinear.
             angle_tolerance: The max angle in radians that the direction between
                 this object and another can vary for them to be considered
-                parallel.
+                parallel. If None, the angle tolerance will not be used to
+                evaluate co-linearity and the lines will only be considered
+                colinear if the endpoints of one line are within the tolerance
+                distance of the other line. (Default: None).
         """
-        if not self.is_parallel(line_ray, angle_tolerance):
+        if angle_tolerance is not None and \
+                not self.is_parallel(line_ray, angle_tolerance):
             return False
         _close_pt = closest_point3d_on_line3d_infinite(self.p, line_ray)
         if self.p.distance_to_point(_close_pt) >= tolerance:
