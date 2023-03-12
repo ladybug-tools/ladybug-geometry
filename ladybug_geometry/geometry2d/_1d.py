@@ -3,7 +3,8 @@
 from __future__ import division
 
 from .pointvector import Vector2D, Point2D
-from ..intersection2d import intersect_line2d, closest_point2d_on_line2d
+from ..intersection2d import intersect_line2d, closest_point2d_on_line2d, \
+    closest_point2d_on_line2d_infinite
 
 
 class Base1DIn2D(object):
@@ -101,6 +102,45 @@ class Base1DIn2D(object):
             Point2D of intersection if it exists. None if no intersection exists.
         """
         return intersect_line2d(self, line_ray)
+
+    def is_parallel(self, line_ray, angle_tolerance):
+        """Test whether this object is parallel to another LineSegment2D or Ray2D.
+
+        Args:
+            line_ray: Another LineSegment2D or Ray2D for which parallelization
+                with this objects will be tested.
+            angle_tolerance: The max angle in radians that the direction between
+                this object and another can vary for them to be considered
+                parallel.
+        """
+        if self.v.angle(line_ray.v) <= angle_tolerance:
+            return True
+        elif self.v.angle(line_ray.v.reverse()) <= angle_tolerance:
+            return True
+        return False
+
+    def is_colinear(self, line_ray, tolerance, angle_tolerance=None):
+        """Test whether this object is colinear to another LineSegment2D or Ray2D.
+
+        Args:
+            line_ray: Another LineSegment2D or Ray2D for which co-linearity
+                with this object will be tested.
+            tolerance: The maximum distance between the line_ray and the infinite
+                extension of this object for them to be considered colinear.
+            angle_tolerance: The max angle in radians that the direction between
+                this object and another can vary for them to be considered
+                parallel. If None, the angle tolerance will not be used to
+                evaluate co-linearity and the lines will only be considered
+                colinear if the endpoints of one line are within the tolerance
+                distance of the other line. (Default: None).
+        """
+        if angle_tolerance is not None and \
+                not self.is_parallel(line_ray, angle_tolerance):
+            return False
+        _close_pt = closest_point2d_on_line2d_infinite(self.p, line_ray)
+        if self.p.distance_to_point(_close_pt) >= tolerance:
+            return False
+        return True
 
     def duplicate(self):
         """Get a copy of this object."""
