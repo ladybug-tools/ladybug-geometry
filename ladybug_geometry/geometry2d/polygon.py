@@ -998,7 +998,7 @@ class Polygon2D(Base2DIn2D):
     def _from_bool_poly(bool_polygon):
         """Get a list of Polygon2D from a BooleanPolygon object."""
         return [Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
-                for new_poly in bool_polygon.regions]
+                for new_poly in bool_polygon.regions if len(new_poly) > 2]
 
     def boolean_union(self, polygon, tolerance):
         """Get a list of Polygon2D for the union of this Polygon and another.

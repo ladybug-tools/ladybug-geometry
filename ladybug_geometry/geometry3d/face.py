@@ -1798,7 +1798,7 @@ class Face3D(Base2DIn3D):
         """
         # serialize the BooleanPolygon into Polygon2D
         polys = [Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
-                 for new_poly in bool_polygon.regions]
+                 for new_poly in bool_polygon.regions if len(new_poly) > 2]
         if len(polys) == 0:
             return []
         if len(polys) == 1:
