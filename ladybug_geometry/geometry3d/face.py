@@ -1776,13 +1776,24 @@ class Face3D(Base2DIn3D):
         b_poly1 = pb.BooleanPolygon(f1_polys)
         b_poly2 = pb.BooleanPolygon(f2_polys)
         # split the two boolean polygons with one another
-        int_result, poly1_result, poly2_result = pb.split(b_poly1, b_poly2, tolerance)
+        int_tol = tolerance / 3
+        int_result, poly1_result, poly2_result = pb.split(b_poly1, b_poly2, int_tol)
         # rebuild the Face3D from the results and return them
         int_faces = Face3D._from_bool_poly(int_result, prim_pl)
         poly1_faces = Face3D._from_bool_poly(poly1_result, prim_pl)
         poly2_faces = Face3D._from_bool_poly(poly2_result, prim_pl)
         face1_split = poly1_faces + int_faces
         face2_split = poly2_faces + int_faces
+        # try it at a different tolerance if there was not result
+        if all(len(r) == 0 for r in (face1_split, face2_split)):
+            int_result, poly1_result, poly2_result = \
+                pb.split(b_poly1, b_poly2, tolerance)
+            # rebuild the Face3D from the results and return them
+            int_faces = Face3D._from_bool_poly(int_result, prim_pl)
+            poly1_faces = Face3D._from_bool_poly(poly1_result, prim_pl)
+            poly2_faces = Face3D._from_bool_poly(poly2_result, prim_pl)
+            face1_split = poly1_faces + int_faces
+            face2_split = poly2_faces + int_faces
         return face1_split, face2_split
 
     @staticmethod
