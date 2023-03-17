@@ -897,11 +897,11 @@ class Polygon2D(Base2DIn2D):
         return True
 
     def polygon_relationship(self, polygon, tolerance):
-        """Test whether another Polygon2D lies inside, outside or intersects this one.
+        """Test whether another Polygon2D lies inside, outside or overlaps this one.
 
         This method is not usually the fastest for understanding the relationship
         between polygons but it accurately accounts for tolerance such that the
-        case of the two polygons sharing an edge will not determine the outcome.
+        case of the two polygons sharing edges will not determine the outcome.
         Only when the polygon has vertices that are truly outside this polygon
         within the tolerance will the relationship become outside (or intersecting
         if one of the vertices is already inside within the tolerance).
@@ -972,6 +972,37 @@ class Polygon2D(Base2DIn2D):
             inside the Polygon2D.
         """
         return min(seg.distance_to_point(point) for seg in self.segments)
+
+    def snap_to_polygon(self, polygon, tolerance):
+        """Snap another Polygon2D to this one for differences smaller than the tolerance.
+
+        This is useful to run before performing operations where small tolerance
+        differences are likely to cause issues, such as in boolean operations.
+
+        Args:
+            polygon: A Polygon2D which will be snapped to the current polygon.
+            tolerance: The minimum distance at which points will be snapped.
+
+        Returns:
+            A version of the polygon that is snapped to this Polygon2D.
+        """
+        new_verts = []
+        for pt in polygon.vertices:
+            # first check if the point can be snapped to a vertex
+            for s_pt in self.vertices:
+                if pt.is_equivalent(s_pt, tolerance):
+                    new_verts.append(s_pt)
+                    break
+            else:
+                # check if the point can be snapped to a segment
+                for seg in self.segments:
+                    s_pt = seg.closest_point(pt)
+                    if s_pt.distance_to_point(pt) <= tolerance:
+                        new_verts.append(s_pt)
+                        break
+                else:  # point could not be snapped
+                    new_verts.append(pt)
+        return Polygon2D(new_verts)
 
     def to_dict(self):
         """Get Polygon2D as a dictionary."""
