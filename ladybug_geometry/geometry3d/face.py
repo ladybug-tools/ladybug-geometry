@@ -1765,9 +1765,16 @@ class Face3D(Base2DIn3D):
             return [face1], [face2]
         if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
             return [face1], [face2]
+        # snap the polygons to one another to avoid tolerance issues
+        try:
+            f1_poly = f1_poly.remove_colinear_vertices(tolerance)
+            f2_poly = f2_poly.remove_colinear_vertices(tolerance)
+        except AssertionError:  # degenerate faces input
+            return [face1], [face2]
+        s2_poly = f1_poly.snap_to_polygon(f2_poly, tolerance)
         # get BooleanPolygons of the two faces
         f1_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f1_poly.vertices)]
-        f2_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f2_poly.vertices)]
+        f2_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in s2_poly.vertices)]
         if face1.has_holes:
             for hole in face1.hole_polygon2d:
                 f1_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
@@ -1778,8 +1785,11 @@ class Face3D(Base2DIn3D):
         b_poly1 = pb.BooleanPolygon(f1_polys)
         b_poly2 = pb.BooleanPolygon(f2_polys)
         # split the two boolean polygons with one another
-        int_tol = tolerance / 3
-        int_result, poly1_result, poly2_result = pb.split(b_poly1, b_poly2, int_tol)
+        int_tol = tolerance / 100
+        try:
+            int_result, poly1_result, poly2_result = pb.split(b_poly1, b_poly2, int_tol)
+        except Exception:
+            return [face1], [face2]  # typically a tolerance issue causing failure
         # rebuild the Face3D from the results and return them
         int_faces = Face3D._from_bool_poly(int_result, prim_pl)
         poly1_faces = Face3D._from_bool_poly(poly1_result, prim_pl)
