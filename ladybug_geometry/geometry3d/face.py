@@ -1763,6 +1763,8 @@ class Face3D(Base2DIn3D):
         f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
         if not Polygon2D.overlapping_bounding_rect(f1_poly, f2_poly, tolerance):
             return [face1], [face2]
+        if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
+            return [face1], [face2]
         # get BooleanPolygons of the two faces
         f1_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f1_poly.vertices)]
         f2_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f2_poly.vertices)]
@@ -1784,16 +1786,6 @@ class Face3D(Base2DIn3D):
         poly2_faces = Face3D._from_bool_poly(poly2_result, prim_pl)
         face1_split = poly1_faces + int_faces
         face2_split = poly2_faces + int_faces
-        # try it at a different tolerance if there was not result
-        if all(len(r) == 0 for r in (face1_split, face2_split)):
-            int_result, poly1_result, poly2_result = \
-                pb.split(b_poly1, b_poly2, tolerance)
-            # rebuild the Face3D from the results and return them
-            int_faces = Face3D._from_bool_poly(int_result, prim_pl)
-            poly1_faces = Face3D._from_bool_poly(poly1_result, prim_pl)
-            poly2_faces = Face3D._from_bool_poly(poly2_result, prim_pl)
-            face1_split = poly1_faces + int_faces
-            face2_split = poly2_faces + int_faces
         return face1_split, face2_split
 
     @staticmethod

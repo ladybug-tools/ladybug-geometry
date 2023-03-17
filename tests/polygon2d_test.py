@@ -296,6 +296,11 @@ def test_offset():
     assert polygon.is_convex == new_polygon.is_convex
     assert polygon.is_self_intersecting == new_polygon.is_self_intersecting
 
+    rev_poly = polygon.reverse()
+    new_rev_polygon = rev_poly.offset(0.5)
+    assert 0.99 < new_rev_polygon.area < 1.01
+    assert new_rev_polygon.is_clockwise
+
 
 def test_move():
     """Test the Polygon2D move method."""
@@ -595,6 +600,21 @@ def test_polygon_relationship():
     conc_p = Polygon2D(conc_pts)
     assert polygon.polygon_relationship(conc_p, 0.01) == 0
     assert conc_p.polygon_relationship(polygon, 0.01) == 0
+
+    # check the polygon with partial overlaps extending outward
+    pts_1 = (
+        Point2D(-6.30, 0.00), Point2D(-6.30, -1.54), Point2D(-3.16, -1.54),
+        Point2D (-3.16, -6.24),Point2D (0.00, -6.24), Point2D(0.00, 0.00)
+    )
+    pts_2 = (
+        Point2D(-3.16, -1.54), Point2D(-6.55, -1.54), Point2D(-9.04, -1.54),
+        Point2D(-12.10, -1.54), Point2D(-12.10, 0.00), Point2D(0.00, 0.00),
+        Point2D(0.00, -6.20), Point2D(-3.16, -6.20)
+    )
+    poly_1 = Polygon2D(pts_1)
+    poly_2 = Polygon2D(pts_2)
+    assert poly_1.polygon_relationship(poly_2, 0.01) == 0
+    assert poly_2.polygon_relationship(poly_1, 0.01) == 0
 
 
 def test_distance_to_point():
