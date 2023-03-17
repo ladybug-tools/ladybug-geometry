@@ -593,7 +593,7 @@ class Polygon2D(Base2DIn2D):
 
         Args:
             distance: The distance inwards that the polygon will be offset.
-                Positive values will be offset inwards while negative ones
+                Positive values will always be offset inwards while negative ones
                 will be offset outwards.
             check_intersection: A boolean to note whether the resulting operation
                 should be checked for self intersection and, if so, None will be
@@ -604,11 +604,13 @@ class Polygon2D(Base2DIn2D):
             return self
 
         # loop through the vertices and get the new offset vectors
-        move_vecs, max_i = [], len(self._vertices) - 1
-        for i, pt in enumerate(self._vertices):
-            v1 = self._vertices[i - 1] - pt
+        init_verts = self._vertices if not self.is_clockwise \
+            else list(reversed(self._vertices))
+        move_vecs, max_i = [], len(init_verts) - 1
+        for i, pt in enumerate(init_verts):
+            v1 = init_verts[i - 1] - pt
             end_i = i + 1 if i != max_i else 0
-            v2 = self._vertices[end_i] - pt
+            v2 = init_verts[end_i] - pt
             if not self.is_clockwise:
                 ang = v1.angle_clockwise(v2) / 2
                 m_vec = v1.rotate(-ang).normalize()
@@ -621,13 +623,15 @@ class Polygon2D(Base2DIn2D):
             move_vecs.append(m_vec)
 
         # move the vertices by the offset to create the new Polygon2D
-        new_pts = tuple(pt.move(m_vec) for pt, m_vec in zip(self._vertices, move_vecs))
+        new_pts = tuple(pt.move(m_vec) for pt, m_vec in zip(init_verts, move_vecs))
+        if self.is_clockwise:
+            new_pts = tuple(reversed(new_pts))
         new_poly = Polygon2D(new_pts)
 
         # check for self intersection between the moving vectors if requested
         if check_intersection:
             poly_segs = new_poly.segments
-            _segs = [LineSegment2D(p, v) for p, v in zip(self._vertices, move_vecs)]
+            _segs = [LineSegment2D(p, v) for p, v in zip(init_verts, move_vecs)]
             _skip = (0, len(_segs) - 1)
             _other_segs = [x for j, x in enumerate(poly_segs) if j not in _skip]
             for _oth_s in _other_segs:
@@ -928,19 +932,12 @@ class Polygon2D(Base2DIn2D):
         if 1 in pt_rels1 or 1 in pt_rels2 or all(r2 == 0 for r2 in pt_rels2):
             return 0  # definitely overlap in the polygons
 
-        # if two non-colinear edges intersect, we know there must be overlap
-        all_pts = self.vertices + polygon.vertices
+        # offset one of the polygons inward by the tolerance
+        off_poly = polygon.offset(tolerance)
+        # if any of the offset segments intersect the other polygon, there is overlap
         for seg in self.segments:
-            for _s in polygon.segments:
-                if seg.is_colinear(_s, tolerance):
-                    continue
-                int_pt = intersect_line2d(seg, _s)
-                if int_pt is None:
-                    continue
-                for pt in all_pts:
-                    if int_pt.is_equivalent(pt, tolerance):
-                        break
-                else:  # unique intersection point found; there is overlap
+            for _s in off_poly.segments:
+                if does_intersection_exist_line2d(seg, _s):
                     return 0
 
         # we can reliably say that the polygons have nothing to do with one another
