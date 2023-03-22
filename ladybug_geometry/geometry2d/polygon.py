@@ -606,6 +606,7 @@ class Polygon2D(Base2DIn2D):
         # loop through the vertices and get the new offset vectors
         init_verts = self._vertices if not self.is_clockwise \
             else list(reversed(self._vertices))
+        init_verts = [pt for i, pt in enumerate(init_verts) if pt != init_verts[i - 1]]
         move_vecs, max_i = [], len(init_verts) - 1
         for i, pt in enumerate(init_verts):
             v1 = init_verts[i - 1] - pt
@@ -613,10 +614,14 @@ class Polygon2D(Base2DIn2D):
             v2 = init_verts[end_i] - pt
             if not self.is_clockwise:
                 ang = v1.angle_clockwise(v2) / 2
+                if ang == 0:
+                    ang = math.pi / 2
                 m_vec = v1.rotate(-ang).normalize()
                 m_dist = distance / math.sin(ang)
             else:
                 ang = v1.angle_counterclockwise(v2) / 2
+                if ang == 0:
+                    ang = math.pi / 2
                 m_vec = v1.rotate(ang).normalize()
                 m_dist = -distance / math.sin(ang)
             m_vec = m_vec * m_dist

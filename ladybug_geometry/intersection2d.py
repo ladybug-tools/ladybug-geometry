@@ -71,7 +71,7 @@ def intersect_line2d_infinite(line_ray_a, line_ray_b):
 
     Args:
         line_ray_a: A LineSegment2D or Ray2D object.
-        line_ray_b: ALineSegment2D or Ray2D that will be extended infinitely
+        line_ray_b: A LineSegment2D or Ray2D that will be extended infinitely
             for intersection.
 
     Returns:
