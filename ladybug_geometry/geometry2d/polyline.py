@@ -234,7 +234,7 @@ class Polyline2D(Base2DIn2D):
         return intersections
 
     def intersect_line_infinite(self, ray):
-        """Get the intersections between this polyline and a Ray2D extended infintiely.
+        """Get the intersections between this polyline and a Ray2D extended infinitely.
 
         Args:
             ray: A Ray2D or to intersect. This will be extended in both
@@ -285,7 +285,7 @@ class Polyline2D(Base2DIn2D):
         Args:
             segments: An array of LineSegment2D objects.
             tolerance: The minimum difference in X, Y, and Z values at which Point2Ds
-                are considred equivalent. Segments with points that match within the
+                are considered equivalent. Segments with points that match within the
                 tolerance will be joined.
 
         Returns:

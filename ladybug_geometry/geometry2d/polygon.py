@@ -391,7 +391,7 @@ class Polygon2D(Base2DIn2D):
         return not self.area == 0
 
     def is_equivalent(self, other, tolerance):
-        """Boolean noting equivalence (within tolerance) between this polygon and another.
+        """Boolean for equivalence between this polygon and another (within tolerance).
 
         The order of the polygon vertices do not have to start from the
         same vertex for equivalence to be true, but must be in the same counterclockwise
@@ -557,7 +557,7 @@ class Polygon2D(Base2DIn2D):
         return _new_poly
 
     def reflect(self, normal, origin):
-        """Get a polygon reflected across a plane with the input normal vector and origin.
+        """Get a polygon reflected across a plane with the input normal and origin.
 
         Args:
             normal: A Vector2D representing the normal vector for the plane across
@@ -1127,7 +1127,7 @@ class Polygon2D(Base2DIn2D):
         """Get a list of Polygon2D for the union of several Polygon2D.
 
         Using this method is more computationally efficient than calling the
-        Polygon2D.boolean_union() method multiple times as this method will 
+        Polygon2D.boolean_union() method multiple times as this method will
         only compute the intersection of the segments once.
 
         Note that the result will not differentiate hole polygons from boundary
@@ -1155,7 +1155,7 @@ class Polygon2D(Base2DIn2D):
         """Get a list of Polygon2D for the intersection of several Polygon2D.
 
         Using this method is more computationally efficient than calling the
-        Polygon2D.boolean_intersect() method multiple times as this method will 
+        Polygon2D.boolean_intersect() method multiple times as this method will
         only compute the intersection of the segments once.
 
         Note that the result will not differentiate hole polygons from boundary
