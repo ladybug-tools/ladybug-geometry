@@ -1209,7 +1209,7 @@ class Face3D(Base2DIn3D):
         return self._get_extrusion_fins(contours, extru_vec, offset)
 
     def sub_faces_by_ratio(self, ratio):
-        """Get a list of faces with a combined area equal to the ratio times this face area.
+        """Get a list of faces with a combined area equal to ratio times this face area.
 
         All sub faces will lie inside the boundaries of this face and will have
         the same normal as this face.
@@ -1234,7 +1234,7 @@ class Face3D(Base2DIn3D):
             return [Face3D(_t, self.plane) for _t in _scaled_verts]
 
     def sub_faces_by_ratio_gridded(self, ratio, x_dim, y_dim=None):
-        """Get a list of faces with a combined area equal to the ratio times this face area.
+        """Get a list of faces with a combined area equal to ratio times this face area.
 
         All sub faces will lie inside the boundaries of this face and have the same
         normal as this face.
@@ -1282,7 +1282,7 @@ class Face3D(Base2DIn3D):
         return sub_faces
 
     def sub_faces_by_ratio_rectangle(self, ratio, tolerance):
-        """Get a list of faces with a combined area equal to the ratio times this face area.
+        """Get a list of faces with a combined area equal to ratio times this face area.
 
         This function is virtually equivalent to the sub_faces_by_ratio method
         but a check will be performed to see if any rectangles can be pulled out
@@ -1317,7 +1317,7 @@ class Face3D(Base2DIn3D):
     def sub_faces_by_ratio_sub_rectangle(self, ratio, sub_rect_height, sill_height,
                                          horizontal_separation, vertical_separation,
                                          tolerance):
-        """Get a list of faces with a combined area equal to the ratio times this face area.
+        """Get a list of faces with a combined area equal to ratio times this face area.
 
         This function is virtually equivalent to the sub_faces_by_ratio_rectangle
         method but any rectangles that are found will be broken down into sub-rectangles

@@ -136,7 +136,7 @@ class LineSegment2D(Base1DIn2D):
         return LineSegment2D(self.p.rotate(angle, origin), self.v.rotate(angle))
 
     def reflect(self, normal, origin):
-        """Get a line segment reflected across a plane with the input normal vector and origin.
+        """Get a line segment reflected across a plane with the input normal and origin.
 
         Args:
             normal: A Vector2D representing the normal vector for the plane across
