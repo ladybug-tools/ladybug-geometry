@@ -604,7 +604,7 @@ def test_polygon_relationship():
     # check the polygon with partial overlaps extending outward
     pts_1 = (
         Point2D(-6.30, 0.00), Point2D(-6.30, -1.54), Point2D(-3.16, -1.54),
-        Point2D (-3.16, -6.24),Point2D (0.00, -6.24), Point2D(0.00, 0.00)
+        Point2D(-3.16, -6.24), Point2D(0.00, -6.24), Point2D(0.00, 0.00)
     )
     pts_2 = (
         Point2D(-3.16, -1.54), Point2D(-6.55, -1.54), Point2D(-9.04, -1.54),
@@ -615,6 +615,20 @@ def test_polygon_relationship():
     poly_2 = Polygon2D(pts_2)
     assert poly_1.polygon_relationship(poly_2, 0.01) == 0
     assert poly_2.polygon_relationship(poly_1, 0.01) == 0
+
+
+def test_polygon_relationship_concave():
+    """Test the polygon_relationship method."""
+    # check the case of polygon inside a concave hole
+    inside_pts = [Point2D(1, 0), Point2D(2, 0), Point2D(2, 1), Point2D(1, 1)]
+    outside_pts = [
+        Point2D(0, 0), Point2D(1, 0), Point2D(1, 1), Point2D(2, 1), Point2D(2, 0),
+        Point2D(3, 0), Point2D(3, 3), Point2D(0, 3)
+    ]
+    inside_polygon = Polygon2D(inside_pts)
+    outside_polygon = Polygon2D(outside_pts)
+    assert inside_polygon.polygon_relationship(outside_polygon, 0.01) == -1
+    assert outside_polygon.polygon_relationship(inside_polygon, 0.01) == -1
 
 
 def test_distance_to_point():
