@@ -933,9 +933,15 @@ class Polygon2D(Base2DIn2D):
         pt_rels1 = [self.point_relationship(pt, tolerance) for pt in polygon]
         pt_rels2 = [polygon.point_relationship(pt, tolerance) for pt in self]
         if all(r1 >= 0 for r1 in pt_rels1) and all(r2 <= 0 for r2 in pt_rels2):
-            return 1  # definitely inside the polygon
-        if 1 in pt_rels1 or 1 in pt_rels2 or all(r2 == 0 for r2 in pt_rels2):
+            poi = polygon.pole_of_inaccessibility(tolerance)
+            if self.point_relationship(poi, tolerance) == 1:
+                return 1  # definitely inside the polygon
+        if 1 in pt_rels1 or 1 in pt_rels2:
             return 0  # definitely overlap in the polygons
+        if all(r2 == 0 for r2 in pt_rels2):
+            poi = self.pole_of_inaccessibility(tolerance)
+            if polygon.point_relationship(poi, tolerance) == 1:
+                return 0
 
         # offset one of the polygons inward by the tolerance
         off_poly = polygon.offset(tolerance)
