@@ -933,14 +933,14 @@ class Polygon2D(Base2DIn2D):
         pt_rels1 = [self.point_relationship(pt, tolerance) for pt in polygon]
         pt_rels2 = [polygon.point_relationship(pt, tolerance) for pt in self]
         if all(r1 >= 0 for r1 in pt_rels1) and all(r2 <= 0 for r2 in pt_rels2):
-            poi = polygon.pole_of_inaccessibility(tolerance)
-            if self.point_relationship(poi, tolerance) == 1:
+            poi = polygon._point_in_polygon(tolerance)
+            if self.is_point_inside(poi) == 1:
                 return 1  # definitely inside the polygon
         if 1 in pt_rels1 or 1 in pt_rels2:
             return 0  # definitely overlap in the polygons
         if all(r2 == 0 for r2 in pt_rels2):
-            poi = self.pole_of_inaccessibility(tolerance)
-            if polygon.point_relationship(poi, tolerance) == 1:
+            poi = self._point_in_polygon(tolerance)
+            if polygon.is_point_inside(poi) == 1:
                 return 0
 
         # offset one of the polygons inward by the tolerance
@@ -1333,6 +1333,39 @@ class Polygon2D(Base2DIn2D):
         if x_gap_btwn_rect > tolerance or y_gap_btwn_rect > tolerance:
             return False  # no overlap
         return True  # overlap exists
+
+    def _point_in_polygon(self, tolerance):
+        """Get a Point2D that is always reliably inside this Polygon2D.
+
+        The point will be close to the edge of the Polygon but it will always
+        be inside it for all concave geometries. Furthermore, it is relatively
+        fast compared with computing the pole_of_inaccessibility.
+        """
+        try:
+            poly = self.remove_colinear_vertices(tolerance)
+            move_vec, v_angle = self._inward_pointing_vec(poly)
+        except (AssertionError, ZeroDivisionError):  # zero area Polygon2D; use center
+            return self.center
+
+        move_vec = move_vec * ((tolerance / math.sin(v_angle / 2)) + 0.00001)
+        point_in_poly = poly.vertices[0] + move_vec
+        if not self.is_point_inside(point_in_poly):
+            point_in_poly = poly.vertices[0] - move_vec
+        return point_in_poly
+
+    @staticmethod
+    def _inward_pointing_vec(polygon):
+        """Get a unit vector pointing inward/outward from the first vertex of the Polygon
+        """
+        v1 = polygon.vertices[-1] - polygon.vertices[0]
+        v2 = polygon.vertices[1] - polygon.vertices[0]
+        v_angle = v1.angle(v2)
+        if v_angle == math.pi:  # colinear vertices; prevent averaging to zero
+            rgt_ang = math.pi / 2
+            return v1.rotate(rgt_ang).normalize(), rgt_ang
+        else:  # average the two edge vectors together
+            avg_coords = ((v1.x + v2.x) / 2), ((v1.y + v2.y) / 2)
+            return Vector2D(*avg_coords).normalize(), v_angle
 
     def _transfer_properties(self, new_polygon):
         """Transfer properties from this polygon to a new polygon.

@@ -2134,9 +2134,8 @@ class Face3D(Base2DIn3D):
         """Get a point that is always reliably on this face.
 
         The point will be close to the edge of the Face but it will always
-        be inside it for all concave and holed geometries. Furthermore, it is
-        relatively fast compared with methods that attempt to find something
-        that approximates a geometric center on a concave geometry.
+        be inside its boundary for all concave and holed geometries. Furthermore,
+        it is relatively fast compared with computing the pole_of_inaccessibility.
         """
         try:
             face = self.remove_colinear_vertices(tolerance)
@@ -2235,7 +2234,7 @@ class Face3D(Base2DIn3D):
         if v1.angle(v2) == math.pi:  # colinear vertices; prevent averaging to zero
             return v1.rotate(face.normal, math.pi / 2).normalize()
         else:  # average the two edge vectors together
-            avg_coords = (v1.x + v2.x / 2), (v1.y + v2.y / 2), (v1.z + v2.z / 2)
+            avg_coords = ((v1.x + v2.x) / 2), ((v1.y + v2.y) / 2), ((v1.z + v2.z) / 2)
             return Vector3D(*avg_coords).normalize()
 
     @staticmethod
