@@ -44,6 +44,32 @@ def test_polygon2d_init():
         assert len(arr) == 2
 
 
+def test_polygon2d_is_rectangle():
+    """Test the Polygon2D.is_rectangle method."""
+    ang_tol = math.radians(1)
+
+    pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+    polygon = Polygon2D(pts)
+    assert polygon.is_rectangle(ang_tol)
+    rect_ap = polygon.rectangular_approximation()
+    assert polygon.area == pytest.approx(rect_ap.area, rel=1e-3)
+    assert rect_ap.is_rectangle(ang_tol)
+
+    pts = (Point2D(0, 0), Point2D(2.5, 0), Point2D(2, 2), Point2D(0, 2))
+    polygon = Polygon2D(pts)
+    assert not polygon.is_rectangle(ang_tol)
+    rect_ap = polygon.rectangular_approximation()
+    assert polygon.area == pytest.approx(rect_ap.area, rel=1e-3)
+    assert rect_ap.is_rectangle(ang_tol)
+
+    pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(1, 3), Point2D(0, 2))
+    polygon = Polygon2D(pts)
+    assert not polygon.is_rectangle(ang_tol)
+    rect_ap = polygon.rectangular_approximation()
+    assert polygon.area == pytest.approx(rect_ap.area, rel=1e-3)
+    assert rect_ap.is_rectangle(ang_tol)
+
+
 def test_polygon2d_pole_of_inaccessibility():
     """Test the Polygon2D.pole_of_inaccessibility method."""
     pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))

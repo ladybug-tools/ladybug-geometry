@@ -431,6 +431,44 @@ class Polygon2D(Base2DIn2D):
             is_equivalent = is_equivalent and pt.is_equivalent(other_pt, tolerance)
         return is_equivalent
 
+    def is_rectangle(self, angle_tolerance):
+        """Test whether this Polygon2D is a rectangle given an angle tolerance.
+
+        Note that this method will return False if the Polygon2D does not have
+        four vertices, even if they are duplicated or colinear.
+
+        Args:
+            angle_tolerance: The max angle in radians that the corners of the
+                rectangle can differ from a right angle before it is not
+                considered a rectangle.
+        """
+        if len(self.vertices) != 4:
+            return False
+        min_ang = (math.pi / 2) - angle_tolerance
+        max_ang = (math.pi / 2) + angle_tolerance
+        for i, pt in enumerate(self.vertices):
+            v1 = self.vertices[i - 2] - self.vertices[i - 1]
+            v2 = pt - self.vertices[i - 1]
+            v_angle = v1.angle(v2)
+            if v_angle < min_ang or v_angle > max_ang:
+                return False
+        return True
+
+    def rectangular_approximation(self):
+        """Get a rectangular Polygon2D with the same area and aspect ratio as this one.
+
+        This is useful when an interface requires a rectangular input but the
+        user-defined geometry can be any shape. The resulting rectangle will share
+        the same center as this one.
+        """
+        b_rect_len = self.max.x - self.min.x
+        b_rect_hgt = self.max.y - self.min.y
+        aspect_ratio = b_rect_len / b_rect_hgt
+        final_hgt = math.sqrt(self.area / aspect_ratio)
+        final_len = self.area / final_hgt
+        b_pt = Point2D(self.center.x - (final_len / 2), self.center.y - (final_hgt / 2))
+        return Polygon2D.from_rectangle(b_pt, Vector2D(0, 1), final_len, final_hgt)
+
     def pole_of_inaccessibility(self, tolerance):
         """Get the pole of inaccessibility for the polygon.
 
@@ -1448,7 +1486,9 @@ class Polygon2D(Base2DIn2D):
         The run time of this method scales linearly with the total number of
         vertices, which makes it significantly better for shapes with many holes
         compared to recursively calling the Polygon2D._merge_boundary_and_closest_hole
-        method.
+        method. However, it is not nearly as efficient as the method used in
+        Polygon2D.from_shape_with_holes_fast, which is typically not as beautiful
+        of a result as this method.
 
         Args:
             boundary: A list of Point2D objects for the outer boundary inside of
