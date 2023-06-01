@@ -1445,9 +1445,9 @@ class Polygon2D(Base2DIn2D):
 
         The holes are merged one-by-one using the shortest distance from all of
         the holes to the boundary to ensure one hole's seam does not cross another.
-        This run time of this method scales linearly with the number of hole
+        The run time of this method scales linearly with the total number of
         vertices, which makes it significantly better for shapes with many holes
-        compared to recursively calling the _merge_boundary_and_closest_hole
+        compared to recursively calling the Polygon2D._merge_boundary_and_closest_hole
         method.
 
         Args:
@@ -1456,21 +1456,26 @@ class Polygon2D(Base2DIn2D):
             hole: A list of lists where each sub-list represents a hole and contains
                 several Point2D objects that represent the hole.
             split: A boolean to note whether the last hole should be merged into
-                the boundary for a second time, effectively splitting the shape
-                into two lists of vertices instead of a single list. It is useful
-                to set this tro True when trying to translate a shape with holes
-                to a platform that does not support holes and also struggles with
-                single lists of vertices that wind inward to cut out the holes
-                since this option typically returns two "normal" concave
-                polygons. (Default: False).
+                the boundary, effectively splitting the shape into two lists of
+                vertices instead of a single list. This is useful when trying to
+                translate a shape with holes to a platform that does not support
+                holes or struggles with single lists of vertices that wind inward
+                to cut out the holes since this option returns two "normal" concave
+                polygons. However, it is possible that the shape cannot be
+                reliably split this way and, in this case, this method will
+                return None. (Default: False).
 
         Returns:
             A single list of vertices with the holes merged into the boundary. When
-            split is True, this will be two lists of vertices for the two split shapes.
+            split is True and the splitting is successful, this will be two lists
+            of vertices for the split shapes. If splitting was not successful,
+            this method will return None and, if a hole-less split shape is
+            still required, it is recommended that triangulation be used to get
+            the hole-less shapes.
         """
         # compute the initial distances between the holes and the boundary
-        hole_dicts = []
-        min_dists = []
+        original_boundary = boundary[:]
+        hole_dicts, min_dists = [], []
         for hole in holes:
             dist_dict = {}
             for i, b_pt in enumerate(boundary):
@@ -1505,13 +1510,18 @@ class Polygon2D(Base2DIn2D):
         if not split:
             return boundary
 
-        # sort the distances to find the first and second most distant points
+        # sort the distances to find the closest point
         last_hd = hole_dicts[0]
         sort_dist = sorted(last_hd.keys())
-        p1_dist, p2_dist = sort_dist[0], sort_dist[1]
-        p1_indices, p2_indices = dist_dict[p1_dist], dist_dict[p2_dist]
-        # keep track of the second most distant points for later
+        # find the closest connection between the hole and the original boundary polygon
+        p1_indices = dist_dict[sort_dist[0]]
+        p2_index = 1
+        p2_indices = dist_dict[sort_dist[p2_index]]
         p2_bound_pt = boundary[p2_indices[0]]
+        while p2_bound_pt not in original_boundary:
+            p2_index += 1
+            p2_indices = dist_dict[sort_dist[p2_index]]
+            p2_bound_pt = boundary[p2_indices[0]]
         p2_hole_pt = hole[p2_indices[1]]
         # merge the hole into the boundary
         hole_deque = deque(hole)
@@ -1519,7 +1529,7 @@ class Polygon2D(Base2DIn2D):
         hole_insert = [boundary[p1_indices[0]]] + list(hole_deque) + \
             [hole[p1_indices[1]]]
         boundary[p1_indices[0]:p1_indices[0]] = hole_insert
-        # use the second most distant points to split the shape\
+        # use the second most distant points to split the shape
         p2_bound_i = boundary.index(p2_bound_pt)
         p2_hole_i = boundary.index(p2_hole_pt)
         if p2_hole_i < p2_bound_i:
@@ -1528,6 +1538,30 @@ class Polygon2D(Base2DIn2D):
         else:
             boundary_1 = boundary[p2_bound_i:p2_hole_i + 1]
             boundary_2 = boundary[:p2_bound_i + 1] + boundary[p2_hole_i:]
+        poly_1, poly_2 = Polygon2D(boundary_1), Polygon2D(boundary_2)
+
+        # if the split polygons are self-intersecting, try to find a solution
+        p2_index = 0
+        while poly_1.is_self_intersecting or poly_2.is_self_intersecting:
+            p2_index += 1
+            try:
+                p2_indices = dist_dict[sort_dist[p2_index]]
+            except IndexError:  # no solution was found; just return None
+                return None
+            p2_bound_pt = boundary[p2_indices[0]]
+            p2_hole_pt = hole[p2_indices[1]]
+            p2_bound_i = boundary.index(p2_bound_pt)
+            p2_hole_i = boundary.index(p2_hole_pt)
+            if p2_hole_i < p2_bound_i:
+                boundary_1 = boundary[p2_hole_i:p2_bound_i + 1]
+                boundary_2 = boundary[:p2_hole_i + 1] + boundary[p2_bound_i:]
+            else:
+                boundary_1 = boundary[p2_bound_i:p2_hole_i + 1]
+                boundary_2 = boundary[:p2_bound_i + 1] + boundary[p2_hole_i:]
+            try:
+                poly_1, poly_2 = Polygon2D(boundary_1), Polygon2D(boundary_2)
+            except AssertionError:
+                pass  # the polygons are not valid; keep searching
         return boundary_1, boundary_2
 
     @staticmethod
