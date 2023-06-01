@@ -907,12 +907,22 @@ class Face3D(Base2DIn3D):
         return _new_face
 
     def split_through_holes(self):
-        """Get this Face3D split in two through its holes to get shapes without holes.
+        """Get this Face3D split through its holes to get Face3D without holes.
 
-        Will be None if this Face3D has not holes.
+        This method attempts to return the minimum number of non-holed shapes that
+        are needed to represent the original Face3D. If this fails, the result
+        will be a fully-triangulated shape. If getting a minimum number
+        of constituent Face3D is not important, it is more efficient to just
+        use all of the triangles in Face3D.triangulated_mesh3d instead of the
+        result of this method.
+
+        Returns:
+            A list of Face3D without holes that together form a geometric
+            representation of this Face3D. If this Face3D has no holes a list
+            with a single Face3D is returned.
         """
         if not self.has_holes:
-            return None
+            return [self]
         # check that the direction of vertices for the hole is opposite the boundary
         boundary = list(self.boundary_polygon2d.vertices)
         holes = [list(hole.vertices) for hole in self.hole_polygon2d]
@@ -921,7 +931,16 @@ class Face3D(Base2DIn3D):
             if Polygon2D._are_clockwise(hole) is bound_direction:
                 hole.reverse()
         # split the polygon through the holes
-        poly_1, poly_2 = Polygon2D._merge_boundary_and_holes(boundary, holes, split=True)
+        s_result = Polygon2D._merge_boundary_and_holes(boundary, holes, split=True)
+        if s_result is None:  # return a fully-triangulated shape
+            tri_faces = []
+            tri_mesh = self.triangulated_mesh3d
+            tri_verts = tri_mesh.vertices
+            for f in tri_mesh.faces:
+                f_verts = tuple(tri_verts[pt] for pt in f)
+                tri_faces.append(Face3D(f_verts, plane=self.plane))
+            return tri_faces
+        poly_1, poly_2 = s_result
         vert_1 = tuple(self.plane.xy_to_xyz(pt) for pt in poly_1)
         vert_2 = tuple(self.plane.xy_to_xyz(pt) for pt in poly_2)
         face_1 = Face3D(vert_1, plane=self.plane)
