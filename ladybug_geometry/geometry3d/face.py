@@ -794,6 +794,29 @@ class Face3D(Base2DIn3D):
                     return False
         return True
 
+    def remove_duplicate_vertices(self, tolerance):
+        """Get a version of this face without duplicate vertices.
+
+        Args:
+            tolerance: The minimum distance between a two vertices at which
+                they are considered co-located or duplicated.
+        """
+        if not self.has_holes:  # we only need to evaluate one list of vertices
+            new_vertices = tuple(
+                pt for i, pt in enumerate(self._vertices)
+                if not pt.is_equivalent(self._vertices[i - 1], tolerance))
+            _new_face = Face3D(new_vertices, self.plane, enforce_right_hand=False)
+            return _new_face
+        # the face has holes
+        _boundary = tuple(
+            pt for i, pt in enumerate(self._boundary)
+            if not pt.is_equivalent(self._boundary[i - 1], tolerance))
+        _holes = tuple(
+            tuple(p for i, p in enumerate(h) if not p.is_equivalent(h[i - 1], tolerance))
+            for j, h in enumerate(self._holes))
+        _new_face = Face3D(_boundary, self.plane, _holes, enforce_right_hand=False)
+        return _new_face
+
     def remove_colinear_vertices(self, tolerance):
         """Get a version of this face without colinear or duplicate vertices.
 
