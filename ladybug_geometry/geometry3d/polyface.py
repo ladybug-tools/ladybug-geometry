@@ -16,7 +16,7 @@ except ImportError:
 
 
 class Polyface3D(Base2DIn3D):
-    """Object with Multiple Planar Faces in 3D Space. Includes solid objects and polyhedra.
+    """Object with Multiple Planar Faces in 3D Space. Includes solids and polyhedra.
 
     Args:
         vertices: A list of Point3D objects representing the vertices of
@@ -384,7 +384,7 @@ class Polyface3D(Base2DIn3D):
 
     @property
     def edge_information(self):
-        """Dictionary with keys: 'edge_indices', 'edge_types' and corresponding properties.
+        """Dictionary with keys edge_indices, edge_types and corresponding properties.
         """
         return {'edge_indices': self._edge_indices, 'edge_types': self._edge_types}
 
@@ -419,7 +419,7 @@ class Polyface3D(Base2DIn3D):
         return self._is_solid
 
     def merge_overlapping_edges(self, tolerance, angle_tolerance):
-        """Get this object with overlapping naked edges merged into single internal edges.
+        """Get this object with overlapping naked edges merged into single internal edges
 
         This can be used to determine if a polyface is truly solid.
         The default test of edge conditions that runs upon creation of a polyface does
@@ -609,7 +609,7 @@ class Polyface3D(Base2DIn3D):
         return _new_pface
 
     def reflect(self, normal, origin):
-        """Get a polyface reflected across a plane with the input normal vector and origin.
+        """Get a polyface reflected across a plane with the input normal and origin.
 
         Args:
             normal: A Vector3D representing the normal vector for the plane across
@@ -671,7 +671,7 @@ class Polyface3D(Base2DIn3D):
         return True
 
     def does_intersect_line_ray_exist(self, line_ray):
-        """Boolean denoting whether an intersection exists between the input Line3D or Ray3D.
+        """Boolean for whether an intersection exists between the input Line3D or Ray3D.
 
         Args:
             line_ray: A Line3D or Ray3D object for which intersection will be evaluated.

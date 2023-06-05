@@ -29,7 +29,9 @@ class MeshBase(object):
         * vertex_connected_faces
     """
     __slots__ = ('_vertices', '_faces', '_colors', '_is_color_by_face',
-                 '_area', '_face_areas', '_face_centroids', '_vertex_connected_faces')
+                 '_area', '_face_areas', '_face_centroids', '_vertex_connected_faces',
+                 '_edge_indices', '_edge_types', '_edges',
+                 '_naked_edges', '_internal_edges', '_non_manifold_edges')
 
     def __init__(self, vertices, faces, colors=None):
         """Initialize MeshBase."""
@@ -41,6 +43,12 @@ class MeshBase(object):
         self._face_areas = None
         self._face_centroids = None
         self._vertex_connected_faces = None
+        self._edge_indices = None
+        self._edge_types = None
+        self._edges = None
+        self._naked_edges = None
+        self._internal_edges = None
+        self._non_manifold_edges = None
 
     @property
     def vertices(self):
@@ -294,6 +302,26 @@ class MeshBase(object):
         _new_f_cent, _new_f_area = self._transfer_face_centroids_areas(pattern)
 
         return tuple(_new_faces), _new_colors, _new_f_cent, _new_f_area
+
+    def _compute_edge_info(self):
+        """Compute information about the edges of the mesh faces."""
+        edge_i = []
+        edge_t = []
+        for fi in self.faces:
+            for i, vi in enumerate(fi):
+                try:  # this can get slow for large number of vertices
+                    ind = edge_i.index((vi, fi[i - 1]))
+                    edge_t[ind] += 1
+                except ValueError:  # make sure reversed edge isn't there
+                    try:
+                        ind = edge_i.index((fi[i - 1], vi))
+                        edge_t[ind] += 1
+                    except ValueError:  # add a new edge
+                        if fi[i - 1] != vi:  # avoid cases of same start and end
+                            edge_i.append((fi[i - 1], vi))
+                            edge_t.append(0)
+        self._edge_indices = edge_i if isinstance(edge_i, tuple) else tuple(edge_i)
+        self._edge_types = edge_t if isinstance(edge_t, tuple) else tuple(edge_t)
 
     def _transfer_properties(self, new_mesh):
         """Transfer properties when making a copy of the mesh or doing transforms."""
