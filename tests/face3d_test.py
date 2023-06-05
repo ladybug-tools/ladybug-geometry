@@ -389,6 +389,16 @@ def test_face3d_split_through_holes():
     assert len(face_1.vertices) + len(face_2.vertices) == 18
 
 
+def test_face3d_split_through_holes_detailed():
+    """Test the Face3D split_through_holes method with a detailed Face3D."""
+    geo_file = './tests/json/tri_hole_face.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    face_1 = Face3D.from_dict(geo_dict)
+    s_faces = face_1.split_through_holes()
+    assert 2 < len(s_faces) < 20
+
+
 def test_face3d_init_h_shape():
     """Test the initialization of Face3D that is H-shaped."""
     geo_file = './tests/json/h_shaped_face.json'

@@ -5,6 +5,7 @@ from __future__ import division
 from .._mesh import MeshBase
 from ..geometry2d.mesh import Mesh2D
 from .pointvector import Point3D, Vector3D
+from .line import LineSegment3D
 from .plane import Plane
 
 try:
@@ -38,6 +39,10 @@ class Mesh3D(MeshBase):
         * face_normals
         * vertex_normals
         * vertex_connected_faces
+        * edges
+        * naked_edges
+        * internal_edges
+        * non_manifold_edges
     """
     __slots__ = ('_min', '_max', '_center', '_face_normals', '_vertex_normals')
 
@@ -57,6 +62,12 @@ class Mesh3D(MeshBase):
         self._face_normals = None
         self._vertex_normals = None
         self._vertex_connected_faces = None
+        self._edge_indices = None
+        self._edge_types = None
+        self._edges = None
+        self._naked_edges = None
+        self._internal_edges = None
+        self._non_manifold_edges = None
 
     @classmethod
     def from_dict(cls, data):
@@ -87,7 +98,7 @@ class Mesh3D(MeshBase):
 
     @classmethod
     def from_face_vertices(cls, faces, purge=True):
-        """Create a mesh from a list of faces with each face defined by a list of Point3Ds.
+        """Create a mesh from a list of faces with each face defined by Point3Ds.
 
         Args:
             faces: A list of faces with each face defined as a list of 3 or 4 Point3D.
@@ -180,6 +191,54 @@ class Mesh3D(MeshBase):
             self._vertex_normals = tuple(self._vertex_normals for face in self.vertices)
         return self._vertex_normals
 
+    @property
+    def edges(self):
+        """"Tuple of all edges in this Mesh3D as LineSegment3D objects."""
+        if self._edges is None:
+            if self._edge_indices is None:
+                self._compute_edge_info()
+            self._edges = tuple(LineSegment3D.from_end_points(
+                self.vertices[seg[0]], self.vertices[seg[1]])
+                for seg in self._edge_indices)
+        return self._edges
+
+    @property
+    def naked_edges(self):
+        """"Tuple of all naked edges in this Mesh3D as LineSegment3D objects.
+
+        Naked edges belong to only one face in the mesh (they are not
+        shared between faces).
+        """
+        if self._naked_edges is None:
+            self._naked_edges = self._get_edge_type(0)
+        return self._naked_edges
+
+    @property
+    def internal_edges(self):
+        """"Tuple of all internal edges in this Mesh3D as LineSegment3D objects.
+
+        Internal edges are shared between two faces in the mesh.
+        """
+        if self._internal_edges is None:
+            self._internal_edges = self._get_edge_type(1)
+        return self._internal_edges
+
+    @property
+    def non_manifold_edges(self):
+        """"Tuple of all non-manifold edges in this mesh as LineSegment3D objects.
+
+        Non-manifold edges are shared between three or more faces.
+        """
+        if self._non_manifold_edges is None:
+            if self._edges is None:
+                self.edges
+            nm_edges = []
+            for i, type in enumerate(self._edge_types):
+                if type > 1:
+                    nm_edges.append(self._edges[i])
+            self._non_manifold_edges = tuple(nm_edges)
+        return self._non_manifold_edges
+
     def remove_vertices(self, pattern):
         """Get a version of this mesh where vertices are removed according to a pattern.
 
@@ -238,7 +297,7 @@ class Mesh3D(MeshBase):
         return new_mesh, vertex_pattern
 
     def remove_faces_only(self, pattern):
-        """Get a version of this mesh where faces are removed and vertices are not altered.
+        """Get a version of this mesh where faces are removed and vertices are unaltered.
 
         This is faster than the Mesh3D.remove_faces method but will likely result
         a lower-quality mesh where several vertices exist in the mesh that are not
@@ -471,6 +530,16 @@ class Mesh3D(MeshBase):
             _v = Vector3D(x, y, z)
             vn.append(_v.normalize())
         self._vertex_normals = tuple(vn)
+
+    def _get_edge_type(self, edge_type):
+        """Get all of the edges of a certain type in this mesh."""
+        if self._edges is None:
+            self.edges
+        sel_edges = []
+        for i, type in enumerate(self._edge_types):
+            if type == edge_type:
+                sel_edges.append(self._edges[i])
+        return tuple(sel_edges)
 
     def _tri_face_centroid(self, face):
         """Compute the centroid of a triangular face."""

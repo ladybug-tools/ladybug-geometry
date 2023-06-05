@@ -40,6 +40,11 @@ def test_mesh3d_init():
     for vf in mesh.vertex_connected_faces:
         assert len(vf) == 1
 
+    assert len(mesh.edges) == 4
+    assert len(mesh.naked_edges) == 4
+    assert len(mesh.internal_edges) == 0
+    assert len(mesh.non_manifold_edges) == 0
+
     mesh.colors = []
     assert mesh.colors is None
 
@@ -142,6 +147,11 @@ def test_mesh3d_init_two_faces():
     assert mesh.face_centroids[1].z == pytest.approx(2, rel=1e-2)
     assert mesh._is_color_by_face is False
     assert mesh.colors is None
+
+    assert len(mesh.edges) == 6
+    assert len(mesh.naked_edges) == 5
+    assert len(mesh.internal_edges) == 1
+    assert len(mesh.non_manifold_edges) == 0
 
 
 def test_mesh3d_init_from_face_vertices():

@@ -9,6 +9,7 @@ if (sys.version_info > (3, 0)):  # python 3
 from .pointvector import Point3D, Vector3D
 from .ray import Ray3D
 from .line import LineSegment3D
+from .polyline import Polyline3D
 from .plane import Plane
 from .mesh import Mesh3D
 from ._2d import Base2DIn3D
@@ -934,7 +935,7 @@ class Face3D(Base2DIn3D):
 
         This method attempts to return the minimum number of non-holed shapes that
         are needed to represent the original Face3D. If this fails, the result
-        will be a fully-triangulated shape. If getting a minimum number
+        will be derived from a triangulated shape. If getting a minimum number
         of constituent Face3D is not important, it is more efficient to just
         use all of the triangles in Face3D.triangulated_mesh3d instead of the
         result of this method.
@@ -944,8 +945,19 @@ class Face3D(Base2DIn3D):
             representation of this Face3D. If this Face3D has no holes a list
             with a single Face3D is returned.
         """
+        def _shared_vertex_count(vert_set, verts):
+            """Get the number of shared vertices."""
+            in_set = tuple(v for v in verts if v in vert_set)
+            return len(in_set)
+
+        def _shared_edge_count(edge_set, verts):
+            """Get the number of shared edges."""
+            edges = tuple((verts[i], verts[i - 1]) for i in range(3))
+            in_set = tuple(e for e in edges if e in edge_set)
+            return len(in_set)
+
         if not self.has_holes:
-            return [self]
+            return (self,)
         # check that the direction of vertices for the hole is opposite the boundary
         boundary = list(self.boundary_polygon2d.vertices)
         holes = [list(hole.vertices) for hole in self.hole_polygon2d]
@@ -953,22 +965,53 @@ class Face3D(Base2DIn3D):
         for hole in holes:
             if Polygon2D._are_clockwise(hole) is bound_direction:
                 hole.reverse()
-        # split the polygon through the holes
+        # try to split the polygon neatly in two
         s_result = Polygon2D._merge_boundary_and_holes(boundary, holes, split=True)
-        if s_result is None:  # return a fully-triangulated shape
-            tri_faces = []
-            tri_mesh = self.triangulated_mesh3d
-            tri_verts = tri_mesh.vertices
-            for f in tri_mesh.faces:
-                f_verts = tuple(tri_verts[pt] for pt in f)
-                tri_faces.append(Face3D(f_verts, plane=self.plane))
-            return tri_faces
-        poly_1, poly_2 = s_result
-        vert_1 = tuple(self.plane.xy_to_xyz(pt) for pt in poly_1)
-        vert_2 = tuple(self.plane.xy_to_xyz(pt) for pt in poly_2)
-        face_1 = Face3D(vert_1, plane=self.plane)
-        face_2 = Face3D(vert_2, plane=self.plane)
-        return face_1, face_2
+        if s_result is not None:
+            poly_1, poly_2 = s_result
+            vert_1 = tuple(self.plane.xy_to_xyz(pt) for pt in poly_1)
+            vert_2 = tuple(self.plane.xy_to_xyz(pt) for pt in poly_2)
+            face_1 = Face3D(vert_1, plane=self.plane)
+            face_2 = Face3D(vert_2, plane=self.plane)
+            return face_1, face_2
+        # if splitting in two did not work, then triangulate it and merge them together
+        tri_mesh = self.triangulated_mesh3d
+        tri_verts = tri_mesh.vertices
+        rel_f = tri_mesh.faces[0]
+        tri_faces = [[tuple(tri_verts[pt] for pt in rel_f)]]
+        tri_face_sets = [set(rel_f)]
+        tri_edge_sets = [set((rel_f[i - 1], rel_f[i]) for i in range(3))]
+        faces_to_test = list(tri_mesh.faces[1:])
+        # group the faces along matched edges
+        for f in faces_to_test:
+            connected = False
+            for tfs, fs, es in zip(tri_faces, tri_face_sets, tri_edge_sets):
+                svc = _shared_vertex_count(fs, f)
+                sec = _shared_edge_count(es, f)
+                if svc == 2 and sec == 1:  # matched edge
+                    tfs.append(tuple(tri_verts[pt] for pt in f))
+                    for i, v in enumerate(f):
+                        fs.add(v)
+                        es.add((f[i - 1], f[i]))
+                    break
+                elif svc == 3:  # definitely a new shape
+                    connected = True
+            else:  # not ready to be merged; put it to the back
+                if connected:
+                    tri_faces.append([tuple(tri_verts[pt] for pt in f)])
+                    tri_face_sets.append(set(f))
+                    tri_edge_sets.append(set((f[i - 1], f[i]) for i in range(3)))
+                else:
+                    faces_to_test.append(f)
+        # create Face3Ds from the triangle groups
+        final_faces = []
+        for tf in tri_faces:
+            t_mesh = Mesh3D.from_face_vertices(tf)
+            ed_len = (seg.length for seg in t_mesh.naked_edges)
+            tol = min(ed_len) / 10
+            f_bound = Polyline3D.join_segments(t_mesh.naked_edges, tol)
+            final_faces.append(Face3D(f_bound[0].vertices, plane=self.plane))
+        return final_faces
 
     def intersect_line_ray(self, line_ray):
         """Get the intersection between this face and the input Line3D or Ray3D.

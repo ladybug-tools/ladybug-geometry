@@ -38,6 +38,10 @@ class Mesh2D(MeshBase):
         * face_centroids
         * face_vertices
         * vertex_connected_faces
+        * edges
+        * naked_edges
+        * internal_edges
+        * non_manifold_edges
     """
     __slots__ = ('_min', '_max', '_center', '_centroid')
 
@@ -56,6 +60,12 @@ class Mesh2D(MeshBase):
         self._face_areas = None
         self._face_centroids = None
         self._vertex_connected_faces = None
+        self._edge_indices = None
+        self._edge_types = None
+        self._edges = None
+        self._naked_edges = None
+        self._internal_edges = None
+        self._non_manifold_edges = None
 
     @classmethod
     def from_dict(cls, data):
@@ -86,7 +96,7 @@ class Mesh2D(MeshBase):
 
     @classmethod
     def from_face_vertices(cls, faces, purge=True):
-        """Create a mesh from a list of faces with each face defined by a list of Point2Ds.
+        """Create a mesh from a list of faces with each face defined by Point2Ds.
 
         Args:
             faces: A list of faces with each face defined as a list of 3 or 4 Point2D.
@@ -258,6 +268,54 @@ class Mesh2D(MeshBase):
             self._centroid = Point2D(_weight_x / self.area, _weight_y / self.area)
         return self._centroid
 
+    @property
+    def edges(self):
+        """"Tuple of all edges in this Mesh3D as LineSegment3D objects."""
+        if self._edges is None:
+            if self._edge_indices is None:
+                self._compute_edge_info()
+            self._edges = tuple(LineSegment2D.from_end_points(
+                self.vertices[seg[0]], self.vertices[seg[1]])
+                for seg in self._edge_indices)
+        return self._edges
+
+    @property
+    def naked_edges(self):
+        """"Tuple of all naked edges in this Mesh3D as LineSegment3D objects.
+
+        Naked edges belong to only one face in the mesh (they are not
+        shared between faces).
+        """
+        if self._naked_edges is None:
+            self._naked_edges = self._get_edge_type(0)
+        return self._naked_edges
+
+    @property
+    def internal_edges(self):
+        """"Tuple of all internal edges in this Mesh3D as LineSegment3D objects.
+
+        Internal edges are shared between two faces in the mesh.
+        """
+        if self._internal_edges is None:
+            self._internal_edges = self._get_edge_type(1)
+        return self._internal_edges
+
+    @property
+    def non_manifold_edges(self):
+        """"Tuple of all non-manifold edges in this mesh as LineSegment3D objects.
+
+        Non-manifold edges are shared between three or more faces.
+        """
+        if self._non_manifold_edges is None:
+            if self._edges is None:
+                self.edges
+            nm_edges = []
+            for i, type in enumerate(self._edge_types):
+                if type > 1:
+                    nm_edges.append(self._edges[i])
+            self._non_manifold_edges = tuple(nm_edges)
+        return self._non_manifold_edges
+
     def triangulated(self):
         """Get a version of this Mesh2D where all quads have been triangulated."""
         _new_faces = []
@@ -342,7 +400,7 @@ class Mesh2D(MeshBase):
         return new_mesh, vertex_pattern
 
     def remove_faces_only(self, pattern):
-        """Get a version of this mesh where faces are removed and vertices are not altered.
+        """Get a version of this mesh where faces are removed and vertices are unaltered.
 
         This is faster than the Mesh2D.remove_faces method but will likely result
         a lower-quality mesh where several vertices exist in the mesh that are not
@@ -455,6 +513,16 @@ class Mesh2D(MeshBase):
 
         self._min = Point2D(min_pt[0], min_pt[1])
         self._max = Point2D(max_pt[0], max_pt[1])
+
+    def _get_edge_type(self, edge_type):
+        """Get all of the edges of a certain type in this mesh."""
+        if self._edges is None:
+            self.edges
+        sel_edges = []
+        for i, type in enumerate(self._edge_types):
+            if type == edge_type:
+                sel_edges.append(self._edges[i])
+        return tuple(sel_edges)
 
     def _face_area(self, face):
         """Return the area of a face."""
