@@ -60,6 +60,13 @@ def test_face3d_pole_of_inaccessibility():
     assert pole.y == pytest.approx(1.0, rel=1e-3)
     assert pole.z == pytest.approx(2.0, rel=1e-3)
 
+    deg_pts = (Point3D(0, 0, 2), Point3D(0, 0.0001, 2),
+               Point3D(2, 0.0001, 2), Point3D(2, 0, 2))
+    plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+    deg_face = Face3D(deg_pts, plane)
+    deg_pole = deg_face.pole_of_inaccessibility(0.01)
+    assert isinstance(deg_pole, Point3D)
+
 
 def test_equality():
     """Test the equality of Face3D objects."""
