@@ -492,8 +492,10 @@ class Polygon2D(Base2DIn2D):
         height = max_y - min_y
         cell_size = min(width, height)
         h = cell_size / 2.0
-        if cell_size == 0:  # degenerate polygon; just return the minimum
-            return self.min
+        max_dim = max(width, height)
+        if cell_size == 0 or self.area < max_dim * tolerance:
+            # degenerate polygon; just return the center
+            return self.center
 
         # get an array representation of the polygon and set up the priority queue
         _polygon = tuple(pt.to_array() for pt in self.vertices)
