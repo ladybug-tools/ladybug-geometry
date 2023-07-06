@@ -13,9 +13,11 @@ except ImportError:  # Python2
 from .pointvector import Point2D, Vector2D
 from .line import LineSegment2D
 from .ray import Ray2D
+from .polyline import Polyline2D
 from ..triangulation import _linked_list, _eliminate_holes
 from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
-    does_intersection_exist_line2d, closest_point2d_on_line2d
+    does_intersection_exist_line2d, closest_point2d_on_line2d, \
+    closest_end_point2d_between_line2d
 from ._2d import Base2DIn2D
 import ladybug_geometry.boolean as pb
 
@@ -1373,6 +1375,262 @@ class Polygon2D(Base2DIn2D):
         if x_gap_btwn_rect > tolerance or y_gap_btwn_rect > tolerance:
             return False  # no overlap
         return True  # overlap exists
+
+    @staticmethod
+    def joined_intersected_boundary(floor_polys, tolerance):
+        """Get the boundary around several Polygon2D that are touching one another.
+
+        This method is faster and more reliable than the gap_crossing_boundary
+        but requires that the Polygon2D be touching one another within the tolerance.
+
+        Args:
+            polygons: The polygons to be joined into a boundary. These polygons
+                should have colinear vertices removed and they should not contain
+                degenerate polygons at the tolerance. The remove_colinear_vertices
+                method can be used to pre-process the input polygons to ensure they
+                meet these criteria.
+            tolerance: The tolerance at which the polygons are to be intersected
+                and then joined to give a resulting boundary.
+
+        Returns:
+            A list of Polygon2D that represent the boundary around the input polygons.
+            Note that some of these Polygon2D may represent 'holes' within others
+            and it may be necessary to assess this when interpreting the result.
+        """
+        # intersect the polygons with one another
+        int_poly = Polygon2D.intersect_polygon_segments(floor_polys, tolerance)
+
+        # get indices of all unique vertices across the polygons
+        vertices = []  # collection of vertices as point objects
+        poly_indices = []  # collection of polygon indices
+        for loop in floor_polys:
+            ind = []
+            for v in loop:
+                found = False
+                for i, vert in enumerate(vertices):
+                    if v.is_equivalent(vert, tolerance):
+                        found = True
+                        ind.append(i)
+                        break
+                if not found:  # add new point
+                    vertices.append(v)
+                    ind.append(len(vertices) - 1)
+            poly_indices.append(ind)
+
+        # use the unique vertices to extract naked edges
+        edge_i = []
+        edge_t = []
+        for poly_i in poly_indices:
+            for i, vi in enumerate(poly_i):
+                try:  # this can get slow for large number of vertices
+                    ind = edge_i.index((vi, poly_i[i - 1]))
+                    edge_t[ind] += 1
+                except ValueError:  # make sure reversed edge isn't there
+                    try:
+                        ind = edge_i.index((poly_i[i - 1], vi))
+                        edge_t[ind] += 1
+                    except ValueError:  # add a new edge
+                        if poly_i[i - 1] != vi:  # avoid cases of same start and end
+                            edge_i.append((poly_i[i - 1], vi))
+                            edge_t.append(0)
+        ext_edges = []
+        for i, et in enumerate(edge_t):
+            if et == 0:
+                edg_ind = edge_i[i]
+                pts_2d = (vertices[edg_ind[0]], vertices[edg_ind[1]])
+                ext_edges.append(LineSegment2D.from_end_points(*pts_2d))
+
+        # join the naked edges into closed polygons
+        outlines = Polyline2D.join_segments(ext_edges, tolerance)
+        closed_polys = []
+        for bnd in outlines:
+            if isinstance(bnd, Polyline2D) and bnd.is_closed(tolerance):
+                closed_polys.append(bnd.to_polygon(tolerance))
+        return closed_polys
+
+    @staticmethod
+    def gap_crossing_boundary(polygons, min_separation, tolerance):
+        """Get the boundary around several Polygon2D, crossing gaps of min_separation.
+
+        This method is less reliable than the joined_intersected_boundary because
+        higher values of min_separation that are greater than the lengths of polygon
+        segments can cause important details of the polygons to disappear. However,
+        when used appropriately, it can provide a boundary that jumps across gaps
+        to give resulting polygons that effectively bound all of the input polygons.
+
+        Args:
+            polygons: The polygons to be joined into a boundary. These polygons
+                should have colinear vertices removed and they should not contain
+                degenerate polygons at the tolerance. The remove_colinear_vertices
+                method can be used to pre-process the input polygons to ensure they
+                meet these criteria.
+            min_separation: A number for the minimum distance between Polygon2D that
+                is considered a meaningful separation. In other words, this is
+                the maximum distance of the gap across
+            tolerance: The maximum difference between coordinate values of two
+                vertices at which they can be considered equivalent.
+
+        Returns:
+            A list of Polygon2D that represent the boundary around the input polygons.
+            Note that some of these Polygon2D may represent 'holes' within others
+            and it may be necessary to assess this when interpreting the result.
+        """
+        # ensure that all of the input polygons are counterclockwise
+        cclock_poly = []
+        for poly in polygons:
+            if poly.is_clockwise:
+                cclock_poly.append(poly.reverse())
+            else:
+                cclock_poly.append(poly)
+
+        # determine which Polygon2D segments are 'exterior' using the min_separation
+        right_ang = -math.pi / 2
+        ext_segs = []
+        for i, poly in enumerate(cclock_poly):
+            # remove any short segments
+            rel_segs = [s for s in poly.segments if s.length > min_separation]
+
+            # create min_separation line segments to be used to test intersection
+            test_segs = []
+            for _s in rel_segs:
+                d_vec = _s.v.rotate(right_ang).normalize()
+                seg_pts = _s.subdivide(min_separation)
+                if len(seg_pts) <= 3:
+                    seg_pts = [_s.midpoint]
+                else:
+                    seg_pts = seg_pts[1:-1]
+                spec_test_segs = []
+                for spt in seg_pts:
+                    m_pt = spt.move(d_vec * -tolerance)
+                    spec_test_segs.append(LineSegment2D(m_pt, d_vec * min_separation))
+                test_segs.append(spec_test_segs)
+
+            # intersect the test line segments to asses which parts are exterior
+            non_int_segs = []
+            other_poly = [p for j, p in enumerate(cclock_poly) if j != i]
+            for j, (_s, int_lins) in enumerate(zip(rel_segs, test_segs)):
+                int_vals = [0] * len(int_lins)
+                for l, int_lin in enumerate(int_lins):
+                    for _oth_p in other_poly:
+                        if _oth_p.intersect_line_ray(int_lin):  # intersection!
+                            int_vals[l] = 1
+                            break
+                if sum(int_vals) == len(int_lins):  # fully internal line
+                    continue
+                else: # if the polygon is concave, also check for self intersection
+                    if not poly.is_convex:
+                        _other_segs = [x for k, x in enumerate(rel_segs) if k != j]
+                        for l, int_lin in enumerate(int_lins):
+                            for _oth_s in _other_segs:
+                                if int_lin.intersect_line_ray(_oth_s) is not None:
+                                    int_vals[l] = 1
+                                    break
+
+                # determine the exterior segments using the intersections
+                check_sum = sum(int_vals)
+                if check_sum == 0:  # fully external line
+                    non_int_segs.append(_s)
+                elif len(int_vals) == 1 or check_sum == len(int_vals):
+                    continue  # fully internal line
+                else:  # line that extends from inside to outside
+                    # first see if the exterior part is meaningful
+                    count_in_a_rows, repeat_count = [], 0
+                    for v in int_vals:
+                        if v == 0:
+                            repeat_count += 1
+                            count_in_a_rows.append(repeat_count)
+                        else:
+                            repeat_count = 0
+                    max_repeat = max(count_in_a_rows)
+                    # if the exterior part is meaningful, split it
+                    if max_repeat != 1:
+                        last_pt = _s.p1 if int_vals[0] == 0 else None
+                        for v, ts in zip(int_vals, int_lins):
+                            if v == 0 and last_pt is None:
+                                last_pt = ts.p1
+                            elif v == 1 and last_pt is not None:
+                                lin_seg = LineSegment2D.from_end_points(last_pt, ts.p1)
+                                last_pt = None
+                                non_int_segs.append(lin_seg)
+                        if last_pt is not None:
+                            lin_seg = LineSegment2D.from_end_points(last_pt, _s.p2)
+                            non_int_segs.append(lin_seg)
+
+            ext_segs.extend(non_int_segs)
+
+        # loop through exterior segments and add segments across the min_separation
+        joining_segs = []
+        for i, e_seg in enumerate(ext_segs):
+            try:
+                for o_seg in ext_segs[i + 1:]:
+                    dist, pts = closest_end_point2d_between_line2d(e_seg, o_seg)
+                    if tolerance < dist <= min_separation:
+                        joining_segs.append(LineSegment2D.from_end_points(*pts))
+            except IndexError:
+                pass  # we have reached the end of the list
+
+        # join all of the segments together into polylines
+        all_segs = ext_segs + joining_segs
+        ext_bounds = Polyline2D.join_segments(all_segs, tolerance)
+
+        # separate valid closed boundaries from open ones
+        closed_polys, open_bounds = [], []
+        for bnd in ext_bounds:
+            if isinstance(bnd, Polyline2D) and bnd.is_closed(tolerance):
+                try:
+                    closed_polys.append(bnd.to_polygon(tolerance))
+                except AssertionError:  # not a valid polygon
+                    pass
+            else:
+                open_bounds.append(bnd)
+
+        # if the resulting polylines are not closed, join the nearest end points
+        if len(closed_polys) != len(ext_bounds):
+            extra_segs, extra_pts = [], []
+            for i, s_bnd in enumerate(open_bounds):
+                self_seg = LineSegment2D.from_end_points(s_bnd.p1, s_bnd.p2)
+                poss_segs = [self_seg]
+                try:
+                    for o_bnd in open_bounds[i + 1:]:
+                        pts = [
+                            (s_bnd.p1, o_bnd.p1), (s_bnd.p1, o_bnd.p2),
+                            (s_bnd.p2, o_bnd.p1), (s_bnd.p2, o_bnd.p2)]
+                        for comb in pts:
+                            poss_segs.append(LineSegment2D.from_end_points(*comb))
+                except IndexError:
+                    continue  # we have reached the end of the list
+                # sort the possible segments by their length
+                poss_segs.sort(key=lambda x: x.length, reverse=False)
+                if poss_segs[0] is self_seg:
+                    extra_segs.append(poss_segs[0])
+                else:  # two possible connecting segments
+                    extra_segs.append(poss_segs[0])
+                    extra_segs.append(poss_segs[1])
+            # remove any duplicates from the extra segment list
+            non_dup_segs = []
+            for e_seg in extra_segs:
+                for f_seg in non_dup_segs:
+                    if e_seg.is_equivalent(f_seg, tolerance):
+                        break
+                else:
+                    non_dup_segs.append(e_seg)
+            extra_segs = non_dup_segs
+            # take the best available segments that fit the criteria
+            extra_segs.sort(key=lambda x: x.length, reverse=False)
+            extra_segs = extra_segs[:len(open_bounds)]
+
+            # join all segments, hopefully into a final closed polyline
+            all_segs = ext_segs + joining_segs + extra_segs
+            ext_bounds = Polyline2D.join_segments(all_segs, tolerance)
+            closed_polys = []
+            for bnd in ext_bounds:
+                if isinstance(bnd, Polyline2D) and bnd.is_closed(tolerance):
+                    try:
+                        closed_polys.append(bnd.to_polygon(tolerance))
+                    except AssertionError:  # not a valid polygon
+                        pass
+
+        return closed_polys
 
     def _point_in_polygon(self, tolerance):
         """Get a Point2D that is always reliably inside this Polygon2D.

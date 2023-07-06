@@ -1,12 +1,12 @@
 # coding=utf-8
 import pytest
+import math
+import json
 
 from ladybug_geometry.geometry2d.polygon import Polygon2D
 from ladybug_geometry.geometry2d.pointvector import Point2D, Vector2D
 from ladybug_geometry.geometry2d.line import LineSegment2D
 from ladybug_geometry.geometry2d.ray import Ray2D
-
-import math
 
 
 def test_polygon2d_init():
@@ -1043,3 +1043,29 @@ def test_boolean_split():
 
     assert len(poly2_dif) == 1
     assert len(poly2_dif[0].vertices) == 7
+
+
+def test_joined_intersected_boundary():
+    geo_file = './tests/json/polygons_for_joined_boundary.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    polygons = [Polygon2D.from_dict(p) for p in geo_dict]
+
+    bound_polygons = Polygon2D.joined_intersected_boundary(polygons, 0.01)
+    assert len(bound_polygons) == 6
+
+    sorted_polys = sorted(bound_polygons, key=lambda x: x.area, reverse=True)
+    large_poly = sorted_polys[0]
+    for sub_poly in sorted_polys[1:]:
+        assert large_poly.is_polygon_inside(sub_poly)
+
+
+def test_gap_crossing_boundary():
+    geo_file = './tests/json/polygons_for_gap_boundary.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    polygons = [Polygon2D.from_dict(p) for p in geo_dict]
+
+    bound_polygons = Polygon2D.gap_crossing_boundary(polygons, 0.25, 0.01)
+    assert len(bound_polygons) == 1
+    assert bound_polygons[0].area > 1600

@@ -5,7 +5,6 @@ from __future__ import division
 from ._2d import Base2DIn2D
 from .pointvector import Point2D
 from .line import LineSegment2D
-from .polygon import Polygon2D
 from ..intersection2d import intersect_line2d, intersect_line2d_infinite
 from .._polyline import _group_vertices
 
@@ -274,6 +273,7 @@ class Polyline2D(Base2DIn2D):
             tolerance: The minimum difference between vertices below which vertices
                 are considered the same.
         """
+        from .polygon import Polygon2D  # must be imported here to avoid circular import
         if self.is_closed(tolerance):
             return Polygon2D(self._vertices[:-1])
         return Polygon2D(self._vertices)

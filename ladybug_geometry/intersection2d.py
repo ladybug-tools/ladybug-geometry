@@ -231,7 +231,9 @@ def closest_point2d_on_line2d_infinite(point, line_ray):
 def closest_point2d_between_line2d(line_ray_a, line_ray_b):
     """Get the two closest Point2D between two LineSegment2D objects.
 
-    Note that the line segments should not intersect for the result to be valid.
+    When the closest point on one of the segments lies in the middle of the
+    segment, this will be accounted for. Also note that the line segments
+    should not intersect for the result to be valid.
 
     Args:
         line_ray_a: A LineSegment2D object.
@@ -262,6 +264,39 @@ def closest_point2d_between_line2d(line_ray_a, line_ray_b):
     # sort the closest points based on their distance
     dists = [dist_1, dist_2, dist_3, dist_4]
     pts = [(line_ray_a.p, pt_1), (a_p2, pt_2), (pt_3, line_ray_b.p), (pt_4, b_p2)]
+    dists, i = zip(*sorted(zip(dists, range(len(pts)))))
+    return dists[0], pts[i[0]]
+
+
+def closest_end_point2d_between_line2d(line_a, line_b):
+    """Get the two closest end Point2Ds between two LineSegment2D objects.
+
+    The result will always be composed of endpoints of the segments and will not
+    account for cases where the closest point lies in the middle of a segment.
+    For cases where such middle points are important, the
+    closest_point2d_between_line2d method should be used.
+
+    Args:
+        line_a: A LineSegment2D object.
+        line_b: Another LineSegment2D to which closest points will
+            be determined.
+
+    Returns:
+        A tuple with two elements
+
+        - dist: The distance between the two endpoints objects.
+        - pts: A tuple of two Point2D objects representing:
+
+        1) The end point on line_a that is closest to line_b
+        2) The end point on line_b that is closest to line_a
+    """
+    # one of the 4 endpoints must be a closest point
+    pts = [
+        (line_a.p1, line_b.p1), (line_a.p1, line_b.p2),
+        (line_a.p2, line_b.p1), (line_a.p2, line_b.p2)
+    ]
+    dists = [p1.distance_to_point(p2) for p1, p2 in pts]
+    # sort the closest points based on their distance
     dists, i = zip(*sorted(zip(dists, range(len(pts)))))
     return dists[0], pts[i[0]]
 
