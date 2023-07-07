@@ -1377,7 +1377,7 @@ class Polygon2D(Base2DIn2D):
         return True  # overlap exists
 
     @staticmethod
-    def joined_intersected_boundary(floor_polys, tolerance):
+    def joined_intersected_boundary(polygons, tolerance):
         """Get the boundary around several Polygon2D that are touching one another.
 
         This method is faster and more reliable than the gap_crossing_boundary
@@ -1398,12 +1398,12 @@ class Polygon2D(Base2DIn2D):
             and it may be necessary to assess this when interpreting the result.
         """
         # intersect the polygons with one another
-        int_poly = Polygon2D.intersect_polygon_segments(floor_polys, tolerance)
+        int_poly = Polygon2D.intersect_polygon_segments(polygons, tolerance)
 
         # get indices of all unique vertices across the polygons
         vertices = []  # collection of vertices as point objects
         poly_indices = []  # collection of polygon indices
-        for loop in floor_polys:
+        for loop in int_poly:
             ind = []
             for v in loop:
                 found = False

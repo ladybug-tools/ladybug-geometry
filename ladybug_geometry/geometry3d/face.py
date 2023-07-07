@@ -1631,7 +1631,7 @@ class Face3D(Base2DIn3D):
                 ratio is too large for the height, the ratio will take precedence
                 and the sub-rectangle height will be smaller than this value.
             horizontal_separation: A number for the target separation between
-                individual sub-rectangle centerlines.  If this number is larger than
+                individual sub-rectangle center lines.  If this number is larger than
                 the parent rectangle base, only one sub-rectangle will be produced.
             vertical_separation: An optional number to create a single vertical
                 separation between top and bottom sub-rectangles. The default is
@@ -1750,7 +1750,7 @@ class Face3D(Base2DIn3D):
                 is too large for the sill_height to fit within the rectangle,
                 the sub_rect_height will take precedence.
             horizontal_separation: A number for the target separation between
-                individual sub-rectangle centerlines.  If this number is larger than
+                individual sub-rectangle center lines.  If this number is larger than
                 the parent rectangle base, only one sub-rectangle will be produced.
 
         Returns:
@@ -1920,6 +1920,116 @@ class Face3D(Base2DIn3D):
                 pg_3d.append(tuple(plane.xy_to_xyz(pt) for pt in shp.vertices))
             face_3d.append(Face3D(pg_3d[0], plane, holes=pg_3d[1:]))
         return face_3d
+
+    @staticmethod
+    def join_coplanar_faces(faces, tolerance):
+        """Join a list of coplanar Face3Ds together to get as few as possible.
+
+        Args:
+            faces: A list of Face3D objects to be joined together. These should
+                all be coplanar but they do not need to have their colinear
+                vertices removed or be intersected for matching segments along
+                which they are joined.
+            tolerance: The maximum difference between values at which point vertices
+                are considered to be the same.
+
+        Returns:
+            A list of Face3Ds for the minimum number joined together.
+        """
+        # get polygons for the faces that all lie within the same plane
+        face_polys, base_plane = [], faces[0].plane
+        for fg in faces:
+            verts2d = tuple(base_plane.xyz_to_xy(_v) for _v in fg.boundary)
+            face_polys.append(Polygon2D(verts2d))
+            if fg.has_holes:
+                for hole in fg.holes:
+                    verts2d = tuple(base_plane.xyz_to_xy(_v) for _v in hole)
+                    face_polys.append(Polygon2D(verts2d))
+
+        # remove colinear vertices
+        clean_face_polys = []
+        for geo in face_polys:
+            try:
+                clean_face_polys.append(geo.remove_colinear_vertices(tolerance))
+            except AssertionError:  # degenerate geometry to ignore
+                pass
+
+        # get the joined boundaries around the Polygon2D
+        joined_bounds = Polygon2D.joined_intersected_boundary(
+            clean_face_polys, tolerance)
+
+        # convert the boundary polygons back to Face3D
+        if len(joined_bounds) == 1:  # can be represented with a single Face3D
+            verts3d = tuple(base_plane.xy_to_xyz(_v) for _v in joined_bounds[0])
+            return [Face3D(verts3d, plane=base_plane)]
+        else:  # need to separate holes from distinct Face3Ds
+            bound_faces = []
+            for poly in joined_bounds:
+                verts3d = tuple(base_plane.xy_to_xyz(_v) for _v in poly)
+                bound_faces.append(Face3D(verts3d, plane=base_plane))
+            return Face3D.merge_faces_to_holes(bound_faces, tolerance)
+
+    @staticmethod
+    def merge_faces_to_holes(faces, tolerance):
+        """Take of list of Face3Ds and merge any sub-faces into the others as holes.
+
+        This is particularly useful when translating 2D Polygons back into a 3D
+        space and it is unknown whether certain polygons represent holes in the
+        others.
+
+        Args:
+            faces: A list of Face3D which will be merged into fewer faces with
+                any sub-faces represented as holes.
+            tolerance: The tolerance to be used for evaluating sub-faces.
+        """
+        # sort the faces by area and separate base face from the remaining
+        faces = sorted(faces, key=lambda x: x.area, reverse=True)
+        base_face = faces[0]
+        remain_faces = list(faces[1:])
+
+        # merge the smaller faces into the larger faces
+        merged_face3ds = []
+        while len(remain_faces) > 0:
+            merged_face3ds.append(
+                Face3D._match_holes_to_face(base_face, remain_faces, tolerance))
+            if len(remain_faces) > 1:
+                base_face = remain_faces[0]
+                del remain_faces[0]
+            elif len(remain_faces) == 1:  # lone last Face3D
+                merged_face3ds.append(remain_faces[0])
+                del remain_faces[0]
+        return merged_face3ds
+
+    @staticmethod
+    def _match_holes_to_face(base_face, other_faces, tol):
+        """Attempt to merge other faces into a base face as holes.
+
+        Args:
+            base_face: A Face3D to serve as the base.
+            other_faces: A list of other Face3D objects to attempt to merge into
+                the base_face as a hole. This method will delete any faces
+                that are successfully merged into the output from this list.
+            tol: The tolerance to be used for evaluating sub-faces.
+
+        Returns:
+            A Face3D which has holes in it if any of the other_faces is a valid
+            sub face.
+        """
+        holes = []
+        more_to_check = True
+        while more_to_check:
+            for i, r_face in enumerate(other_faces):
+                if base_face.is_sub_face(r_face, tol, 1):
+                    holes.append(r_face)
+                    del other_faces[i]
+                    break
+            else:
+                more_to_check = False
+        if len(holes) == 0:
+            return base_face
+        else:
+            hole_verts = [hole.vertices for hole in holes]
+            return Face3D(base_face.vertices, Plane(n=Vector3D(0, 0, 1)), hole_verts)
 
     def to_dict(self, include_plane=True, enforce_upper_left=False):
         """Get Face3D as a dictionary.

@@ -1,12 +1,9 @@
 # coding=utf-8
 import pytest
 
-from ladybug_geometry.geometry2d.pointvector import Vector2D
-from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
-from ladybug_geometry.geometry3d.plane import Plane
-from ladybug_geometry.geometry3d.line import LineSegment3D
-from ladybug_geometry.geometry3d.ray import Ray3D
-from ladybug_geometry.geometry3d.face import Face3D
+from ladybug_geometry.geometry2d import Vector2D, Polygon2D
+from ladybug_geometry.geometry3d import Point3D, Vector3D, Ray3D, LineSegment3D, \
+    Plane, Face3D
 
 import math
 import json
@@ -1527,6 +1524,20 @@ def test_coplanar_split():
 
     assert len(split1) == 2
     assert len(split2) == 4
+
+
+def test_join_coplanar_faces():
+    """Test the join_coplanar_faces method."""
+    geo_file = './tests/json/polygons_for_joined_boundary.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    polygons = [Polygon2D.from_dict(p) for p in geo_dict]
+    faces = [Face3D([Point3D(p.x, p.y, 0) for p in poly]) for poly in polygons]
+
+    joined_faces = Face3D.join_coplanar_faces(faces, 0.01)
+    assert len(joined_faces) == 1
+    assert joined_faces[0].has_holes
+    assert len(joined_faces[0].holes) == 5
 
 
 def test_extract_all_from_stl():
