@@ -194,7 +194,6 @@ class Polygon2D(Base2DIn2D):
         _new_poly = cls(boundary)
         _new_poly._is_clockwise = bound_direction
         _new_poly._is_convex = False
-        _new_poly._is_self_intersecting = False
         return _new_poly
 
     @classmethod
@@ -234,7 +233,6 @@ class Polygon2D(Base2DIn2D):
         _new_poly = cls(boundary)
         _new_poly._is_clockwise = bound_direction
         _new_poly._is_convex = False
-        _new_poly._is_self_intersecting = False
         return _new_poly
 
     @classmethod

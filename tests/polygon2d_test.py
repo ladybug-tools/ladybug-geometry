@@ -177,7 +177,6 @@ def test_polygon2d_init_from_shape_with_hole():
     assert polygon.perimeter == pytest.approx(26.828427, rel=1e-3)
     assert not polygon.is_clockwise
     assert not polygon.is_convex
-    assert not polygon.is_self_intersecting
 
 
 def test_polygon2d_init_from_shape_with_holes():
@@ -201,7 +200,6 @@ def test_polygon2d_init_from_shape_with_holes():
     assert polygon.perimeter == pytest.approx(26.24264068, rel=1e-3)
     assert not polygon.is_clockwise
     assert not polygon.is_convex
-    assert not polygon.is_self_intersecting
 
 
 def test_clockwise():
