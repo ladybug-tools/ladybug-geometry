@@ -499,7 +499,14 @@ class Face3D(Base2DIn3D):
         origin of the geometry is unknown.
         """
         if self._is_self_intersecting is None:
-            self._is_self_intersecting = self.polygon2d.is_self_intersecting
+            self._is_self_intersecting = False
+            if self.boundary_polygon2d.is_self_intersecting:
+                self._is_self_intersecting = True
+            if self.has_holes:
+                for hp in self.hole_polygon2d:
+                    if hp.is_self_intersecting:
+                        self._is_self_intersecting = True
+                        break
         return self._is_self_intersecting
 
     @property
