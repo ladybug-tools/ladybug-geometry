@@ -1375,6 +1375,39 @@ class Polygon2D(Base2DIn2D):
         return True  # overlap exists
 
     @staticmethod
+    def group_by_overlap(polygons, tolerance):
+        """Group Polygon2Ds that overlap one another greater than the tolerance.
+
+        This is useful as a pre-step before running Polygon2d.boolean_union_all()
+        in order to assess whether unionizing is necessary and to ensure that
+        it is only performed among the necessary groups of polygons.
+
+        Args:
+            polygons: A list of Polygon2D to be grouped by their overlapping.
+            tolerance: The minimum distance from the edge of a neighboring polygon
+                at which a point is considered to overlap with that polygon.
+
+        Returns:
+            A list of lists where each sub-list represents a group of polygons
+            that all overlap with one another.
+        """
+        # loop through the polygons and check to see if it overlaps with the others
+        grouped_polys = [[polygons[0]]]
+        for poly in polygons[1:]:
+            group_found = False
+            for poly_group in grouped_polys:
+                if group_found:
+                    break
+                for oth_poly in poly_group:
+                    if poly.polygon_relationship(oth_poly, tolerance) >= 0:
+                        poly_group.append(poly)
+                        group_found = True
+                        break
+            if not group_found:  # the polygon does not overlap with any of the others
+                grouped_polys.append([poly])  # make a new group for the polygon
+        return grouped_polys
+
+    @staticmethod
     def joined_intersected_boundary(polygons, tolerance):
         """Get the boundary around several Polygon2D that are touching one another.
 
