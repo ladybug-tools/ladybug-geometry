@@ -655,6 +655,28 @@ def test_polygon_relationship_concave():
     assert outside_polygon.polygon_relationship(inside_polygon, 0.01) == -1
 
 
+def test_group_by_overlap():
+    """Test the group_by_overlap method."""
+    bound_pts1 = [Point2D(0, 0), Point2D(4, 0), Point2D(4, 4), Point2D(0, 4)]
+    bound_pts2 = [Point2D(2, 2), Point2D(6, 2), Point2D(6, 6), Point2D(2, 6)]
+    bound_pts3 = [Point2D(6, 6), Point2D(7, 6), Point2D(7, 7), Point2D(6, 7)]
+    polygon1 = Polygon2D(bound_pts1)
+    polygon2 = Polygon2D(bound_pts2)
+    polygon3 = Polygon2D(bound_pts3)
+
+    all_polys = [polygon1, polygon2, polygon3]
+
+    grouped_polys = Polygon2D.group_by_overlap(all_polys, 0.01)
+    assert len(grouped_polys) == 2
+    assert len(grouped_polys[0]) == 2
+    assert len(grouped_polys[1]) == 1
+
+    grouped_polys = Polygon2D.group_by_overlap(list(reversed(all_polys)), 0.01)
+    assert len(grouped_polys) == 2
+    assert len(grouped_polys[0]) == 1
+    assert len(grouped_polys[1]) == 2
+
+
 def test_distance_to_point():
     """Test the distance_to_point method."""
     pts = (Point2D(0, 0), Point2D(4, 0), Point2D(4, 2), Point2D(2, 2),
