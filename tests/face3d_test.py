@@ -1560,13 +1560,27 @@ def test_group_by_coplanar_overlap():
 
     grouped_faces = Face3D.group_by_coplanar_overlap(all_faces, 0.01)
     assert len(grouped_faces) == 2
-    assert len(grouped_faces[0]) == 2
-    assert len(grouped_faces[1]) == 1
+    assert len(grouped_faces[0]) in (2, 1)
+    assert len(grouped_faces[1]) in (2, 1)
 
-    grouped_faces = Face3D.group_by_coplanar_overlap(list(reversed(all_faces)), 0.01)
+
+def test_group_by_coplanar_overlap_3_group():
+    """Test the group_by_coplanar_overlap method with a group of 3."""
+    bound_pts1 = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
+    bound_pts2 = [Point3D(2, 2), Point3D(6, 2), Point3D(6, 6), Point3D(2, 6)]
+    bound_pts3 = [Point3D(6, 6), Point3D(7, 6), Point3D(7, 7), Point3D(6, 7)]
+    bound_pts4 = [Point3D(0, 0), Point3D(2, 0), Point3D(2, 2), Point3D(0, 2)]
+    face1 = Face3D(bound_pts1)
+    face2 = Face3D(bound_pts2)
+    face3 = Face3D(bound_pts3)
+    face4 = Face3D(bound_pts4)
+
+    all_faces = [face4, face2, face3, face1]
+
+    grouped_faces = Face3D.group_by_coplanar_overlap(all_faces, 0.01)
     assert len(grouped_faces) == 2
-    assert len(grouped_faces[0]) == 1
-    assert len(grouped_faces[1]) == 2
+    assert len(grouped_faces[0]) in (3, 1)
+    assert len(grouped_faces[1]) in (3, 1)
 
 
 def test_join_coplanar_faces():

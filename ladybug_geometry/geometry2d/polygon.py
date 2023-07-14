@@ -1391,6 +1391,8 @@ class Polygon2D(Base2DIn2D):
             A list of lists where each sub-list represents a group of polygons
             that all overlap with one another.
         """
+        # sort the polygons by area to ensure larger ones grab smaller ones
+        polygons = list(sorted(polygons, key=lambda x: x.area, reverse=True))
         # loop through the polygons and check to see if it overlaps with the others
         grouped_polys = [[polygons[0]]]
         for poly in polygons[1:]:
