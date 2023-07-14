@@ -1505,8 +1505,29 @@ def test_sub_faces_by_ratio_sub_rectangle_tol_issue():
         assert face_1.is_sub_face(sf, 0.01, 1)
 
 
+def test_coplanar_union():
+    """Test the coplanar_union method."""
+    b_pts1 = (Point3D(-14.79, -36.61, 0.00), Point3D(6.68, -36.61, 0.00),
+              Point3D(6.68, -10.37, 0.00), Point3D(-14.79, -10.37, 0.00))
+    h_pts1 = (
+        (Point3D(-9.71, -22.66, 0.00), Point3D(-9.71, -16.19, 0.00),
+         Point3D(-5.01, -16.19, 0.00), Point3D(-5.01, -22.66, 0.00)),
+        (Point3D(0.31, -35.20, 0.00), Point3D(0.31, -29.89, 0.00),
+         Point3D(5.15, -29.89, 0.00), Point3D(5.15, -35.20, 0.00))
+    )
+    b_pts2 = (Point3D(-7.02, -32.34, 0.00), Point3D(13.23, -32.34, 0.00),
+              Point3D(13.23, -18.57, 0.00), Point3D(-7.02, -18.57, 0.00))
+    face1 = Face3D(b_pts1, holes=h_pts1)
+    face2 = Face3D(b_pts2)
+
+    face_union = Face3D.coplanar_union(face1, face2, 0.01, 1)
+
+    assert isinstance(face_union, Face3D)
+    assert len(face_union.holes) == 2
+
+
 def test_coplanar_split():
-    """Test the coplanar_split_method."""
+    """Test the coplanar_split method."""
     b_pts1 = (Point3D(-14.79, -36.61, 0.00), Point3D(6.68, -36.61, 0.00),
               Point3D(6.68, -10.37, 0.00), Point3D(-14.79, -10.37, 0.00))
     h_pts1 = (
@@ -1524,6 +1545,28 @@ def test_coplanar_split():
 
     assert len(split1) == 2
     assert len(split2) == 4
+
+
+def test_group_by_coplanar_overlap():
+    """Test the group_by_coplanar_overlap method."""
+    bound_pts1 = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
+    bound_pts2 = [Point3D(2, 2), Point3D(6, 2), Point3D(6, 6), Point3D(2, 6)]
+    bound_pts3 = [Point3D(6, 6), Point3D(7, 6), Point3D(7, 7), Point3D(6, 7)]
+    face1 = Face3D(bound_pts1)
+    face2 = Face3D(bound_pts2)
+    face3 = Face3D(bound_pts3)
+
+    all_faces = [face1, face2, face3]
+
+    grouped_faces = Face3D.group_by_coplanar_overlap(all_faces, 0.01)
+    assert len(grouped_faces) == 2
+    assert len(grouped_faces[0]) == 2
+    assert len(grouped_faces[1]) == 1
+
+    grouped_faces = Face3D.group_by_coplanar_overlap(list(reversed(all_faces)), 0.01)
+    assert len(grouped_faces) == 2
+    assert len(grouped_faces[0]) == 1
+    assert len(grouped_faces[1]) == 2
 
 
 def test_join_coplanar_faces():
