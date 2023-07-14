@@ -1825,6 +1825,62 @@ class Face3D(Base2DIn3D):
         return final_faces
 
     @staticmethod
+    def coplanar_union(face1, face2, tolerance, angle_tolerance):
+        """Boolean Union two coplanar Face3D with one another.
+
+        Args:
+            face1: A Face3D for the first face that will be unioned with the second face.
+            face2: A Face3D for the second face that will be unioned with the first face.
+            tolerance: The minimum distance between points before they are considered
+                distinct from one another.
+            angle_tolerance: The max angle in radians that the plane normals can
+                differ from one another in order for them to be considered coplanar.
+
+        Returns:
+            A single Face3D for the Union of the two input Face3D. When the faces
+            are not coplanar or they do not overlap, None will be returned.
+        """
+        # test whether the faces are coplanar
+        prim_pl = face1.plane
+        if not prim_pl.is_coplanar_tolerance(face2.plane, tolerance, angle_tolerance):
+            return None
+        # test whether the two polygons have any overlap in 2D space
+        f1_poly = face1.boundary_polygon2d
+        f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
+        if not Polygon2D.overlapping_bounding_rect(f1_poly, f2_poly, tolerance):
+            return None
+        if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
+            return None
+        # snap the polygons to one another to avoid tolerance issues
+        try:
+            f1_poly = f1_poly.remove_colinear_vertices(tolerance)
+            f2_poly = f2_poly.remove_colinear_vertices(tolerance)
+        except AssertionError:  # degenerate faces input
+            return None
+        s2_poly = f1_poly.snap_to_polygon(f2_poly, tolerance)
+        # get BooleanPolygons of the two faces
+        f1_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f1_poly.vertices)]
+        f2_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in s2_poly.vertices)]
+        if face1.has_holes:
+            for hole in face1.hole_polygon2d:
+                f1_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+        if face2.has_holes:
+            for hole in face2.holes:
+                h_pt2d = (prim_pl.xyz_to_xy(pt) for pt in hole)
+                f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in h_pt2d))
+        b_poly1 = pb.BooleanPolygon(f1_polys)
+        b_poly2 = pb.BooleanPolygon(f2_polys)
+        # split the two boolean polygons with one another
+        int_tol = tolerance / 100
+        try:
+            poly_result = pb.union(b_poly1, b_poly2, int_tol)
+        except Exception:
+            return [face1], [face2]  # typically a tolerance issue causing failure
+        # rebuild the Face3D from the results and return them
+        union_faces = Face3D._from_bool_poly(poly_result, prim_pl)
+        return union_faces[0]
+
+    @staticmethod
     def coplanar_split(face1, face2, tolerance, angle_tolerance):
         """Split two coplanar Face3D with one another (ensuring matching overlapped area)
 
@@ -1927,6 +1983,45 @@ class Face3D(Base2DIn3D):
                 pg_3d.append(tuple(plane.xy_to_xyz(pt) for pt in shp.vertices))
             face_3d.append(Face3D(pg_3d[0], plane, holes=pg_3d[1:]))
         return face_3d
+
+    @staticmethod
+    def group_by_coplanar_overlap(faces, tolerance):
+        """Group coplanar Face3Ds depending on whether they overlap one another.
+
+        This is useful as a pre-step before running Face3D.coplanar_union()
+        in order to assess whether unionizing is necessary and to ensure that
+        it is only performed among the necessary groups of faces.
+
+        Args:
+            faces: A list of Face3D to be grouped by their overlapping.
+            tolerance: The minimum distance from the edge of a neighboring Face3D
+                at which a point is considered to overlap with that Face3D.
+
+        Returns:
+            A list of lists where each sub-list represents a group of Face3Ds
+            that all overlap with one another.
+        """
+        # create polygons for all of the faces
+        r_plane = faces[0].plane
+        polygons = [Polygon2D([r_plane.xyz_to_xy(pt) for pt in face.vertices])
+                    for face in faces]
+        # loop through the polygons and check to see if it overlaps with the others
+        grouped_polys, grouped_faces = [[polygons[0]]], [[faces[0]]]
+        for poly, face in zip(polygons[1:], faces[1:]):
+            group_found = False
+            for poly_group, face_group in zip(grouped_polys, grouped_faces):
+                for oth_poly in poly_group:
+                    if poly.polygon_relationship(oth_poly, tolerance) >= 0:
+                        poly_group.append(poly)
+                        face_group.append(face)
+                        group_found = True
+                        break
+                if group_found:
+                    break
+            if not group_found:  # the polygon does not overlap with any of the others
+                grouped_polys.append([poly])  # make a new group for the polygon
+                grouped_faces.append([face])  # make a new group for the face
+        return grouped_faces
 
     @staticmethod
     def join_coplanar_faces(faces, tolerance):
