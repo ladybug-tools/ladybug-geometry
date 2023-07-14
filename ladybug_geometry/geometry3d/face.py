@@ -2001,6 +2001,8 @@ class Face3D(Base2DIn3D):
             A list of lists where each sub-list represents a group of Face3Ds
             that all overlap with one another.
         """
+        # sort the faces by area to ensure larger ones grab smaller ones
+        faces = list(sorted(faces, key=lambda x: x.area, reverse=True))
         # create polygons for all of the faces
         r_plane = faces[0].plane
         polygons = [Polygon2D([r_plane.xyz_to_xy(pt) for pt in face.vertices])
