@@ -33,6 +33,8 @@ class Polygon2D(Base2DIn2D):
     Properties:
         * vertices
         * segments
+        * inside_angles
+        * outside_angles
         * min
         * max
         * center
@@ -43,7 +45,7 @@ class Polygon2D(Base2DIn2D):
         * is_self_intersecting
         * is_valid
     """
-    __slots__ = ('_segments', '_perimeter', '_area',
+    __slots__ = ('_segments', '_inside_angles', '_outside_angles', '_perimeter', '_area',
                  '_is_clockwise', '_is_convex', '_is_self_intersecting')
 
     def __init__(self, vertices):
@@ -51,6 +53,8 @@ class Polygon2D(Base2DIn2D):
         Base2DIn2D.__init__(self, vertices)
         self._segments = None
         self._perimeter = None
+        self._inside_angles = None
+        self._outside_angles = None
         self._area = None
         self._is_clockwise = None
         self._is_convex = None
@@ -307,6 +311,39 @@ class Polygon2D(Base2DIn2D):
             _segs = self._segments_from_vertices(self.vertices)
             self._segments = tuple(_segs)
         return self._segments
+
+    @property
+    def inside_angles(self):
+        """Tuple of angles in radians for the interior angles of the polygon.
+
+        These are aligned with the vertices such that the first angle corresponds
+        to the inside angle at the first vertex, the second at the second vertex,
+        and so on.
+        """
+        if self._inside_angles is None:
+            angles, is_clock = [], self.is_clockwise
+            for i, pt in enumerate(self.vertices):
+                v1 = self.vertices[i - 2] - self.vertices[i - 1]
+                v2 = pt - self.vertices[i - 1]
+                v_angle = v1.angle_counterclockwise(v2) if is_clock \
+                    else v1.angle_clockwise(v2)
+                angles.append(v_angle)
+            angles.append(angles.pop(0))  # move the start angle to the end
+            self._inside_angles = tuple(angles)
+        return self._inside_angles
+
+    @property
+    def outside_angles(self):
+        """Tuple of angles in radians for the exterior angles of the polygon.
+
+        These are aligned with the vertices such that the first angle corresponds
+        to the inside angle at the first vertex, the second at the second vertex,
+        and so on.
+        """
+        if self._outside_angles is None:
+            pi2 = math.pi * 2
+            self._outside_angles = tuple(pi2 - a for a in self.inside_angles)
+        return self._outside_angles
 
     @property
     def perimeter(self):

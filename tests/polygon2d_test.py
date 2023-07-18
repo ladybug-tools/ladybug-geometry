@@ -43,6 +43,25 @@ def test_polygon2d_init():
         assert isinstance(p_array, tuple)
         assert len(arr) == 2
 
+    assert isinstance(polygon.inside_angles, tuple)
+    assert len(polygon.inside_angles) == 4
+    assert all(math.degrees(a) == 90 for a in polygon.inside_angles)
+
+    assert isinstance(polygon.outside_angles, tuple)
+    assert len(polygon.outside_angles) == 4
+    assert all(math.degrees(a) == 270 for a in polygon.outside_angles)
+
+
+def test_polygon2d_inside_angles():
+    """Test the Polygon2D.inside_angles property."""
+    pts = (Point2D(-2, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+    polygon = Polygon2D(pts)
+
+    assert math.degrees(polygon.inside_angles[0]) == pytest.approx(45, rel=1e-3)
+    assert math.degrees(polygon.inside_angles[1]) == pytest.approx(90, rel=1e-3)
+    assert math.degrees(polygon.inside_angles[2]) == pytest.approx(90, rel=1e-3)
+    assert math.degrees(polygon.inside_angles[3]) == pytest.approx(135, rel=1e-3)
+
 
 def test_polygon2d_is_rectangle():
     """Test the Polygon2D.is_rectangle method."""
