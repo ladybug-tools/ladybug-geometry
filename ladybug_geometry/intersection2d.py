@@ -58,12 +58,56 @@ def intersect_line2d(line_ray_a, line_ray_b):
     if not line_ray_b._u_in(ub):
         return None
 
-    # final check for co-linearity that escapes floating tolerance
-    if ua == ub == 0 and math.copysign(1, ua) == -1 and math.copysign(1, ub) == -1:
-        return None
-
     return Point2D(line_ray_a.p.x + ua * line_ray_a.v.x,
                    line_ray_a.p.y + ua * line_ray_a.v.y)
+
+
+def intersect_line_segment2d(line_a, line_b):
+    """Get the intersection between two LineSegment2D objects as a Point2D.
+
+    This function is identical to intersect_line2d but has some extra checks to
+    avoid certain cases of floating point tolerance issues. It is only intended
+    to work with LineSegment2D and not Ray2D.
+
+    Args:
+        line_a: A LineSegment2D object.
+        line_b: Another LineSegment2D intersect.
+
+    Returns:
+        Point2D of intersection if it exists. None if no intersection exists.
+    """
+    # d is the determinant between lines, if 0 lines are collinear
+    d = line_b.v.y * line_a.v.x - line_b.v.x * line_a.v.y
+    if d == 0:
+        return None
+
+    # (dx, dy) = A.p - B.p
+    dy = line_a.p.y - line_b.p.y
+    dx = line_a.p.x - line_b.p.x
+
+    # Find parameters ua and ub for intersection between two lines
+
+    # Calculate scaling parameter for line_b
+    ua = (line_b.v.x * dy - line_b.v.y * dx) / d
+    # Checks the bounds of ua to ensure it obeys ray/line behavior
+    if not line_a._u_in(ua):
+        return None
+
+    # Calculate scaling parameter for line_b
+    ub = (line_a.v.x * dy - line_a.v.y * dx) / d
+    # Checks the bounds of ub to ensure it obeys ray/line behavior
+    if not line_b._u_in(ub):
+        return None
+
+    # compute the intersection point
+    int_pta = Point2D(line_a.p.x + ua * line_a.v.x, line_a.p.y + ua * line_a.v.y)
+    int_ptb = Point2D(line_b.p.x + ub * line_b.v.x, line_b.p.y + ub * line_b.v.y)
+    
+    # if the two points are unequal, there's a floating point tolerance issue
+    if int_pta != int_ptb:
+        return None
+
+    return int_pta
 
 
 def intersect_line2d_infinite(line_ray_a, line_ray_b):

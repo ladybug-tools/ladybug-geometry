@@ -4,7 +4,8 @@ from __future__ import division
 
 from .pointvector import Vector2D, Point2D
 from ._1d import Base1DIn2D
-from ..intersection2d import closest_point2d_between_line2d
+from ..intersection2d import closest_point2d_between_line2d, intersect_line2d, \
+    intersect_line_segment2d
 
 
 class LineSegment2D(Base1DIn2D):
@@ -208,6 +209,19 @@ class LineSegment2D(Base1DIn2D):
                 desired point lies.
         """
         return self.p + self.v * (length / self.length)
+
+    def intersect_line_ray(self, line_ray):
+        """Get the intersection between this object and another Ray2 or LineSegment2D.
+
+        Args:
+            line_ray: Another LineSegment2D or Ray2D or to intersect.
+
+        Returns:
+            Point2D of intersection if it exists. None if no intersection exists.
+        """
+        if isinstance(line_ray, LineSegment2D):
+            return intersect_line_segment2d(self, line_ray)
+        return intersect_line2d(self, line_ray)
 
     def closest_points_between_line(self, line):
         """Get the two closest Point2D between this object to another LineSegment2D.

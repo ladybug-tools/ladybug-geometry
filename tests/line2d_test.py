@@ -1,10 +1,10 @@
 # coding=utf-8
+import math
 import pytest
+import json
 
 from ladybug_geometry.geometry2d.pointvector import Point2D, Vector2D
 from ladybug_geometry.geometry2d.line import LineSegment2D
-
-import math
 
 
 def test_linesegment2_init():
@@ -356,6 +356,38 @@ def test_intersect_line_ray_colinear():
     seg_2 = LineSegment2D(pt_2, vec_2)
 
     assert seg_1.intersect_line_ray(seg_2) == Point2D(0, 0)
+
+
+def test_intersect_line_ray_colinear_float_tol():
+    """Test the LineSegment2D intersect_line_ray method with colinear segments."""
+    geo_file = './tests/json/colinear_segs_no_int.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    segs = [LineSegment2D.from_dict(s) for s in geo_dict[0]]
+
+    seg_1, seg_2 = segs
+    assert seg_1.intersect_line_ray(seg_2) is None
+    assert seg_2.intersect_line_ray(seg_1) is None
+    seg_1 = seg_1.flip()
+    assert seg_1.intersect_line_ray(seg_2) is None
+    seg_2 = seg_2.flip()
+    assert seg_1.intersect_line_ray(seg_2) is None
+
+
+def test_intersect_line_ray_colinear_float_tol2():
+    """Test the LineSegment2D intersect_line_ray method with more colinear segments."""
+    geo_file = './tests/json/colinear_segs_no_int.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    segs = [LineSegment2D.from_dict(s) for s in geo_dict[1]]
+
+    seg_1, seg_2 = segs
+    assert seg_1.intersect_line_ray(seg_2) is None
+    assert seg_2.intersect_line_ray(seg_1) is None
+    seg_1 = seg_1.flip()
+    assert seg_1.intersect_line_ray(seg_2) is None
+    seg_2 = seg_2.flip()
+    assert seg_1.intersect_line_ray(seg_2) is None
 
 
 def test_closest_points_between_line():
