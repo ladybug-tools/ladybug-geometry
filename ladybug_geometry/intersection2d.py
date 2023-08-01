@@ -5,10 +5,9 @@ Taken mostly from the euclid package available at
 https://pypi.org/project/euclid/
 """
 from __future__ import division
+import math
 
 from .geometry2d.pointvector import Point2D, Vector2D
-
-import math
 
 
 def intersect_line2d(line_ray_a, line_ray_b):
@@ -104,10 +103,9 @@ def intersect_line_segment2d(line_a, line_b):
     int_ptb = Point2D(line_b.p.x + ub * line_b.v.x, line_b.p.y + ub * line_b.v.y)
     
     # if the two points are unequal, there's a floating point tolerance issue
-    if int_pta != int_ptb:
-        return None
-
-    return int_pta
+    if math.isclose(int_pta.x, int_ptb.x) and math.isclose(int_pta.y, int_ptb.y):
+        return int_pta
+    return None
 
 
 def intersect_line2d_infinite(line_ray_a, line_ray_b):

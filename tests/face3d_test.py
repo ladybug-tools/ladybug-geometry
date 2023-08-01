@@ -562,15 +562,18 @@ def test_is_self_intersecting():
     plane_2 = Plane(Vector3D(0, 0, -1))
     pts_1 = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 2), Point3D(0, 2))
     pts_2 = (Point3D(0, 0), Point3D(0, 2), Point3D(2, 0), Point3D(2, 2))
+    pts_5 = (Point3D(10, 0, 3), Point3D(0, 5, 3), Point3D(10, 10, 3), Point3D(0, 0, 3))
     face_1 = Face3D(pts_1, plane_1)
     face_2 = Face3D(pts_2, plane_1)
     face_3 = Face3D(pts_1, plane_2)
     face_4 = Face3D(pts_2, plane_2)
+    face_5 = Face3D(pts_5)
 
-    assert face_1.is_self_intersecting is False
-    assert face_2.is_self_intersecting is True
-    assert face_3.is_self_intersecting is False
-    assert face_4.is_self_intersecting is True
+    assert not face_1.is_self_intersecting
+    assert face_2.is_self_intersecting
+    assert not face_3.is_self_intersecting
+    assert face_4.is_self_intersecting
+    assert face_5.is_self_intersecting
 
 
 def test_is_valid():
