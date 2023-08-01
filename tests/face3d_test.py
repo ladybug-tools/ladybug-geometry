@@ -570,10 +570,15 @@ def test_is_self_intersecting():
     face_5 = Face3D(pts_5)
 
     assert not face_1.is_self_intersecting
+    assert len(face_1.self_intersection_points) == 0
     assert face_2.is_self_intersecting
+    assert len(face_2.self_intersection_points) == 1
     assert not face_3.is_self_intersecting
+    assert len(face_3.self_intersection_points) == 0
     assert face_4.is_self_intersecting
+    assert len(face_4.self_intersection_points) == 1
     assert face_5.is_self_intersecting
+    assert len(face_5.self_intersection_points) == 1
 
 
 def test_is_valid():
@@ -811,12 +816,15 @@ def test_check_planar():
     face_2 = Face3D(pts_2, plane_1)
     face_3 = Face3D(pts_3, plane_1)
 
-    assert face_1.check_planar(0.001) is True
-    assert face_2.check_planar(0.001, False) is False
+    assert face_1.check_planar(0.001, False)
+    assert len(face_1.non_planar_vertices(0.001)) == 0
+    assert not face_2.check_planar(0.001, False)
+    assert len(face_2.non_planar_vertices(0.001)) == 1
     with pytest.raises(Exception):
         face_2.check_planar(0.0001)
-    assert face_3.check_planar(0.001) is True
-    assert face_3.check_planar(0.000001, False) is False
+    assert face_3.check_planar(0.001, False)
+    assert not face_3.check_planar(0.000001, False)
+    assert len(face_3.non_planar_vertices(0.000001)) == 1
     with pytest.raises(Exception):
         face_3.check_planar(0.000001)
 

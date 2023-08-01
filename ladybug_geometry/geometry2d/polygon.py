@@ -43,6 +43,7 @@ class Polygon2D(Base2DIn2D):
         * is_clockwise
         * is_convex
         * is_self_intersecting
+        * self_intersection_points
         * is_valid
     """
     __slots__ = ('_segments', '_inside_angles', '_outside_angles', '_perimeter', '_area',
@@ -396,10 +397,10 @@ class Polygon2D(Base2DIn2D):
     def is_self_intersecting(self):
         """Boolean noting whether the polygon has self-intersecting edges.
 
-        Note that this property is relatively computationally intense to obtain and
-        most CAD programs forbid surfaces with self-intersecting edges.
-        So this property should only be used in quality control scripts where the
-        origin of the geometry is unknown.
+        Note that this property is relatively computationally intense to obtain compared
+        to properties like area and is_convex. Also, most CAD programs forbid geometry
+        with self-intersecting edges. So it is recommended that this property only
+        be used in quality control scripts where the origin of the geometry is unknown.
         """
         if self._is_self_intersecting is None:
             self._is_self_intersecting = False
@@ -415,6 +416,27 @@ class Polygon2D(Base2DIn2D):
                     if self._is_self_intersecting is True:
                         break
         return self._is_self_intersecting
+
+    @property
+    def self_intersection_points(self):
+        """A tuple of Point2Ds for the locations where the polygon intersects itself.
+
+        This will be an empty tuple if the polygon is not self-intersecting and it
+        is generally recommended that the Polygon2D.is_self_intersecting property
+        be checked before using this property.
+        """
+        if self.is_self_intersecting:
+            int_pts = []
+            _segs = self.segments
+            for i, _s in enumerate(_segs[1: len(_segs) - 1]):
+                _skip = (i, i + 1, i + 2)
+                _other_segs = [x for j, x in enumerate(_segs) if j not in _skip]
+                for _oth_s in _other_segs:
+                    int_pt = _s.intersect_line_ray(_oth_s)
+                    if int_pt is not None:  # intersection!
+                        int_pts.append(int_pt)
+            return tuple(int_pts)
+        return ()
 
     @property
     def is_valid(self):
