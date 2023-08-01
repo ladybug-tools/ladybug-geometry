@@ -5,6 +5,7 @@ from __future__ import division
 from .pointvector import Vector3D, Point3D
 from .ray import Ray3D
 from .line import LineSegment3D
+from .polyline import Polyline3D
 from .plane import Plane
 from .face import Face3D
 from ._2d import Base2DIn3D
@@ -421,10 +422,11 @@ class Polyface3D(Base2DIn3D):
     def merge_overlapping_edges(self, tolerance, angle_tolerance):
         """Get this object with overlapping naked edges merged into single internal edges
 
-        This can be used to determine if a polyface is truly solid.
-        The default test of edge conditions that runs upon creation of a polyface does
-        not check for cases where overlapping colinear edges could be considered
-        a single internal edge such as the case below:
+        This can be used to determine if a polyface is truly solid since this check
+        is not performed by default when the Polyface3D is created from_faces.
+        In the default test of edge conditions, overlapping colinear edges are
+        considered naked when the could be interpreted a single internal edge
+        such as the case below:
 
         .. code-block:: shell
 
@@ -555,9 +557,40 @@ class Polyface3D(Base2DIn3D):
         for new_edge in add_edges:
             new_edge_indices.append(new_edge)
             new_edge_types.append(1)
-        _new_polyface = Polyface3D(self._vertices, self._face_indices,
-                                   {'edge_indices': new_edge_indices,
-                                    'edge_types': new_edge_types})
+        _new_polyface = Polyface3D(
+            self._vertices, self._face_indices,
+            {'edge_indices': new_edge_indices, 'edge_types': new_edge_types}
+        )
+
+        # if the result is still not solid, perform a check on the remaining edges
+        if len(_new_polyface.naked_edges) != 0 and \
+                len(_new_polyface.non_manifold_edges) == 0:
+            # it's possible that the remaining gaps are smaller than the tolerance
+            small_gaps = True
+            joined_edges = Polyline3D.join_segments(_new_polyface.naked_edges, tolerance)
+            for bnd in joined_edges:
+                if isinstance(bnd, Polyline3D) and bnd.is_closed(tolerance):
+                    test_face = Face3D(bnd.vertices)
+                    if test_face.check_planar(tolerance, False):
+                        min_, max_ = test_face.min, test_face.max
+                        max_dim = max(max_.x - min_.x, max_.y - min_.y, max_.z - min_.z)
+                        tol_area = tolerance * max_dim
+                        if test_face.area > tol_area:
+                            small_gaps = False
+                            break
+                    else:
+                        small_gaps = False
+                        break
+                else:
+                    small_gaps = False
+                    break
+            if small_gaps:  # the gaps are small enough to make the Polyface closed
+                new_edge_types = [1 for _ in new_edge_types]
+                _new_polyface = Polyface3D(
+                    self._vertices, self._face_indices,
+                    {'edge_indices': new_edge_indices, 'edge_types': new_edge_types}
+                )
+
         return _new_polyface
 
     def move(self, moving_vec):
