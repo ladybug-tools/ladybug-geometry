@@ -75,6 +75,7 @@ class Face3D(Base2DIn3D):
         * is_clockwise
         * is_convex
         * is_self_intersecting
+        * self_intersection_points
         * is_valid
         * has_holes
         * upper_left_corner
@@ -493,10 +494,10 @@ class Face3D(Base2DIn3D):
     def is_self_intersecting(self):
         """Boolean noting whether the face has self-intersecting edges.
 
-        Note that this property is relatively computationally intense to obtain and
-        most CAD programs forbid all surfaces with self-intersecting edges.
-        So this property should only be used in quality control scripts where the
-        origin of the geometry is unknown.
+        Note that this property is relatively computationally intense to obtain compared
+        to properties like area and is_convex. Also, most CAD programs forbid geometry
+        with self-intersecting edges. So it is recommended that this property only
+        be used in quality control scripts where the origin of the geometry is unknown.
         """
         if self._is_self_intersecting is None:
             self._is_self_intersecting = False
@@ -508,6 +509,25 @@ class Face3D(Base2DIn3D):
                         self._is_self_intersecting = True
                         break
         return self._is_self_intersecting
+
+    @property
+    def self_intersection_points(self):
+        """A tuple of Point3Ds for the locations where the Face3D intersects itself.
+
+        This will be an empty tuple if the Face3D is not self-intersecting and it
+        is generally recommended that the Face3D.is_self_intersecting property
+        be checked before using this property.
+        """
+        if self.is_self_intersecting:
+            int_pts = []
+            for pt2 in self.boundary_polygon2d.self_intersection_points:
+                int_pts.append(self.plane.xy_to_xyz(pt2))
+            if self.has_holes:
+                for hp in self.hole_polygon2d:
+                    for pt2 in hp.self_intersection_points:
+                        int_pts.append(self.plane.xy_to_xyz(pt2))
+            return tuple(int_pts)
+        return ()
 
     @property
     def is_valid(self):
@@ -724,6 +744,11 @@ class Face3D(Base2DIn3D):
     def polygon_in_face(self, sub_face, origin=None, flip=False):
         """Get a Polygon2D for a sub_face within the plane of this Face3D.
 
+        Note that there is no check within this method to determine whether the
+        the sub_face is coplanar with this Face3D or is fully bounded by it.
+        So the is_sub_face method should be used to evaluate this before using
+        this method.
+
         Args:
             sub_face: A Face3D for which a Polygon2D in the plane of this
                 Face3D will be returned.
@@ -789,7 +814,7 @@ class Face3D(Base2DIn3D):
                 simply return a False boolean if a vertex is found that is out
                 of plane. Default is True to raise an exception.
 
-        Return:
+        Returns:
             True if planar within the tolerance. False if not planar.
         """
         for _v in self.vertices:
@@ -801,6 +826,22 @@ class Face3D(Base2DIn3D):
                 else:
                     return False
         return True
+
+    def non_planar_vertices(self, tolerance):
+        """Get a tuple of Point3D for any vertices that lie outside the face's plane.
+
+        This will be an empty tuple when the Face3D is planar and it is recommended
+        that the Face3D.check_planar method be used before calling this one.
+        
+        Args:
+            tolerance: The minimum distance between a given vertex and a the
+                face's plane at which the vertex is said to lie in the plane.
+        """
+        np_verts = []
+        for _v in self.vertices:
+            if self._plane.distance_to_point(_v) >= tolerance:
+                np_verts.append(_v)
+        return tuple(np_verts)
 
     def remove_duplicate_vertices(self, tolerance):
         """Get a version of this face without duplicate vertices.
