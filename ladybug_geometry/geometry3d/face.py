@@ -1916,7 +1916,7 @@ class Face3D(Base2DIn3D):
         try:
             poly_result = pb.union(b_poly1, b_poly2, int_tol)
         except Exception:
-            return [face1], [face2]  # typically a tolerance issue causing failure
+            return None  # typically a tolerance issue causing failure
         # rebuild the Face3D from the results and return them
         union_faces = Face3D._from_bool_poly(poly_result, prim_pl)
         return union_faces[0]
