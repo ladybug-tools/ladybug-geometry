@@ -10,6 +10,11 @@ import math
 from .geometry2d.pointvector import Point2D, Vector2D
 
 
+def _isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
+    """Implementation of the math.isclose method from Python 3.5 onward."""
+    return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
+
 def intersect_line2d(line_ray_a, line_ray_b):
     """Get the intersection between any Ray2D or LineSegment2D objects as a Point2D.
 
@@ -103,7 +108,7 @@ def intersect_line_segment2d(line_a, line_b):
     int_ptb = Point2D(line_b.p.x + ub * line_b.v.x, line_b.p.y + ub * line_b.v.y)
     
     # if the two points are unequal, there's a floating point tolerance issue
-    if math.isclose(int_pta.x, int_ptb.x) and math.isclose(int_pta.y, int_ptb.y):
+    if _isclose(int_pta.x, int_ptb.x) and _isclose(int_pta.y, int_ptb.y):
         return int_pta
     return None
 
