@@ -1516,6 +1516,21 @@ def test_sub_faces_by_ratio_sub_rectangle_tol_issue():
         assert face_1.is_sub_face(sf, 0.01, 1)
 
 
+def test_coplanar_difference():
+    """Test the coplanar_difference method."""
+    b_pts = (Point3D(0, 2), Point3D(10, 2), Point3D(10, 8), Point3D(0, 8))
+    sub_1_pts = (Point3D(2, 0), Point3D(4, 0), Point3D(4, 10), Point3D(2, 10))
+    sub_2_pts = (Point3D(8, 4), Point3D(12, 4), Point3D(12, 6), Point3D(8, 6))
+    b_face = Face3D(b_pts)
+    face1 = Face3D(sub_1_pts)
+    face2 = Face3D(sub_2_pts)
+
+    result = b_face.coplanar_difference((face1, face2), 0.001, math.radians(1))
+    assert len(result) == 2
+    assert len(result[0]) == 8
+    assert len(result[1]) == 4
+
+
 def test_coplanar_union():
     """Test the coplanar_union method."""
     b_pts1 = (Point3D(-14.79, -36.61, 0.00), Point3D(6.68, -36.61, 0.00),
