@@ -1865,6 +1865,79 @@ class Face3D(Base2DIn3D):
                                   base_plane)]
         return final_faces
 
+    def coplanar_difference(self, faces, tolerance, angle_tolerance):
+        """Subtract one or more coplanar Face3D from this Face3D.
+
+        Note that, when the faces are not coplanar or they do not overlap, the
+        original face will be returned.
+
+        Args:
+            faces: A list of Face3D for which will be subtracted from this Face3D.
+            tolerance: The minimum difference between X, Y and Z values at which
+                vertices are considered distinct from one another.
+            angle_tolerance: The max angle in radians that the plane normals can
+                differ from one another in order for them to be considered coplanar.
+
+        Returns:
+            A List of Face3D representing the original Face3D with the input faces
+            subtracted from it.
+        """
+        # define the primary boolean polygon
+        prim_pl = self.plane
+        f1_poly = self.boundary_polygon2d
+        try:
+            f1_poly = f1_poly.remove_colinear_vertices(tolerance)
+        except AssertionError:  # degenerate face input
+            return self
+        f1_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f1_poly.vertices)]
+        if self.has_holes:
+            for hole in self.hole_polygon2d:
+                f1_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+        b_poly1 = pb.BooleanPolygon(f1_polys)
+
+        # pre-process the Face3Ds to be intersected
+        relevant_b_polys = []
+        for face2 in faces:
+            # test whether the faces are coplanar
+            if not prim_pl.is_coplanar_tolerance(face2.plane, tolerance, angle_tolerance):
+                continue
+            # test whether the two polygons have any overlap in 2D space
+            f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
+            if not Polygon2D.overlapping_bounding_rect(f1_poly, f2_poly, tolerance):
+                continue
+            if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
+                continue
+            # snap the polygons to one another to avoid tolerance issues
+            try:
+                f2_poly = f2_poly.remove_colinear_vertices(tolerance)
+            except AssertionError:  # degenerate faces input
+                continue
+            s2_poly = f1_poly.snap_to_polygon(f2_poly, tolerance)
+            # get BooleanPolygons of the two faces
+            f2_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in s2_poly.vertices)]
+            if face2.has_holes:
+                for hole in face2.holes:
+                    h_pt2d = (prim_pl.xyz_to_xy(pt) for pt in hole)
+                    f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in h_pt2d))
+            b_poly2 = pb.BooleanPolygon(f2_polys)
+            relevant_b_polys.append(b_poly2)
+        
+        # if no relevant polygons were found, return self
+        if len(relevant_b_polys) == 0:
+            return self
+        
+        # loop through the boolean polygons and subtract them
+        int_tol = tolerance / 100
+        for b_poly2 in relevant_b_polys:
+            # subtract the boolean polygons
+            try:
+                b_poly1 = pb.difference(b_poly1, b_poly2, int_tol)
+            except Exception:
+                return self  # typically a tolerance issue causing failure
+
+        # rebuild the Face3D from the result of the subtraction
+        return Face3D._from_bool_poly(b_poly1, prim_pl)
+
     @staticmethod
     def coplanar_union(face1, face2, tolerance, angle_tolerance):
         """Boolean Union two coplanar Face3D with one another.
@@ -1872,8 +1945,8 @@ class Face3D(Base2DIn3D):
         Args:
             face1: A Face3D for the first face that will be unioned with the second face.
             face2: A Face3D for the second face that will be unioned with the first face.
-            tolerance: The minimum distance between points before they are considered
-                distinct from one another.
+            tolerance: The minimum difference between X, Y and Z values at which
+                vertices are considered distinct from one another.
             angle_tolerance: The max angle in radians that the plane normals can
                 differ from one another in order for them to be considered coplanar.
 
@@ -1931,8 +2004,8 @@ class Face3D(Base2DIn3D):
         Args:
             face1: A Face3D for the first face that will be split with the second face.
             face2: A Face3D for the second face that will be split with the first face.
-            tolerance: The minimum distance between points before they are considered
-                distinct from one another.
+            tolerance: The minimum difference between X, Y and Z values at which
+                vertices are considered distinct from one another.
             angle_tolerance: The max angle in radians that the plane normals can
                 differ from one another in order for them to be considered coplanar.
 
@@ -2069,6 +2142,9 @@ class Face3D(Base2DIn3D):
     @staticmethod
     def join_coplanar_faces(faces, tolerance):
         """Join a list of coplanar Face3Ds together to get as few as possible.
+
+        Note that this method does not perform any boolean union operations on
+        the input faces. It will only join the objects together along shared edges.
 
         Args:
             faces: A list of Face3D objects to be joined together. These should
