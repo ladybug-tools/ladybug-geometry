@@ -215,7 +215,7 @@ class Vector2D(object):
         """Ensure that an input coordinate value is a float."""
         try:
             number = float(value)
-        except (ValueError, TypeError):
+        except Exception:
             raise TypeError(
                 'Coordinates must be numbers. Got {}: {}.'.format(type(value), value))
         return number
