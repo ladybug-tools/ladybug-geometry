@@ -1,5 +1,5 @@
 # coding=utf-8
-"""A class that supports the import of STL data to ladybug_geometry objects.
+"""A class that supports the import and export of STL data to/from ladybug_geometry.
 
 The methods in the object below are inspired from pySTL module.
 
@@ -45,13 +45,38 @@ class STL(object):
 
     @classmethod
     def from_file(cls, file_path):
-        """A class that supports the import of STL data to ladybug_geometry objects.
+        """Create an STL object from a .stl file.
 
         Args:
             file_path: Path to an STL file as a text string. The STL file can be
                 in either ASCII or binary format.
         """
         face_vertices, face_normals, name = cls._load_stl(file_path)
+        return cls(face_vertices, face_normals, name)
+
+    @classmethod
+    def from_mesh3d(cls, mesh, name='polyhedron'):
+        """Create an STL object from a ladybug_geometry Mesh3D object.
+
+        All quad faces will be automatically triangulated by using this method.
+
+        Args:
+            mesh: A ladybug_geometry Mesh3D object to be converted to an OBJ object.
+            name: Text string for the name of the solid object in the STL
+                file. (Default: polyhedron).
+        """
+        face_vertices, face_normals = [], []
+        for f, fn in zip(mesh.faces, mesh.face_normals):
+            if len(f) == 3:
+                face_vertices.append(tuple(mesh._vertices[i] for i in f))
+                face_normals.append(fn)
+            else:  # it's a quad mesh to be triangulated
+                vts1 = (mesh._vertices[f[0]], mesh._vertices[f[1]], mesh._vertices[f[2]])
+                vts2 = (mesh._vertices[f[2]], mesh._vertices[f[3]], mesh._vertices[f[0]])
+                face_vertices.append(vts1)
+                face_vertices.append(vts2)
+                face_normals.append(fn)
+                face_normals.append(fn)
         return cls(face_vertices, face_normals, name)
 
     @property
@@ -114,11 +139,11 @@ class STL(object):
         """Write the STL object to an ASCII STL file.
 
         Args:
-            folder: A text string for the direcotry where the STL will be written.
+            folder: A text string for the directory where the STL will be written.
             name: A text string for the name of the STL file. If None, the name
                 of the STL object will be used. (Default: None).
         """
-        # set up a name and folder for the HBpkl
+        # set up a name and folder
         if name is None:
             name = self.name
         file_name = name if name.lower().endswith('.stl') else '{}.stl'.format(name)
