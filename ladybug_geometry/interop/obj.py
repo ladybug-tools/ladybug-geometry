@@ -47,6 +47,7 @@ class OBJ(object):
         * vertex_texture_map
         * vertex_normals
         * vertex_colors
+        * material_structure
     """
 
     __slots__ = (
@@ -73,7 +74,7 @@ class OBJ(object):
             file_path: Path to an OBJ file as a text string. Note that, if the file
                 includes texture mapping coordinates or vertex normals, the number
                 of texture coordinates and normals must align with the number of
-                vertices to be importable. NEarly all OBJ files follow this standard.
+                vertices to be importable. Nearly all OBJ files follow this standard.
                 If any of the OBJ mesh faces contain more than 4 vertices, only
                 the first 4 vertices will be counted.
         """
@@ -95,7 +96,7 @@ class OBJ(object):
                     elif first_word == 'f':  # start of a new face
                         face = []
                         for fv in wds[1:]:
-                            face.append(int(fv.split('/')[0]))
+                            face.append(int(fv.split('/')[0]) - 1)
                         if len(face) > 4:  # truncate for compatibility with Mesh3D
                             face = face[:4]
                         faces.append(tuple(face))
@@ -107,13 +108,11 @@ class OBJ(object):
                         vertex_texture_map.append(texture)
                     elif first_word == 'usemtl':  # start of a new material application
                         mat_struct.append((wds[1], len(faces)))
-        if len(mat_struct) == 1:  # there's only one material and no real structure
-            mat_struct = None
         return cls(vertices, faces, vertex_texture_map, vertex_normals,
                    vertex_colors, mat_struct)
 
     @classmethod
-    def from_meh3d(cls, mesh, include_colors=True, include_normals=False):
+    def from_mesh3d(cls, mesh, include_colors=True, include_normals=False):
         """Create an OBJ object from a ladybug_geometry Mesh3D.
         
         If colors are specified on the Mesh3D, they will be correctly transferred
@@ -154,6 +153,66 @@ class OBJ(object):
             return cls(mesh.vertices, mesh.faces, vertex_normals=mesh.vertex_normals,
                        vertex_colors=vertex_colors)
         return cls(mesh.vertices, mesh.faces, vertex_colors=vertex_colors)
+
+    @classmethod
+    def from_mesh3ds(cls, meshes, material_ids=None, include_normals=False):
+        """Create an OBJ object from a list of ladybug_geometry Mesh3D.
+
+        Mesh3D colors are ignored when using this method with the assumption that
+        materials are used to specify how the meshes should be rendered.
+
+        Args:
+            meshes: A list of ladybug_geometry Mesh3D objects to be converted
+                into an OBJ object.
+            material_ids: An optional list of strings that aligns with the input
+                meshes and denote materials assigned to each mesh. This list of
+                material IDs will be automatically converted into an efficient
+                material_structure for the OBJ object where materials used for
+                multiple meshes only include one reference to the material. If
+                None, the OBJ will have no material structure. (Default: None).
+            include_normals: Boolean to note whether the vertex normals should be
+                included in the resulting OBJ object. (Default: False).
+        """
+        # sort the meshes by material ID to ensure efficient material structure
+        if material_ids is not None:
+            assert len(material_ids) == len(meshes), 'Length of OBJ material_ids ({}) ' \
+                'does not match the length of meshes ({}).'.format(
+                    len(material_ids), len(meshes))
+            meshes = [x for _, x in sorted(zip(material_ids, meshes))]
+            material_ids = sorted(material_ids)
+
+        # gather all vertices, faces, and (optionally) normals together
+        vertices, faces, normals, mat_struct = [], [], [], []
+        v_count = 0
+        if material_ids is not None:
+            last_mat = None
+            for mesh, mat_id in zip(meshes, material_ids):
+                if mat_id != last_mat:
+                    mat_struct.append((mat_id, len(faces)))
+                    last_mat = mat_id
+                vertices.extend(mesh.vertices)
+                if include_normals:
+                    normals.extend(mesh.vertex_normals)
+                if v_count == 0:
+                    faces.extend(mesh.faces)
+                else:
+                    for f in mesh.faces:
+                        faces.append(tuple(fi + v_count for fi in f))
+                v_count += len(mesh.vertices)
+        else:
+            for mesh in meshes:
+                vertices.extend(mesh.vertices)
+                if include_normals:
+                    normals.extend(mesh.vertex_normals)
+                if v_count == 0:
+                    faces.extend(mesh.faces)
+                else:
+                    for f in mesh.faces:
+                        faces.append(tuple(fi + v_count for fi in f))
+                v_count += len(mesh.vertices)
+
+        return cls(
+            vertices, faces, vertex_normals=normals, material_structure=mat_struct)
 
     @property
     def vertices(self):
@@ -238,10 +297,6 @@ class OBJ(object):
                 raise ValueError(
                     'Number of OBJ vertex_normals ({}) does not match the number of'
                     ' OBJ vertices ({}).'.format(len(value), len(self.vertices)))
-            else:
-                for norm in value:
-                    assert isinstance(norm, Vector3D), 'Expected Vector3D for OBJ ' \
-                        'vertex normal. Got {}.'.format(type(norm))
         self._vertex_colors = value
 
     @property
@@ -285,7 +340,7 @@ class OBJ(object):
                 value = tuple(value)
         self._material_structure = value
 
-    def to_file(self, folder, name, include_mtl=True):
+    def to_file(self, folder, name, triangulate_quads=False, include_mtl=False):
         """Write the OBJ object to an ASCII text file.
 
         Args:
@@ -294,11 +349,15 @@ class OBJ(object):
                 texture is meant to be assigned to this OBJ, the image should have
                 the same name as the one input here except with the .mtl extension
                 instead of the .obj extension.
+            triangulate_quads: Boolean to note whether quad faces should be
+                triangulated upon export to OBJ. This may be needed for certain
+                software platforms that require the mesh to be composed entirely
+                of triangles (eg. Radiance). (Default: False).
             include_mtl: Boolean to note whether an .mtl file should be automatically
                 generated from the material structure written next to the .obj
                 file in the output folder. All materials in the mtl file will
                 be diffuse white, with the assumption that these will be
-                customized later. (Default: True).
+                customized later. (Default: False).
         """
         # set up a name and folder
         file_name = name if name.lower().endswith('.obj') else '{}.obj'.format(name)
@@ -312,19 +371,27 @@ class OBJ(object):
             outfile.write('# OBJ file written by ladybug geometry\n\n')
 
             # add material file name if include_mtl is true
-            outfile.write('mtllib ' + mtl_file + '\n')
-            if self._material_structure is None:
-                outfile.write('usemtl diffuse_0\n')
+            if self._material_structure is not None or include_mtl:
+                outfile.write('mtllib ' + mtl_file + '\n')
+                if self._material_structure is None:
+                    outfile.write('usemtl diffuse_0\n')
 
             # loop through the vertices and add them to the file
             if self.vertex_colors is None:
                 for v in self.vertices:
                     outfile.write('v {} {} {}\n'.format(v.x, v.y, v.z))
             else:  # write the vertex colors alongside the vertices
-                for v, c in zip(self.vertices, self.vertex_colors):
-                    outfile.write(
-                        'v {} {} {} {} {} {}\n'.format(v.x, v.y, v.z, c[0], c[1], c[2])
-                    )
+                if len(self.vertex_colors[0]) > 3:
+                    for v, c in zip(self.vertices, self.vertex_colors):
+                        outfile.write(
+                            'v {} {} {} {} {} {}\n'.format(
+                                v.x, v.y, v.z, c[0], c[1], c[2])
+                        )
+                else:  # might be a grayscale weight
+                    for v, c in zip(self.vertices, self.vertex_colors):
+                        outfile.write(
+                            'v {} {} {} {}\n'.format(v.x, v.y, v.z, ' '.join(c))
+                        )
 
             # loop through the texture vertices, if present, and add them to the file
             if self.vertex_texture_map is not None:
@@ -336,33 +403,65 @@ class OBJ(object):
                 for vn in self.vertex_normals:
                     outfile.write('vn {} {} {}\n'.format(vn.x, vn.y, vn.z))
 
+            # triangulate the faces if requested
+            formatted_faces, formatted_mats = self.faces, self.material_structure
+            if triangulate_quads:
+                formatted_faces = []
+                if formatted_mats is None or len(formatted_mats) == 1:
+                    for f in self.faces:
+                        if len(f) > 3:
+                            formatted_faces.append((f[0], f[1], f[2]))
+                            formatted_faces.append((f[2], f[3], f[0]))
+                        else:
+                            formatted_faces.append(f)
+                else:
+                    mat_ind = [mat[1] for mat in formatted_mats]
+                    for i, f in enumerate(self.faces):
+                        if len(f) > 3:
+                            formatted_faces.append((f[0], f[1], f[2]))
+                            formatted_faces.append((f[2], f[3], f[0]))
+                            for j, m in enumerate(formatted_mats):
+                                if m[1] > i:
+                                    mat_ind[j] = mat_ind[j] + 1
+                        else:
+                            formatted_faces.append(f)
+                    formatted_mats = \
+                        [(mn[0], mi) for mn, mi in zip(formatted_mats, mat_ind)]
+
             # loop through the faces and get all lines of text for them
             face_txt = []
             if self.vertex_texture_map is None and self.vertex_normals is None:
-                for f in self.faces:
-                    face_txt.append('f ' + ' '.join(str(fi) for fi in f) + '\n')
+                for f in formatted_faces:
+                    face_txt.append('f ' + ' '.join(str(fi + 1) for fi in f) + '\n')
             else:
-                if self.vertex_texture_map is not None and self.vertex_normals is not None:
+                if self.vertex_texture_map is not None and \
+                        self.vertex_normals is not None:
                     f_map = '{0}/{0}/{0}'
-                elif self.vertex_texture_map is None and self.vertex_normals is not None:
+                elif self.vertex_texture_map is None and \
+                        self.vertex_normals is not None:
                     f_map = '{0}//{0}'
                 else:
                     f_map = '{0}/{0}'
-                for f in self.faces:
-                    face_txt.append('f ' + ' '.join(f_map.format(fi) for fi in f) + '\n')
+                for f in formatted_faces:
+                    face_txt.append(
+                        'f ' + ' '.join(f_map.format(fi + 1) for fi in f) + '\n'
+                    )
 
-            # write the faces into the file with the material (if specified)
-            if self._material_structure is not None:  # insert the materials
-                for mat in reversed(self._material_structure):
-                    face_txt.insert(mat[1], mat[0])
+            # write the faces into the file with the material structure
+            if formatted_mats is not None:  # insert the materials
+                for mat in reversed(formatted_mats):
+                    face_txt.insert(mat[1], 'usemtl {}\n'.format(mat[0]))
             for f_lin in face_txt:
                 outfile.write(f_lin)
 
         # write the MTL file if requested
         if include_mtl:
-            with open(mtl_file, writemode) as mtl_f:
+            mat_struct = [('diffuse_0', 0)] if self._material_structure is None else \
+                self._material_structure
+            mtl_fp = os.path.join(folder, mtl_file)
+            with open(mtl_fp, writemode) as mtl_f:
                 mtl_f.write('# Ladybug Geometry\n')
-                for mat in reversed(self._material_structure):
+                for mat in reversed(mat_struct):
                     mtl_str =  \
                         'newmtl {}\n' \
                         'Ka 0.0000 0.0000 0.0000\n' \

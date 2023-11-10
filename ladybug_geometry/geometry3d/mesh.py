@@ -35,6 +35,7 @@ class Mesh3D(MeshBase):
         * area
         * face_areas
         * face_centroids
+        * face_area_centroids
         * face_vertices
         * face_normals
         * vertex_normals
@@ -59,6 +60,7 @@ class Mesh3D(MeshBase):
         self._area = None
         self._face_areas = None
         self._face_centroids = None
+        self._face_area_centroids = None
         self._face_normals = None
         self._vertex_normals = None
         self._vertex_connected_faces = None
@@ -140,6 +142,17 @@ class Mesh3D(MeshBase):
         from ladybug_geometry.interop.stl import STL  # avoid circular import
         face_vertices = STL.from_file(file_path).face_vertices
         return cls.from_face_vertices(face_vertices)
+
+    @classmethod
+    def from_obj(cls, file_path):
+        """Create a Mesh3D from an OBJ file.
+
+        Args:
+            file_path: Path to an OBJ file as a text string.
+        """
+        from ladybug_geometry.interop.obj import OBJ  # avoid circular import
+        transl_obj = OBJ.from_file(file_path)
+        return cls(transl_obj.vertices, transl_obj.faces, transl_obj.vertex_colors)
 
     @property
     def min(self):
@@ -434,6 +447,30 @@ class Mesh3D(MeshBase):
         stl_obj = STL(self.face_vertices, self.face_normals)
         return stl_obj.to_file(folder, name)
 
+    def to_obj(self, folder, name, include_colors=True, include_normals=False,
+               triangulate_quads=False, include_mtl=False):
+        """Write the Mesh3D to an ASCII OBJ file.
+
+        Args:
+            folder: A text string for the directory where the OBJ will be written.
+            name: A text string for the name of the OBJ file.
+            include_colors: Boolean to note whether the Mesh3D colors should be
+                included in the OBJ file. (Default: True).
+            include_normals: Boolean to note whether the vertex normals should be
+                included in the OBJ file. (Default: False).
+            triangulate_quads: Boolean to note whether quad faces should be
+                triangulated upon export to OBJ. This may be needed for certain
+                software platforms that require the mesh to be composed entirely
+                of triangles (eg. Radiance). (Default: False).
+            include_mtl: Boolean to note whether an .mtl file should be automatically
+                generated next to the .obj file in the output folder. All materials
+                in the mtl file will be diffuse white, with the assumption that
+                these will be customized later. (Default: False).
+        """
+        from ladybug_geometry.interop.obj import OBJ  # avoid circular import
+        transl_obj = OBJ.from_mesh3d(self, include_colors, include_normals)
+        return transl_obj.to_file(folder, name, triangulate_quads, include_mtl)
+
     @staticmethod
     def join_meshes(meshes):
         """Join an array of Mesh3Ds into a single Mesh3D.
@@ -624,6 +661,15 @@ class Mesh3D(MeshBase):
         return n.normalize(), a
 
     @staticmethod
+    def _face_center(verts):
+        """Get the center of a list of Point3D vertices."""
+        _cent_x = sum([v.x for v in verts])
+        _cent_y = sum([v.y for v in verts])
+        _cent_z = sum([v.z for v in verts])
+        v_count = len(verts)
+        return Point3D(_cent_x / v_count, _cent_y / v_count, _cent_z / v_count)
+
+    @staticmethod
     def _tri_centroid(verts):
         """Get the centroid of a list of 3 Point3D vertices."""
         _cent_x = sum([v.x for v in verts])
@@ -638,7 +684,6 @@ class Mesh3D(MeshBase):
         # This method is only reliable when quads are convex since we assume
         # either diagonal of the quad splits it into two triangles.
         # It seems Rhino never produces concave quads when it automatically meshes
-        # but we will likely want to add support for this if meshes have other origins
         _tri_verts = ((verts[0], verts[1], verts[2]), (verts[2], verts[3], verts[0]))
         _tri_c = [Mesh3D._tri_centroid(tri) for tri in _tri_verts]
         _tri_a = [Mesh3D._get_tri_area(tri) for tri in _tri_verts]

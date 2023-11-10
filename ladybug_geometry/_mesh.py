@@ -25,11 +25,13 @@ class MeshBase(object):
         * face_areas
         * area
         * face_centroids
+        * face_area_centroids
         * face_vertices
         * vertex_connected_faces
     """
     __slots__ = ('_vertices', '_faces', '_colors', '_is_color_by_face',
-                 '_area', '_face_areas', '_face_centroids', '_vertex_connected_faces',
+                 '_area', '_face_areas', '_face_centroids', '_face_area_centroids',
+                 '_vertex_connected_faces',
                  '_edge_indices', '_edge_types', '_edges',
                  '_naked_edges', '_internal_edges', '_non_manifold_edges')
 
@@ -42,6 +44,7 @@ class MeshBase(object):
         self._area = None
         self._face_areas = None
         self._face_centroids = None
+        self._face_area_centroids = None
         self._vertex_connected_faces = None
         self._edge_indices = None
         self._edge_types = None
@@ -107,16 +110,47 @@ class MeshBase(object):
 
     @property
     def face_centroids(self):
-        """Tuple of face centroids that parallels the Faces property."""
+        """Tuple of face centroids that aligns the faces property.
+
+        These Point3Ds are are the vertex centroids of the faces, which come from
+        considering each quad face as being empty but having equal mass at each vertex.
+
+        Because such vertex centroids are computed as the mean of the coordinate
+        values, they are fast to compute and a good property to use when generating
+        test points that align large meshes predominantly containing triangles
+        and/or convex quad faces. For meshes containing concave quad faces, the
+        face_area_centroids may produce a more desirable result.
+        """
         if self._face_centroids is None:
+            _f_cent = []
+            for face in self.faces:
+                _f_cent.append(self._face_center(tuple(self._vertices[i] for i in face)))
+            self._face_centroids = tuple(_f_cent)
+        return self._face_centroids
+
+    @property
+    def face_area_centroids(self):
+        """Tuple of face area centroids that aligns the faces property.
+
+        These Point3Ds are are the area centroids of the faces, which come from
+        considering the surface of each quad face as having constant density.
+
+        The area centroid is more intensive to compute compared to the vertex
+        centroid available through the face_centroids property. Moreover, the
+        area centroid is equal to the vertex centroid for triangles and fairly
+        close to the vertex centroid for convex quad faces with moderate aspect ratios.
+        Therefore, this property is most useful when working with meshes containing
+        concave quad faces or quads with extreme aspect ratios.
+        """
+        if self._face_area_centroids is None:
             _f_cent = []
             for face in self.faces:
                 if len(face) == 3:
                     _f_cent.append(self._tri_face_centroid(face))
                 else:
                     _f_cent.append(self._quad_face_centroid(face))
-            self._face_centroids = tuple(_f_cent)
-        return self._face_centroids
+            self._face_area_centroids = tuple(_f_cent)
+        return self._face_area_centroids
 
     @property
     def face_vertices(self):

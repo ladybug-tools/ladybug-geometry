@@ -36,6 +36,7 @@ class Mesh2D(MeshBase):
         * centroid
         * face_areas
         * face_centroids
+        * face_area_centroids
         * face_vertices
         * vertex_connected_faces
         * edges
@@ -59,6 +60,7 @@ class Mesh2D(MeshBase):
         self._centroid = None
         self._face_areas = None
         self._face_centroids = None
+        self._face_area_centroids = None
         self._vertex_connected_faces = None
         self._edge_indices = None
         self._edge_types = None
@@ -184,6 +186,7 @@ class Mesh2D(MeshBase):
         # build the mesh
         _mesh_init = cls(_verts, _faces)
         _mesh_init._face_centroids = _centroids
+        _mesh_init._face_area_centroids = _centroids
         _new_mesh, _face_pattern = _mesh_init.remove_vertices(_pattern)
         _new_mesh._face_areas = x_dim * y_dim
         return _new_mesh
@@ -217,6 +220,7 @@ class Mesh2D(MeshBase):
         _new_mesh = cls(tuple(_verts), tuple(_faces))
         _new_mesh._face_areas = x_dim * y_dim
         _new_mesh._face_centroids = _centroids
+        _new_mesh._face_area_centroids = _centroids
         return _new_mesh
 
     @property
@@ -262,7 +266,7 @@ class Mesh2D(MeshBase):
         if self._centroid is None:
             _weight_x = 0
             _weight_y = 0
-            for _c, _a in zip(self.face_centroids, self.face_areas):
+            for _c, _a in zip(self.face_area_centroids, self.face_areas):
                 _weight_x += _c.x * _a
                 _weight_y += _c.y * _a
             self._centroid = Point2D(_weight_x / self.area, _weight_y / self.area)
@@ -613,6 +617,14 @@ class Mesh2D(MeshBase):
         else:
             # if not, then the other diagonal splits it into two ears
             return [(1, 2, 3), (3, 0, 1)]
+
+    @staticmethod
+    def _face_center(verts):
+        """Get the center of a list of Point3D vertices."""
+        _cent_x = sum([v.x for v in verts])
+        _cent_y = sum([v.y for v in verts])
+        v_count = len(verts)
+        return Point2D(_cent_x / v_count, _cent_y / v_count)
 
     @staticmethod
     def _quad_centroid(verts):
