@@ -533,3 +533,31 @@ def test_from_stl_binary():
     ]
     for count, cent in enumerate(mesh.face_centroids):
         assert cent.distance_to_point(centroids[count]) <= 0.01
+
+
+def test_to_from_obj_cube():
+    """Test from_obj method with a simple OBJ file."""
+    file_path = 'tests/obj/cube.obj'
+    mesh = Mesh3D.from_obj(file_path)
+    assert len(mesh.vertices) == 24
+    assert len(mesh.faces) == 8
+
+    new_folder, new_name = 'tests/obj/', 'cube_new.obj'
+    new_file = mesh.to_obj(new_folder, new_name)
+    assert os.path.isfile(new_file)
+    Mesh3D.from_obj(new_file)
+    os.remove(new_file)
+
+
+def test_to_from_obj_colored_mesh():
+    """Test from_obj method with an OBJ file of a colored mesh."""
+    file_path = 'tests/obj/colored_flood_plot.obj'
+    mesh = Mesh3D.from_obj(file_path)
+    assert len(mesh.vertices) == len(mesh.colors)
+    assert len(mesh.faces) == 8760
+
+    new_folder, new_name = 'tests/obj/', 'colored_flood_plot_new.obj'
+    new_file = mesh.to_obj(new_folder, new_name)
+    assert os.path.isfile(new_file)
+    Mesh3D.from_obj(new_file)
+    os.remove(new_file)
