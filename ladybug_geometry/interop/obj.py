@@ -372,7 +372,8 @@ class OBJ(object):
 
             # add material file name if include_mtl is true
             if self._material_structure is not None or include_mtl:
-                outfile.write('mtllib ' + mtl_file + '\n')
+                if include_mtl:
+                    outfile.write('mtllib ' + mtl_file + '\n')
                 if self._material_structure is None:
                     outfile.write('usemtl diffuse_0\n')
 
