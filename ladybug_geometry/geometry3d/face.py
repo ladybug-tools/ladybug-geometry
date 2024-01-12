@@ -2037,10 +2037,22 @@ class Face3D(Base2DIn3D):
         # get BooleanPolygons of the two faces
         f1_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f1_poly.vertices)]
         f2_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in s2_poly.vertices)]
-        if face1.has_holes:
+        if face1.has_holes and face2.has_holes:  # snap corresponding holes together
+            f1h_polys = face1.hole_polygon2d
+            f2h_polys = [Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in h_pts))
+                         for h_pts in face2.holes]
+            for f1hp in f1h_polys:
+                for hi, f2hp in enumerate(f2h_polys):
+                    if f1hp.center.distance_to_point(f2hp.center) < tolerance:
+                        f2h_polys[hi] = f1hp.snap_to_polygon(f2hp, tolerance)
+            for hole in f1h_polys:
+                f1_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+            for hole in f2h_polys:
+                f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+        elif face1.has_holes:
             for hole in face1.hole_polygon2d:
                 f1_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
-        if face2.has_holes:
+        elif face2.has_holes:
             for hole in face2.holes:
                 h_pt2d = (prim_pl.xyz_to_xy(pt) for pt in hole)
                 f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in h_pt2d))
