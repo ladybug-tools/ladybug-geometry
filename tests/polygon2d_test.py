@@ -1079,6 +1079,22 @@ def test_boolean_split():
     assert len(poly2_dif[0].vertices) == 7
 
 
+def test_common_axes():
+    """Test the common_axes method"""
+    geo_file = './tests/json/polygons_for_alignment.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    polygons = [Polygon2D.from_dict(p) for p in geo_dict]
+
+    axes = Polygon2D.common_axes(
+        polygons, Vector2D(1, 0),min_distance=0.15, merge_distance=0.3,
+        fraction_to_keep=0.2, angle_tolerance=math.pi / 180)
+    
+    assert len(axes) == 16
+    for item in axes:
+        assert isinstance(item, LineSegment2D)
+
+
 def test_joined_intersected_boundary():
     geo_file = './tests/json/polygons_for_joined_boundary.json'
     with open(geo_file, 'r') as fp:
