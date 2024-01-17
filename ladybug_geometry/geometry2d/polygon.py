@@ -1124,13 +1124,18 @@ class Polygon2D(Base2DIn2D):
         return tuple(pt.to_array() for pt in self.vertices)
 
     def _to_bool_poly(self):
-        """A hidden method used to translate the Polygon2D to a BooleanPolygon.
-
-        This is necessary before performing any boolean operations with
-        the polygon.
-        """
+        """Translate the Polygon2D to a BooleanPolygon."""
         b_pts = (pb.BooleanPoint(pt.x, pt.y) for pt in self.vertices)
         return pb.BooleanPolygon([b_pts])
+
+    def _to_snapped_bool_poly(self, snap_ref_polygon, tolerance):
+        """Snap a Polygon2D to this one and translate it to a BooleanPolygon.
+
+        This is necessary to ensure that boolean operations will succeed between
+        two polygons.
+        """
+        new_poly = snap_ref_polygon.snap_to_polygon(self, tolerance)
+        return new_poly._to_bool_poly()
 
     @staticmethod
     def _from_bool_poly(bool_polygon):
@@ -1159,7 +1164,9 @@ class Polygon2D(Base2DIn2D):
             A list of Polygon2D representing the union of the two polygons.
         """
         result = pb.union(
-            self._to_bool_poly(), polygon._to_bool_poly(), tolerance)
+            self._to_bool_poly(),
+            polygon._to_snapped_bool_poly(self, tolerance),
+            tolerance / 100)
         return Polygon2D._from_bool_poly(result)
 
     def boolean_intersect(self, polygon, tolerance):
@@ -1176,7 +1183,9 @@ class Polygon2D(Base2DIn2D):
             Will be an empty list if no overlap exists between the polygons.
         """
         result = pb.intersect(
-            self._to_bool_poly(), polygon._to_bool_poly(), tolerance)
+            self._to_bool_poly(),
+            polygon._to_snapped_bool_poly(self, tolerance),
+            tolerance / 100)
         return Polygon2D._from_bool_poly(result)
 
     def boolean_difference(self, polygon, tolerance):
@@ -1195,7 +1204,9 @@ class Polygon2D(Base2DIn2D):
             is no overlap between the polygons.
         """
         result = pb.difference(
-            self._to_bool_poly(), polygon._to_bool_poly(), tolerance)
+            self._to_bool_poly(),
+            polygon._to_snapped_bool_poly(self, tolerance),
+            tolerance / 100)
         return Polygon2D._from_bool_poly(result)
 
     def boolean_xor(self, polygon, tolerance):
@@ -1224,7 +1235,9 @@ class Polygon2D(Base2DIn2D):
             in the two.
         """
         result = pb.xor(
-            self._to_bool_poly(), polygon._to_bool_poly(), tolerance)
+            self._to_bool_poly(),
+            polygon._to_snapped_bool_poly(self, tolerance),
+            tolerance / 100)
         return Polygon2D._from_bool_poly(result)
 
     @staticmethod
@@ -1320,7 +1333,9 @@ class Polygon2D(Base2DIn2D):
             makes a split version of polygon2.
         """
         int_result, poly1_result, poly2_result = pb.split(
-            polygon1._to_bool_poly(), polygon2._to_bool_poly(), tolerance)
+            polygon1._to_bool_poly(),
+            polygon2._to_snapped_bool_poly(polygon1, tolerance),
+            tolerance / 100)
         intersection = Polygon2D._from_bool_poly(int_result)
         poly1_difference = Polygon2D._from_bool_poly(poly1_result)
         poly2_difference = Polygon2D._from_bool_poly(poly2_result)
@@ -1723,6 +1738,154 @@ class Polygon2D(Base2DIn2D):
                         pass
 
         return closed_polys
+
+    @staticmethod
+    def common_axes(
+        polygons, direction, min_distance, merge_distance, fraction_to_keep,
+        angle_tolerance
+    ):
+        """Get LineSegment2Ds for the most common axes across a set of Polygon2Ds.
+
+        This is often useful as a step before aligning a set of polygons to these
+        common axes.
+
+        Args:
+            polygons: A list or tuple of Polygon2D objects for which common axes
+                will be evaluated.
+            direction: A Vector2D object to represent the direction in which the
+                common axes will be evaluated and generated
+            min_distance: The minimum distance at which common axes will be evaluated.
+                This value should typically be a little larger than the model
+                tolerance (eg. 5 to 20 times the tolerance) in order to ensure that
+                possible common axes across the input polygons are not missed.
+            merge_distance: The distance at which common axes next to one another
+                will be merged into a single axis. This should typically be 2-3
+                times the min_distance in order to avoid generating several axes
+                that are immediately adjacent to one another. When using this
+                method to generate axes for alignment, this merge_distance should
+                be in the range of the alignment distance.
+            fraction_to_keep: A number between 0 and 1 representing the fraction of
+                all possible axes that will be kept in the result. Depending on
+                the complexity of the input geometry, something between 0.1 and
+                0.3 is typically appropriate.
+            angle_tolerance: The max angle difference in radians that the polygon
+                segments direction can differ from the input direction before the
+                segments are not factored into this calculation of common axes.
+
+            Returns:
+                A list of LineSegment2D objects for the common axes across the
+                input polygons.
+        """
+        # gather the relevant segments of the input polygons
+        min_ang, max_ang = angle_tolerance, math.pi - angle_tolerance
+        rel_segs = []
+        for p_gon in polygons:
+             for seg in p_gon.segments:
+                try:
+                     s_ang = direction.angle(seg.v)
+                     if s_ang < min_ang or s_ang > max_ang:
+                        rel_segs.append(seg)
+                except ZeroDivisionError:  # zero length segment to ignore
+                    continue
+        if len(rel_segs) == 0:
+            return []  # none of the polygon segments are relevant in the direction
+
+        # determine the extents around the polygons and the input direction
+        gen_vec = direction.rotate(math.pi / 2)
+        axis_angle = Vector2D(0, 1).angle_counterclockwise(gen_vec)
+        orient_poly = polygons
+        if axis_angle != 0:  # rotate geometry to the bounding box
+            cpt = polygons[0].vertices[0]
+            orient_poly = [pl.rotate(-axis_angle, cpt) for pl in polygons]
+        xx = Polygon2D._bounding_domain_x(orient_poly)
+        yy = Polygon2D._bounding_domain_y(orient_poly)
+        min_pt = Point2D(xx[0], yy[0])
+        max_pt = Point2D(xx[1], yy[1])
+        if axis_angle != 0:  # rotate the points back
+            min_pt = min_pt.rotate(axis_angle, cpt)
+            max_pt = max_pt.rotate(axis_angle, cpt)
+
+        # generate all possible axes from the extents and min_distance
+        axis_vec = direction.normalize() * (xx[1] - xx[0])
+        incr_vec = gen_vec.normalize() * (min_distance)
+        current_pt = min_pt
+        current_dist, max_dist = 0, yy[1] - yy[0]
+        all_axes = []
+        while current_dist < max_dist:
+            axis = LineSegment2D(current_pt, axis_vec)
+            all_axes.append(axis)
+            current_pt = current_pt.move(incr_vec)
+            current_dist += min_distance
+
+        # evaluate the axes based on how many relevant segments they are next to
+        mid_pts = [seg.midpoint for seg in rel_segs]
+        rel_axes, axes_value = [], []
+        for axis in all_axes:
+            axis_val = 0
+            for pt in mid_pts:
+                if axis.distance_to_point(pt) <= merge_distance:
+                    axis_val += 1
+            if axis_val != 0:
+                rel_axes.append(axis)
+                axes_value.append(axis_val)
+        if len(rel_axes) == 0:
+            return []  # none of the generated axes are relevant
+
+        # sort the axes by how relevant they are to segments and keep a certain fraction
+        count_to_keep = int(len(all_axes) * fraction_to_keep)
+        i_to_keep = [i for _, i in sorted(zip(axes_value, range(len(rel_axes))))]
+        i_to_keep.reverse()
+        if count_to_keep == 0:
+            count_to_keep = 1
+        elif count_to_keep > len(i_to_keep):
+            count_to_keep = len(i_to_keep)
+        rel_i = i_to_keep[:count_to_keep]
+        rel_i.sort()
+        rel_axes = [rel_axes[i] for i in rel_i]
+
+        # group the axes by proximity
+        last_ax = rel_axes[0]
+        axes_groups = [[last_ax]]
+        for axis in rel_axes[1:]:
+            if axis.p.distance_to_point(last_ax.p) <= merge_distance:
+                axes_groups[-1].append(axis)
+            else:  # start a new group
+                axes_groups.append([axis])
+            last_ax = axis
+
+        # average the line segments that are within the merge_distance of one another
+        final_axes = []
+        for ax_group in axes_groups:
+            if len(ax_group) == 1:
+                final_axes.append(ax_group[0])
+            else:
+                st_pt_x = (ax_group[0].p1.x + ax_group[-1].p1.x) / 2
+                st_pt_y = (ax_group[0].p1.y + ax_group[-1].p1.y) / 2
+                avg_ax = LineSegment2D(Point2D(st_pt_x, st_pt_y), axis_vec)
+                final_axes.append(avg_ax)
+        return final_axes
+
+    @staticmethod
+    def _bounding_domain_x(geometries):
+        """Get minimum and maximum X coordinates of multiple polygons."""
+        min_x, max_x = geometries[0].min.x, geometries[0].max.x
+        for geom in geometries[1:]:
+            if geom.min.x < min_x:
+                min_x = geom.min.x
+            if geom.max.x > max_x:
+                max_x = geom.max.x
+        return min_x, max_x
+
+    @staticmethod
+    def _bounding_domain_y(geometries):
+        """Get minimum and maximum Y coordinates of multiple polygons."""
+        min_y, max_y = geometries[0].min.y, geometries[0].max.y
+        for geom in geometries[1:]:
+            if geom.min.y < min_y:
+                min_y = geom.min.y
+            if geom.max.y > max_y:
+                max_y = geom.max.y
+        return min_y, max_y
 
     def _point_in_polygon(self, tolerance):
         """Get a Point2D that is always reliably inside this Polygon2D.
