@@ -1086,11 +1086,11 @@ def test_common_axes():
         geo_dict = json.load(fp)
     polygons = [Polygon2D.from_dict(p) for p in geo_dict]
 
-    axes = Polygon2D.common_axes(
-        polygons, Vector2D(1, 0),min_distance=0.15, merge_distance=0.3,
-        fraction_to_keep=0.2, angle_tolerance=math.pi / 180)
-    
-    assert len(axes) == 16
+    axes, values = Polygon2D.common_axes(
+        polygons, Vector2D(1, 0),min_distance=0.1, merge_distance=0.3,
+        angle_tolerance=math.pi / 180)
+
+    assert len(axes) == 31
     for item in axes:
         assert isinstance(item, LineSegment2D)
 
