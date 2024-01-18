@@ -17,7 +17,7 @@ from .polyline import Polyline2D
 from ..triangulation import _linked_list, _eliminate_holes
 from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
     does_intersection_exist_line2d, closest_point2d_on_line2d, \
-    closest_end_point2d_between_line2d
+    closest_end_point2d_between_line2d, closest_point2d_on_line2d_infinite
 from ._2d import Base2DIn2D
 import ladybug_geometry.boolean as pb
 
@@ -1740,10 +1740,7 @@ class Polygon2D(Base2DIn2D):
         return closed_polys
 
     @staticmethod
-    def common_axes(
-        polygons, direction, min_distance, merge_distance, fraction_to_keep,
-        angle_tolerance
-    ):
+    def common_axes(polygons, direction, min_distance, merge_distance, angle_tolerance):
         """Get LineSegment2Ds for the most common axes across a set of Polygon2Ds.
 
         This is often useful as a step before aligning a set of polygons to these
@@ -1764,17 +1761,20 @@ class Polygon2D(Base2DIn2D):
                 that are immediately adjacent to one another. When using this
                 method to generate axes for alignment, this merge_distance should
                 be in the range of the alignment distance.
-            fraction_to_keep: A number between 0 and 1 representing the fraction of
-                all possible axes that will be kept in the result. Depending on
-                the complexity of the input geometry, something between 0.1 and
-                0.3 is typically appropriate.
             angle_tolerance: The max angle difference in radians that the polygon
                 segments direction can differ from the input direction before the
                 segments are not factored into this calculation of common axes.
 
             Returns:
-                A list of LineSegment2D objects for the common axes across the
-                input polygons.
+                A tuple with two elements.
+
+            -   common_axes: A list of LineSegment2D objects for the common
+                axes across the input polygons.
+
+            -   axis_values: A list of integers that aligns with the common_axes
+                and denotes how many segments of the input polygons each axis
+                relates to. Higher numbers indicate that that the axis is more
+                common among all of the possible axes.
         """
         # gather the relevant segments of the input polygons
         min_ang, max_ang = angle_tolerance, math.pi - angle_tolerance
@@ -1788,7 +1788,7 @@ class Polygon2D(Base2DIn2D):
                 except ZeroDivisionError:  # zero length segment to ignore
                     continue
         if len(rel_segs) == 0:
-            return []  # none of the polygon segments are relevant in the direction
+            return [], []  # none of the polygon segments are relevant in the direction
 
         # determine the extents around the polygons and the input direction
         gen_vec = direction.rotate(math.pi / 2)
@@ -1823,47 +1823,38 @@ class Polygon2D(Base2DIn2D):
         for axis in all_axes:
             axis_val = 0
             for pt in mid_pts:
-                if axis.distance_to_point(pt) <= merge_distance:
+                close_pt = closest_point2d_on_line2d_infinite(pt, axis)
+                if close_pt.distance_to_point(pt) <= min_distance:
                     axis_val += 1
             if axis_val != 0:
                 rel_axes.append(axis)
                 axes_value.append(axis_val)
         if len(rel_axes) == 0:
-            return []  # none of the generated axes are relevant
-
-        # sort the axes by how relevant they are to segments and keep a certain fraction
-        count_to_keep = int(len(all_axes) * fraction_to_keep)
-        i_to_keep = [i for _, i in sorted(zip(axes_value, range(len(rel_axes))))]
-        i_to_keep.reverse()
-        if count_to_keep == 0:
-            count_to_keep = 1
-        elif count_to_keep > len(i_to_keep):
-            count_to_keep = len(i_to_keep)
-        rel_i = i_to_keep[:count_to_keep]
-        rel_i.sort()
-        rel_axes = [rel_axes[i] for i in rel_i]
+            return [], []  # none of the generated axes are relevant
 
         # group the axes by proximity
         last_ax = rel_axes[0]
         axes_groups = [[last_ax]]
-        for axis in rel_axes[1:]:
+        group_values = [[axes_value[0]]]
+        for axis, val in zip(rel_axes[1:], axes_value[1:]):
             if axis.p.distance_to_point(last_ax.p) <= merge_distance:
                 axes_groups[-1].append(axis)
+                group_values[-1].append(val)
             else:  # start a new group
                 axes_groups.append([axis])
+                group_values.append([val])
             last_ax = axis
 
         # average the line segments that are within the merge_distance of one another
-        final_axes = []
-        for ax_group in axes_groups:
+        axis_values = [max(val) for val in group_values]
+        common_axes = []
+        for ax_group, grp_vals in zip(axes_groups, group_values):
             if len(ax_group) == 1:
-                final_axes.append(ax_group[0])
+                common_axes.append(ax_group[0])
             else:
-                st_pt_x = (ax_group[0].p1.x + ax_group[-1].p1.x) / 2
-                st_pt_y = (ax_group[0].p1.y + ax_group[-1].p1.y) / 2
-                avg_ax = LineSegment2D(Point2D(st_pt_x, st_pt_y), axis_vec)
-                final_axes.append(avg_ax)
-        return final_axes
+                index_max = max(range(len(grp_vals)), key=grp_vals.__getitem__)
+                common_axes.append(ax_group[index_max])
+        return common_axes, axis_values
 
     @staticmethod
     def _bounding_domain_x(geometries):
