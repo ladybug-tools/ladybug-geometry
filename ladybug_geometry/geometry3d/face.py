@@ -1526,9 +1526,11 @@ class Face3D(Base2DIn3D):
         rect_res = self.extract_rectangle(tolerance)
         if rect_res is None:
             return []
-        bottom_seg, top_seg, other_faces = rect_res
+        bottom_seg, top_seg, _ = rect_res
         height_seg = LineSegment3D.from_end_points(bottom_seg.p, top_seg.p)
-        base_plane = Plane(self.normal, bottom_seg.p, bottom_seg.v)
+        norm_tup = self._normal_from_3pts(bottom_seg.p, bottom_seg.p2, top_seg.p)
+        norm = Vector3D(*norm_tup).normalize()
+        base_plane = Plane(norm, bottom_seg.p, bottom_seg.v)
         sub_faces = Face3D.sub_rects_from_rect_dimensions(
             base_plane, bottom_seg.length, height_seg.length, sub_rect_height,
             sub_rect_width, sill_height, horizontal_separation)
