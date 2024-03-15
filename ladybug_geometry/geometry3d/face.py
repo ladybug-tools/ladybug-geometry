@@ -1923,11 +1923,11 @@ class Face3D(Base2DIn3D):
                     f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in h_pt2d))
             b_poly2 = pb.BooleanPolygon(f2_polys)
             relevant_b_polys.append(b_poly2)
-        
+
         # if no relevant polygons were found, return self
         if len(relevant_b_polys) == 0:
             return self
-        
+
         # loop through the boolean polygons and subtract them
         int_tol = tolerance / 100
         for b_poly2 in relevant_b_polys:
@@ -1995,6 +1995,65 @@ class Face3D(Base2DIn3D):
         # rebuild the Face3D from the results and return them
         union_faces = Face3D._from_bool_poly(poly_result, prim_pl)
         return union_faces[0]
+
+    @staticmethod
+    def coplanar_intersection(face1, face2, tolerance, angle_tolerance):
+        """Boolean Intersection two coplanar Face3D with one another.
+
+        Args:
+            face1: A Face3D for the first face that will be intersected with
+                the second face.
+            face2: A Face3D for the second face that will be intersected with
+                the first face.
+            tolerance: The minimum difference between X, Y and Z values at which
+                vertices are considered distinct from one another.
+            angle_tolerance: The max angle in radians that the plane normals can
+                differ from one another in order for them to be considered coplanar.
+
+        Returns:
+            A list of Face3D for the Intersection of the two input Face3D.
+            When the faces are not coplanar or they do not overlap, None will
+            be returned.
+        """
+        # test whether the faces are coplanar
+        prim_pl = face1.plane
+        if not prim_pl.is_coplanar_tolerance(face2.plane, tolerance, angle_tolerance):
+            return None
+        # test whether the two polygons have any overlap in 2D space
+        f1_poly = face1.boundary_polygon2d
+        f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
+        if not Polygon2D.overlapping_bounding_rect(f1_poly, f2_poly, tolerance):
+            return None
+        if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
+            return None
+        # snap the polygons to one another to avoid tolerance issues
+        try:
+            f1_poly = f1_poly.remove_colinear_vertices(tolerance)
+            f2_poly = f2_poly.remove_colinear_vertices(tolerance)
+        except AssertionError:  # degenerate faces input
+            return None
+        s2_poly = f1_poly.snap_to_polygon(f2_poly, tolerance)
+        # get BooleanPolygons of the two faces
+        f1_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f1_poly.vertices)]
+        f2_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in s2_poly.vertices)]
+        if face1.has_holes:
+            for hole in face1.hole_polygon2d:
+                f1_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+        if face2.has_holes:
+            for hole in face2.holes:
+                h_pt2d = (prim_pl.xyz_to_xy(pt) for pt in hole)
+                f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in h_pt2d))
+        b_poly1 = pb.BooleanPolygon(f1_polys)
+        b_poly2 = pb.BooleanPolygon(f2_polys)
+        # split the two boolean polygons with one another
+        int_tol = tolerance / 100
+        try:
+            poly_result = pb.intersect(b_poly1, b_poly2, int_tol)
+        except Exception:
+            return None  # typically a tolerance issue causing failure
+        # rebuild the Face3D from the results and return them
+        int_faces = Face3D._from_bool_poly(poly_result, prim_pl)
+        return int_faces
 
     @staticmethod
     def coplanar_split(face1, face2, tolerance, angle_tolerance):
