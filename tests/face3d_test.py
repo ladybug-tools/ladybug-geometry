@@ -1623,6 +1623,17 @@ def test_join_coplanar_faces():
     assert len(joined_faces[0].holes) == 5
 
 
+def test_join_coplanar_faces_advanced():
+    """Test the join_coplanar_faces method."""
+    geo_file = './tests/json/union_faces.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    join_faces = [Face3D.from_dict(fd) for fd in geo_dict]
+
+    join_face = Face3D.join_coplanar_faces(join_faces, 0.001)
+    assert sum(f.area for f in join_faces) == pytest.approx(join_face[0].area, rel=1e-3)
+
+
 def test_extract_all_from_stl():
     file_path = 'tests/stl/cube_binary.stl'
     faces = Face3D.extract_all_from_stl(file_path)
