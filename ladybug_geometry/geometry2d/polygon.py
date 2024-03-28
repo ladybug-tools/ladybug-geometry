@@ -1619,20 +1619,20 @@ class Polygon2D(Base2DIn2D):
             other_poly = [p for j, p in enumerate(cclock_poly) if j != i]
             for j, (_s, int_lins) in enumerate(zip(rel_segs, test_segs)):
                 int_vals = [0] * len(int_lins)
-                for l, int_lin in enumerate(int_lins):
+                for m, int_lin in enumerate(int_lins):
                     for _oth_p in other_poly:
                         if _oth_p.intersect_line_ray(int_lin):  # intersection!
-                            int_vals[l] = 1
+                            int_vals[m] = 1
                             break
                 if sum(int_vals) == len(int_lins):  # fully internal line
                     continue
-                else: # if the polygon is concave, also check for self intersection
+                else:  # if the polygon is concave, also check for self intersection
                     if not poly.is_convex:
                         _other_segs = [x for k, x in enumerate(rel_segs) if k != j]
-                        for l, int_lin in enumerate(int_lins):
+                        for m, int_lin in enumerate(int_lins):
                             for _oth_s in _other_segs:
                                 if int_lin.intersect_line_ray(_oth_s) is not None:
-                                    int_vals[l] = 1
+                                    int_vals[m] = 1
                                     break
 
                 # determine the exterior segments using the intersections
@@ -1695,7 +1695,7 @@ class Polygon2D(Base2DIn2D):
 
         # if the resulting polylines are not closed, join the nearest end points
         if len(closed_polys) != len(ext_bounds):
-            extra_segs, extra_pts = [], []
+            extra_segs = []
             for i, s_bnd in enumerate(open_bounds):
                 self_seg = LineSegment2D.from_end_points(s_bnd.p1, s_bnd.p2)
                 poss_segs = [self_seg]
@@ -1782,10 +1782,10 @@ class Polygon2D(Base2DIn2D):
         min_ang, max_ang = angle_tolerance, math.pi - angle_tolerance
         rel_segs = []
         for p_gon in polygons:
-             for seg in p_gon.segments:
+            for seg in p_gon.segments:
                 try:
-                     s_ang = direction.angle(seg.v)
-                     if s_ang < min_ang or s_ang > max_ang:
+                    s_ang = direction.angle(seg.v)
+                    if s_ang < min_ang or s_ang > max_ang:
                         rel_segs.append(seg)
                 except ZeroDivisionError:  # zero length segment to ignore
                     continue
