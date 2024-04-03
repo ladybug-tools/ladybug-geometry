@@ -1982,7 +1982,7 @@ class Face3D(Base2DIn3D):
                 f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in h_pt2d))
         b_poly1 = pb.BooleanPolygon(f1_polys)
         b_poly2 = pb.BooleanPolygon(f2_polys)
-        # split the two boolean polygons with one another
+        # union the two boolean polygons with one another
         int_tol = tolerance / 100
         try:
             poly_result = pb.union(b_poly1, b_poly2, int_tol)
@@ -2039,7 +2039,7 @@ class Face3D(Base2DIn3D):
                 f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in h_pt2d))
         b_poly1 = pb.BooleanPolygon(f1_polys)
         b_poly2 = pb.BooleanPolygon(f2_polys)
-        # split the two boolean polygons with one another
+        # intersect the two boolean polygons with one another
         int_tol = tolerance / 100
         try:
             poly_result = pb.intersect(b_poly1, b_poly2, int_tol)
@@ -2124,6 +2124,75 @@ class Face3D(Base2DIn3D):
         face1_split = poly1_faces + int_faces
         face2_split = poly2_faces + int_faces
         return face1_split, face2_split
+
+    @staticmethod
+    def coplanar_union_all(faces, tolerance, angle_tolerance):
+        """Boolean Union several coplanar Face3D together.
+
+        Note that this method does not perform any check for whether the input
+        faces overlap before it performs the unioning operation. So it is
+        recommended that the Face3D.group_by_coplanar_overlap method be run
+        before using this method to union each group together.
+
+        Args:
+            faces: A list of Face3D that will be unioned together.
+            tolerance: The minimum difference between X, Y and Z values at which
+                vertices are considered distinct from one another.
+            angle_tolerance: The max angle in radians that the plane normals can
+                differ from one another in order for them to be considered coplanar.
+
+        Returns:
+            A list of Face3D for the Union of all the input Face3D. When the faces
+            are not coplanar, None will be returned.
+        """
+        # test whether the faces are coplanar
+        prim_pl = faces[0].plane
+        for of in faces[1:]:
+            if not prim_pl.is_coplanar_tolerance(of.plane, tolerance, angle_tolerance):
+                return None
+        # convert all boundaries and holes to 2D space
+        hole_decoder = [False]
+        all_poly = [faces[0].boundary_polygon2d]
+        if faces[0].has_holes:
+            for hole in faces[0].hole_polygon2d:
+                all_poly.extend(hole)
+                hole_decoder.append(True)
+        for of in faces[1:]:
+            of_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in of.boundary))
+            all_poly.append(of_poly)
+            hole_decoder.append(False)
+            if of.has_holes:
+                for hole in of.holes:
+                    h_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in hole))
+                    all_poly.extend(h_poly)
+                    hole_decoder.append(True)
+        # snap the polygons to one another to avoid tolerance issues
+        try:
+            all_poly = [ply.remove_colinear_vertices(tolerance) for ply in all_poly]
+        except AssertionError:  # degenerate faces input
+            return None
+        all_poly = Polygon2D.snap_polygons(all_poly, tolerance)
+        # create BooleanPolygons of the faces
+        bool_polys = []
+        prev_poly = None
+        for ply, is_hole in zip(all_poly, hole_decoder):
+            bool_pts = (pb.BooleanPoint(pt.x, pt.y) for pt in ply.vertices)
+            if not is_hole:
+                if prev_poly is not None:
+                    bool_polys.append(pb.BooleanPolygon(prev_poly))
+                prev_poly = [bool_pts]
+            else:
+                prev_poly.append(bool_pts)
+        bool_polys.append(pb.BooleanPolygon(prev_poly))
+        # union the boolean polygons with one another
+        int_tol = tolerance / 100
+        try:
+            poly_result = pb.union_all(bool_polys, int_tol)
+        except Exception:
+            return None  # typically a tolerance issue causing failure
+        # rebuild the Face3D from the results and return them
+        union_faces = Face3D._from_bool_poly(poly_result, prim_pl)
+        return union_faces
 
     @staticmethod
     def _from_bool_poly(bool_polygon, plane):
