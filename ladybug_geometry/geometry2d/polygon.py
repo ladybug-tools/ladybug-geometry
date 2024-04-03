@@ -1243,6 +1243,29 @@ class Polygon2D(Base2DIn2D):
         return Polygon2D._from_bool_poly(result)
 
     @staticmethod
+    def snap_polygons(polygons, tolerance):
+        """Snap several Polygon2D to each other if they differ less than the tolerance.
+
+        This is useful to run before performing operations where small tolerance
+        differences are likely to cause issues, such as in boolean operations.
+
+        Args:
+            polygons: A list of Polygon2D, which will be snapped to each other.
+            tolerance: The minimum distance at which points will be snapped.
+
+        Returns:
+            A list of the input polygon2D that have been snapped to one another.
+        """
+        new_polygons = list(polygons)
+        for i, poly_1 in enumerate(new_polygons):
+            try:
+                for j, poly_2 in enumerate(new_polygons[i + 1:]):
+                    new_polygons[i + j + 1] = poly_1.snap_to_polygon(poly_2, tolerance)
+            except IndexError:
+                pass  # we have reached the end of the list of polygons
+        return new_polygons
+
+    @staticmethod
     def boolean_union_all(polygons, tolerance):
         """Get a list of Polygon2D for the union of several Polygon2D.
 
@@ -1266,8 +1289,9 @@ class Polygon2D(Base2DIn2D):
         Returns:
             A list of Polygon2D representing the union of all the polygons.
         """
+        polygons = Polygon2D.snap_polygons(polygons, tolerance)
         bool_polys = [poly._to_bool_poly() for poly in polygons]
-        result = pb.union_all(bool_polys, tolerance)
+        result = pb.union_all(bool_polys, tolerance / 100)
         return Polygon2D._from_bool_poly(result)
 
     @staticmethod
@@ -1295,8 +1319,9 @@ class Polygon2D(Base2DIn2D):
             A list of Polygon2D representing the intersection of all the polygons.
             Will be an empty list if no overlap exists between the polygons.
         """
+        polygons = Polygon2D.snap_polygons(polygons, tolerance)
         bool_polys = [poly._to_bool_poly() for poly in polygons]
-        result = pb.intersect_all(bool_polys, tolerance)
+        result = pb.intersect_all(bool_polys, tolerance / 100)
         return Polygon2D._from_bool_poly(result)
 
     @staticmethod
@@ -1458,6 +1483,9 @@ class Polygon2D(Base2DIn2D):
         in order to assess whether unionizing is necessary and to ensure that
         it is only performed among the necessary groups of polygons.
 
+        This method will return the minimal number of overlapping polygon groups
+        thanks to a recursive check of whether groups can be merged.
+
         Args:
             polygons: A list of Polygon2D to be grouped by their overlapping.
             tolerance: The minimum distance from the edge of a neighboring polygon
@@ -1483,7 +1511,35 @@ class Polygon2D(Base2DIn2D):
                     break
             if not group_found:  # the polygon does not overlap with any of the others
                 grouped_polys.append([poly])  # make a new group for the polygon
+        # if some groups were found, do several passes to merge groups
+        old_group_len = len(polygons)
+        while len(grouped_polys) != old_group_len:
+            new_groups, g_to_remove = grouped_polys[:], []
+            for i, group_1 in enumerate(grouped_polys):
+                try:
+                    for j, group_2 in enumerate(grouped_polys[i + 1:]):
+                        if Polygon2D._groups_overlap(group_1, group_2, tolerance):
+                            new_groups[i] = new_groups[i] + group_2
+                            g_to_remove.append(i + j + 1)
+                except IndexError:
+                    pass  # we have reached the end of the list of polygons
+            if len(g_to_remove) != 0:
+                g_to_remove = list(set(g_to_remove))
+                g_to_remove.sort()
+                for ri in reversed(g_to_remove):
+                    new_groups.pop(ri)
+            old_group_len = len(grouped_polys)
+            grouped_polys = new_groups
         return grouped_polys
+
+    @staticmethod
+    def _groups_overlap(group_1, group_2, tolerance):
+        """Evaluate whether two groups of Polygons overlap with one another."""
+        for poly_1 in group_1:
+            for poly_2 in group_2:
+                if poly_1.polygon_relationship(poly_2, tolerance) >= 0:
+                    return True
+        return False
 
     @staticmethod
     def joined_intersected_boundary(polygons, tolerance):
