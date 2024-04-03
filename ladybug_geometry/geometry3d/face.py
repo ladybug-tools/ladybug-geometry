@@ -1905,8 +1905,6 @@ class Face3D(Base2DIn3D):
                 continue
             # test whether the two polygons have any overlap in 2D space
             f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
-            if not Polygon2D.overlapping_bounding_rect(f1_poly, f2_poly, tolerance):
-                continue
             if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
                 continue
             # snap the polygons to one another to avoid tolerance issues
@@ -1963,8 +1961,6 @@ class Face3D(Base2DIn3D):
         # test whether the two polygons have any overlap in 2D space
         f1_poly = face1.boundary_polygon2d
         f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
-        if not Polygon2D.overlapping_bounding_rect(f1_poly, f2_poly, tolerance):
-            return None
         if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
             return None
         # snap the polygons to one another to avoid tolerance issues
@@ -2022,8 +2018,6 @@ class Face3D(Base2DIn3D):
         # test whether the two polygons have any overlap in 2D space
         f1_poly = face1.boundary_polygon2d
         f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
-        if not Polygon2D.overlapping_bounding_rect(f1_poly, f2_poly, tolerance):
-            return None
         if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
             return None
         # snap the polygons to one another to avoid tolerance issues
@@ -2084,8 +2078,6 @@ class Face3D(Base2DIn3D):
         # test whether the two polygons have any overlap in 2D space
         f1_poly = face1.boundary_polygon2d
         f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
-        if not Polygon2D.overlapping_bounding_rect(f1_poly, f2_poly, tolerance):
-            return [face1], [face2]
         if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
             return [face1], [face2]
         # snap the polygons to one another to avoid tolerance issues
@@ -2176,8 +2168,11 @@ class Face3D(Base2DIn3D):
         """Group coplanar Face3Ds depending on whether they overlap one another.
 
         This is useful as a pre-step before running Face3D.coplanar_union()
-        in order to assess whether unionizing is necessary and to ensure that
+        in order to assess whether union-ing is necessary and to ensure that
         it is only performed among the necessary groups of faces.
+
+        This method will return the minimal number of overlapping polygon groups
+        thanks to a recursive check of whether groups can be merged.
 
         Args:
             faces: A list of Face3D to be grouped by their overlapping.
@@ -2194,6 +2189,7 @@ class Face3D(Base2DIn3D):
         r_plane = faces[0].plane
         polygons = [Polygon2D([r_plane.xyz_to_xy(pt) for pt in face.vertices])
                     for face in faces]
+
         # loop through the polygons and check to see if it overlaps with the others
         grouped_polys, grouped_faces = [[polygons[0]]], [[faces[0]]]
         for poly, face in zip(polygons[1:], faces[1:]):
@@ -2210,6 +2206,31 @@ class Face3D(Base2DIn3D):
             if not group_found:  # the polygon does not overlap with any of the others
                 grouped_polys.append([poly])  # make a new group for the polygon
                 grouped_faces.append([face])  # make a new group for the face
+
+        # if some groups were found, recursively merge groups together
+        old_group_len = len(polygons)
+        while len(grouped_polys) != old_group_len:
+            new_poly_groups, new_face_groups = grouped_polys[:], grouped_faces[:]
+            g_to_remove = []
+            for i, group_1 in enumerate(grouped_polys):
+                try:
+                    zip_obj = zip(grouped_polys[i + 1:], grouped_faces[i + 1:])
+                    for j, (group_2, f2) in enumerate(zip_obj):
+                        if Polygon2D._groups_overlap(group_1, group_2, tolerance):
+                            new_poly_groups[i] = new_poly_groups[i] + group_2
+                            new_face_groups[i] = new_face_groups[i] + f2
+                            g_to_remove.append(i + j + 1)
+                except IndexError:
+                    pass  # we have reached the end of the list of polygons
+            if len(g_to_remove) != 0:
+                g_to_remove = list(set(g_to_remove))
+                g_to_remove.sort()
+                for ri in reversed(g_to_remove):
+                    new_poly_groups.pop(ri)
+                    new_face_groups.pop(ri)
+            old_group_len = len(grouped_polys)
+            grouped_polys = new_poly_groups
+            grouped_faces = new_face_groups
         return grouped_faces
 
     @staticmethod
