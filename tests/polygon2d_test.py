@@ -691,6 +691,20 @@ def test_group_by_overlap():
     assert len(grouped_polys[1]) in (2, 1)
 
 
+def test_group_by_touching():
+    """Test the group_by_touching method."""
+    geo_file = './tests/json/overlapping_polygons.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    polygons = [Polygon2D.from_dict(p) for p in geo_dict]
+
+    grouped_polys = Polygon2D.group_by_touching(polygons, 0.01)
+    assert len(grouped_polys) == 3
+
+    grouped_polys = Polygon2D.group_by_overlap(polygons, 0.01)
+    assert len(grouped_polys) == 13
+
+
 def test_distance_to_point():
     """Test the distance_to_point method."""
     pts = (Point2D(0, 0), Point2D(4, 0), Point2D(4, 2), Point2D(2, 2),

@@ -965,7 +965,7 @@ class Polygon2D(Base2DIn2D):
         return self.is_point_inside(point, test_vector)
 
     def is_polygon_inside(self, polygon):
-        """"Test whether another Polygon2D lies completely inside this polygon.
+        """Test whether another Polygon2D lies completely inside this polygon.
 
         Args:
             polygon: A Polygon2D to test whether it is completely inside this one.
@@ -984,7 +984,7 @@ class Polygon2D(Base2DIn2D):
         return True
 
     def is_polygon_outside(self, polygon):
-        """"Test whether another Polygon2D lies completely outside this polygon.
+        """Test whether another Polygon2D lies completely outside this polygon.
 
         Args:
             polygon: A Polygon2D to test whether it is completely outside this one.
@@ -1001,6 +1001,36 @@ class Polygon2D(Base2DIn2D):
                 if does_intersection_exist_line2d(seg, _s):
                     return False
         return True
+
+    def does_polygon_touch(self, polygon, tolerance):
+        """Test whether another Polygon2D touches, overlaps or is inside this polygon.
+
+        Args:
+            polygon: A Polygon2D to test whether it touches this polygon.
+
+        Returns:
+            A boolean denoting whether the polygon touches (True) or not (False).
+        """
+        # perform a bounding rectangle check to see if the polygons cannot overlap
+        if not Polygon2D.overlapping_bounding_rect(self, polygon, tolerance):
+            return False
+
+        # first evaluate the point relationships
+        pt_rels1 = [self.point_relationship(pt, tolerance) for pt in polygon]
+        if 0 in pt_rels1 or 1 in pt_rels1:
+            return True  # definitely touching polygons
+        pt_rels2 = [polygon.point_relationship(pt, tolerance) for pt in self]
+        if 0 in pt_rels2 or 1 in pt_rels2:
+            return True  # definitely touching polygons
+        
+        # if any of the segments intersect the other polygon, there is overlap
+        for seg in self.segments:
+            for _s in polygon.segments:
+                if does_intersection_exist_line2d(seg, _s):
+                    return True
+
+        # we can reliably say that the polygons do not touch
+        return False
 
     def polygon_relationship(self, polygon, tolerance):
         """Test whether another Polygon2D lies inside, outside or overlaps this one.
@@ -1027,9 +1057,13 @@ class Polygon2D(Base2DIn2D):
             This will be one of the following:
 
             * -1 = Outside this polygon
-            *  0 = Overlaps (intersects or contains) this polygon
+            *  0 = Overlaps (intersects) this polygon
             * +1 = Inside this polygon
         """
+        # perform a bounding rectangle check to see if the polygons cannot overlap
+        if not Polygon2D.overlapping_bounding_rect(self, polygon, tolerance):
+            return -1
+
         # first evaluate the point relationships to rule out the inside case
         pt_rels1 = [self.point_relationship(pt, tolerance) for pt in polygon]
         pt_rels2 = [polygon.point_relationship(pt, tolerance) for pt in self]
@@ -1056,7 +1090,7 @@ class Polygon2D(Base2DIn2D):
         return -1
 
     def distance_to_point(self, point):
-        """Get the minimum distance between this shape and the input point.
+        """Get the minimum distance between this shape and a point.
 
         Points that are inside the Polygon2D will return a distance of zero.
         If the distance of an interior point to an edge is needed, the
@@ -1477,7 +1511,7 @@ class Polygon2D(Base2DIn2D):
 
     @staticmethod
     def group_by_overlap(polygons, tolerance):
-        """Group Polygon2Ds that overlap one another greater than the tolerance.
+        """Group Polygon2Ds that overlap one another within the tolerance.
 
         This is useful as a pre-step before running Polygon2D.boolean_union_all()
         in order to assess whether unionizing is necessary and to ensure that
@@ -1495,8 +1529,9 @@ class Polygon2D(Base2DIn2D):
             A list of lists where each sub-list represents a group of polygons
             that all overlap with one another.
         """
-        # sort the polygons by area to ensure larger ones grab smaller ones
+        # sort the polygons by area to help larger ones grab smaller ones
         polygons = list(sorted(polygons, key=lambda x: x.area, reverse=True))
+
         # loop through the polygons and check to see if it overlaps with the others
         grouped_polys = [[polygons[0]]]
         for poly in polygons[1:]:
@@ -1511,7 +1546,8 @@ class Polygon2D(Base2DIn2D):
                     break
             if not group_found:  # the polygon does not overlap with any of the others
                 grouped_polys.append([poly])  # make a new group for the polygon
-        # if some groups were found, do several passes to merge groups
+
+        # if some groups were found, recursively merge groups together
         old_group_len = len(polygons)
         while len(grouped_polys) != old_group_len:
             new_groups, g_to_remove = grouped_polys[:], []
@@ -1533,11 +1569,78 @@ class Polygon2D(Base2DIn2D):
         return grouped_polys
 
     @staticmethod
+    def group_by_touching(polygons, tolerance):
+        """Group Polygon2Ds that touch or overlap one another within the tolerance.
+
+        This is useful to group geometries together before extracting a bounding
+        rectangle or convex hull around multiple polygons.
+
+        This method will return the minimal number of polygon groups
+        thanks to a recursive check of whether groups can be merged.
+
+        Args:
+            polygons: A list of Polygon2D to be grouped by their touching.
+            tolerance: The minimum distance from the edge of a neighboring polygon
+                at which a point is considered to touch that polygon.
+
+        Returns:
+            A list of lists where each sub-list represents a group of polygons
+            that all touch or overlap with one another.
+        """
+        # sort the polygons by area to help larger ones grab smaller ones
+        polygons = list(sorted(polygons, key=lambda x: x.area, reverse=True))
+
+        # loop through the polygons and check to see if it overlaps with the others
+        grouped_polys = [[polygons[0]]]
+        for poly in polygons[1:]:
+            group_found = False
+            for poly_group in grouped_polys:
+                for oth_poly in poly_group:
+                    if poly.does_polygon_touch(oth_poly, tolerance):
+                        poly_group.append(poly)
+                        group_found = True
+                        break
+                if group_found:
+                    break
+            if not group_found:  # the polygon does not touch any of the others
+                grouped_polys.append([poly])  # make a new group for the polygon
+
+        # if some groups were found, recursively merge groups together
+        old_group_len = len(polygons)
+        while len(grouped_polys) != old_group_len:
+            new_groups, g_to_remove = grouped_polys[:], []
+            for i, group_1 in enumerate(grouped_polys):
+                try:
+                    for j, group_2 in enumerate(grouped_polys[i + 1:]):
+                        if Polygon2D._groups_touch(group_1, group_2, tolerance):
+                            new_groups[i] = new_groups[i] + group_2
+                            g_to_remove.append(i + j + 1)
+                except IndexError:
+                    pass  # we have reached the end of the list of polygons
+            if len(g_to_remove) != 0:
+                g_to_remove = list(set(g_to_remove))
+                g_to_remove.sort()
+                for ri in reversed(g_to_remove):
+                    new_groups.pop(ri)
+            old_group_len = len(grouped_polys)
+            grouped_polys = new_groups
+        return grouped_polys
+
+    @staticmethod
     def _groups_overlap(group_1, group_2, tolerance):
         """Evaluate whether two groups of Polygons overlap with one another."""
         for poly_1 in group_1:
             for poly_2 in group_2:
                 if poly_1.polygon_relationship(poly_2, tolerance) >= 0:
+                    return True
+        return False
+    
+    @staticmethod
+    def _groups_touch(group_1, group_2, tolerance):
+        """Evaluate whether two groups of Polygons touch with one another."""
+        for poly_1 in group_1:
+            for poly_2 in group_2:
+                if poly_1.does_polygon_touch(poly_2, tolerance):
                     return True
         return False
 
