@@ -721,6 +721,19 @@ def test_distance_to_point():
     assert polygon.distance_from_edge_to_point(Point2D(1, 1)) != 0
 
 
+def test_snap_to_grid():
+    """Test the snap_to_grid method."""
+    pts = (Point2D(0.2, 0), Point2D(4.1, 0), Point2D(4.1, 4), Point2D(0, 4.2))
+    snapped_pts = (Point2D(0, 0), Point2D(4, 0), Point2D(4, 4), Point2D(0, 4))
+    polygon = Polygon2D(pts)
+
+    new_poly = polygon.snap_to_grid(0.5)
+    assert new_poly.vertices == snapped_pts
+
+    new_poly = polygon.snap_to_grid(0.01)
+    assert new_poly.vertices == pts
+
+
 def test_intersect_segments():
     """Tests that polygons within tolerance distance have vertices updated."""
     tolerance = 0.02

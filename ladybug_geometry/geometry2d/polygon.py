@@ -1150,6 +1150,25 @@ class Polygon2D(Base2DIn2D):
                     new_verts.append(pt)
         return Polygon2D(new_verts)
 
+    def snap_to_grid(self, grid_increment):
+        """Snap this polygon's vertices to the nearest grid node defined by an increment.
+
+        Args:
+            grid_increment: A positive number for dimension of each grid cell. This
+                typically should be equal to the tolerance or larger but should
+                not be larger than the smallest detail of the polygon that you
+                wish to resolve.
+
+        Returns:
+            A version of this polygon that is snapped to the grid.
+        """
+        new_verts = []
+        for pt in self.vertices:
+            new_x = grid_increment * round(pt.x / grid_increment)
+            new_y = grid_increment * round(pt.y / grid_increment)
+            new_verts.append(Point2D(new_x, new_y))
+        return Polygon2D(new_verts)
+
     def to_dict(self):
         """Get Polygon2D as a dictionary."""
         return {'type': 'Polygon2D',
