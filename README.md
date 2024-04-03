@@ -30,11 +30,13 @@ it returns consistent results between them (cPython 2 and 3, IronPython 2).
 - Triangulate Planar Geometry
 - Compute Mesh Face Areas, Centroids, and Normals
 - Move Any Geometry
-- Rotate Any Geometry Around an Axis
+- Rotate Any Geometry Around an Axis (or in the XY plane)
 - Mirror (Reflect) Any Geometry Over a Plane
 - Scale Any Geometry from a Base Point
 - Check if a 2D Point Inside 2D Polygon
 - Compute [Pole of Inaccessibility](https://en.wikipedia.org/wiki/Pole_of_inaccessibility) for any 2D Polygon
+- Check the Relationship Between 2D Polygons within a Tolerance (inside, outside, overlap)
+- Group 2D Polygons According to Overlaps
 - Perform 2D Polygon Boolean Operations (Union, Intersection, Difference)
 - Intersect Colinear 2D Polygon Segments with one Another (for matching lengths)
 - Join Line Segments into Polylines
@@ -43,7 +45,7 @@ it returns consistent results between them (cPython 2 and 3, IronPython 2).
 - Generate a Quad Mesh Grid from a 3D Face
 - Generate Sub-faces Based on Ratio with a Face (used for window generation)
 - Generate Contours and Contour Fins from a Face (used to generate louvers, fins and overhangs)
-- Split 3D Coplanar Faces with one Another (for matching areas)
+- Split, Union, or Intersect 3D Coplanar Faces with one Another (for matching areas)
 - Solve Adjacencies by Matching 3D Face Geometries
 - Join 3D Faces into 3D Polyfaces
 - Check if a 3D PolyFace is a Closed Solid
