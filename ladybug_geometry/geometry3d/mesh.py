@@ -6,6 +6,7 @@ from .._mesh import MeshBase
 from ..geometry2d.mesh import Mesh2D
 from .pointvector import Point3D, Vector3D
 from .line import LineSegment3D
+from .polyline import Polyline3D
 from .plane import Plane
 
 try:
@@ -40,6 +41,7 @@ class Mesh3D(MeshBase):
         * face_normals
         * vertex_normals
         * vertex_connected_faces
+        * face_edges
         * edges
         * naked_edges
         * internal_edges
@@ -205,8 +207,26 @@ class Mesh3D(MeshBase):
         return self._vertex_normals
 
     @property
+    def face_edges(self):
+        """List of polylines with one Polyline3D for each face.
+        
+        This is faster to compute compared to the edges and results in effectively
+        the same type of wireframe visualization.
+        """
+        _all_verts = self._vertices
+        f_edges = []
+        for face in self._faces:
+            verts = tuple(_all_verts[v] for v in face) + (_all_verts[face[0]],)
+            f_edges.append(Polyline3D(verts))
+        return f_edges
+
+    @property
     def edges(self):
-        """"Tuple of all edges in this Mesh3D as LineSegment3D objects."""
+        """"Tuple of all edges in this Mesh3D as LineSegment3D objects.
+        
+        Note that this method will return only the unique edges in the mesh without
+        any duplicates. This is sometimes desirable but can take a lot of time
+        to compute for large meshes. For a faster property, use face_edges."""
         if self._edges is None:
             if self._edge_indices is None:
                 self._compute_edge_info()

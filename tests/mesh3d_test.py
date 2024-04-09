@@ -1,15 +1,11 @@
 # coding=utf-8
 import pytest
-
-from ladybug_geometry.geometry3d.pointvector import Point3D, Vector3D
-from ladybug_geometry.geometry3d.mesh import Mesh3D
-from ladybug_geometry.geometry3d.plane import Plane
-from ladybug_geometry.geometry2d.mesh import Mesh2D
-from ladybug_geometry.geometry2d.pointvector import Point2D
-
 import math
 import json
 import os
+
+from ladybug_geometry.geometry2d import Point2D, Mesh2D
+from ladybug_geometry.geometry3d import Point3D, Vector3D, Polyline3D, Plane, Mesh3D
 
 
 def test_mesh3d_init():
@@ -39,6 +35,9 @@ def test_mesh3d_init():
     assert len(mesh.vertex_connected_faces) == 4
     for vf in mesh.vertex_connected_faces:
         assert len(vf) == 1
+    assert len(mesh.face_edges) == 1
+    for pline in mesh.face_edges:
+        assert isinstance(pline, Polyline3D)
 
     assert len(mesh.edges) == 4
     assert len(mesh.naked_edges) == 4
