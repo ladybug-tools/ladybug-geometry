@@ -11,6 +11,7 @@ from ..triangulation import earcut
 
 from .pointvector import Point2D, Vector2D
 from .line import LineSegment2D
+from .polyline import Polyline2D
 from .polygon import Polygon2D
 
 
@@ -271,6 +272,20 @@ class Mesh2D(MeshBase):
                 _weight_y += _c.y * _a
             self._centroid = Point2D(_weight_x / self.area, _weight_y / self.area)
         return self._centroid
+
+    @property
+    def face_edges(self):
+        """List of polylines with one Polyline2D for each face.
+        
+        This is faster to compute compared to the edges and results in effectively
+        the same type of wireframe visualization.
+        """
+        _all_verts = self._vertices
+        f_edges = []
+        for face in self._faces:
+            verts = tuple(_all_verts[v] for v in face) + (_all_verts[face[0]],)
+            f_edges.append(Polyline2D(verts))
+        return f_edges
 
     @property
     def edges(self):

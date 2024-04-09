@@ -1,11 +1,8 @@
 # coding=utf-8
 import pytest
-
-from ladybug_geometry.geometry2d.pointvector import Point2D, Vector2D
-from ladybug_geometry.geometry2d.mesh import Mesh2D
-from ladybug_geometry.geometry2d.polygon import Polygon2D
-
 import math
+
+from ladybug_geometry.geometry2d import Point2D, Vector2D, Polyline2D, Mesh2D, Polygon2D
 
 
 def test_mesh2d_init():
@@ -38,6 +35,9 @@ def test_mesh2d_init():
     assert len(mesh.vertex_connected_faces) == 4
     for vf in mesh.vertex_connected_faces:
         assert len(vf) == 1
+    assert len(mesh.face_edges) == 1
+    for pline in mesh.face_edges:
+        assert isinstance(pline, Polyline2D)
 
     assert len(mesh.edges) == 4
     assert len(mesh.naked_edges) == 4

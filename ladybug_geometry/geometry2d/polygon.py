@@ -1007,6 +1007,8 @@ class Polygon2D(Base2DIn2D):
 
         Args:
             polygon: A Polygon2D to test whether it touches this polygon.
+            tolerance: The minimum distance from an edge at which a point is
+                considered to touch the edge.
 
         Returns:
             A boolean denoting whether the polygon touches (True) or not (False).

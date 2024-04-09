@@ -162,7 +162,7 @@ class MeshBase(object):
         """Tuple with a tuple for each vertex that lists the indexes of connected faces.
         """
         if self._vertex_connected_faces is None:
-            _vert_faces = [[] for i in xrange(len(self._vertices))]
+            _vert_faces = [[] for _ in xrange(len(self._vertices))]
             for i, face in enumerate(self._faces):
                 for j in face:
                     _vert_faces[j].append(i)
