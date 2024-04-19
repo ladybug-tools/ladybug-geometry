@@ -85,7 +85,11 @@ class Face3D(Base2DIn3D):
         * upper_left_counter_clockwise_vertices
         * lower_left_counter_clockwise_vertices
         * lower_right_counter_clockwise_vertices
-        * upper_right_counter_clockwise_vertices
+        * upper_right_counter_clockwise_boundary
+        * upper_left_counter_clockwise_boundary
+        * lower_left_counter_clockwise_boundary
+        * lower_right_counter_clockwise_boundary
+        * upper_right_counter_clockwise_boundary
     """
     __slots__ = ('_plane', '_polygon2d', '_mesh2d', '_mesh3d',
                  '_boundary', '_holes', '_boundary_segments', '_hole_segments',
@@ -466,8 +470,13 @@ class Face3D(Base2DIn3D):
 
     @property
     def altitude(self):
-        """Get the altitude of the Face3D (between Pi/2 and -Pi/2)."""
+        """Get the altitude of the Face3D. Between Pi/2 (up) and -Pi/2 (down)."""
         return self.plane.altitude
+
+    @property
+    def tilt(self):
+        """Get the tilt of the Face3D. Between 0 (up) and Pi (down)."""
+        return self.plane.tilt
 
     @property
     def is_clockwise(self):
@@ -606,6 +615,50 @@ class Face3D(Base2DIn3D):
         treat the positive Z axis as up.
         """
         corner_pt, polygon = self._corner_point_and_polygon(self._vertices, 'max', 'max')
+        verts3d, verts2d = self._counter_clockwise_verts(polygon)
+        return self._corner_pt_verts(corner_pt, verts3d, verts2d)
+
+    @property
+    def upper_left_counter_clockwise_boundary(self):
+        """Get face boundary starting from the upper left and moving counterclockwise.
+
+        Horizontal faces will treat the positive Y axis as up. All other faces
+        treat the positive Z axis as up.
+        """
+        corner_pt, polygon = self._corner_point_and_polygon(self._boundary, 'min', 'max')
+        verts3d, verts2d = self._counter_clockwise_verts(polygon)
+        return self._corner_pt_verts(corner_pt, verts3d, verts2d)
+
+    @property
+    def lower_left_counter_clockwise_boundary(self):
+        """Get face boundary starting from the lower left and moving counterclockwise.
+
+        Horizontal faces will treat the positive Y axis as up. All other faces
+        treat the positive Z axis as up.
+        """
+        corner_pt, polygon = self._corner_point_and_polygon(self._boundary, 'min', 'min')
+        verts3d, verts2d = self._counter_clockwise_verts(polygon)
+        return self._corner_pt_verts(corner_pt, verts3d, verts2d)
+
+    @property
+    def lower_right_counter_clockwise_boundary(self):
+        """Get face boundary starting from the lower left and moving counterclockwise.
+
+        Horizontal faces will treat the positive Y axis as up. All other faces
+        treat the positive Z axis as up.
+        """
+        corner_pt, polygon = self._corner_point_and_polygon(self._boundary, 'max', 'min')
+        verts3d, verts2d = self._counter_clockwise_verts(polygon)
+        return self._corner_pt_verts(corner_pt, verts3d, verts2d)
+
+    @property
+    def upper_right_counter_clockwise_boundary(self):
+        """Get face boundary starting from the lower left and moving counterclockwise.
+
+        Horizontal faces will treat the positive Y axis as up. All other faces
+        treat the positive Z axis as up.
+        """
+        corner_pt, polygon = self._corner_point_and_polygon(self._boundary, 'max', 'max')
         verts3d, verts2d = self._counter_clockwise_verts(polygon)
         return self._corner_pt_verts(corner_pt, verts3d, verts2d)
 

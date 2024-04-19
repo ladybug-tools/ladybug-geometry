@@ -37,6 +37,7 @@ def test_face3d_init():
 
     assert face.area == 4
     assert face.perimeter == 8
+    assert round(face.tilt, 3) == 0
     assert round(face.altitude, 3) == round(math.pi / 2, 3)
     assert round(face.azimuth, 3) == 0
     assert face.is_clockwise is False
@@ -623,6 +624,7 @@ def test_upper_left_counter_clockwise_vertices():
     face_4 = Face3D(pts_2, plane_2, enforce_right_hand=False)
 
     up_cclock_1 = face_1.upper_left_counter_clockwise_vertices
+    assert up_cclock_1 == face_1.upper_left_counter_clockwise_boundary
     assert up_cclock_1[0] == Point3D(2, 0, 2)
     assert face_1.is_clockwise is True
     assert Face3D(up_cclock_1, enforce_right_hand=False).is_clockwise is False
@@ -651,6 +653,7 @@ def test_upper_left_counter_clockwise_vertices_triangle():
     face_2 = Face3D(pts_2, plane_1, enforce_right_hand=False)
 
     up_cclock_1 = face_1.upper_left_counter_clockwise_vertices
+    assert up_cclock_1 == face_1.upper_left_counter_clockwise_boundary
     assert up_cclock_1[0] == Point3D(0, 0, 2)
     assert face_1.is_clockwise is True
     assert Face3D(up_cclock_1, enforce_right_hand=False).is_clockwise is False

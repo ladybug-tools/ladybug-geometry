@@ -29,6 +29,7 @@ class Plane(object):
         * k
         * x
         * y
+        * tilt
         * altitude
         * azimuth
         * min
@@ -139,7 +140,10 @@ class Plane(object):
 
     @property
     def azimuth(self):
-        """Get the azimuth of the plane (between 0 and 2 * Pi).
+        """Get the azimuth of the plane.
+        
+        This is always between 0, indicating the positive Y-axis, and moving clockwise
+        up to 2 * Pi, which indicates a return to the positive Y-axis.
 
         This will be zero if the plane is perfectly horizontal.
         """
@@ -153,10 +157,15 @@ class Plane(object):
 
     @property
     def altitude(self):
-        """Get the altitude of the plane (between Pi/2 and -Pi/2)."""
+        """Get the altitude of the plane. Between Pi/2 (up) and -Pi/2 (down)."""
         if self._altitude is None:
             self._altitude = self.n.angle(Vector3D(0, 0, -1)) - math.pi / 2
         return self._altitude
+
+    @property
+    def tilt(self):
+        """Get the tilt of the plane. Between 0 (up) and Pi (down)."""
+        return abs(self.altitude - (math.pi / 2))
 
     @property
     def min(self):
