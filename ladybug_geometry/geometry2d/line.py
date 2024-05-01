@@ -1,6 +1,7 @@
 # coding=utf-8
 """2D Line Segment"""
 from __future__ import division
+import math
 
 from .pointvector import Vector2D, Point2D
 from ._1d import Base1DIn2D
@@ -155,6 +156,21 @@ class LineSegment2D(Base1DIn2D):
                 If None, it will be scaled from the World origin (0, 0).
         """
         return LineSegment2D(self.p.scale(factor, origin), self.v * factor)
+
+    def offset(self, distance):
+        """Offset the line segment by a given distance.
+
+        Args:
+            distance: The distance that the line segment will be offset. Both positive
+                and negative values are accepted with positive values being offset
+                to the left of the line and negative values being offset to the
+                right of the line (starting from LineSegment.p and looking
+                in the direction of LineSegment.v).
+        """
+        if distance == 0:
+            return self
+        move_vec = self.v.rotate(math.pi / 2).normalize() * distance
+        return LineSegment2D(self.p.move(move_vec), self.v)
 
     def subdivide(self, distances):
         """Get Point2D values along the line that subdivide it based on input distances.
