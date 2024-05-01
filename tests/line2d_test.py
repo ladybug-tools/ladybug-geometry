@@ -224,6 +224,23 @@ def test_reflect():
     assert test_1.v.y == pytest.approx(0, rel=1e-3)
 
 
+def test_offset():
+    """Test the LineSegment2D offset method."""
+    pt = Point2D(0, 0)
+    vec = Vector2D(0, 2)
+    seg = LineSegment2D(pt, vec)
+
+    new_seg = seg.offset(2)
+    assert new_seg.p.x == pytest.approx(-2, rel=1e-3)
+    assert new_seg.p.y == pytest.approx(0, rel=1e-3)
+    assert new_seg.v == vec
+
+    new_seg = seg.offset(-2)
+    assert new_seg.p.x == pytest.approx(2, rel=1e-3)
+    assert new_seg.p.y == pytest.approx(0, rel=1e-3)
+    assert new_seg.v == vec
+
+
 def test_subdivide():
     """Test the LineSegment2D subdivide methods."""
     pt = Point2D(2, 2)

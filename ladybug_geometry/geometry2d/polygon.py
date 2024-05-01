@@ -698,7 +698,7 @@ class Polygon2D(Base2DIn2D):
                 will be offset outwards.
             check_intersection: A boolean to note whether the resulting operation
                 should be checked for self intersection and, if so, None will be
-                returned instead of the mis-shaped polygon.
+                returned instead of the self-intersecting polygon.
         """
         # make sure the offset is not zero
         if distance == 0:

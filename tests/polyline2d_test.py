@@ -248,6 +248,24 @@ def test_reflect():
     assert pline.length == pytest.approx(test_1.length, rel=1e-3)
 
 
+def test_offset():
+    """Test the Polyline2D move method."""
+    pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+    pline = Polyline2D(pts)
+
+    new_pline = pline.offset(0.5)
+    assert new_pline[0].x == pytest.approx(0, rel=1e-3)
+    assert new_pline[0].y == pytest.approx(0.5, rel=1e-3)
+    assert new_pline[2].x == pytest.approx(1.5, rel=1e-3)
+    assert new_pline[2].y == pytest.approx(1.5, rel=1e-3)
+
+    new_pline = pline.offset(-0.5)
+    assert new_pline[0].x == pytest.approx(0, rel=1e-3)
+    assert new_pline[0].y == pytest.approx(-0.5, rel=1e-3)
+    assert new_pline[2].x == pytest.approx(2.5, rel=1e-3)
+    assert new_pline[2].y == pytest.approx(2.5, rel=1e-3)
+
+
 def test_intersect_line_ray():
     """Test the Polyline2D intersect_line_ray method."""
     pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))

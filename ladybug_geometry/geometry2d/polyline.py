@@ -1,6 +1,7 @@
 # coding=utf-8
 """2D Polyline"""
 from __future__ import division
+import math
 
 from ._2d import Base2DIn2D
 from .pointvector import Point2D
@@ -149,11 +150,16 @@ class Polyline2D(Base2DIn2D):
         if len(self.vertices) == 3:
             return self  # Polyline2D cannot have fewer than 3 vertices
         new_vertices = [self.vertices[0]]  # first vertex is always ok
+        skip = 0  # track the number of vertices being skipped/removed
+        # loop through vertices and remove all cases of colinear verts
         for i, _v in enumerate(self.vertices[1:-1]):
-            _a = self[i].determinant(_v) + _v.determinant(self[i + 2]) + \
-                self[i + 2].determinant(self[i])
+            _a = self[i - skip].determinant(_v) + _v.determinant(self[i + 2]) + \
+                self[i + 2].determinant(self[i - skip])
             if abs(_a) >= tolerance:
                 new_vertices.append(_v)
+                skip = 0
+            else:
+                skip += 1
         new_vertices.append(self[-1])  # last vertex is always ok
         _new_poly = Polyline2D(new_vertices)
         self._transfer_properties(_new_poly)
@@ -214,6 +220,69 @@ class Polyline2D(Base2DIn2D):
                 pt.scale(factor, origin) for pt in self.vertices))
         _new_poly._interpolated = self._interpolated
         return _new_poly
+
+    def offset(self, distance, check_intersection=False):
+        """Offset the polyline by a given distance.
+
+        Note that the resulting shape may be self-intersecting if the distance
+        is large enough and the is_self_intersecting property may be used to identify
+        these shapes.
+
+        Args:
+            distance: The distance that the polyline will be offset. Both positive
+                and negative values are accepted with positive values being offset
+                to the left of the polyline line and negative values being offset
+                to the right of the polyline (starting from the first polyline point
+                and continuing down the polyline).
+            check_intersection: A boolean to note whether the resulting operation
+                should be checked for self intersection and, if so, None will be
+                returned instead of the self-intersecting polyline.
+        """
+        # make sure the offset is not zero
+        if distance == 0:
+            return self
+
+        # loop through the vertices and get the new offset vectors
+        middle_verts = list(self._vertices[1:-1])
+        if len(middle_verts) != 1:
+            middle_verts = [pt for i, pt in enumerate(middle_verts)
+                            if pt != middle_verts[i - 1]]
+        all_verts = [self._vertices[0]] + middle_verts + [self._vertices[-1]]
+        move_vec_st = self.segments[0].v.rotate(math.pi / 2).normalize() * distance
+        move_vecs = [move_vec_st]
+        for i, pt in enumerate(middle_verts):
+            v1 = all_verts[i] - pt
+            v2 = all_verts[i + 2] - pt
+            ang = v1.angle_counterclockwise(v2) / 2
+            if ang == 0:
+                ang = math.pi / 2
+            m_vec = v1.rotate(ang).normalize()
+            m_dist = -distance / math.sin(ang)
+            m_vec = m_vec * m_dist
+            move_vecs.append(m_vec)
+        move_vec_end = self.segments[-1].v.rotate(math.pi / 2).normalize() * distance
+        move_vecs.append(move_vec_end)
+
+        # move the vertices by the offset to create the new Polygon2D
+        new_pts = tuple(pt.move(m_vec) for pt, m_vec in zip(all_verts, move_vecs))
+        new_poly = Polyline2D(new_pts, self.interpolated)
+
+        # check for self intersection between the moving vectors if requested
+        if check_intersection:
+            poly_segs = new_poly.segments
+            _segs = [LineSegment2D(p, v) for p, v in zip(all_verts, move_vecs)]
+            _skip = (0, len(_segs) - 1)
+            _other_segs = [x for j, x in enumerate(poly_segs) if j not in _skip]
+            for _oth_s in _other_segs:
+                if _segs[0].intersect_line_ray(_oth_s) is not None:  # intersection!
+                    return None
+            for i, _s in enumerate(_segs[1: len(_segs)]):
+                _skip = (i, i + 1)
+                _other_segs = [x for j, x in enumerate(poly_segs) if j not in _skip]
+                for _oth_s in _other_segs:
+                    if _s.intersect_line_ray(_oth_s) is not None:  # intersection!
+                        return None
+        return new_poly
 
     def intersect_line_ray(self, line_ray):
         """Get the intersections between this polyline and a Ray2D or LineSegment2D.
