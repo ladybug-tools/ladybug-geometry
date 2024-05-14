@@ -599,6 +599,18 @@ class Polygon2D(Base2DIn2D):
             num_of_probes += 4
         return Point2D(best_cell.x, best_cell.y)
 
+    def remove_duplicate_vertices(self, tolerance):
+        """Get a version of this polygon without duplicate vertices.
+
+        Args:
+            tolerance: The minimum distance between a two vertices at which
+                they are considered co-located or duplicated.
+        """
+        new_vertices = tuple(
+            pt for i, pt in enumerate(self._vertices)
+            if not pt.is_equivalent(self._vertices[i - 1], tolerance))
+        return Polygon2D(new_vertices)
+
     def remove_colinear_vertices(self, tolerance):
         """Get a version of this polygon without colinear or duplicate vertices.
 
