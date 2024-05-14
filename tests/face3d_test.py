@@ -3,7 +3,7 @@ import pytest
 
 from ladybug_geometry.geometry2d import Vector2D, Polygon2D
 from ladybug_geometry.geometry3d import Point3D, Vector3D, Ray3D, LineSegment3D, \
-    Plane, Face3D
+    Polyline3D, Plane, Face3D
 
 import math
 import json
@@ -1095,6 +1095,64 @@ def test_reflect():
     assert test_1.is_clockwise is False
     test_2 = face.reflect(normal_2, origin_1)
     assert test_2.is_clockwise is False
+
+
+def test_split_with_line():
+    """Test the split_with_line method."""
+    f_pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
+    face = Face3D(f_pts)
+
+    l_pts = (Point3D(1, -1, 2), Point3D(1, 3, 2))
+    line = LineSegment3D.from_end_points(*l_pts)
+    int_result = face.split_with_line(line, 0.01)
+    assert len(int_result) == 2
+    assert len(int_result[0]) == 4
+    assert len(int_result[1]) == 4
+    assert int_result[0].area == pytest.approx(face.area / 2, rel=1e-2)
+    assert int_result[1].area == pytest.approx(face.area / 2, rel=1e-2)
+
+    l_pts = (Point3D(1, 0, 2), Point3D(1, 2, 2))
+    line = LineSegment3D.from_end_points(*l_pts)
+    int_result = face.split_with_line(line, 0.01)
+    assert len(int_result) == 2
+    assert len(int_result[0]) == 4
+    assert len(int_result[1]) == 4
+    assert int_result[0].area == pytest.approx(face.area / 2, rel=1e-2)
+    assert int_result[1].area == pytest.approx(face.area / 2, rel=1e-2)
+
+    l_pts = (Point3D(1, 0, 2), Point3D(1, 1, 2))
+    line = LineSegment3D.from_end_points(*l_pts)
+    int_result = face.split_with_line(line, 0.01)
+    assert int_result is None
+
+    l_pts = (Point3D(-1, -1, 2), Point3D(3, 3, 2))
+    line = LineSegment3D.from_end_points(*l_pts)
+    int_result = face.split_with_line(line, 0.01)
+    assert len(int_result) == 2
+    assert len(int_result[0]) == 3
+    assert len(int_result[1]) == 3
+    assert int_result[0].area == pytest.approx(face.area / 2, rel=1e-2)
+    assert int_result[1].area == pytest.approx(face.area / 2, rel=1e-2)
+
+
+def test_split_with_polyline():
+    """Test the split_with_polyline method."""
+    f_pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
+    face = Face3D(f_pts)
+
+    pl_pts = (Point3D(1, -1, 2), Point3D(1, 1, 2), Point3D(3, 1, 2))
+    line = Polyline3D(pl_pts)
+    int_result = face.split_with_polyline(line, 0.01)
+    assert len(int_result) == 2
+    assert len(int_result[0]) == 6
+    assert len(int_result[1]) == 4
+    assert int_result[0].area == pytest.approx(face.area * 0.75, rel=1e-2)
+    assert int_result[1].area == pytest.approx(face.area * 0.25, rel=1e-2)
+
+    pl_pts = (Point3D(1, -1, 2), Point3D(1, 1, 2), Point3D(1.5, 1, 2))
+    line = Polyline3D(pl_pts)
+    int_result = face.split_with_polyline(line, 0.01)
+    assert int_result is None
 
 
 def test_intersect_line_ray():

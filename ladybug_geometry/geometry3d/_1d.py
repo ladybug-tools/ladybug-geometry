@@ -19,6 +19,7 @@ class Base1DIn3D(object):
         * v
         * min
         * max
+        * center
     """
     __slots__ = ('_p', '_v')
 
@@ -69,6 +70,12 @@ class Base1DIn3D(object):
         p = self._p
         return Point3D(
             max(p.x, p.x + self.v.x), max(p.y, p.y + self.v.y), max(p.z, p.z + self.v.z))
+
+    @property
+    def center(self):
+        """A Point3D for the center of the bounding box around this geometry."""
+        p = self._p
+        return Point3D(p.x + (self.v.x / 2), p.y + (self.v.y / 2), p.z + (self.v.z / 2))
 
     def is_parallel(self, line_ray, angle_tolerance):
         """Test whether this object is parallel to another LineSegment3D or Ray3D.

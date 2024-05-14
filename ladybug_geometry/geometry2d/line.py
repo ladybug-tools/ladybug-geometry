@@ -23,6 +23,7 @@ class LineSegment2D(Base1DIn2D):
         * p2
         * min
         * max
+        * center
         * midpoint
         * endpoints
         * length

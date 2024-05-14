@@ -20,6 +20,7 @@ class LineSegment3D(Base1DIn3D):
         * p2
         * min
         * max
+        * center
         * midpoint
         * endpoints
         * length

@@ -18,6 +18,8 @@ from ..intersection3d import closest_point3d_on_line3d
 
 from ..geometry2d.pointvector import Point2D, Vector2D
 from ..geometry2d.ray import Ray2D
+from ..geometry2d.line import LineSegment2D
+from ..geometry2d.polyline import Polyline2D
 from ..geometry2d.polygon import Polygon2D
 from ..geometry2d.mesh import Mesh2D
 
@@ -885,7 +887,7 @@ class Face3D(Base2DIn3D):
 
         This will be an empty tuple when the Face3D is planar and it is recommended
         that the Face3D.check_planar method be used before calling this one.
-        
+
         Args:
             tolerance: The minimum distance between a given vertex and a the
                 face's plane at which the vertex is said to lie in the plane.
@@ -1114,11 +1116,143 @@ class Face3D(Base2DIn3D):
             final_faces.append(Face3D(f_bound[0].vertices, plane=self.plane))
         return final_faces
 
-    def intersect_line_ray(self, line_ray):
-        """Get the intersection between this face and the input Line3D or Ray3D.
+    def split_with_line(self, line, tolerance):
+        """Split this face into two or more Face3D given a LineSegment3D.
+
+        If the input line is found to not exist in the plane of this Face3D
+        or it does not intersect this Face3D in a manner that splits it into two
+        or more pieces, None will be returned.
 
         Args:
-            line_ray: A Line3D or Ray3D object for which intersection will be computed.
+            line: A LineSegment3D object in the plane of this Face3D, which will
+                be used to split it into two or more pieces.
+            tolerance: The maximum difference between point values for them to be
+                considered distinct from one another.
+
+        Returns:
+            A list of Face3D for the result of splitting this Face3D with the
+            input line. Will be None if the line is not in the plane of the
+            Face3D or if it does not split the Face3D into two or more pieces.
+        """
+        # first check that the line is in the plane of the Face3D
+        if self.plane.distance_to_point(line.p1) > tolerance or \
+                self.plane.distance_to_point(line.p1) > tolerance:
+            return None
+        # extend the endpoints of the line so that tolerance will split it
+        tvc = line.v.normalize() * tolerance
+        line = LineSegment3D.from_end_points(line.p1.move(-tvc), line.p2.move(tvc))
+
+        # change the line and face to be in 2D and check that it can split the Face
+        prim_pl = self.plane
+        bnd_poly = self.boundary_polygon2d
+        line_2d = LineSegment2D.from_end_points(
+            prim_pl.xyz_to_xy(line.p1), prim_pl.xyz_to_xy(line.p2))
+        if not Polygon2D.overlapping_bounding_rect(bnd_poly, line_2d, tolerance):
+            return None
+        intersect_count = len(bnd_poly.intersect_line_ray(line_2d))
+        if intersect_count == 0 or intersect_count % 2 != 0:
+            return None
+
+        # get BooleanPolygons of the polygon and the line segment
+        move_vec = line_2d.v.rotate(math.pi / 2) * (tolerance / 10)
+        line_verts = (line_2d.p1, line_2d.p2, line_2d.p2.move(move_vec),
+                      line_2d.p1.move(move_vec))
+        line_poly = [(pb.BooleanPoint(pt.x, pt.y) for pt in line_verts)]
+        face_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in bnd_poly.vertices)]
+        if self.has_holes:
+            for hole in self.hole_polygon2d:
+                face_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+        b_poly1 = pb.BooleanPolygon(face_polys)
+        b_poly2 = pb.BooleanPolygon(line_poly)
+
+        # split the two boolean polygons with one another
+        int_tol = tolerance / 100
+        try:
+            _, poly1_result, _ = pb.split(b_poly1, b_poly2, int_tol)
+        except Exception:
+            return None  # typically a tolerance issue causing failure
+
+        # rebuild the Face3D from the results and return them
+        return Face3D._from_bool_poly(poly1_result, prim_pl)
+
+    def split_with_polyline(self, polyline, tolerance):
+        """Split this face into two or more Face3D given an open Polyline3D.
+
+        If the input polyline is found to not exist in the plane of this Face3D,
+        or the polyline is self-intersecting (or closed), or it does not intersect
+        this Face3D in a manner that splits it into two or more pieces, None
+        will be returned.
+
+        Note that, if you wish to use an operation similar to this method but
+        with a closed Polyline3D (effectively another Face3D), then the
+        Face3D.coplanar_split() method should be used instead of this method.
+
+        Args:
+            polyline: A Polyline3D object in the plane of this Face3D, which will
+                be used to split it into two or more pieces.
+            tolerance: The maximum difference between point values for them to be
+                considered distinct from one another.
+
+        Returns:
+            A list of Face3D for the result of splitting this Face3D with the
+            input polyline. Will be None if the polyline is not in the plane of
+            the Face3D, or the polyline intersects itself (or is closed), or if it
+            does not split the Face3D into two or more pieces.
+        """
+        # first check that the line is in the plane of the Face3D
+        for pl_pt in polyline.vertices:
+            if self.plane.distance_to_point(pl_pt) > tolerance:
+                return None
+        # extend the endpoints of the polyline so that tolerance will split it
+        st_mv = polyline[0] - polyline[1]
+        end_mv = polyline[-1] - polyline[-2]
+        st_mv = st_mv.normalize() * tolerance
+        end_mv = end_mv.normalize() * tolerance
+        new_pts = [polyline[0].move(st_mv)]
+        new_pts.extend(polyline[1:-1])
+        new_pts.append(polyline[-1].move(end_mv))
+
+        # change the polyline and face to be in 2D and check that it can split the Face
+        prim_pl = self.plane
+        bnd_poly = self.boundary_polygon2d
+        polyline_2d = Polyline2D([prim_pl.xyz_to_xy(pt) for pt in new_pts])
+        if not Polygon2D.overlapping_bounding_rect(bnd_poly, polyline_2d, tolerance):
+            return None
+        if polyline_2d.is_self_intersecting:
+            return None
+        intersect_count = 0
+        for seg in polyline_2d.segments:
+            intersect_count += len(bnd_poly.intersect_line_ray(seg))
+        if intersect_count == 0 or intersect_count % 2 != 0:
+            return None
+
+        # get BooleanPolygons of the polygon and the polyline
+        off_p_line = polyline_2d.offset(tolerance / 10)
+        P_line_verts = polyline_2d.vertices + tuple(reversed(off_p_line.vertices))
+        line_poly = [(pb.BooleanPoint(pt.x, pt.y) for pt in P_line_verts)]
+        face_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in bnd_poly.vertices)]
+        if self.has_holes:
+            for hole in self.hole_polygon2d:
+                face_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+        b_poly1 = pb.BooleanPolygon(face_polys)
+        b_poly2 = pb.BooleanPolygon(line_poly)
+
+        # split the two boolean polygons with one another
+        int_tol = tolerance / 100
+        try:
+            _, poly1_result, _ = pb.split(b_poly1, b_poly2, int_tol)
+        except Exception:
+            return None  # typically a tolerance issue causing failure
+
+        # rebuild the Face3D from the results and return them
+        return Face3D._from_bool_poly(poly1_result, prim_pl)
+
+    def intersect_line_ray(self, line_ray):
+        """Get the intersection between this face and the input LineSegment3D or Ray3D.
+
+        Args:
+            line_ray: A LineSegment3D or Ray3D object for which intersection
+                will be computed.
 
         Returns:
             Point3D for the intersection. Will be None if no intersection exists.
@@ -1262,7 +1396,8 @@ class Face3D(Base2DIn3D):
                 should be flipped. Recommended value is False to have contours
                 on top or right.
                 Setting to True will start contours on the bottom or left.
-            tolerance: An optional value to remove any contours with a length less
+            tolerance: The minimum distance between coordinates that is considered
+                meaningful. Will be used to remove any contours with a length less
                 than the tolerance.
         """
         # interpret the 2D direction_vector into one that exists in 3D space
@@ -1304,7 +1439,8 @@ class Face3D(Base2DIn3D):
                 should be flipped. Recommended value is is False to have contours
                 start on top or right. Setting to True will start contours on
                 the bottom or left.
-            tolerance: An optional value to remove any contours with a length less
+            tolerance: The minimum distance between coordinates that is considered
+                meaningful. Will be used to remove any contours with a length less
                 than the tolerance.
         """
         # interpret the 2D direction_vector into one that exists in 3D space
@@ -1357,7 +1493,8 @@ class Face3D(Base2DIn3D):
                 should be flipped. Recommended value is False to have contours
                 start on top or right. Setting to True will start contours on
                 the bottom or left.
-            tolerance: An optional value to remove any contours with a length less
+            tolerance: The minimum distance between coordinates that is considered
+                meaningful. Will be used to remove any contours with a length less
                 than the tolerance.
         """
         extru_vec = self._get_fin_extrusion_vector(depth, angle, contour_vector)
@@ -1386,7 +1523,8 @@ class Face3D(Base2DIn3D):
                 should be flipped. Recommended value is False to have contours
                 start on top or right. Setting to True will start contours on
                 the bottom or left.
-            tolerance: An optional value to remove any contours with a length less
+            tolerance: The minimum distance between coordinates that is considered
+                meaningful. Will be used to remove any contours with a length less
                 than the tolerance.
         """
         extru_vec = self._get_fin_extrusion_vector(depth, angle, contour_vector)
@@ -1523,7 +1661,7 @@ class Face3D(Base2DIn3D):
                 ratio is too large for the height, the ratio will take precedence
                 and the sub-rectangle height will be smaller than this value.
             horizontal_separation: A number for the target separation between
-                individual sub-rectangle centerlines.  If this number is larger than
+                individual sub-rectangle center lines.  If this number is larger than
                 the parent rectangle base, only one sub-rectangle will be produced.
             vertical_separation: An optional number to create a single vertical
                 separation between top and bottom sub-rectangles. The default is
@@ -1568,7 +1706,7 @@ class Face3D(Base2DIn3D):
                 is too large for the sill_height to fit within the rectangle,
                 the sub_rect_height will take precedence.
             horizontal_separation: A number for the target separation between
-                individual sub-rectangle centerlines.  If this number is larger than
+                individual sub-rectangle center lines.  If this number is larger than
                 the parent rectangle base, only one sub-rectangle will be produced.
             tolerance: The maximum difference between point values for them to be
                 considered a part of a rectangle.

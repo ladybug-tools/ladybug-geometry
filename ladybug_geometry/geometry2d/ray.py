@@ -18,6 +18,7 @@ class Ray2D(Base1DIn2D):
         * v
         * min
         * max
+        * center
     """
     __slots__ = ()
 
