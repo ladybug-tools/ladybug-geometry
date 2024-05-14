@@ -18,6 +18,7 @@ class Ray3D(Base1DIn3D):
         * v
         * min
         * max
+        * center
     """
     __slots__ = ()
 

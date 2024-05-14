@@ -1036,7 +1036,7 @@ class Polygon2D(Base2DIn2D):
         pt_rels2 = [polygon.point_relationship(pt, tolerance) for pt in self]
         if 0 in pt_rels2 or 1 in pt_rels2:
             return True  # definitely touching polygons
-        
+
         # if any of the segments intersect the other polygon, there is overlap
         for seg in self.segments:
             for _s in polygon.segments:
@@ -1667,7 +1667,7 @@ class Polygon2D(Base2DIn2D):
                 if poly_1.polygon_relationship(poly_2, tolerance) >= 0:
                     return True
         return False
-    
+
     @staticmethod
     def _groups_touch(group_1, group_2, tolerance):
         """Evaluate whether two groups of Polygons touch with one another."""
