@@ -1168,7 +1168,7 @@ class Face3D(Base2DIn3D):
         # split the two boolean polygons with one another
         int_tol = tolerance / 100
         try:
-            _, poly1_result, _ = pb.split(b_poly1, b_poly2, int_tol)
+            poly1_result = pb.difference(b_poly1, b_poly2, int_tol)
         except Exception:
             return None  # typically a tolerance issue causing failure
 
@@ -1240,12 +1240,94 @@ class Face3D(Base2DIn3D):
         # split the two boolean polygons with one another
         int_tol = tolerance / 100
         try:
-            _, poly1_result, _ = pb.split(b_poly1, b_poly2, int_tol)
+            poly1_result = pb.difference(b_poly1, b_poly2, int_tol)
         except Exception:
             return None  # typically a tolerance issue causing failure
 
         # rebuild the Face3D from the results and return them
         return Face3D._from_bool_poly(poly1_result, prim_pl)
+
+    def split_with_lines(self, lines, tolerance):
+        """Split this face into two or more Face3D given multiple LineSegment3D.
+
+        Using this method is distinct from looping over the Face3D.split_with_line
+        in that this method will resolve cases where multiple segments branch out
+        from nodes in a network of input lines. So, if three line segments
+        meet at a point in the middle of this Face3D and each extend past the
+        edges of this Face3D, this method can split the Face3D in 3 parts whereas
+        looping over the Face3D.split_with_line will not do this given that each
+        individual segment cannot split the Face3D.
+
+        If the input lines together do not intersect this Face3D in a manner
+        that splits it into two or more pieces, None will be returned.
+
+        Args:
+            lines: A list of LineSegment3D objects in the plane of this Face3D,
+                which will be used to split it into two or more pieces.
+            tolerance: The maximum difference between point values for them to be
+                considered distinct from one another.
+
+        Returns:
+            A list of Face3D for the result of splitting this Face3D with the
+            input lines. Will be None if the line is not in the plane of the
+            Face3D or if it does not split the Face3D into two or more pieces.
+        """
+        # first check that the lines are in the plane of the Face3D
+        rel_line_3ds = []
+        for line in lines:
+            if self.plane.distance_to_point(line.p1) <= tolerance or \
+                    self.plane.distance_to_point(line.p1) <= tolerance:
+                rel_line_3ds.append(line)
+        if len(rel_line_3ds) == 0:
+            return None
+        # extend the endpoints of the lines so that tolerance will split it
+        ext_rel_line_3ds = []
+        for line in rel_line_3ds:
+            tvc = line.v.normalize() * (tolerance / 2)
+            line = LineSegment3D.from_end_points(line.p1.move(-tvc), line.p2.move(tvc))
+            ext_rel_line_3ds.append(line)
+
+        # change the line and face to be in 2D and check that it can split the Face
+        prim_pl = self.plane
+        bnd_poly = self.boundary_polygon2d
+        rel_line_2ds = []
+        for line in ext_rel_line_3ds:
+            line_2d = LineSegment2D.from_end_points(
+                prim_pl.xyz_to_xy(line.p1), prim_pl.xyz_to_xy(line.p2))
+            if Polygon2D.overlapping_bounding_rect(bnd_poly, line_2d, tolerance):
+                rel_line_2ds.append(line_2d)
+        if len(rel_line_2ds) == 0:
+            return None
+
+        # get BooleanPolygon of the face
+        face_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in bnd_poly.vertices)]
+        if self.has_holes:
+            for hole in self.hole_polygon2d:
+                face_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+        b_poly1 = pb.BooleanPolygon(face_polys)
+
+        # loop through the segments and split the faces' boolean polygon
+        int_tol = tolerance / 100000
+        for line_2d in rel_line_2ds:
+            move_vec1 = line_2d.v.rotate(math.pi / 2) * (tolerance / 20)
+            move_vec2 = move_vec1.reverse()
+            line_verts = (line_2d.p1.move(move_vec1), line_2d.p2.move(move_vec1),
+                          line_2d.p2.move(move_vec2), line_2d.p1.move(move_vec2))
+            line_poly = [(pb.BooleanPoint(pt.x, pt.y) for pt in line_verts)]
+            b_poly2 = pb.BooleanPolygon(line_poly)
+            try:
+                b_poly1 = pb.difference(b_poly1, b_poly2, int_tol)
+            except Exception:
+                return None  # typically a tolerance issue causing failure
+
+        # rebuild the Face3D from the results and clean up the result
+        split_result = Face3D._from_bool_poly(b_poly1, prim_pl)
+        if len(split_result) == 1:  # nothing was split
+            return None  # return None as the result is probably less clean than input
+        final_result = []
+        for face in split_result:
+            final_result.append(face.remove_duplicate_vertices(tolerance))
+        return final_result
 
     def intersect_line_ray(self, line_ray):
         """Get the intersection between this face and the input LineSegment3D or Ray3D.
@@ -2061,8 +2143,8 @@ class Face3D(Base2DIn3D):
     def coplanar_difference(self, faces, tolerance, angle_tolerance):
         """Subtract one or more coplanar Face3D from this Face3D.
 
-        Note that, when the faces are not coplanar or they do not overlap, the
-        original face will be returned.
+        Note that, when the faces are not coplanar or they do not overlap, a list
+        with only the original face will be returned.
 
         Args:
             faces: A list of Face3D for which will be subtracted from this Face3D.
@@ -2081,7 +2163,7 @@ class Face3D(Base2DIn3D):
         try:
             f1_poly = f1_poly.remove_colinear_vertices(tolerance)
         except AssertionError:  # degenerate face input
-            return self
+            return [self]
         f1_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f1_poly.vertices)]
         if self.has_holes:
             for hole in self.hole_polygon2d:
@@ -2115,7 +2197,7 @@ class Face3D(Base2DIn3D):
 
         # if no relevant polygons were found, return self
         if len(relevant_b_polys) == 0:
-            return self
+            return [self]
 
         # loop through the boolean polygons and subtract them
         int_tol = tolerance / 100
@@ -2124,7 +2206,7 @@ class Face3D(Base2DIn3D):
             try:
                 b_poly1 = pb.difference(b_poly1, b_poly2, int_tol)
             except Exception:
-                return self  # typically a tolerance issue causing failure
+                return [self]  # typically a tolerance issue causing failure
 
         # rebuild the Face3D from the result of the subtraction
         return Face3D._from_bool_poly(b_poly1, prim_pl)
