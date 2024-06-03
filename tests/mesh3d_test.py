@@ -185,6 +185,33 @@ def test_mesh3d_init_from_face_vertices():
     assert mesh_1.colors is mesh_1.colors is None
 
 
+def test_mesh3d_init_from_purged_face_vertices():
+    """Test the initialization of Mesh3D from_purged_face_vertices."""
+    face_1 = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
+    face_2 = (Point3D(2, 2, 2), Point3D(2, 0, 2), Point3D(4, 0, 2))
+    mesh_1 = Mesh3D.from_purged_face_vertices([face_1, face_2], 0.01)
+
+    assert len(mesh_1.vertices) == 5
+    assert len(mesh_1.faces) == 2
+    assert mesh_1.area == 6.0
+
+    assert mesh_1.min == Point3D(0, 0, 2)
+    assert mesh_1.max == Point3D(4, 2, 2)
+    assert mesh_1.center == Point3D(2, 1, 2)
+
+    assert len(mesh_1.face_areas) == 2
+    assert mesh_1.face_areas[0] == 4
+    assert mesh_1.face_areas[1] == 2
+    assert len(mesh_1.face_centroids) == 2
+    assert mesh_1.face_centroids[0] == Point3D(1, 1, 2)
+    assert mesh_1.face_centroids[1].x == pytest.approx(2.67, rel=1e-2)
+    assert mesh_1.face_centroids[1].y == pytest.approx(0.67, rel=1e-2)
+    assert mesh_1.face_centroids[1].z == pytest.approx(2, rel=1e-2)
+
+    assert mesh_1._is_color_by_face is False
+    assert mesh_1.colors is mesh_1.colors is None
+
+
 def test_mesh3d_from_mesh2d():
     """Test the initialization of Mesh3D objects from_mesh2d."""
     pts = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 2), Point2D(2, 0))
