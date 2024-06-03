@@ -115,6 +115,25 @@ class Mesh3D(MeshBase):
         return cls(tuple(vertices), tuple(face_collector))
 
     @classmethod
+    def from_purged_face_vertices(cls, faces, tolerance):
+        """Create a mesh from a list of faces with each face defined by Point3Ds.
+
+        This method is slower than 'from_face_vertices' but will result in a mesh
+        with fewer vertices and a smaller size in memory. This method is similar to
+        using the 'purge' option in 'from_face_vertices' but will result in more shared
+        vertices since it uses the `is_equivalent` test to check the vertices rather than
+        the more strict `__eq__` comparison.
+
+        Args:
+            faces: A list of faces with each face defined as a list of 3 or 4 Point3D.
+            tolerance: A number for the tolerance to use when checking for duplicate vertices.
+        """
+        vertices, faces = cls._interpret_input_from_face_vertices_with_tolerance(
+            faces, tolerance
+        )
+        return cls(tuple(vertices), tuple(faces))
+
+    @classmethod
     def from_mesh2d(cls, mesh_2d, plane=None):
         """Create a Mesh3D from a Mesh2D and a Plane in which the mesh exists.
 
