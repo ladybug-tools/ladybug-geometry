@@ -399,6 +399,37 @@ class MeshBase(object):
                 face_collector.append(tuple(ind))
         return vertices, face_collector
 
+    @staticmethod
+    def _interpret_input_from_face_vertices_with_tolerance(faces, tolerance):
+        """Get faces and vertices from a list of faces as points.
+
+        Args:
+            faces: A list of faces where each face is a list of points.
+            tolerance: A number for the tolerance to use when checking for duplicate vertices.
+        Returns:
+            A tuple of vertices and faces.
+        """
+
+        def index_of_equivalent_point(vertix_list, vertix):
+            """Get the index of a vertix in a list of vertices using the is_equivalent test."""
+            for i, other_vert in enumerate(vertix_list):
+                if vertix.is_equivalent(other_vert, tolerance):
+                    return i
+            raise ValueError()
+
+        vertices = []
+        face_collector = []
+        for f in faces:
+            ind = []
+            for v in f:
+                try:
+                    ind.append(index_of_equivalent_point(vertices, v))
+                except ValueError:  # add new point
+                    vertices.append(v)
+                    ind.append(len(vertices) - 1)
+            face_collector.append(tuple(ind))
+        return vertices, face_collector
+
     def __len__(self):
         return len(self._vertices)
 
