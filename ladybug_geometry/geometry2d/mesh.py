@@ -106,10 +106,33 @@ class Mesh2D(MeshBase):
             purge: A boolean to indicate if duplicate vertices should be shared between
                 faces. Default is True to purge duplicate vertices, which can be slow
                 for large lists of faces but results in a higher-quality mesh with
-                a smaller size in memory. Default is True.
+                a smaller size in memory. Note that vertices are only considered
+                duplicate if the coordinate values are equal to one another
+                within floating point tolerance. To remove duplicate vertices
+                within a specified tolerance other than floating point, the
+                from_purged_face_vertices method should be used instead.
         """
         vertices, face_collector = cls._interpret_input_from_face_vertices(faces, purge)
         return cls(tuple(vertices), tuple(face_collector))
+
+    @classmethod
+    def from_purged_face_vertices(cls, faces, tolerance):
+        """Create a mesh from a list of faces with each face defined by Point3Ds.
+
+        This method is slower than 'from_face_vertices' but will result in a mesh
+        with fewer vertices and a smaller size in memory. This method is similar to
+        using the 'purge' option in 'from_face_vertices' but will result in more shared
+        vertices since it uses a tolerance to check equivalent vertices rather than
+        comparing within floating point tolerance.
+
+        Args:
+            faces: A list of faces with each face defined as a list of 3 or 4 Point3D.
+            tolerance: A number for the minimum difference between coordinate
+                values at which point vertices are considered equal to one another.
+        """
+        vertices, faces = cls._interpret_input_from_face_vertices_with_tolerance(
+            faces, tolerance)
+        return cls(tuple(vertices), tuple(faces))
 
     @classmethod
     def from_polygon_triangulated(cls, boundary_polygon, hole_polygons=None):
