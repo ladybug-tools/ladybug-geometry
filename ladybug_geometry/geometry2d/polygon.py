@@ -1436,6 +1436,80 @@ class Polygon2D(Base2DIn2D):
         return intersection, poly1_difference, poly2_difference
 
     @staticmethod
+    def perimeter_core_by_offset(polygon, distance, holes=None):
+        """Compute perimeter and core sub-polygons using a simple offset method.
+
+        This method will only return polygons when the distance is shallow enough
+        that the perimeter offset does not intersect itself or turn inward on itself.
+        Otherwise, the method will simple return None. This means that there will
+        only ever be one core polygon.
+
+        Args:
+            polygon: A Polygon2D to split into perimeter and core sub-polygons.
+            distance: Distance in model units to offset perimeter sub-polygon.
+            holes: A list of Polygon2D objects representing holes in the
+                polygon. (Default: None).
+
+        Returns:
+            A tuple with two items.
+
+            * perimeter_sub_polys -- A list of perimeter sub-polygons as Polygon2D
+                objects. Will be None if the offset distance is too deep.
+
+            * core_sub_polys -- A list of core sub-polygons as Polygon2D objects. In the
+                event of a core sub-polygon with a hole, a list with be returned with
+                the first item being a boundary and successive items as hole polygons.
+                Will be None if the offset distance is too deep.
+        """
+        # extract the core polygon and make sure it doesn't intersect itself
+        core_sub_poly = polygon.offset(distance, check_intersection=True)
+        if core_sub_poly is None:
+            return None, None
+        # generate the perimeter polygons
+        if holes is None:
+            perimeter_sub_polys = []
+            for out_seg, in_seg in zip(polygon.segments, core_sub_poly.segments):
+                pts = (out_seg.p1, out_seg.p2, in_seg.p2, in_seg.p1)
+                perimeter_sub_polys.append(Polygon2D(pts))
+            return perimeter_sub_polys, [core_sub_poly]
+        else:
+            # offset all of the holes into the shape
+            core_sub_polys = [core_sub_poly]
+            for hole in holes:
+                hole_sub_poly = hole.offset(-distance, check_intersection=True)
+                if hole_sub_poly is None:
+                    return None, None
+                core_sub_polys.append(hole_sub_poly)
+            # check that None of the holes intersect one another
+            for i, c_pgon in enumerate(core_sub_polys):
+                for other_pgon in core_sub_polys[i + 1:]:
+                    if Polygon2D._do_polygons_intersect(c_pgon, other_pgon):
+                        return None, None
+            # if nothing intersects, we can build the perimeter polygons
+            out_polys = [polygon] + list(holes)
+            perimeter_sub_polys = []
+            for p_count, (out_poly, in_poly) in enumerate(zip(out_polys, core_sub_polys)):
+                for out_seg, in_seg in zip(out_poly.segments, in_poly.segments):
+                    if p_count == 0:
+                        pts = (out_seg.p1, out_seg.p2, in_seg.p2, in_seg.p1)
+                    else:
+                        if not out_poly.is_clockwise:
+                            pts = (out_seg.p1, in_seg.p1, in_seg.p2, out_seg.p2)
+                        else:
+                            (out_seg.p1, out_seg.p2, in_seg.p2, in_seg.p1)
+                    perimeter_sub_polys.append(Polygon2D(pts))
+            return perimeter_sub_polys, core_sub_polys
+
+    @staticmethod
+    def _do_polygons_intersect(polygon_1, polygon_2):
+        """Test to see if two polygons intersect one another."""
+        for seg in polygon_1.segments:
+            for _s in polygon_2.segments:
+                if does_intersection_exist_line2d(seg, _s):
+                    return True
+        return False
+
+    @staticmethod
     def intersect_polygon_segments(polygon_list, tolerance):
         """Intersect the line segments of a Polygon2D array to ensure matching segments.
 
