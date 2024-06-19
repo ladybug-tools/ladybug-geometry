@@ -628,7 +628,7 @@ class Face3D(Base2DIn3D):
         treat the positive Z axis as up.
         """
         corner_pt, polygon = self._corner_point_and_polygon(self._boundary, 'min', 'max')
-        verts3d, verts2d = self._counter_clockwise_verts(polygon)
+        verts3d, verts2d = self._counter_clockwise_bound(polygon)
         return self._corner_pt_verts(corner_pt, verts3d, verts2d)
 
     @property
@@ -639,7 +639,7 @@ class Face3D(Base2DIn3D):
         treat the positive Z axis as up.
         """
         corner_pt, polygon = self._corner_point_and_polygon(self._boundary, 'min', 'min')
-        verts3d, verts2d = self._counter_clockwise_verts(polygon)
+        verts3d, verts2d = self._counter_clockwise_bound(polygon)
         return self._corner_pt_verts(corner_pt, verts3d, verts2d)
 
     @property
@@ -650,7 +650,7 @@ class Face3D(Base2DIn3D):
         treat the positive Z axis as up.
         """
         corner_pt, polygon = self._corner_point_and_polygon(self._boundary, 'max', 'min')
-        verts3d, verts2d = self._counter_clockwise_verts(polygon)
+        verts3d, verts2d = self._counter_clockwise_bound(polygon)
         return self._corner_pt_verts(corner_pt, verts3d, verts2d)
 
     @property
@@ -661,7 +661,7 @@ class Face3D(Base2DIn3D):
         treat the positive Z axis as up.
         """
         corner_pt, polygon = self._corner_point_and_polygon(self._boundary, 'max', 'max')
-        verts3d, verts2d = self._counter_clockwise_verts(polygon)
+        verts3d, verts2d = self._counter_clockwise_bound(polygon)
         return self._corner_pt_verts(corner_pt, verts3d, verts2d)
 
     def pole_of_inaccessibility(self, tolerance):
@@ -3060,6 +3060,13 @@ class Face3D(Base2DIn3D):
             return tuple(reversed(self.vertices)), tuple(reversed(polygon.vertices))
         else:
             return self.vertices, polygon.vertices
+
+    def _counter_clockwise_bound(self, polygon):
+        """Get aligned lists of counter-clockwise 2D and 3D vertices."""
+        if self.is_clockwise:
+            return tuple(reversed(self.boundary)), tuple(reversed(polygon.vertices))
+        else:
+            return self.boundary, polygon.vertices
 
     def _upper_left_counter_clockwise_boundary(self):
         """Get this face's boundary starting from upper left and moving counterclockwise.
