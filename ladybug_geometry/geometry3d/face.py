@@ -186,6 +186,22 @@ class Face3D(Base2DIn3D):
                    plane, holes)
 
     @classmethod
+    def from_array(cls, point_array):
+        """Create a Face3D from a nested array of vertex coordinates.
+
+        Args:
+            point_array: A nested array of arrays where each sub-array represents
+                a loop of the Face3D. The first array is the boundary and subsequent
+                arrays represent holes in the Face3D. point arrays. Each sub-array
+                is composed of arrays that each have a length of 3 and denote 3D
+                points that define the face.
+        """
+        boundary = tuple(Point3D(*point) for point in point_array[0])
+        holes = None if len(point_array) == 1 else \
+            tuple(tuple(Point3D(*point) for point in hole) for hole in point_array[1:])
+        return cls(boundary, None, holes)
+
+    @classmethod
     def from_extrusion(cls, line_segment, extrusion_vector):
         """Initialize Face3D by extruding a line segment.
 
@@ -2712,6 +2728,19 @@ class Face3D(Base2DIn3D):
             base['holes'] = [[pt.to_array() for pt in hole]
                              for hole in self.holes]
         return base
+
+    def to_array(self):
+        """Get Face3D as a nested list of tuples where each sub-tuple represents loop.
+
+        The first loop is always the outer boundary and successive loops represent
+        holes in the face (if they exist). Each sub-tuple is composed of tuples
+        that each have a length of 3 and denote 3D points that define the face.
+        """
+        if self.has_holes:
+            return (tuple(pt.to_array() for pt in self.boundary),) + \
+                tuple(tuple(pt.to_array() for pt in hole) for hole in self.holes)
+        else:
+            return (tuple(pt.to_array() for pt in self.boundary),)
 
     @staticmethod
     def extract_all_from_stl(file_path):
