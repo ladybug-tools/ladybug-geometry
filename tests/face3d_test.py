@@ -112,6 +112,25 @@ def test_face3d_to_from_dict():
     assert new_face.to_dict() == face_dict
 
 
+def test_face3d_to_from_array():
+    """Test the to/from array of Face3D objects."""
+    pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))
+    plane = Plane(Vector3D(0, 0, 1), Point3D(0, 0, 2))
+    face = Face3D(pts, plane)
+    face_array = face.to_array()
+    new_face = Face3D.from_array(face_array)
+    assert isinstance(new_face, Face3D)
+    assert new_face.to_array() == face_array
+
+    bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
+    hole_pts = [Point3D(1, 1), Point3D(3, 1), Point3D(3, 3), Point3D(1, 3)]
+    face = Face3D(bound_pts, None, [hole_pts])
+    face_array = face.to_array()
+    new_face = Face3D.from_array(face_array)
+    assert isinstance(new_face, Face3D)
+    assert new_face.to_array() == face_array
+
+
 def test_face3d_init_from_vertices():
     """Test the initialization of Face3D objects without a plane."""
     pts = (Point3D(0, 0, 2), Point3D(0, 2, 2), Point3D(2, 2, 2), Point3D(2, 0, 2))

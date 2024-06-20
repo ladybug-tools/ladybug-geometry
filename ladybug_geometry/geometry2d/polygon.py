@@ -1189,7 +1189,7 @@ class Polygon2D(Base2DIn2D):
                 'vertices': [pt.to_array() for pt in self.vertices]}
 
     def to_array(self):
-        """Get a list of lists where each sub-list represents a Point2D vertex."""
+        """Get a tuple of tuples where each sub-tuple represents a Point2D vertex."""
         return tuple(pt.to_array() for pt in self.vertices)
 
     def _to_bool_poly(self):
