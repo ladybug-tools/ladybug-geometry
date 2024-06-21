@@ -640,6 +640,85 @@ class Polygon2D(Base2DIn2D):
                 new_vertices.append(pts_2d[-1])
         return Polygon2D(new_vertices)
 
+    def split_through_self_intersection(self, tolerance):
+        """Get a list of non-intersecting Polygon2D if this polygon intersects itself.
+
+        If the Polygon2D does not intersect itself, then a list with the current
+        Polygon2D will be returned.
+
+        Args:
+            tolerance: The minimum difference between vertices before they are
+                considered co-located.
+        """
+        # loop over the segments and group the vertices by intersection points
+        intersect_groups = [[]]
+        _segs = self.segments
+        seg_count = len(_segs)
+        for i, _s in enumerate(_segs):
+            # loop over the other segments and find any intersection points
+            if i == 0:
+                _skip = (len(_segs) - 1, i, i + 1) 
+            elif i == seg_count - 1:
+                _skip = (i - 1, i, 0)
+            else:
+                _skip = (i - 1, i, i + 1)
+            _other_segs = [x for j, x in enumerate(_segs) if j not in _skip]
+            int_pts = []
+            for _oth_s in _other_segs:
+                int_pt = _s.intersect_line_ray(_oth_s)
+                if int_pt is not None:  # intersection!
+                    int_pts.append(int_pt)
+            # if intersection points were found, adjust the groups accordingly
+            if len(int_pts) == 0:  # no self intersection on this segment
+                intersect_groups[-1].append(_s.p2)
+            elif len(int_pts) == 1:  # typical self-intersection case we should split
+                intersect_groups[-1].append(int_pts[0])
+                intersect_groups.append([_s.p2])
+            else:  # rare case of multiple intersections on the same segment
+                # sort the intersection points along the segment
+                dists = [_s.p1.distance_to_point(ipt) for ipt in int_pts]
+                sort_pts = [pt for _, pt in sorted(zip(dists, int_pts),
+                                                   key=lambda pair: pair[0])]
+                intersect_groups[-1].append(sort_pts[0])
+                for s_pt in sort_pts[1:]:
+                    intersect_groups.append([s_pt])
+                intersect_groups.append([_s.p2])
+
+        # process the intersect groups into polygon objects
+        if len(intersect_groups) == 1:
+            return [self]  # not a self-intersecting shape
+        split_polygons = []
+        poly_count = int(len(intersect_groups) / 2)
+        if len(intersect_groups[poly_count]) == 1:  # rare case of start at intersect
+            for i in range(poly_count):
+                vert_group = [intersect_groups[i], intersect_groups[-i - 1]]
+                for verts_list in vert_group:
+                    if len(verts_list) > 2:
+                        try:
+                            clean_poly = Polygon2D(verts_list)
+                            clean_poly = clean_poly.remove_duplicate_vertices(tolerance)
+                            split_polygons.append(clean_poly)
+                        except AssertionError:  # degenerate polygon that should not be added
+                            pass
+        else:  # typical case of intersection in the middle
+            for i in range(poly_count):
+                verts_list = intersect_groups[i] + intersect_groups[-i - 1]
+                if len(verts_list) > 2:
+                    try:
+                        clean_poly = Polygon2D(verts_list)
+                        clean_poly = clean_poly.remove_duplicate_vertices(tolerance)
+                        split_polygons.append(clean_poly)
+                    except AssertionError:  # degenerate polygon that should not be added
+                        pass
+            final_verts = intersect_groups[i + 1]
+            try:
+                clean_poly = Polygon2D(final_verts)
+                clean_poly = clean_poly.remove_duplicate_vertices(tolerance)
+                split_polygons.append(clean_poly)
+            except AssertionError:  # degenerate polygon that should not be added
+                pass
+        return split_polygons
+
     def reverse(self):
         """Get a copy of this polygon where the vertices are reversed."""
         _new_poly = Polygon2D(tuple(pt for pt in reversed(self.vertices)))
@@ -1441,8 +1520,7 @@ class Polygon2D(Base2DIn2D):
 
         This method will only return polygons when the distance is shallow enough
         that the perimeter offset does not intersect itself or turn inward on itself.
-        Otherwise, the method will simple return None. This means that there will
-        only ever be one core polygon.
+        Otherwise, the method will simply return None.
 
         Args:
             polygon: A Polygon2D to split into perimeter and core sub-polygons.
