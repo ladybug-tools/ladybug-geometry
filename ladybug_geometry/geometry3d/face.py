@@ -1170,7 +1170,7 @@ class Face3D(Base2DIn3D):
             return None
 
         # get BooleanPolygons of the polygon and the line segment
-        move_vec = line_2d.v.rotate(math.pi / 2) * (tolerance / 10)
+        move_vec = line_2d.v.rotate(math.pi / 2).normalize() * (tolerance / 10)
         line_verts = (line_2d.p1, line_2d.p2, line_2d.p2.move(move_vec),
                       line_2d.p1.move(move_vec))
         line_poly = [(pb.BooleanPoint(pt.x, pt.y) for pt in line_verts)]
