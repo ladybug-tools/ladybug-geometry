@@ -1754,6 +1754,15 @@ class Polygon2D(Base2DIn2D):
         return grouped_polys
 
     @staticmethod
+    def _groups_overlap(group_1, group_2, tolerance):
+        """Evaluate whether two groups of Polygons overlap with one another."""
+        for poly_1 in group_1:
+            for poly_2 in group_2:
+                if poly_1.polygon_relationship(poly_2, tolerance) >= 0:
+                    return True
+        return False
+
+    @staticmethod
     def group_by_touching(polygons, tolerance):
         """Group Polygon2Ds that touch or overlap one another within the tolerance.
 
@@ -1812,15 +1821,6 @@ class Polygon2D(Base2DIn2D):
         return grouped_polys
 
     @staticmethod
-    def _groups_overlap(group_1, group_2, tolerance):
-        """Evaluate whether two groups of Polygons overlap with one another."""
-        for poly_1 in group_1:
-            for poly_2 in group_2:
-                if poly_1.polygon_relationship(poly_2, tolerance) >= 0:
-                    return True
-        return False
-
-    @staticmethod
     def _groups_touch(group_1, group_2, tolerance):
         """Evaluate whether two groups of Polygons touch with one another."""
         for poly_1 in group_1:
@@ -1828,6 +1828,73 @@ class Polygon2D(Base2DIn2D):
                 if poly_1.does_polygon_touch(poly_2, tolerance):
                     return True
         return False
+
+    @staticmethod
+    def group_boundaries_and_holes(polygons, tolerance):
+        """Group polygons by whether they are contained within another.
+
+        Args:
+            polygons: A list of Polygon2Ds to be grouped according to boundary and
+                holes within those boundaries.
+            tolerance: The minimum distance between points at which they are
+                considered distinct.
+
+        Returns:
+            A list of lists where each sub-list contains Polygon2Ds and represents
+            one core geometry. Each sub-list will have has at least one Polygon2D
+            and, in the event that a core geometry has holes, there will be multiple
+            Polygon2Ds in the sub-list. The first item in the list will be the outer
+            boundary of the geometry and successive items represent hole polygons
+            contained within it.
+        """
+        # first check to be sure that there isn't just one polygon
+        if len(polygons) == 1:
+            return [polygons]
+        # sort the polygons by area and separate base polygon from the remaining
+        polygons = sorted(polygons, key=lambda x: x.area, reverse=True)
+        base_poly = polygons[0]
+        remain_polys = list(polygons[1:])
+
+        # merge the smaller polygons into the larger polygons
+        merged_polys = []
+        while len(remain_polys) > 0:
+            grp_poly = Polygon2D._match_holes_to_poly(base_poly, remain_polys, tolerance)
+            merged_polys.append(grp_poly)
+            if len(remain_polys) > 1:
+                base_poly = remain_polys[0]
+                del remain_polys[0]
+            elif len(remain_polys) == 1:  # lone last Polygon2D
+                merged_polys.append([remain_polys[0]])
+                del remain_polys[0]
+        return merged_polys
+
+    @staticmethod
+    def _match_holes_to_poly(base_poly, other_polys, tolerance):
+        """Attempt to merge other polygons into a base polygon as holes.
+
+        Args:
+            base_poly: A Polygon2D to serve as the base.
+            other_polys: A list of other Polygon2D objects to attempt to merge into
+                the base_poly as a hole. This method will remove any Polygon2D
+                that are successfully merged into the output from this list.
+            tolerance: The minimum distance between points at which they are
+                considered distinct.
+
+        Returns:
+            A list of Polygon2D where the first item is the base_poly and successive
+            items represent holes in this geometry.
+        """
+        holes = []
+        more_to_check = True
+        while more_to_check:
+            for i, r_poly in enumerate(other_polys):
+                if base_poly.polygon_relationship(r_poly, tolerance) == 1:
+                    holes.append(r_poly)
+                    del other_polys[i]
+                    break
+            else:
+                more_to_check = False
+        return [base_poly] + holes
 
     @staticmethod
     def joined_intersected_boundary(polygons, tolerance):
