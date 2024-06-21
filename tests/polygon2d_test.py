@@ -292,6 +292,89 @@ def test_remove_colinear_vertices():
     assert len(polygon_2.remove_colinear_vertices(0.0001).vertices) == 4
 
 
+def test_split_through_self_intersection():
+    """Test the split_through_self_intersection method."""
+    pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
+    polygon_1 = Polygon2D(pts_1)
+    assert not polygon_1.is_self_intersecting
+    split_polys = polygon_1.split_through_self_intersection(0.01)
+    assert len(split_polys) == 1
+
+    pts_2 = (Point2D(0, 0), Point2D(0, 2), Point2D(2, 0), Point2D(2, 2))
+    polygon_2 = Polygon2D(pts_2)
+    assert polygon_2.is_self_intersecting
+    split_polys = polygon_2.split_through_self_intersection(0.01)
+    assert len(split_polys) == 2
+    for poly in split_polys:
+        assert not poly.is_self_intersecting
+        assert len(poly) == 3
+        assert poly.area == pytest.approx(1.0, rel=1e-3)
+
+    pts_3 = (Point2D(0, 0), Point2D(0, 2), Point2D(1, 1),
+             Point2D(2, 0), Point2D(2, 2), Point2D(1, 1))
+    polygon_3 = Polygon2D(pts_3)
+    assert polygon_3.is_self_intersecting
+    split_polys = polygon_3.split_through_self_intersection(0.01)
+    assert len(split_polys) == 2
+    for poly in split_polys:
+        assert not poly.is_self_intersecting
+        assert len(poly) == 3
+        assert poly.area == pytest.approx(1.0, rel=1e-3)
+
+    pts_4 = (Point2D(0, 0), Point2D(0, 2), Point2D(1, 1),
+             Point2D(2, 0), Point2D(2, 2))
+    polygon_4 = Polygon2D(pts_4)
+    assert polygon_4.is_self_intersecting
+    split_polys = polygon_4.split_through_self_intersection(0.01)
+    assert len(split_polys) == 2
+    for poly in split_polys:
+        assert not poly.is_self_intersecting
+        assert len(poly) == 3
+        assert poly.area == pytest.approx(1.0, rel=1e-3)
+
+    pts_5 = (Point2D(1, 1), Point2D(2, 0), Point2D(2, 2), Point2D(0, 0), Point2D(0, 2))
+    polygon_5 = Polygon2D(pts_5)
+    assert polygon_5.is_self_intersecting
+    split_polys = polygon_5.split_through_self_intersection(0.01)
+    assert len(split_polys) == 2
+    for poly in split_polys:
+        assert not poly.is_self_intersecting
+        assert len(poly) == 3
+        assert poly.area == pytest.approx(1.0, rel=1e-3)
+
+    pts_6 = (Point2D(2, 0), Point2D(2, 2), Point2D(0, 0), Point2D(0, 2), Point2D(1, 1))
+    polygon_6 = Polygon2D(pts_6)
+    assert polygon_6.is_self_intersecting
+    split_polys = polygon_6.split_through_self_intersection(0.01)
+    assert len(split_polys) == 2
+    for poly in split_polys:
+        assert not poly.is_self_intersecting
+        assert len(poly) == 3
+        assert poly.area == pytest.approx(1.0, rel=1e-3)
+
+    pts_7 = (Point2D(1, 1), Point2D(2, 0), Point2D(2, 2), Point2D(0, 0),
+             Point2D(0, 2), Point2D(1, 1))
+    polygon_7 = Polygon2D(pts_7)
+    assert polygon_7.is_self_intersecting
+    split_polys = polygon_7.split_through_self_intersection(0.01)
+    assert len(split_polys) == 2
+    for poly in split_polys:
+        assert not poly.is_self_intersecting
+        assert len(poly) == 3
+        assert poly.area == pytest.approx(1.0, rel=1e-3)
+
+    pts_8 = (Point2D(0, 1), Point2D(0, 2), Point2D(1, 0), Point2D(2, 2), Point2D(2, 1))
+    polygon_8 = Polygon2D(pts_8)
+    assert polygon_8.is_self_intersecting
+    split_polys = polygon_8.split_through_self_intersection(0.01)
+    assert len(split_polys) == 3
+    for poly in split_polys:
+        assert not poly.is_self_intersecting
+        assert len(poly) == 3
+        assert poly.area == pytest.approx(0.25, rel=1e-3) or \
+            poly.area == pytest.approx(0.5, rel=1e-3)
+
+
 def test_polygon2d_duplicate():
     """Test the duplicate method of Polygon2D."""
     pts = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))
@@ -1114,7 +1197,7 @@ def test_common_axes():
     polygons = [Polygon2D.from_dict(p) for p in geo_dict]
 
     axes, values = Polygon2D.common_axes(
-        polygons, Vector2D(1, 0),min_distance=0.1, merge_distance=0.3,
+        polygons, Vector2D(1, 0), min_distance=0.1, merge_distance=0.3,
         angle_tolerance=math.pi / 180)
 
     assert len(axes) == 31
