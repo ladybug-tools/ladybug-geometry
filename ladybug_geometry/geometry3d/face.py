@@ -2702,7 +2702,7 @@ class Face3D(Base2DIn3D):
             return base_face
         else:
             hole_verts = [hole.vertices for hole in holes]
-            return Face3D(base_face.vertices, Plane(n=Vector3D(0, 0, 1)), hole_verts)
+            return Face3D(base_face.vertices, base_face.plane, hole_verts)
 
     def to_dict(self, include_plane=True, enforce_upper_left=False):
         """Get Face3D as a dictionary.
