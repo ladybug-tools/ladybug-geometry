@@ -1,0 +1,33 @@
+ladybug\_geometry package
+=========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ladybug_geometry.geometry2d
+   ladybug_geometry.geometry3d
+   ladybug_geometry.interop
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ladybug_geometry.boolean
+   ladybug_geometry.bounding
+   ladybug_geometry.dictutil
+   ladybug_geometry.intersection2d
+   ladybug_geometry.intersection3d
+   ladybug_geometry.triangulation
+
+Module contents
+---------------
+
+.. automodule:: ladybug_geometry
+   :members:
+   :undoc-members:
+   :show-inheritance:
