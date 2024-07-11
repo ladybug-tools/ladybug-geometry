@@ -259,6 +259,23 @@ def test_is_self_intersecting():
     assert polygon_2.is_self_intersecting
 
 
+def test_is_self_intersecting_complex_clockwise():
+    """Test the is_self_intersecting property on a more complex shape."""
+    pts_3 = (
+        (355.665006, -49.844883),
+        (298.354434, 4.142452),
+        (280.207456, 59.649202),
+        (336.988767, 88.694148),
+        (348.680933, 44.475185),
+        (342.255592, 52.129292),
+        (373.115776, 106.898085),
+        (421.261481, 55.706056),
+        (355.665006, -49.844883)
+    )
+    polygon = Polygon2D.from_array(pts_3)
+    assert polygon.is_self_intersecting
+
+
 def test_is_valid():
     """Test the is_valid property."""
     pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2))

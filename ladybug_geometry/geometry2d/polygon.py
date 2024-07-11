@@ -404,17 +404,16 @@ class Polygon2D(Base2DIn2D):
         """
         if self._is_self_intersecting is None:
             self._is_self_intersecting = False
-            if self.is_convex is False:
-                _segs = self.segments
-                for i, _s in enumerate(_segs[1: len(_segs) - 1]):
-                    _skip = (i, i + 1, i + 2)
-                    _other_segs = [x for j, x in enumerate(_segs) if j not in _skip]
-                    for _oth_s in _other_segs:
-                        if _s.intersect_line_ray(_oth_s) is not None:  # intersection!
-                            self._is_self_intersecting = True
-                            break
-                    if self._is_self_intersecting is True:
+            _segs = self.segments
+            for i, _s in enumerate(_segs[1: len(_segs) - 1]):
+                _skip = (i, i + 1, i + 2)
+                _other_segs = [x for j, x in enumerate(_segs) if j not in _skip]
+                for _oth_s in _other_segs:
+                    if _s.intersect_line_ray(_oth_s) is not None:  # intersection!
+                        self._is_self_intersecting = True
                         break
+                if self._is_self_intersecting is True:
+                    break
         return self._is_self_intersecting
 
     @property
