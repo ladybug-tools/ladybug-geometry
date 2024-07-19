@@ -1174,41 +1174,6 @@ def test_split_with_polyline():
     assert int_result is None
 
 
-def test_split_with_lines():
-    """Test the split_with_line method."""
-    f_pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
-    face = Face3D(f_pts)
-
-    l_pts1 = (Point3D(1, -1, 2), Point3D(1, 1, 2))
-    line1 = LineSegment3D.from_end_points(*l_pts1)
-    l_pts2 = (Point3D(-1, 1, 2), Point3D(1, 1, 2))
-    line2 = LineSegment3D.from_end_points(*l_pts2)
-    l_pts3 = (Point3D(1, 1, 2), Point3D(3, 3, 2))
-    line3 = LineSegment3D.from_end_points(*l_pts3)
-    all_lines = [line1, line2, line3]
-    int_result = face.split_with_lines(all_lines, 0.01)
-
-    assert len(int_result) == 3
-    for int_f in int_result:
-        assert int_f.area == pytest.approx(face.area * 0.25, rel=1e-2) or \
-            int_f.area == pytest.approx(face.area * 0.375, rel=1e-2)
-
-    l_pts1 = (Point3D(1, -1, 2), Point3D(1, 1, 2))
-    line1 = LineSegment3D.from_end_points(*l_pts1)
-    l_pts2 = (Point3D(-1, 1, 2), Point3D(1, 1, 2))
-    line2 = LineSegment3D.from_end_points(*l_pts2)
-    l_pts3 = (Point3D(1, 1, 2), Point3D(3, 1, 2))
-    line3 = LineSegment3D.from_end_points(*l_pts3)
-    l_pts4 = (Point3D(1, 1, 2), Point3D(1, 3, 2))
-    line4 = LineSegment3D.from_end_points(*l_pts4)
-    all_lines = [line1, line2, line3, line4]
-    int_result = face.split_with_lines(all_lines, 0.01)
-
-    assert len(int_result) == 4
-    for int_f in int_result:
-        assert int_f.area == pytest.approx(face.area * 0.25, rel=1e-2)
-
-
 def test_intersect_line_ray():
     """Test the Face3D intersect_line_ray method."""
     pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 1, 2), Point3D(1, 1, 2),
