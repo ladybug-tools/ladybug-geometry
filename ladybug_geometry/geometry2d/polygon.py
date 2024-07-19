@@ -1206,8 +1206,7 @@ class Polygon2D(Base2DIn2D):
             point: A Point2D object to which the minimum distance will be computed.
 
         Returns:
-            The distance to the input point. Will be zero if the point is
-            inside the Polygon2D.
+            The distance to the input point from the nearest edge.
         """
         return min(seg.distance_to_point(point) for seg in self.segments)
 
