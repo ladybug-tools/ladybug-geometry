@@ -5,6 +5,7 @@ Note that importing this module will import almost all modules within the
 Ladybug_geometry library in order to be able to re-serialize almost any
 dictionary produced from the library.
 """
+from __future__ import division
 
 from ladybug_geometry.geometry2d import Vector2D, Point2D, Ray2D, \
     LineSegment2D, Arc2D, Polyline2D, Polygon2D, Mesh2D

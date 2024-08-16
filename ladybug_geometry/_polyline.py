@@ -1,4 +1,5 @@
 """Hidden utility functions used by both Polyline2D and Polyline3D classes."""
+from __future__ import division
 
 
 def _group_vertices(segments, tolerance):
