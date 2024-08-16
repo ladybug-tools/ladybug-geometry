@@ -106,7 +106,7 @@ def intersect_line_segment2d(line_a, line_b):
     # compute the intersection point
     int_pta = Point2D(line_a.p.x + ua * line_a.v.x, line_a.p.y + ua * line_a.v.y)
     int_ptb = Point2D(line_b.p.x + ub * line_b.v.x, line_b.p.y + ub * line_b.v.y)
-    
+
     # if the two points are unequal, there's a floating point tolerance issue
     if _isclose(int_pta.x, int_ptb.x) and _isclose(int_pta.y, int_ptb.y):
         return int_pta

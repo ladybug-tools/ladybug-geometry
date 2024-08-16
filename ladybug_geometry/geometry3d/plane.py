@@ -141,7 +141,7 @@ class Plane(object):
     @property
     def azimuth(self):
         """Get the azimuth of the plane.
-        
+
         This is always between 0, indicating the positive Y-axis, and moving clockwise
         up to 2 * Pi, which indicates a return to the positive Y-axis.
 
