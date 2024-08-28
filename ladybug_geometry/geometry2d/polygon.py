@@ -656,7 +656,7 @@ class Polygon2D(Base2DIn2D):
         for i, _s in enumerate(_segs):
             # loop over the other segments and find any intersection points
             if i == 0:
-                _skip = (len(_segs) - 1, i, i + 1) 
+                _skip = (len(_segs) - 1, i, i + 1)
             elif i == seg_count - 1:
                 _skip = (i - 1, i, 0)
             else:
