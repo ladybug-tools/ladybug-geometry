@@ -247,11 +247,28 @@ class DirectedGraphNetwork(object):
             of each exterior edge. The nodes at the boundary and the holes have
             the exterior property set to True.
         """
-        # make the directed graph for the boundary + holes
-        dg = cls.from_shape_with_holes(boundary, holes, tolerance)
+        # first split the boundary and holes with the split_segments
+        bound_sgs = cls._intersect_segments(boundary.segments, split_segments, tolerance)
+        bound_pts = [seg.p1 for seg in bound_sgs]
+        split_boundary = boundary.__class__(bound_pts)
+        split_holes = None
+        if holes is not None:
+            split_holes = []
+            for hole in holes:
+                hole_sgs = cls._intersect_segments(
+                    hole.segments, split_segments, tolerance)
+                hole_pts = [seg.p1 for seg in hole_sgs]
+                split_holes.append(boundary.__class__(hole_pts))
 
-        # process the segments for intersection
-        split_seg = cls._intersect_segments(split_segments, tolerance)
+        # make the directed graph for the boundary + holes
+        dg = cls.from_shape_with_holes(split_boundary, split_holes, tolerance)
+
+        # process the split_segments for intersection
+        add_segs = list(boundary.segments)
+        if holes is not None:
+            for hole in holes:
+                add_segs.extend(hole.segments)
+        split_seg = cls._intersect_segments(split_segments, add_segs, tolerance)
         split_seg = cls._remove_segments_outside_boundary(split_seg, boundary, tolerance)
         if len(split_seg) == 0:  # none of the segments are inside the shape
             return dg
@@ -491,8 +508,6 @@ class DirectedGraphNetwork(object):
                     if neighbor == goal_node:  # the shortest path was found!
                         path.append(goal_node)
                         return path
-                    elif neighbor.exterior:
-                        continue  # don't traverse the graph exterior
                     edge_dir = neighbor.pt - node.pt
                     cw_angle = prev_dir.angle_clockwise(edge_dir * -1)
                     if not (1e-5 < cw_angle < (2 * math.pi) - 1e-5):
@@ -517,8 +532,50 @@ class DirectedGraphNetwork(object):
         # if we reached the end of the queue, then no path was found
         return None
 
+    def all_min_cycles(self):
+        """Get a list of lists where each sub-list is a minimum cycle of Nodes.
+
+        The combination of all min cycles should account for the full area of
+        the input shape if the DirectedGraphNetwork was made using any of the
+        class methods that work from polygons. If the DirectedGraphNetwork was made
+        using the from_shape_to_split method, the resulting cycles here represent
+        the input shape split with the split_segments.
+        """
+        # first, figure out how many loops each node should be a part of
+        node_cycle_counts = {}
+        for node in self.nodes:
+            node_cycle_counts[node.key] = len(node.adj_lst)
+
+        # loop through the nodes until all min cycles have been identified
+        all_cycles = []
+        iter_count = 0
+        max_iter = len(self.nodes)
+        remaining_nodes = self.ordered_nodes
+        while len(remaining_nodes) != 0 or iter_count > max_iter:
+            cycle_root = remaining_nodes[0]
+            min_cycle = self.min_cycle(cycle_root, cycle_root, True)
+            if min_cycle is None:  # try it without the CCW restriction
+                min_cycle = self.min_cycle(cycle_root, cycle_root, False)
+            if min_cycle is not None:
+                min_cycle.pop(-1)  # take out the last duplicated node
+                is_valid_cycle = True
+                for node in min_cycle:
+                    node_cycle_counts[node.key] = node_cycle_counts[node.key] - 1
+                    if node_cycle_counts[node.key] == 0:  # all cycles for node found
+                        for i, r_node in enumerate(remaining_nodes):
+                            if r_node.key == node.key:
+                                remaining_nodes.pop(i)
+                                break
+                    elif node_cycle_counts[node.key] < 0:  # not a valid cycle
+                        node_cycle_counts[node.key] = 0
+                        is_valid_cycle = False
+                if is_valid_cycle:
+                    all_cycles.append(min_cycle)
+            iter_count += 1
+        return all_cycles
+
     def exterior_cycle(self, cycle_root):
-        """Computes exterior boundary from a given node.
+        """Compute exterior boundary from a given node.
 
         This method assumes that exterior edges are naked (unidirectional) and
         interior edges are bidirectional.
@@ -551,7 +608,12 @@ class DirectedGraphNetwork(object):
         return ext_cycle
 
     def exterior_cycles(self):
-        """Get a list of lists where each sub-list is an exterior cycle of Nodes."""
+        """Get a list of lists where each sub-list is an exterior cycle of Nodes.
+
+        Exterior cycles refer to the cycles of both the boundary and the holes
+        of the DirectedGraphNetwork was created using the from_shape_to_split
+        class method.
+        """
         exterior_poly_lst = []  # list to store cycles
         explored_nodes = set()  # set to note explored exterior nodes
         max_iter = self.node_count + 1  # maximum length a cycle can be
@@ -687,22 +749,24 @@ class DirectedGraphNetwork(object):
             node2.key in (n.key for n in node1.adj_lst)
 
     @staticmethod
-    def _intersect_segments(segments, tolerance):
-        """Intersect a list of LineSegment2D with one another and split them.
+    def _intersect_segments(segments, additional_segments, tolerance):
+        """Intersect a list of LineSegment2D and split them.
 
         Args:
-            segments: A list of ladybug-geometry LineSegment2D for the segments to
-                be split/intersected.
+            segments: A list of LineSegment2D for the segments to be split/intersected.
+            additional_segments: A list of additional LineSegment2Ds, which will be
+                used to split the input segments but will not be included in the
+                output themselves.
             tolerance: The tolerance at which the intersection will be computed.
 
         Returns:
-            A list of LineSegment2D objects for the input segments split through
-            self-intersection.
+            A list of LineSegment2D for the input segments split through
+            self-intersection and intersection with the additional_segments.
         """
         # extend segments a little to ensure intersections happen
         under_tol = tolerance * 0.99
         ext_segments = []
-        for seg in segments:
+        for seg in segments + additional_segments:
             m_v = seg.v.normalize() * under_tol
             ext_seg = LineSegment2D.from_end_points(seg.p1.move(-m_v), seg.p2.move(m_v))
             ext_segments.append(ext_seg)
