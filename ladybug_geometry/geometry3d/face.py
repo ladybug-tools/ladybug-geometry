@@ -707,6 +707,26 @@ class Face3D(Base2DIn3D):
         """
         return self.max.z - self.min.z <= tolerance
 
+    def is_coplanar(self, face, tolerance):
+        """Check whether a this face is coplanar with another given tolerance.
+
+        This method will only evaluate the distance between the other face's
+        vertices and this face's plane so it does not rely on a check based
+        on angle tolerance.
+
+        Args:
+            face: A neighboring Face3D for which co-planarity will be checked.
+            tolerance: The minimum difference between the coordinate values of two
+                vertices at which they can be considered equivalent.
+
+        Returns:
+            True if the face is coplanar with this one. False if it is not.
+        """
+        for pt in face.vertices:
+            if self.plane.distance_to_point(pt) > tolerance:
+                return False
+        return True
+
     def is_geometrically_equivalent(self, face, tolerance):
         """Check whether a given face is geometrically equivalent to this Face.
 
@@ -785,6 +805,29 @@ class Face3D(Base2DIn3D):
         if face.intersect_line_ray(test_ray):
             return True
         return False
+
+    def is_overlapping(self, face, tolerance):
+        """Check whether a this face overlaps with another given tolerance.
+
+        Overlapping faces must not only be coplanar but they also have overlapping
+        polygons when evaluated within the same plane. Note that, if the face
+        is a sub-face of this one, this method will return True.
+
+        Args:
+            face: A neighboring Face3D for which overlaps will be checked.
+            tolerance: The minimum difference between the coordinate values of two
+                vertices at which they can be considered equivalent.
+
+        Returns:
+            True if the face is overlapping with this one. False if it is not.
+        """
+        if not self.is_coplanar(face, tolerance):
+            return False
+        verts2d = tuple(self.plane.xyz_to_xy(_v) for _v in face.vertices)
+        other_poly = Polygon2D(verts2d)
+        if self.polygon2d.polygon_relationship(other_poly, tolerance) == -1:
+            return False
+        return True
 
     def is_sub_face(self, face, tolerance, angle_tolerance):
         """Check whether a given face is a sub-face of this face.
