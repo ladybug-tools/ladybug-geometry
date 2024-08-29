@@ -494,7 +494,8 @@ class DirectedGraphNetwork(object):
         # set up a queue for exploring the graph
         explored = []
         queue = [[base_node]]
-        orig_dir = base_node.pt - goal_node.pt  # yields a vector
+        orig_dir = base_node.pt - goal_node.pt \
+            if base_node.key != goal_node.key else None
         # loop to traverse the graph  with the help of the queue
         while queue:
             path = queue.pop(0)
@@ -504,16 +505,23 @@ class DirectedGraphNetwork(object):
                 prev_dir = node.pt - path[-2].pt if len(path) > 1 else orig_dir
                 # iterate over the neighbors to determine relevant nodes
                 rel_neighbors, rel_angles = [], []
+                last_resort_neighbors, last_resort_angles = [], []
                 for neighbor in node.adj_lst:
                     if neighbor == goal_node:  # the shortest path was found!
                         path.append(goal_node)
                         return path
                     edge_dir = neighbor.pt - node.pt
-                    cw_angle = prev_dir.angle_clockwise(edge_dir * -1)
-                    if not (1e-5 < cw_angle < (2 * math.pi) - 1e-5):
-                        continue  # prevent back-tracking along the search
-                    rel_neighbors.append(neighbor)
-                    rel_angles.append(cw_angle)
+                    cw_angle = prev_dir.angle_clockwise(edge_dir * -1) \
+                        if prev_dir is not None else math.pi
+                    if 1e-5 < cw_angle < (2 * math.pi) - 1e-5:
+                        rel_neighbors.append(neighbor)
+                        rel_angles.append(cw_angle)
+                    else:  # try to avoid back-tracking along the search
+                        last_resort_neighbors.append(neighbor)
+                        last_resort_angles.append(cw_angle)
+                if len(rel_neighbors) == 0:  # back tracking is the only option
+                    rel_neighbors = last_resort_neighbors
+                    rel_angles = last_resort_angles
                 # sort the neighbors by clockwise angle
                 if len(rel_neighbors) > 1:
                     rel_neighbors = [n for _, n in sorted(zip(rel_angles, rel_neighbors),
@@ -551,13 +559,27 @@ class DirectedGraphNetwork(object):
         iter_count = 0
         max_iter = len(self.nodes)
         remaining_nodes = self.ordered_nodes
-        while len(remaining_nodes) != 0 or iter_count > max_iter:
+        explored_nodes = set()
+        while len(remaining_nodes) > 1 or iter_count > max_iter:
             cycle_root = remaining_nodes[0]
-            min_cycle = self.min_cycle(cycle_root, cycle_root, True)
+            next_node = cycle_root
+            ext_cycle = False
+            if cycle_root.exterior:  # exterior cycles tend to be easier to find
+                next_node = DirectedGraphNetwork.next_exterior_node(cycle_root)
+                if next_node is not None:
+                    ext_cycle = True
+                else:
+                    next_node = cycle_root
+
+            # find the minimum cycle by first searching counter-clockwise; then all over
+            min_cycle = self.min_cycle(next_node, cycle_root, True)
             if min_cycle is None:  # try it without the CCW restriction
-                min_cycle = self.min_cycle(cycle_root, cycle_root, False)
+                min_cycle = self.min_cycle(next_node, cycle_root, False)
+
+            # if we found a minimum cycle, evaluate its validity by node connections
             if min_cycle is not None:
-                min_cycle.pop(-1)  # take out the last duplicated node
+                if not ext_cycle:
+                    min_cycle.pop(-1)  # take out the last duplicated node
                 is_valid_cycle = True
                 for node in min_cycle:
                     node_cycle_counts[node.key] = node_cycle_counts[node.key] - 1
@@ -569,8 +591,17 @@ class DirectedGraphNetwork(object):
                     elif node_cycle_counts[node.key] < 0:  # not a valid cycle
                         node_cycle_counts[node.key] = 0
                         is_valid_cycle = False
+                # add the valid cycle to the list to be returned
                 if is_valid_cycle:
                     all_cycles.append(min_cycle)
+                    # reorder the remaining nodes so unexplored nodes get prioritized
+                    for node in min_cycle:
+                        explored_nodes.add(node.key)
+                    if len(remaining_nodes) != 0:
+                        for j, node in enumerate(remaining_nodes):
+                            if node.key not in explored_nodes:
+                                break
+                        remaining_nodes.insert(0, remaining_nodes.pop(j))
             iter_count += 1
         return all_cycles
 
@@ -763,6 +794,12 @@ class DirectedGraphNetwork(object):
             A list of LineSegment2D for the input segments split through
             self-intersection and intersection with the additional_segments.
         """
+        # make sure that we are working with lists
+        if not isinstance(segments, list):
+            segments = list(segments)
+        if not isinstance(additional_segments, list):
+            additional_segments = list(additional_segments)
+
         # extend segments a little to ensure intersections happen
         under_tol = tolerance * 0.99
         ext_segments = []
