@@ -1251,53 +1251,39 @@ class Face3D(Base2DIn3D):
             the Face3D, or the polyline intersects itself (or is closed), or if it
             does not split the Face3D into two or more pieces.
         """
-        # first check that the line is in the plane of the Face3D
+        # first check that the polyline is in the plane of the Face3D
         for pl_pt in polyline.vertices:
             if self.plane.distance_to_point(pl_pt) > tolerance:
                 return None
-        # extend the endpoints of the polyline so that tolerance will split it
-        st_mv = polyline[0] - polyline[1]
-        end_mv = polyline[-1] - polyline[-2]
-        st_mv = st_mv.normalize() * tolerance
-        end_mv = end_mv.normalize() * tolerance
-        new_pts = [polyline[0].move(st_mv)]
-        new_pts.extend(polyline[1:-1])
-        new_pts.append(polyline[-1].move(end_mv))
 
         # change the polyline and face to be in 2D and check that it can split the Face
         prim_pl = self.plane
         bnd_poly = self.boundary_polygon2d
-        polyline_2d = Polyline2D([prim_pl.xyz_to_xy(pt) for pt in new_pts])
+        hole_polys = self.hole_polygon2d
+        polyline_2d = Polyline2D([prim_pl.xyz_to_xy(pt) for pt in polyline])
         if not Polygon2D.overlapping_bounding_rect(bnd_poly, polyline_2d, tolerance):
-            return None
-        if polyline_2d.is_self_intersecting:
             return None
         intersect_count = 0
         for seg in polyline_2d.segments:
             intersect_count += len(bnd_poly.intersect_line_ray(seg))
-        if intersect_count == 0 or intersect_count % 2 != 0:
+        if intersect_count == 0:
             return None
 
-        # get BooleanPolygons of the polygon and the polyline
-        off_p_line = polyline_2d.offset(tolerance / 2)
-        P_line_verts = polyline_2d.vertices + tuple(reversed(off_p_line.vertices))
-        line_poly = [(pb.BooleanPoint(pt.x, pt.y) for pt in P_line_verts)]
-        face_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in bnd_poly.vertices)]
-        if self.has_holes:
-            for hole in self.hole_polygon2d:
-                face_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
-        b_poly1 = pb.BooleanPolygon(face_polys)
-        b_poly2 = pb.BooleanPolygon(line_poly)
-
-        # split the two boolean polygons with one another
-        int_tol = tolerance / 100
-        try:
-            poly1_result = pb.difference(b_poly1, b_poly2, int_tol)
-        except Exception:
-            return None  # typically a tolerance issue causing failure
+        # create the network object and use it to find the cycles
+        dg = DirectedGraphNetwork.from_shape_to_split(
+            bnd_poly, hole_polys, polyline_2d.segments, tolerance)
+        split_faces = []
+        for cycle in dg.all_min_cycles():
+            if len(cycle) >= 3:
+                pt_3ds = [prim_pl.xy_to_xyz(node.pt) for node in cycle]
+                new_face = Face3D(pt_3ds, plane=prim_pl)
+                new_face = new_face.remove_colinear_vertices(tolerance)
+                split_faces.append(new_face)
 
         # rebuild the Face3D from the results and return them
-        return Face3D._from_bool_poly(poly1_result, prim_pl, tolerance)
+        if len(split_faces) == 1:
+            return split_faces
+        return Face3D.merge_faces_to_holes(split_faces, tolerance)
 
     def intersect_line_ray(self, line_ray):
         """Get the intersection between this face and the input LineSegment3D or Ray3D.

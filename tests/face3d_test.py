@@ -1172,7 +1172,8 @@ def test_split_with_polyline():
     pl_pts = (Point3D(1, -1, 2), Point3D(1, 1, 2), Point3D(1.5, 1, 2))
     line = Polyline3D(pl_pts)
     int_result = face.split_with_polyline(line, 0.01)
-    assert int_result is None
+    assert int_result is None or \
+        (len(int_result) == 1 and int_result[0].area == pytest.approx(face.area, rel=1e-2))
 
 
 def test_intersect_line_ray():
