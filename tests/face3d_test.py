@@ -1155,6 +1155,21 @@ def test_split_with_line():
     assert int_result[1].area == pytest.approx(face.area / 2, rel=1e-2)
 
 
+def test_split_with_line_trapezoid():
+    """Test the split_with_line method with a trapezoidal shape."""
+    f_pts = (Point3D(0, 0, 2), Point3D(4, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
+    face = Face3D(f_pts)
+
+    l_pts = (Point3D(2, -1, 2), Point3D(2, 3, 2))
+    line = LineSegment3D.from_end_points(*l_pts)
+    int_result = face.split_with_line(line, 0.01)
+    assert len(int_result) == 2
+    assert len(int_result[0]) == 4
+    assert len(int_result[1]) == 3
+    assert int_result[0].area == pytest.approx(face.area * (2 / 3), rel=1e-2)
+    assert int_result[1].area == pytest.approx(face.area * (1 / 3), rel=1e-2)
+
+
 def test_split_with_polyline():
     """Test the split_with_polyline method."""
     f_pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
