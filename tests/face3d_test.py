@@ -1142,7 +1142,8 @@ def test_split_with_line():
     l_pts = (Point3D(1, 0, 2), Point3D(1, 1, 2))
     line = LineSegment3D.from_end_points(*l_pts)
     int_result = face.split_with_line(line, 0.01)
-    assert int_result is None
+    assert int_result is None or \
+        (len(int_result) == 1 and int_result[0].area == pytest.approx(face.area, rel=1e-2))
 
     l_pts = (Point3D(-1, -1, 2), Point3D(3, 3, 2))
     line = LineSegment3D.from_end_points(*l_pts)

@@ -15,6 +15,7 @@ from .mesh import Mesh3D
 from ._2d import Base2DIn3D
 
 from ..intersection3d import closest_point3d_on_line3d
+from ..network import DirectedGraphNetwork
 
 from ..geometry2d.pointvector import Point2D, Vector2D
 from ..geometry2d.ray import Ray2D
@@ -1197,42 +1198,34 @@ class Face3D(Base2DIn3D):
         if self.plane.distance_to_point(line.p1) > tolerance or \
                 self.plane.distance_to_point(line.p1) > tolerance:
             return None
-        # extend the endpoints of the line so that tolerance will split it
-        tvc = line.v.normalize() * tolerance
-        line = LineSegment3D.from_end_points(line.p1.move(-tvc), line.p2.move(tvc))
 
         # change the line and face to be in 2D and check that it can split the Face
         prim_pl = self.plane
         bnd_poly = self.boundary_polygon2d
+        hole_polys = self.hole_polygon2d
         line_2d = LineSegment2D.from_end_points(
             prim_pl.xyz_to_xy(line.p1), prim_pl.xyz_to_xy(line.p2))
         if not Polygon2D.overlapping_bounding_rect(bnd_poly, line_2d, tolerance):
             return None
         intersect_count = len(bnd_poly.intersect_line_ray(line_2d))
-        if intersect_count == 0 or intersect_count % 2 != 0:
+        if intersect_count == 0:
             return None
 
-        # get BooleanPolygons of the polygon and the line segment
-        move_vec = line_2d.v.rotate(math.pi / 2).normalize() * (tolerance / 2)
-        line_verts = (line_2d.p1, line_2d.p2, line_2d.p2.move(move_vec),
-                      line_2d.p1.move(move_vec))
-        line_poly = [(pb.BooleanPoint(pt.x, pt.y) for pt in line_verts)]
-        face_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in bnd_poly.vertices)]
-        if self.has_holes:
-            for hole in self.hole_polygon2d:
-                face_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
-        b_poly1 = pb.BooleanPolygon(face_polys)
-        b_poly2 = pb.BooleanPolygon(line_poly)
-
-        # split the two boolean polygons with one another
-        int_tol = tolerance / 100
-        try:
-            poly1_result = pb.difference(b_poly1, b_poly2, int_tol)
-        except Exception:
-            return None  # typically a tolerance issue causing failure
+        # create the network object and use it to find the cycles
+        dg = DirectedGraphNetwork.from_shape_to_split(
+            bnd_poly, hole_polys, [line_2d], tolerance)
+        split_faces = []
+        for cycle in dg.all_min_cycles():
+            if len(cycle) >= 3:
+                pt_3ds = [prim_pl.xy_to_xyz(node.pt) for node in cycle]
+                new_face = Face3D(pt_3ds, plane=prim_pl)
+                new_face = new_face.remove_colinear_vertices(tolerance)
+                split_faces.append(new_face)
 
         # rebuild the Face3D from the results and return them
-        return Face3D._from_bool_poly(poly1_result, prim_pl, tolerance)
+        if len(split_faces) == 1:
+            return split_faces
+        return Face3D.merge_faces_to_holes(split_faces, tolerance)
 
     def split_with_polyline(self, polyline, tolerance):
         """Split this face into two or more Face3D given an open Polyline3D.
