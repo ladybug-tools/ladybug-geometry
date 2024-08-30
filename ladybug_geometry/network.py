@@ -63,7 +63,7 @@ class Node(object):
         pt: A Point2D object for the node
         key: String representation of the Point2D object which accounts for tolerance.
         order: Integer for the order of the Node (based on directed graph propagation).
-        adj_lst: List of strings representing keys adjacent to this node.
+        adj_lst: List of Node objects that are adjacent to this node.
         exterior: Optional boolean to indicate if the Node is on the exterior of
             the graph. If None, this value can be computed later based on the
             position within the overall graph.
@@ -560,16 +560,23 @@ class DirectedGraphNetwork(object):
         max_iter = len(self.nodes)
         remaining_nodes = self.ordered_nodes
         explored_nodes = set()
-        while len(remaining_nodes) > 1 or iter_count > max_iter:
+        while len(remaining_nodes) > 1 and iter_count < max_iter:
+            # try to identify two connected nodes which we can use to build a cycle
             cycle_root = remaining_nodes[0]
-            next_node = cycle_root
+            next_node = cycle_root  # if we can't find a connected node, connect to self
             ext_cycle = False
-            if cycle_root.exterior:  # exterior cycles tend to be easier to find
+            if cycle_root.exterior:  # exterior cycles tend to have clear connections
                 next_node = DirectedGraphNetwork.next_exterior_node(cycle_root)
                 if next_node is not None:
                     ext_cycle = True
                 else:
                     next_node = cycle_root
+            if not ext_cycle:  # see if we can connect it to another incomplete node
+                for _next_node in cycle_root.adj_lst:
+                    if node_cycle_counts[_next_node.key] != 0:
+                        next_node = _next_node
+                        ext_cycle = True
+                        break
 
             # find the minimum cycle by first searching counter-clockwise; then all over
             min_cycle = self.min_cycle(next_node, cycle_root, True)
@@ -577,7 +584,7 @@ class DirectedGraphNetwork(object):
                 min_cycle = self.min_cycle(next_node, cycle_root, False)
 
             # if we found a minimum cycle, evaluate its validity by node connections
-            if min_cycle is not None:
+            if min_cycle is not None and len(min_cycle) >= 3:
                 if not ext_cycle:
                     min_cycle.pop(-1)  # take out the last duplicated node
                 is_valid_cycle = True
@@ -602,7 +609,31 @@ class DirectedGraphNetwork(object):
                             if node.key not in explored_nodes:
                                 break
                         remaining_nodes.insert(0, remaining_nodes.pop(j))
+            elif len(min_cycle) == 2:
+                if len(remaining_nodes) != 0:
+                    for j, node in enumerate(remaining_nodes):
+                        if node.key not in explored_nodes:
+                            break
+                    remaining_nodes.insert(0, remaining_nodes.pop(j))
             iter_count += 1
+
+        # if we wer not able to address all nodes, see if they are all in the same loop
+        if len(remaining_nodes) >= 3:
+            current_node = remaining_nodes.pop(0)
+            current_node_adj = [node.key for node in node.adj_lst]
+            last_cycle = [current_node]
+            iter_count, max_iter = 0, len(remaining_nodes)
+            while len(remaining_nodes) > 0 and iter_count < max_iter:
+                for k, node in enumerate(remaining_nodes):
+                    if node.key in current_node_adj:
+                        current_node = remaining_nodes.pop(k)
+                        current_node_adj = [node.key for node in node.adj_lst]
+                        last_cycle.append(current_node)
+                        break
+                iter_count += 1
+            if len(last_cycle) > 2:
+                all_cycles.append(last_cycle)
+
         return all_cycles
 
     def exterior_cycle(self, cycle_root):

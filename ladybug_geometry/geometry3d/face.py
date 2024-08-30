@@ -1207,9 +1207,6 @@ class Face3D(Base2DIn3D):
             prim_pl.xyz_to_xy(line.p1), prim_pl.xyz_to_xy(line.p2))
         if not Polygon2D.overlapping_bounding_rect(bnd_poly, line_2d, tolerance):
             return None
-        intersect_count = len(bnd_poly.intersect_line_ray(line_2d))
-        if intersect_count == 0:
-            return None
 
         # create the network object and use it to find the cycles
         dg = DirectedGraphNetwork.from_shape_to_split(
@@ -1263,15 +1260,83 @@ class Face3D(Base2DIn3D):
         polyline_2d = Polyline2D([prim_pl.xyz_to_xy(pt) for pt in polyline])
         if not Polygon2D.overlapping_bounding_rect(bnd_poly, polyline_2d, tolerance):
             return None
+        rel_line_2ds = []
         intersect_count = 0
         for seg in polyline_2d.segments:
             intersect_count += len(bnd_poly.intersect_line_ray(seg))
-        if intersect_count == 0:
+            if seg.length > tolerance and \
+                    Polygon2D.overlapping_bounding_rect(bnd_poly, seg, tolerance):
+                rel_line_2ds.append(seg)
+        if len(rel_line_2ds) == 0:
             return None
 
         # create the network object and use it to find the cycles
         dg = DirectedGraphNetwork.from_shape_to_split(
             bnd_poly, hole_polys, polyline_2d.segments, tolerance)
+        split_faces = []
+        for cycle in dg.all_min_cycles():
+            if len(cycle) >= 3:
+                pt_3ds = [prim_pl.xy_to_xyz(node.pt) for node in cycle]
+                new_face = Face3D(pt_3ds, plane=prim_pl)
+                new_face = new_face.remove_colinear_vertices(tolerance)
+                split_faces.append(new_face)
+
+        # rebuild the Face3D from the results and return them
+        if len(split_faces) == 1:
+            return split_faces
+        return Face3D.merge_faces_to_holes(split_faces, tolerance)
+
+    def split_with_lines(self, lines, tolerance):
+        """Split this face into two or more Face3D given multiple LineSegment3D.
+
+        Using this method is distinct from looping over Face3D.split_with_line
+        in that this method will resolve cases where multiple segments branch out
+        from nodes in a network of input lines. So, if three line segments
+        meet at a point in the middle of this Face3D and each extend past the
+        edges of this Face3D, this method can split the Face3D in 3 parts whereas
+        looping over the Face3D.split_with_line will not do this given that each
+        individual segment cannot split the Face3D.
+
+        If the input lines together do not intersect this Face3D in a manner
+        that splits it into two or more pieces, None will be returned.
+
+        Args:
+            lines: A list of LineSegment3D objects in the plane of this Face3D,
+                which will be used to split it into two or more pieces.
+            tolerance: The maximum difference between point values for them to be
+                considered distinct from one another.
+
+        Returns:
+            A list of Face3D for the result of splitting this Face3D with the
+            input lines. Will be None if the line is not in the plane of the
+            Face3D or if it does not split the Face3D into two or more pieces.
+        """
+        # first check that the lines are in the plane of the Face3D
+        rel_line_3ds = []
+        for line in lines:
+            if self.plane.distance_to_point(line.p1) <= tolerance or \
+                    self.plane.distance_to_point(line.p1) <= tolerance:
+                rel_line_3ds.append(line)
+        if len(rel_line_3ds) == 0:
+            return None
+
+        # change the line and face to be in 2D and check that it can split the Face
+        prim_pl = self.plane
+        bnd_poly = self.boundary_polygon2d
+        hole_polys = self.hole_polygon2d
+        rel_line_2ds = []
+        for line in rel_line_3ds:
+            line_2d = LineSegment2D.from_end_points(
+                prim_pl.xyz_to_xy(line.p1), prim_pl.xyz_to_xy(line.p2))
+            if line_2d.length > tolerance and \
+                    Polygon2D.overlapping_bounding_rect(bnd_poly, line_2d, tolerance):
+                rel_line_2ds.append(line_2d)
+        if len(rel_line_2ds) == 0:
+            return None
+
+        # create the network object and use it to find the cycles
+        dg = DirectedGraphNetwork.from_shape_to_split(
+            bnd_poly, hole_polys, rel_line_2ds, tolerance)
         split_faces = []
         for cycle in dg.all_min_cycles():
             if len(cycle) >= 3:
