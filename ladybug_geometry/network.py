@@ -248,6 +248,7 @@ class DirectedGraphNetwork(object):
             the exterior property set to True.
         """
         # first split the boundary and holes with the split_segments
+        boundary = boundary.remove_colinear_vertices(tolerance)
         bound_sgs = cls._intersect_segments(boundary.segments, split_segments, tolerance)
         bound_pts = [seg.p1 for seg in bound_sgs]
         split_boundary = boundary.__class__(bound_pts)
@@ -255,6 +256,7 @@ class DirectedGraphNetwork(object):
         if holes is not None:
             split_holes = []
             for hole in holes:
+                hole = hole.remove_colinear_vertices(tolerance)
                 hole_sgs = cls._intersect_segments(
                     hole.segments, split_segments, tolerance)
                 hole_pts = [seg.p1 for seg in hole_sgs]
@@ -560,6 +562,7 @@ class DirectedGraphNetwork(object):
         max_iter = len(self.nodes)
         remaining_nodes = self.ordered_nodes
         explored_nodes = set()
+
         while len(remaining_nodes) > 1 and iter_count < max_iter:
             # try to identify two connected nodes which we can use to build a cycle
             cycle_root = remaining_nodes[0]
@@ -578,10 +581,8 @@ class DirectedGraphNetwork(object):
                         ext_cycle = True
                         break
 
-            # find the minimum cycle by first searching counter-clockwise; then all over
+            # find the minimum cycle by searching counter-clockwise
             min_cycle = self.min_cycle(next_node, cycle_root, True)
-            if min_cycle is None:  # try it without the CCW restriction
-                min_cycle = self.min_cycle(next_node, cycle_root, False)
 
             # if we found a minimum cycle, evaluate its validity by node connections
             if min_cycle is not None and len(min_cycle) >= 3:
@@ -589,32 +590,28 @@ class DirectedGraphNetwork(object):
                     min_cycle.pop(-1)  # take out the last duplicated node
                 is_valid_cycle = True
                 for node in min_cycle:
-                    node_cycle_counts[node.key] = node_cycle_counts[node.key] - 1
-                    if node_cycle_counts[node.key] == 0:  # all cycles for node found
-                        for i, r_node in enumerate(remaining_nodes):
-                            if r_node.key == node.key:
-                                remaining_nodes.pop(i)
-                                break
-                    elif node_cycle_counts[node.key] < 0:  # not a valid cycle
-                        node_cycle_counts[node.key] = 0
-                        is_valid_cycle = False
+                    if node_cycle_counts[node.key] - 1 < 0:  # we are re-traversing
+                        is_valid_cycle = False  # not a valid cycle
+
                 # add the valid cycle to the list to be returned
                 if is_valid_cycle:
+                    for node in min_cycle:
+                        node_cycle_counts[node.key] = node_cycle_counts[node.key] - 1
+                        if node_cycle_counts[node.key] == 0:  # all cycles for node found
+                            for i, r_node in enumerate(remaining_nodes):
+                                if r_node.key == node.key:
+                                    remaining_nodes.pop(i)
+                                    break
                     all_cycles.append(min_cycle)
-                    # reorder the remaining nodes so unexplored nodes get prioritized
                     for node in min_cycle:
                         explored_nodes.add(node.key)
-                    if len(remaining_nodes) != 0:
-                        for j, node in enumerate(remaining_nodes):
-                            if node.key not in explored_nodes:
-                                break
-                        remaining_nodes.insert(0, remaining_nodes.pop(j))
-            elif len(min_cycle) == 2:
-                if len(remaining_nodes) != 0:
-                    for j, node in enumerate(remaining_nodes):
-                        if node.key not in explored_nodes:
-                            break
-                    remaining_nodes.insert(0, remaining_nodes.pop(j))
+
+            # reorder the remaining nodes so unexplored nodes get prioritized
+            if len(remaining_nodes) != 0:
+                for j, node in enumerate(remaining_nodes):
+                    if node.key not in explored_nodes:
+                        break
+                remaining_nodes.insert(0, remaining_nodes.pop(j))
             iter_count += 1
 
         # if we wer not able to address all nodes, see if they are all in the same loop
