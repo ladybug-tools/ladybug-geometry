@@ -617,15 +617,13 @@ class Polygon2D(Base2DIn2D):
             tolerance: The minimum distance that a vertex can be from a line
                 before it is considered colinear.
         """
-        if len(self.vertices) == 3:
-            return self  # Polygon2D cannot have fewer than 3 vertices
         new_vertices = []  # list to hold the new vertices
         skip = 0  # track the number of vertices being skipped/removed
         # loop through vertices and remove all cases of colinear verts
         for i, _v in enumerate(self.vertices):
-            _a = self[i - 2 - skip].determinant(self[i - 1]) + self[i - 1].determinant(_v) + \
-                _v.determinant(self[i - 2 - skip])
-            if abs(_a) >= tolerance:
+            _v2, _v1 = self[i - 2 - skip], self[i - 1]
+            _a = _v2.determinant(_v1) + _v1.determinant(_v) + _v.determinant(_v2)
+            if abs(_a) >= tolerance / (2 * (skip + 1)):
                 new_vertices.append(self[i - 1])
                 skip = 0
             else:
@@ -635,7 +633,7 @@ class Polygon2D(Base2DIn2D):
             pts_2d = self.vertices
             _a = pts_2d[-3].determinant(pts_2d[-1]) + \
                 pts_2d[-1].determinant(pts_2d[0]) + pts_2d[0].determinant(pts_2d[-3])
-            if abs(_a) >= tolerance:
+            if abs(_a) >= tolerance / 2:
                 new_vertices.append(pts_2d[-1])
         return Polygon2D(new_vertices)
 
