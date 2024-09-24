@@ -10,9 +10,9 @@ import math
 from .geometry2d.pointvector import Point2D, Vector2D
 
 
-def _isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
+def _isclose(a, b, rel_tol=1e-09, abs_tol=1e-09):
     """Implementation of the math.isclose method from Python 3.5 onward."""
-    return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+    return abs(a - b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 
 def intersect_line2d(line_ray_a, line_ray_b):
