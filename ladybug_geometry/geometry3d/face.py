@@ -73,8 +73,9 @@ class Face3D(Base2DIn3D):
         * perimeter
         * area
         * centroid
-        * altitude
         * azimuth
+        * altitude
+        * tilt
         * is_clockwise
         * is_convex
         * is_self_intersecting
