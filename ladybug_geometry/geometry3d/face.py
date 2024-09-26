@@ -2879,18 +2879,18 @@ class Face3D(Base2DIn3D):
         skip = 0  # track the number of vertices being skipped/removed
         # loop through vertices and remove all cases of colinear verts
         for i, _v in enumerate(pts_2d):
-            _a = pts_2d[i - 2 - skip].determinant(pts_2d[i - 1]) + \
-                pts_2d[i - 1].determinant(_v) + _v.determinant(pts_2d[i - 2 - skip])
-            if abs(_a) >= tolerance:  # vertex is not colinear
+            _v2, _v1 = pts_2d[i - 2 - skip], pts_2d[i - 1]
+            _a = _v2.determinant(_v1) + _v1.determinant(_v) + _v.determinant(_v2)
+            if abs(_a) >= tolerance:  # triangle area > area tolerance; not colinear
                 new_vertices.append(pts_3d[i - 1])
                 skip = 0
-            else:  # vertex is colinear
+            else:  # colinear point to be removed
                 skip += 1
-        # catch case of last two vertices being equal but distinct from first point
-        if skip != 0 and pts_3d[-2].is_equivalent(pts_3d[-1], tolerance):
-            _a = pts_2d[-3].determinant(pts_2d[-1]) + \
-                pts_2d[-1].determinant(pts_2d[0]) + pts_2d[0].determinant(pts_2d[-3])
-            if abs(_a) >= tolerance:
+        # catch case of last few vertices being equal but distinct from first point
+        if skip != 0:
+            _v2, _v1, _v = pts_2d[-2 - skip], pts_2d[-1], pts_2d[0]
+            _a = _v2.determinant(_v1) + _v1.determinant(_v) + _v.determinant(_v2)
+            if abs(_a) >= tolerance:  # triangle area > area tolerance; not colinear
                 new_vertices.append(pts_3d[-1])
         return new_vertices
 

@@ -623,18 +623,17 @@ class Polygon2D(Base2DIn2D):
         for i, _v in enumerate(self.vertices):
             _v2, _v1 = self[i - 2 - skip], self[i - 1]
             _a = _v2.determinant(_v1) + _v1.determinant(_v) + _v.determinant(_v2)
-            if abs(_a) >= tolerance / (2 * (skip + 1)):
+            if abs(_a) >= tolerance:  # triangle area > tolerance; not colinear
                 new_vertices.append(self[i - 1])
                 skip = 0
-            else:
+            else:  # colinear point to be removed
                 skip += 1
-        # catch case of last two vertices being equal but distinct from first point
-        if skip != 0 and self.vertices[-2].is_equivalent(self.vertices[-1], tolerance):
-            pts_2d = self.vertices
-            _a = pts_2d[-3].determinant(pts_2d[-1]) + \
-                pts_2d[-1].determinant(pts_2d[0]) + pts_2d[0].determinant(pts_2d[-3])
-            if abs(_a) >= tolerance / 2:
-                new_vertices.append(pts_2d[-1])
+        # catch case of last few vertices being equal but distinct from first point
+        if skip != 0:
+            _v2, _v1, _v = self[-2 - skip], self[-1], self[0]
+            _a = _v2.determinant(_v1) + _v1.determinant(_v) + _v.determinant(_v2)
+            if abs(_a) >= tolerance:  # triangle area > area tolerance; not colinear
+                new_vertices.append(_v1)
         return Polygon2D(new_vertices)
 
     def split_through_self_intersection(self, tolerance):
