@@ -739,16 +739,22 @@ def test_remove_colinear_vertices():
              Point3D(27.85, 23.22, 0.00), Point3D(27.85, 23.22, 4.00),
              Point3D(27.85, 23.22, 8.00), Point3D(27.85, 23.22, 8.00),
              Point3D(24.61, 23.22, 8.00), Point3D(24.61, 23.22, 8.00))
+    pts_5 = (Point3D(0, 0), Point3D(0, 0), Point3D(2, 0), Point3D(2, 2),
+             Point3D(0, 2), Point3D(0, 0), Point3D(0, 0))
     plane_1 = Plane(Vector3D(0, 0, 1))
     face_1 = Face3D(pts_1, plane_1)
     face_2 = Face3D(pts_2, plane_1)
     face_3 = Face3D(pts_3, plane_1)
     face_4 = Face3D(pts_4)
+    face_5 = Face3D(pts_5)
+    face_6 = Face3D(list(reversed(pts_2)))
 
     assert len(face_1.remove_colinear_vertices(0.0001).vertices) == 4
     assert len(face_2.remove_colinear_vertices(0.0001).vertices) == 4
     assert len(face_3.remove_colinear_vertices(0.0001).vertices) == 4
     assert len(face_4.remove_colinear_vertices(0.0001).vertices) == 6
+    assert len(face_5.remove_colinear_vertices(0.0001).vertices) == 4
+    assert len(face_6.remove_colinear_vertices(0.0001).vertices) == 4
 
 
 def test_remove_colinear_vertices_custom():

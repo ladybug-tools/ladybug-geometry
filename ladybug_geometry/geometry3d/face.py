@@ -2877,6 +2877,7 @@ class Face3D(Base2DIn3D):
         """
         new_vertices = []  # list to hold the new vertices
         skip = 0  # track the number of vertices being skipped/removed
+        first_skip, is_first, = 0, True  # track the number skipped from first vertex
         # loop through vertices and remove all cases of colinear verts
         for i, _v in enumerate(pts_2d):
             _v2, _v1 = pts_2d[i - 2 - skip], pts_2d[i - 1]
@@ -2884,11 +2885,16 @@ class Face3D(Base2DIn3D):
             if abs(_a) >= tolerance:  # triangle area > area tolerance; not colinear
                 new_vertices.append(pts_3d[i - 1])
                 skip = 0
+                if is_first:
+                    is_first = False
+                    first_skip = i - 1
             else:  # colinear point to be removed
                 skip += 1
         # catch case of last few vertices being equal but distinct from first point
-        if skip != 0:
-            _v2, _v1, _v = pts_2d[-2 - skip], pts_2d[-1], pts_2d[0]
+        if skip != 0 and first_skip != -1:
+            assert abs(-2 - skip) <= len(pts_2d), \
+                'There must be at least 3 vertices for a Face3D.'
+            _v2, _v1, _v = pts_2d[-2 - skip], pts_2d[-1], pts_2d[first_skip]
             _a = _v2.determinant(_v1) + _v1.determinant(_v) + _v.determinant(_v2)
             if abs(_a) >= tolerance:  # triangle area > area tolerance; not colinear
                 new_vertices.append(pts_3d[-1])
