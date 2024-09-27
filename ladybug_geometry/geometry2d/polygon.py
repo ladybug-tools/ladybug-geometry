@@ -619,6 +619,7 @@ class Polygon2D(Base2DIn2D):
         """
         new_vertices = []  # list to hold the new vertices
         skip = 0  # track the number of vertices being skipped/removed
+        first_skip, is_first, = 0, True  # track the number skipped from first vertex
         # loop through vertices and remove all cases of colinear verts
         for i, _v in enumerate(self.vertices):
             _v2, _v1 = self[i - 2 - skip], self[i - 1]
@@ -626,11 +627,16 @@ class Polygon2D(Base2DIn2D):
             if abs(_a) >= tolerance:  # triangle area > tolerance; not colinear
                 new_vertices.append(self[i - 1])
                 skip = 0
+                if is_first:
+                    is_first = False
+                    first_skip = i - 1
             else:  # colinear point to be removed
                 skip += 1
         # catch case of last few vertices being equal but distinct from first point
-        if skip != 0:
-            _v2, _v1, _v = self[-2 - skip], self[-1], self[0]
+        if skip != 0 and first_skip != -1:
+            assert abs(-2 - skip) <= len(self), \
+                'There must be at least 3 vertices for a Polygon2D.'
+            _v2, _v1, _v = self[-2 - skip], self[-1], self[first_skip]
             _a = _v2.determinant(_v1) + _v1.determinant(_v) + _v.determinant(_v2)
             if abs(_a) >= tolerance:  # triangle area > area tolerance; not colinear
                 new_vertices.append(_v1)
