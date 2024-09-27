@@ -757,6 +757,27 @@ def test_remove_colinear_vertices():
     assert len(face_6.remove_colinear_vertices(0.0001).vertices) == 4
 
 
+def test_remove_colinear_vertices_degenerate():
+    """Test the remove_colinear_vertices method on degenerate geometry."""
+    pts_1 = (Point3D(0, 0), Point3D(2, 0), Point3D(0, 0))
+    pts_2 = (Point3D(0, 0), Point3D(2, 0), Point3D(0, 0), Point3D(2, 0))
+    pts_3 = (Point3D(0, 0), Point3D(0, 0), Point3D(0, 0))
+    pts_4 = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 2), Point3D(2, 0), Point3D(0, 0))
+    face_1 = Face3D(pts_1)
+    face_2 = Face3D(pts_2)
+    face_3 = Face3D(pts_3)
+    face_4 = Face3D(pts_4)
+
+    with pytest.raises(AssertionError):
+        face_1.remove_colinear_vertices(0.0001).vertices
+    with pytest.raises(AssertionError):
+        face_2.remove_colinear_vertices(0.0001).vertices
+    with pytest.raises(AssertionError):
+        face_3.remove_colinear_vertices(0.0001).vertices
+    with pytest.raises(AssertionError):
+        face_4.remove_colinear_vertices(0.0001).vertices
+
+
 def test_remove_colinear_vertices_custom():
     """Test the remove_colinear_vertices method with some custom geometry."""
     geo_file = './tests/json/dup_vert_face.json'
