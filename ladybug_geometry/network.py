@@ -47,8 +47,9 @@ def coordinates_hash(point, tolerance):
     else:  # tolerance is not base 10 (eg. 0.003)
         rtol += 1
     # avoid cases of signed zeros messing with the hash
-    x_val = 0.0 if point.x == 0 else point.x
-    y_val = 0.0 if point.y == 0 else point.y
+    z_tol = tolerance / 2
+    x_val = 0.0 if abs(point.x) < z_tol else point.x
+    y_val = 0.0 if abs(point.y) < z_tol else point.y
     # convert the coordinate values to a hash
     return str((
         base * round(x_val / base, rtol),
@@ -277,7 +278,7 @@ class DirectedGraphNetwork(object):
 
         # add the intersection segments to the graph
         for seg in split_seg:  # add a bidirectional edge to represent interior edges
-            dg.add_node(seg.p2, [seg.p1])
+            dg.add_node(seg.p2, [seg.p1], exterior=False)
             dg.add_node(seg.p1, [seg.p2], exterior=False)
         return dg
 
