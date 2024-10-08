@@ -762,7 +762,7 @@ class Face3D(Base2DIn3D):
         match_i = None
         for i, pt in enumerate(self.vertices):
             if pt.is_equivalent(face[0], tolerance):
-                match_i = i
+                match_i = i if i != len(self.vertices) - 1 else -1
                 break
 
         # check equivalency of each vertex
