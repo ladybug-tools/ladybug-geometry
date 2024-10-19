@@ -1217,8 +1217,11 @@ class Face3D(Base2DIn3D):
             if len(cycle) >= 3:
                 pt_3ds = [prim_pl.xy_to_xyz(node.pt) for node in cycle]
                 new_face = Face3D(pt_3ds, plane=prim_pl)
-                new_face = new_face.remove_colinear_vertices(tolerance)
-                split_faces.append(new_face)
+                try:
+                    new_face = new_face.remove_colinear_vertices(tolerance)
+                    split_faces.append(new_face)
+                except AssertionError:  # degenerate geometry to ignore
+                    pass
 
         # rebuild the Face3D from the results and return them
         if len(split_faces) == 1:
@@ -1279,8 +1282,11 @@ class Face3D(Base2DIn3D):
             if len(cycle) >= 3:
                 pt_3ds = [prim_pl.xy_to_xyz(node.pt) for node in cycle]
                 new_face = Face3D(pt_3ds, plane=prim_pl)
-                new_face = new_face.remove_colinear_vertices(tolerance)
-                split_faces.append(new_face)
+                try:
+                    new_face = new_face.remove_colinear_vertices(tolerance)
+                    split_faces.append(new_face)
+                except AssertionError:  # degenerate geometry to ignore
+                    pass
 
         # rebuild the Face3D from the results and return them
         if len(split_faces) == 1:
