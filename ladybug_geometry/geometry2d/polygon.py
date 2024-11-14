@@ -835,14 +835,15 @@ class Polygon2D(Base2DIn2D):
 
         # check for self intersection between the moving vectors if requested
         if check_intersection:
-            poly_segs = new_poly.segments
+            poly_segs = new_poly.segments if not self.is_clockwise else \
+                Polygon2D(tuple(reversed(new_pts))).segments
             _segs = [LineSegment2D(p, v) for p, v in zip(init_verts, move_vecs)]
             _skip = (0, len(_segs) - 1)
             _other_segs = [x for j, x in enumerate(poly_segs) if j not in _skip]
             for _oth_s in _other_segs:
                 if _segs[0].intersect_line_ray(_oth_s) is not None:  # intersection!
                     return None
-            for i, _s in enumerate(_segs[1: len(_segs)]):
+            for i, _s in enumerate(_segs[1:]):
                 _skip = (i, i + 1)
                 _other_segs = [x for j, x in enumerate(poly_segs) if j not in _skip]
                 for _oth_s in _other_segs:
