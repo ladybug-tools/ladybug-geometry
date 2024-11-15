@@ -2231,7 +2231,7 @@ class Face3D(Base2DIn3D):
             return [self]
 
         # loop through the boolean polygons and subtract them
-        int_tol = tolerance / 100
+        int_tol = tolerance / 1000
         for b_poly2 in relevant_b_polys:
             # subtract the boolean polygons
             try:
@@ -2240,7 +2240,7 @@ class Face3D(Base2DIn3D):
                 return [self]  # typically a tolerance issue causing failure
 
         # rebuild the Face3D from the result of the subtraction
-        return Face3D._from_bool_poly(b_poly1, prim_pl)
+        return Face3D._from_bool_poly(b_poly1, prim_pl, tolerance)
 
     @staticmethod
     def coplanar_union(face1, face2, tolerance, angle_tolerance):
@@ -2287,13 +2287,13 @@ class Face3D(Base2DIn3D):
         b_poly1 = pb.BooleanPolygon(f1_polys)
         b_poly2 = pb.BooleanPolygon(f2_polys)
         # union the two boolean polygons with one another
-        int_tol = tolerance / 100
+        int_tol = tolerance / 1000
         try:
             poly_result = pb.union(b_poly1, b_poly2, int_tol)
         except Exception:
             return None  # typically a tolerance issue causing failure
         # rebuild the Face3D from the results and return them
-        union_faces = Face3D._from_bool_poly(poly_result, prim_pl)
+        union_faces = Face3D._from_bool_poly(poly_result, prim_pl, tolerance)
         return union_faces[0]
 
     @staticmethod
@@ -2344,13 +2344,13 @@ class Face3D(Base2DIn3D):
         b_poly1 = pb.BooleanPolygon(f1_polys)
         b_poly2 = pb.BooleanPolygon(f2_polys)
         # intersect the two boolean polygons with one another
-        int_tol = tolerance / 100
+        int_tol = tolerance / 1000
         try:
             poly_result = pb.intersect(b_poly1, b_poly2, int_tol)
         except Exception:
             return None  # typically a tolerance issue causing failure
         # rebuild the Face3D from the results and return them
-        int_faces = Face3D._from_bool_poly(poly_result, prim_pl)
+        int_faces = Face3D._from_bool_poly(poly_result, prim_pl, tolerance)
         return int_faces
 
     @staticmethod
@@ -2416,15 +2416,15 @@ class Face3D(Base2DIn3D):
         b_poly1 = pb.BooleanPolygon(f1_polys)
         b_poly2 = pb.BooleanPolygon(f2_polys)
         # split the two boolean polygons with one another
-        int_tol = tolerance / 100
+        int_tol = tolerance / 1000
         try:
             int_result, poly1_result, poly2_result = pb.split(b_poly1, b_poly2, int_tol)
         except Exception:
             return [face1], [face2]  # typically a tolerance issue causing failure
         # rebuild the Face3D from the results and return them
-        int_faces = Face3D._from_bool_poly(int_result, prim_pl)
-        poly1_faces = Face3D._from_bool_poly(poly1_result, prim_pl)
-        poly2_faces = Face3D._from_bool_poly(poly2_result, prim_pl)
+        int_faces = Face3D._from_bool_poly(int_result, prim_pl, tolerance)
+        poly1_faces = Face3D._from_bool_poly(poly1_result, prim_pl, tolerance)
+        poly2_faces = Face3D._from_bool_poly(poly2_result, prim_pl, tolerance)
         face1_split = poly1_faces + int_faces
         face2_split = poly2_faces + int_faces
         return face1_split, face2_split
@@ -2495,11 +2495,11 @@ class Face3D(Base2DIn3D):
         except Exception:
             return None  # typically a tolerance issue causing failure
         # rebuild the Face3D from the results and return them
-        union_faces = Face3D._from_bool_poly(poly_result, prim_pl)
+        union_faces = Face3D._from_bool_poly(poly_result, prim_pl, tolerance)
         return union_faces
 
     @staticmethod
-    def _from_bool_poly(bool_polygon, plane, snap_tolerance=None):
+    def _from_bool_poly(bool_polygon, plane, tolerance=None):
         """Get a list of Face3D from a BooleanPolygon.
 
         This method will automatically check whether any of the regions is meant
@@ -2508,21 +2508,28 @@ class Face3D(Base2DIn3D):
         Args:
             bool_polygon: A BooleanPolygon to be interpreted to Face3D.
             plane: The Plane in which the resulting Face3Ds exist.
-            snap_tolerance: An optional tolerance value to be used to snap the
-                polygons together before turning them into Face3D. If None,
-                no snapping will occur.
+            tolerance: An optional tolerance value to be used to remove
+                degenerate objects from the result. If None, the result may
+                contain degenerate objects.
         """
         # serialize the BooleanPolygon into Polygon2D
-        polys = [Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
-                 for new_poly in bool_polygon.regions if len(new_poly) > 2]
+        polys = []
+        for new_poly in bool_polygon.regions:
+            if len(new_poly) > 2:
+                poly = Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
+                if tolerance is not None:
+                    try:
+                        poly = poly.remove_duplicate_vertices(tolerance)
+                        polys.append(poly)
+                    except AssertionError:
+                        pass  # degenerate polygon to be removed
+                else:
+                    polys.append(poly)
         if len(polys) == 0:
             return []
         if len(polys) == 1:
             verts_3d = tuple(plane.xy_to_xyz(pt) for pt in polys[0].vertices)
             return [Face3D(verts_3d, plane)]
-        # snap the polygons together if requested
-        if snap_tolerance is not None:
-            polys = Polygon2D.snap_polygons(polys, snap_tolerance)
         # sort the polygons by area and check if any are inside the others
         polys.sort(key=lambda x: x.area, reverse=True)
         poly_groups = [[polys[0]]]

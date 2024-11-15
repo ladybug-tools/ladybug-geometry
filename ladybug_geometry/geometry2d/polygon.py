@@ -1294,10 +1294,28 @@ class Polygon2D(Base2DIn2D):
         return new_poly._to_bool_poly()
 
     @staticmethod
-    def _from_bool_poly(bool_polygon):
-        """Get a list of Polygon2D from a BooleanPolygon object."""
-        return [Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
-                for new_poly in bool_polygon.regions if len(new_poly) > 2]
+    def _from_bool_poly(bool_polygon, tolerance=None):
+        """Get a list of Polygon2D from a BooleanPolygon object.
+
+        Args:
+            bool_polygon: A BooleanPolygon to be interpreted to a list of Polygon2D.
+            tolerance: An optional tolerance value to be used to remove
+                degenerate objects from the result. If None, the result may
+                contain degenerate objects.
+        """
+        polys = []
+        for new_poly in bool_polygon.regions:
+            if len(new_poly) > 2:
+                poly = Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
+                if tolerance is not None:
+                    try:
+                        poly = poly.remove_duplicate_vertices(tolerance)
+                        polys.append(poly)
+                    except AssertionError:
+                        pass  # degenerate polygon to be removed
+                else:
+                    polys.append(poly)
+        return polys
 
     def boolean_union(self, polygon, tolerance):
         """Get a list of Polygon2D for the union of this Polygon and another.
@@ -1322,8 +1340,9 @@ class Polygon2D(Base2DIn2D):
         result = pb.union(
             self._to_bool_poly(),
             polygon._to_snapped_bool_poly(self, tolerance),
-            tolerance / 100)
-        return Polygon2D._from_bool_poly(result)
+            tolerance / 1000
+        )
+        return Polygon2D._from_bool_poly(result, tolerance)
 
     def boolean_intersect(self, polygon, tolerance):
         """Get a list of Polygon2D for the intersection of this Polygon and another.
@@ -1341,8 +1360,9 @@ class Polygon2D(Base2DIn2D):
         result = pb.intersect(
             self._to_bool_poly(),
             polygon._to_snapped_bool_poly(self, tolerance),
-            tolerance / 100)
-        return Polygon2D._from_bool_poly(result)
+            tolerance / 1000
+        )
+        return Polygon2D._from_bool_poly(result, tolerance)
 
     def boolean_difference(self, polygon, tolerance):
         """Get a list of Polygon2D for the subtraction of another polygon from this one.
@@ -1362,8 +1382,9 @@ class Polygon2D(Base2DIn2D):
         result = pb.difference(
             self._to_bool_poly(),
             polygon._to_snapped_bool_poly(self, tolerance),
-            tolerance / 100)
-        return Polygon2D._from_bool_poly(result)
+            tolerance / 1000
+        )
+        return Polygon2D._from_bool_poly(result, tolerance)
 
     def boolean_xor(self, polygon, tolerance):
         """Get Polygon2D list for the exclusive disjunction of this polygon and another.
@@ -1393,8 +1414,9 @@ class Polygon2D(Base2DIn2D):
         result = pb.xor(
             self._to_bool_poly(),
             polygon._to_snapped_bool_poly(self, tolerance),
-            tolerance / 100)
-        return Polygon2D._from_bool_poly(result)
+            tolerance / 1000
+        )
+        return Polygon2D._from_bool_poly(result, tolerance)
 
     @staticmethod
     def snap_polygons(polygons, tolerance):
@@ -1445,8 +1467,8 @@ class Polygon2D(Base2DIn2D):
         """
         polygons = Polygon2D.snap_polygons(polygons, tolerance)
         bool_polys = [poly._to_bool_poly() for poly in polygons]
-        result = pb.union_all(bool_polys, tolerance / 100)
-        return Polygon2D._from_bool_poly(result)
+        result = pb.union_all(bool_polys, tolerance / 1000)
+        return Polygon2D._from_bool_poly(result, tolerance)
 
     @staticmethod
     def boolean_intersect_all(polygons, tolerance):
@@ -1475,8 +1497,8 @@ class Polygon2D(Base2DIn2D):
         """
         polygons = Polygon2D.snap_polygons(polygons, tolerance)
         bool_polys = [poly._to_bool_poly() for poly in polygons]
-        result = pb.intersect_all(bool_polys, tolerance / 100)
-        return Polygon2D._from_bool_poly(result)
+        result = pb.intersect_all(bool_polys, tolerance / 1000)
+        return Polygon2D._from_bool_poly(result, tolerance)
 
     @staticmethod
     def boolean_split(polygon1, polygon2, tolerance):
@@ -1516,10 +1538,11 @@ class Polygon2D(Base2DIn2D):
         int_result, poly1_result, poly2_result = pb.split(
             polygon1._to_bool_poly(),
             polygon2._to_snapped_bool_poly(polygon1, tolerance),
-            tolerance / 100)
-        intersection = Polygon2D._from_bool_poly(int_result)
-        poly1_difference = Polygon2D._from_bool_poly(poly1_result)
-        poly2_difference = Polygon2D._from_bool_poly(poly2_result)
+            tolerance / 1000
+        )
+        intersection = Polygon2D._from_bool_poly(int_result, tolerance)
+        poly1_difference = Polygon2D._from_bool_poly(poly1_result, tolerance)
+        poly2_difference = Polygon2D._from_bool_poly(poly2_result, tolerance)
         return intersection, poly1_difference, poly2_difference
 
     @staticmethod
