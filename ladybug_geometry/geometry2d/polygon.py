@@ -804,9 +804,11 @@ class Polygon2D(Base2DIn2D):
             return self
 
         # loop through the vertices and get the new offset vectors
-        init_verts = self._vertices if not self.is_clockwise \
+        base_verts = self._vertices if not self.is_clockwise \
             else list(reversed(self._vertices))
-        init_verts = [pt for i, pt in enumerate(init_verts) if pt != init_verts[i - 1]]
+        init_verts = [pt for i, pt in enumerate(base_verts) if pt != base_verts[i - 1]]
+        if len(init_verts) < 3:  # degenerate polygon
+            return self  # cannot be offset into a valid shape
         move_vecs, max_i = [], len(init_verts) - 1
         for i, pt in enumerate(init_verts):
             v1 = init_verts[i - 1] - pt
