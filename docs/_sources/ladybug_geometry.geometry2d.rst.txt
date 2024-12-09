@@ -1,0 +1,24 @@
+ladybug\_geometry.geometry2d package
+====================================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   ladybug_geometry.geometry2d.arc
+   ladybug_geometry.geometry2d.line
+   ladybug_geometry.geometry2d.mesh
+   ladybug_geometry.geometry2d.pointvector
+   ladybug_geometry.geometry2d.polygon
+   ladybug_geometry.geometry2d.polyline
+   ladybug_geometry.geometry2d.ray
+
+Module contents
+---------------
+
+.. automodule:: ladybug_geometry.geometry2d
+   :members:
+   :undoc-members:
+   :show-inheritance:
