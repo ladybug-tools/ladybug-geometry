@@ -771,20 +771,23 @@ class Polyface3D(Base2DIn3D):
         polyf2_width = polyface2.max.x - polyface2.min.x
         dist_btwn_x = abs(polyface1.center.x - polyface2.center.x)
         x_gap_btwn_box = dist_btwn_x - (0.5 * polyf1_width) - (0.5 * polyf2_width)
+        if x_gap_btwn_box > tolerance:
+            return False  # overlap impossible
 
         polyf1_depth = polyface1.max.y - polyface1.min.y
         polyf2_depth = polyface2.max.y - polyface2.min.y
         dist_btwn_y = abs(polyface1.center.y - polyface2.center.y)
         y_gap_btwn_box = dist_btwn_y - (0.5 * polyf1_depth) - (0.5 * polyf2_depth)
+        if y_gap_btwn_box > tolerance:
+            return False  # overlap impossible
 
         polyf1_height = polyface1.max.z - polyface1.min.z
         polyf2_height = polyface2.max.z - polyface2.min.z
         dist_btwn_z = abs(polyface1.center.z - polyface2.center.z)
         z_gap_btwn_box = dist_btwn_z - (0.5 * polyf1_height) - (0.5 * polyf2_height)
-
-        if x_gap_btwn_box > tolerance or y_gap_btwn_box > tolerance or \
-                z_gap_btwn_box > tolerance:
+        if z_gap_btwn_box > tolerance:
             return False  # no overlap
+
         return True  # overlap exists
 
     @staticmethod
