@@ -204,3 +204,70 @@ def bounding_box_extents(geometries, axis_angle=0):
     yy = bounding_domain_y(geometries)
     zz = bounding_domain_z_2d_safe(geometries)
     return xx[1] - xx[0], yy[1] - yy[0], zz[1] - zz[0]
+
+
+def overlapping_bounding_rect(geometry_1, geometry_2, distance):
+    """Check if the bounding rectangles of two geometries overlap within a tolerance.
+
+    Args:
+        geometry_1: The first geometry to check.
+        geometry_2: The second geometry to check.
+        distance: The maximum distance at which the geometries are
+            considered overlapping.
+
+    Return:
+        True if the geometries overlap. False if they do not.
+    """
+    # Bounding box check using the Separating Axis Theorem
+    geo1_width = geometry_1.max.x - geometry_1.min.x
+    geo2_width = geometry_2.max.x - geometry_2.min.x
+    dist_btwn_x = abs(geometry_1.center.x - geometry_2.center.x)
+    x_gap_btwn_box = dist_btwn_x - (0.5 * geo1_width) - (0.5 * geo2_width)
+    if x_gap_btwn_box > distance:
+        return False   # overlap impossible
+
+    geo1_depth = geometry_1.max.y - geometry_1.min.y
+    geo2_depth = geometry_2.max.y - geometry_2.min.y
+    dist_btwn_y = abs(geometry_1.center.y - geometry_2.center.y)
+    y_gap_btwn_box = dist_btwn_y - (0.5 * geo1_depth) - (0.5 * geo2_depth)
+    if y_gap_btwn_box > distance:
+        return False   # overlap impossible
+
+    return True  # overlap exists
+
+
+def overlapping_bounding_boxes(geometry_1, geometry_2, distance):
+    """Check if the bounding boxes around two geometries overlap within a distance.
+
+    Args:
+        geometry_1: The first geometry to check.
+        geometry_2: The second geometry to check.
+        distance: The maximum distance at which the geometries are
+            considered overlapping.
+
+    Return:
+        True if the geometries overlap. False if they do not.
+    """
+    # Bounding box check using the Separating Axis Theorem
+    geo1_width = geometry_1.max.x - geometry_1.min.x
+    geo2_width = geometry_2.max.x - geometry_2.min.x
+    dist_btwn_x = abs(geometry_1.center.x - geometry_2.center.x)
+    x_gap_btwn_box = dist_btwn_x - (0.5 * geo1_width) - (0.5 * geo2_width)
+    if x_gap_btwn_box > distance:
+        return False   # overlap impossible
+
+    geo1_depth = geometry_1.max.y - geometry_1.min.y
+    geo2_depth = geometry_2.max.y - geometry_2.min.y
+    dist_btwn_y = abs(geometry_1.center.y - geometry_2.center.y)
+    y_gap_btwn_box = dist_btwn_y - (0.5 * geo1_depth) - (0.5 * geo2_depth)
+    if y_gap_btwn_box > distance:
+        return False   # overlap impossible
+
+    geo1_height = geometry_1.max.z - geometry_1.min.z
+    geo2_height = geometry_2.max.z - geometry_2.min.z
+    dist_btwn_z = abs(geometry_1.center.z - geometry_2.center.z)
+    z_gap_btwn_box = dist_btwn_z - (0.5 * geo1_height) - (0.5 * geo2_height)
+    if z_gap_btwn_box > distance:
+        return False   # overlap impossible
+
+    return True  # overlap exists
