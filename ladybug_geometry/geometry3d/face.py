@@ -2459,7 +2459,7 @@ class Face3D(Base2DIn3D):
         all_poly = [faces[0].boundary_polygon2d]
         if faces[0].has_holes:
             for hole in faces[0].hole_polygon2d:
-                all_poly.extend(hole)
+                all_poly.append(hole)
                 hole_decoder.append(True)
         for of in faces[1:]:
             of_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in of.boundary))
@@ -2468,7 +2468,7 @@ class Face3D(Base2DIn3D):
             if of.has_holes:
                 for hole in of.holes:
                     h_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in hole))
-                    all_poly.extend(h_poly)
+                    all_poly.append(h_poly)
                     hole_decoder.append(True)
         # snap the polygons to one another to avoid tolerance issues
         try:
