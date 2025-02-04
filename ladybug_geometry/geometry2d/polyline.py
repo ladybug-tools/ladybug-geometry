@@ -362,6 +362,8 @@ class Polyline2D(Base2DIn2D):
             joined segments.
         """
         # group the vertices that make up polylines
+        if len(segments) <= 1:
+            return segments
         grouped_verts = _group_vertices(segments, tolerance)
 
         # create the Polyline2D and LineSegment2D objects
