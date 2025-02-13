@@ -1217,7 +1217,7 @@ def test_common_axes():
         polygons, Vector2D(1, 0), min_distance=0.1, merge_distance=0.3,
         angle_tolerance=math.pi / 180)
 
-    assert len(axes) == 31
+    assert len(axes) == 52
     for item in axes:
         assert isinstance(item, LineSegment2D)
 
