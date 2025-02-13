@@ -2188,7 +2188,8 @@ class Polygon2D(Base2DIn2D):
         return closed_polys
 
     @staticmethod
-    def common_axes(polygons, direction, min_distance, merge_distance, angle_tolerance):
+    def common_axes(polygons, direction, min_distance, merge_distance, angle_tolerance,
+                    filter_tolerance=0):
         """Get LineSegment2Ds for the most common axes across a set of Polygon2Ds.
 
         This is often useful as a step before aligning a set of polygons to these
@@ -2212,6 +2213,11 @@ class Polygon2D(Base2DIn2D):
             angle_tolerance: The max angle difference in radians that the polygon
                 segments direction can differ from the input direction before the
                 segments are not factored into this calculation of common axes.
+            filter_tolerance: A number that can be used to filter out axes in the
+                result, which are already perfectly aligned with the input polygon
+                segments. Setting this to zero wil guarantee that no axes are
+                filtered out no matter how close they are to the existing polygon
+                segments. (Default: 0).
 
             Returns:
                 A tuple with two elements.
@@ -2281,27 +2287,49 @@ class Polygon2D(Base2DIn2D):
             return [], []  # none of the generated axes are relevant
 
         # group the axes by proximity
-        last_ax = rel_axes[0]
+        grp_base_axis = last_ax = rel_axes[0]
         axes_groups = [[last_ax]]
         group_values = [[axes_value[0]]]
         for axis, val in zip(rel_axes[1:], axes_value[1:]):
-            if axis.p.distance_to_point(last_ax.p) <= merge_distance:
+            if axis.p.distance_to_point(last_ax.p) <= merge_distance and \
+                    axis.p.distance_to_point(grp_base_axis.p) <= 2 * merge_distance:
                 axes_groups[-1].append(axis)
                 group_values[-1].append(val)
             else:  # start a new group
                 axes_groups.append([axis])
                 group_values.append([val])
+                grp_base_axis = axis
             last_ax = axis
 
         # average the line segments that are within the merge_distance of one another
-        axis_values = [max(val) for val in group_values]
-        common_axes = []
+        average_values = [max(val) for val in group_values]
+        average_axes = []
         for ax_group, grp_vals in zip(axes_groups, group_values):
             if len(ax_group) == 1:
-                common_axes.append(ax_group[0])
+                average_axes.append(ax_group[0])
             else:
                 index_max = max(range(len(grp_vals)), key=grp_vals.__getitem__)
-                common_axes.append(ax_group[index_max])
+                average_axes.append(ax_group[index_max])
+
+        # snap common axes to the nearest polygon segment
+        common_axes, axis_values = [], []
+        for com_ax, ax_val in zip(average_axes, average_values):
+            dists, m_vecs = [], []
+            for pt in mid_pts:
+                close_pt = closest_point2d_on_line2d_infinite(pt, com_ax)
+                dist = close_pt.distance_to_point(pt)
+                if dist <= merge_distance:
+                    dists.append(dist)
+                    m_vecs.append(pt - close_pt)
+            if filter_tolerance > 0:  # evaluate whether axis is already aligned
+                if max(dists) - min(dists) <= filter_tolerance:
+                    continue  # axis is already aligned
+            sort_vecs = [v for _, v in sorted(zip(dists, m_vecs),
+                                              key=lambda pair: pair[0])]
+            m_vec = sort_vecs[0]
+            common_axes.append(com_ax.move(m_vec))
+            axis_values.append(ax_val)
+
         return common_axes, axis_values
 
     @staticmethod
