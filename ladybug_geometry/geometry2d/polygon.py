@@ -2321,14 +2321,26 @@ class Polygon2D(Base2DIn2D):
                 if dist <= merge_distance:
                     dists.append(dist)
                     m_vecs.append(pt - close_pt)
-            if filter_tolerance > 0:  # evaluate whether axis is already aligned
-                if max(dists) - min(dists) <= filter_tolerance:
-                    continue  # axis is already aligned
             sort_vecs = [v for _, v in sorted(zip(dists, m_vecs),
                                               key=lambda pair: pair[0])]
             m_vec = sort_vecs[0]
             common_axes.append(com_ax.move(m_vec))
             axis_values.append(ax_val)
+
+        # filter out axes that are already aligned
+        if filter_tolerance > 0:  # evaluate whether axis is already aligned
+            final_axes, final_values = [], []
+            for com_ax, ax_val in zip(common_axes, axis_values):
+                dists = []
+                for pt in mid_pts:
+                    close_pt = closest_point2d_on_line2d_infinite(pt, com_ax)
+                    dist = close_pt.distance_to_point(pt)
+                    if dist <= merge_distance:
+                        dists.append(dist)
+                if max(dists) - min(dists) > filter_tolerance:
+                    final_axes.append(com_ax)
+                    final_values.append(ax_val)
+            common_axes, axis_values = final_axes, final_values
 
         return common_axes, axis_values
 
