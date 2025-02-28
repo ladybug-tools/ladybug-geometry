@@ -791,6 +791,33 @@ def test_remove_colinear_vertices_custom():
     assert len(face_geo.remove_colinear_vertices(0.0001).vertices) == 16
 
 
+def test_separate_boundary_and_holes():
+    """Test the separate_boundary_and_holes."""
+    bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
+    hole_pts_1 = [Point3D(1, 1), Point3D(1.5, 1), Point3D(1.5, 1.5), Point3D(1, 1.5)]
+    hole_pts_2 = [Point3D(2, 2), Point3D(3, 2), Point3D(3, 3), Point3D(2, 3)]
+    face_1 = Face3D(bound_pts)
+    face_2 = Face3D(Face3D(bound_pts, None, [hole_pts_2]).vertices)
+    face_3 = Face3D(Face3D(bound_pts, None, [hole_pts_1, hole_pts_2]).vertices)
+
+    clean_face_1 = face_1.separate_boundary_and_holes(0.01)
+    assert len(clean_face_1.boundary) == 4
+    assert not clean_face_1.has_holes
+
+    clean_face_2 = face_2.separate_boundary_and_holes(0.01)
+    assert len(clean_face_2.boundary) == 4
+    assert len(clean_face_2.holes) == 1
+    assert len(clean_face_2.holes[0]) == 4
+    assert clean_face_2.area == face_2.area
+
+    clean_face_3 = face_3.separate_boundary_and_holes(0.01)
+    assert len(clean_face_3.boundary) == 4
+    assert len(clean_face_3.holes) == 2
+    assert len(clean_face_3.holes[0]) == 4
+    assert len(clean_face_3.holes[1]) == 4
+    assert clean_face_3.area == face_3.area
+
+
 def test_triangulated_mesh_and_centroid():
     """Test the triangulation properties of Face3D."""
     pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))

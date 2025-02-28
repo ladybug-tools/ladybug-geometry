@@ -1002,6 +1002,78 @@ class Face3D(Base2DIn3D):
         _new_face = Face3D(_boundary, self.plane, _holes, enforce_right_hand=False)
         return _new_face
 
+    def separate_boundary_and_holes(self, tolerance):
+        """Get a version of this face with boundaries and holes separated.
+
+        This method is intended for the case that a Face3D has been imported from
+        a format where everything was collapsed into a single list of vertices.
+        As such, the Face3D.boundary includes both the real shape boundary and the
+        holes by winding inward to cut them out.
+
+        Args:
+            tolerance: The minimum distance between vertices at which point they are
+                considered equivalent.
+        """
+        # first check the holes are not already separated
+        if self.has_holes:
+            return self
+        # loop through the vertices and identify pairs of duplicate vertices
+        boundary, all_holes = self.boundary, []
+        iter_count, max_holes = 0, int(len(boundary) / 3)
+        while iter_count < max_holes:
+            boundary, hole = self._separate_inner_most_hole(boundary, tolerance)
+            if hole is None:
+                break
+            else:
+                all_holes.append(hole)
+            iter_count += 1
+        return Face3D(boundary, self.plane, all_holes)
+
+    @staticmethod
+    def _separate_inner_most_hole(vertices, tolerance):
+        """Separate the inner-most hole from a list of flat vertices:
+
+        Args:
+            vertices: A flat list of Point3D.
+            tolerance: The minimum distance between vertices at which point they are
+                considered equivalent.
+
+        Returns:
+             A tuple with two elements
+
+            -   remain_vertices: A list of Point3D with the inner-most hole
+                separated from it.
+
+            -   hole: A list of Point3D for the inner-most hole. Will be None
+                if the input vertices had no hole.
+        """
+        # loop through the vertices and identify pairs of duplicate vertices
+        dup_pairs, all_dups = [], set()
+        for i, pt in enumerate(vertices):
+            if i in all_dups:
+                continue
+            if i + 2 >= len(vertices):
+                break
+            for j in range(i + 2, len(vertices)):
+                if pt.is_equivalent(vertices[j], tolerance):
+                    dup_pairs.append((i, j))
+                    all_dups.add(i)
+                    all_dups.add(j)
+                    break
+        if len(dup_pairs) == 0:
+            return vertices, None  # no holes were detected
+        # find the duplicate pair with no other duplicates between them (inner most)
+        for pair_low, pair_high in dup_pairs:
+            for btw_pt_i in range(pair_low + 1, pair_high):
+                if btw_pt_i in all_dups:
+                    break  # not an inner-most hole
+            else:
+                break  # the current pair is an inner-most one
+        # separate the inner-most hole from the boundary
+        hole = vertices[pair_low:pair_high]
+        remain_vertices = vertices[:pair_low] + vertices[pair_high + 2:]
+        return remain_vertices, hole
+
     def flip(self):
         """Get a face with a flipped direction from this one."""
         _new_face = Face3D(reversed(self.vertices), self.plane.flip(),
