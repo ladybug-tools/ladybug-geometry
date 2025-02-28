@@ -299,7 +299,7 @@ class Mesh2D(MeshBase):
     @property
     def face_edges(self):
         """List of polylines with one Polyline2D for each face.
-        
+
         This is faster to compute compared to the edges and results in effectively
         the same type of wireframe visualization.
         """

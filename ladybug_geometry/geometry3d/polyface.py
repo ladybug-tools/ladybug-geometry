@@ -247,15 +247,17 @@ class Polyface3D(Base2DIn3D):
         if face.has_holes:
             _st_i = len(verts)
             for i, hole in enumerate(face.hole_polygon2d):
-                hole_verts = face._holes[i] if hole.is_clockwise else \
-                    tuple(reversed(face._holes[i]))
+                is_cc = hole.is_clockwise
+                h_pts = face._holes[i] if is_cc else tuple(reversed(face._holes[i]))
                 verts_2, face_ind_extru_2, edge_indices_2 = \
-                    Polyface3D._verts_faces_edges_from_boundary(
-                        hole_verts, extru_vec, _st_i)
+                    Polyface3D._verts_faces_edges_from_boundary(h_pts, extru_vec, _st_i)
+                if not is_cc:
+                    face_ind_extru_2 = list(reversed(face_ind_extru_2))
+                    face_ind_extru_2.append(face_ind_extru_2.pop(0))
                 verts.extend(verts_2)
                 face_ind_extru.extend(face_ind_extru_2)
                 edge_indices.extend(edge_indices_2)
-                _st_i += len(hole_verts * 2)
+                _st_i += len(h_pts * 2)
         face_ind_extru = [[fc] for fc in face_ind_extru]
         # compute the final faces (accounting for top and bottom)
         if not face.has_holes:
