@@ -2276,10 +2276,10 @@ class Polygon2D(Base2DIn2D):
         rel_axes, axes_value = [], []
         for axis in all_axes:
             axis_val = 0
-            for pt in mid_pts:
+            for pt, seg in zip(mid_pts, rel_segs):
                 close_pt = closest_point2d_on_line2d_infinite(pt, axis)
                 if close_pt.distance_to_point(pt) <= min_distance:
-                    axis_val += 1
+                    axis_val += seg.length
             if axis_val != 0:
                 rel_axes.append(axis)
                 axes_value.append(axis_val)
