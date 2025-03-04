@@ -1,0 +1,7 @@
+ladybug\_geometry.intersection2d module
+=======================================
+
+.. automodule:: ladybug_geometry.intersection2d
+   :members:
+   :undoc-members:
+   :show-inheritance:
