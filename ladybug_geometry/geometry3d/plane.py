@@ -333,7 +333,7 @@ class Plane(object):
         """Project a point onto this Plane given a certain projection direction.
 
         Args:
-            point: A Point3D to be projected onto the plane
+            point: A Point3D to be projected onto the plane.
             projection_direction: A Line3D or Ray3D object to set the direction
                 of projection. If None, this Plane's normal will be
                 used. (Default: None).
@@ -345,6 +345,25 @@ class Plane(object):
         int_ray = Ray3D(point, self.n) if projection_direction is None \
             else Ray3D(point, projection_direction)
         return intersect_line3d_plane_infinite(int_ray, self)
+
+    def project_points(self, points, projection_direction=None):
+        """Project an array of points onto this Plane.
+
+        Args:
+            point: A list of Point3Ds to be projected onto the plane.
+            projection_direction: A Line3D or Ray3D object to set the direction
+                of projection. If None, this Plane's normal will be
+                used. (Default: None).
+
+        Returns:
+            A list of Point3Ds for the projected points. This list will include
+            Nones if the projection_direction is parallel to the plane.
+        """
+        proj_points = []
+        p_dir = self.n if projection_direction is None else projection_direction
+        for pt in points:
+            proj_points.append(intersect_line3d_plane_infinite(Ray3D(pt, p_dir), self))
+        return proj_points
 
     def intersect_line_ray(self, line_ray):
         """Get the intersection between this plane and the input Line3D or Ray3D.
