@@ -3298,9 +3298,9 @@ class Face3D(Base2DIn3D):
         return verts3d
 
     def __copy__(self):
-        _new_face = Face3D(self.vertices, self.plane)
+        _new_face = Face3D(self.boundary, self.plane, self.holes,
+                           enforce_right_hand=False)
         self._transfer_properties(_new_face)
-        _new_face._holes = self._holes
         _new_face._polygon2d = self._polygon2d
         _new_face._mesh2d = self._mesh2d
         _new_face._mesh3d = self._mesh3d
