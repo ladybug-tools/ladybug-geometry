@@ -232,7 +232,7 @@ class Mesh3D(MeshBase):
     @property
     def face_edges(self):
         """List of polylines with one Polyline3D for each face.
-        
+
         This is faster to compute compared to the edges and results in effectively
         the same type of wireframe visualization.
         """
@@ -246,7 +246,7 @@ class Mesh3D(MeshBase):
     @property
     def edges(self):
         """"Tuple of all edges in this Mesh3D as LineSegment3D objects.
-        
+
         Note that this method will return only the unique edges in the mesh without
         any duplicates. This is sometimes desirable but can take a lot of time
         to compute for large meshes. For a faster property, use face_edges."""
