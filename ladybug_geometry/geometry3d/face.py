@@ -1290,7 +1290,7 @@ class Face3D(Base2DIn3D):
                 pt_3ds = [prim_pl.xy_to_xyz(node.pt) for node in cycle]
                 new_face = Face3D(pt_3ds, plane=prim_pl)
                 try:
-                    new_face = new_face.remove_colinear_vertices(tolerance)
+                    new_face = new_face.remove_duplicate_vertices(tolerance)
                     split_faces.append(new_face)
                 except AssertionError:  # degenerate geometry to ignore
                     pass
@@ -1355,7 +1355,7 @@ class Face3D(Base2DIn3D):
                 pt_3ds = [prim_pl.xy_to_xyz(node.pt) for node in cycle]
                 new_face = Face3D(pt_3ds, plane=prim_pl)
                 try:
-                    new_face = new_face.remove_colinear_vertices(tolerance)
+                    new_face = new_face.remove_duplicate_vertices(tolerance)
                     split_faces.append(new_face)
                 except AssertionError:  # degenerate geometry to ignore
                     pass
@@ -1422,7 +1422,7 @@ class Face3D(Base2DIn3D):
                 pt_3ds = [prim_pl.xy_to_xyz(node.pt) for node in cycle]
                 new_face = Face3D(pt_3ds, plane=prim_pl)
                 try:
-                    new_face = new_face.remove_colinear_vertices(tolerance)
+                    new_face = new_face.remove_duplicate_vertices(tolerance)
                     split_faces.append(new_face)
                 except AssertionError:  # degenerate geometry to ignore
                     pass
