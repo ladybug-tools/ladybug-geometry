@@ -658,9 +658,27 @@ class Polygon2D(Base2DIn2D):
             tolerance: The minimum difference between vertices before they are
                 considered co-located.
         """
-        # loop over the segments and group the vertices by intersection points
+        # check that the shape is self-intersecting
+        if not self.is_self_intersecting:
+            return [self]  # not a self-intersecting shape
+
+        # group vertices by intersection until a match is found
+        test_poly = self
+        for i in range(len(self)):
+            split_polygons = self._self_intersect(test_poly, tolerance)
+            if len(split_polygons) != 1:
+                break  # we have split things successfully
+            else:  # rotate the vertices and try to split again
+                points = list(test_poly.vertices)
+                points.insert(0, points.pop(-1))
+                test_poly = Polygon2D(points)
+        return split_polygons
+
+    @staticmethod
+    def _self_intersect(polygon, tolerance):
+        """Loop over polygon segments and split through self intersection."""
         intersect_groups = [[]]
-        _segs = self.segments
+        _segs = polygon.segments
         seg_count = len(_segs)
         for i, _s in enumerate(_segs):
             # loop over the other segments and find any intersection points
@@ -693,8 +711,6 @@ class Polygon2D(Base2DIn2D):
                 intersect_groups.append([_s.p2])
 
         # process the intersect groups into polygon objects
-        if len(intersect_groups) == 1:
-            return [self]  # not a self-intersecting shape
         split_polygons = []
         poly_count = int(len(intersect_groups) / 2)
         if len(intersect_groups[poly_count]) == 1:  # rare case of start at intersect
@@ -706,7 +722,7 @@ class Polygon2D(Base2DIn2D):
                             clean_poly = Polygon2D(verts_list)
                             clean_poly = clean_poly.remove_duplicate_vertices(tolerance)
                             split_polygons.append(clean_poly)
-                        except AssertionError:  # degenerate polygon that should not be added
+                        except AssertionError:  # degenerate polygon to avoid
                             pass
         else:  # typical case of intersection in the middle
             for i in range(poly_count):
@@ -716,14 +732,14 @@ class Polygon2D(Base2DIn2D):
                         clean_poly = Polygon2D(verts_list)
                         clean_poly = clean_poly.remove_duplicate_vertices(tolerance)
                         split_polygons.append(clean_poly)
-                    except AssertionError:  # degenerate polygon that should not be added
+                    except AssertionError:  # degenerate polygon to avoid
                         pass
             final_verts = intersect_groups[i + 1]
             try:
                 clean_poly = Polygon2D(final_verts)
                 clean_poly = clean_poly.remove_duplicate_vertices(tolerance)
                 split_polygons.append(clean_poly)
-            except AssertionError:  # degenerate polygon that should not be added
+            except AssertionError:  # degenerate polygon to avoid
                 pass
         return split_polygons
 
