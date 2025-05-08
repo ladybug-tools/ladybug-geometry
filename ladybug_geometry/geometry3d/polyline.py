@@ -136,11 +136,21 @@ class Polyline3D(Base2DIn3D):
                 before it is considered colinear.
         """
         if len(self.vertices) == 3:
-            return self  # Polyline3D cannot have fewer than 3 vertices
+            return self  # Polyline3D cannot have fewer than 3 vertices 
         new_vertices = [self.vertices[0]]  # first vertex is always ok
+        skip = 0  # track the number of vertices being skipped/removed
+        # loop through vertices and remove all cases of colinear verts
         for i, _v in enumerate(self.vertices[1:-1]):
-            if (self[i] - _v).cross(self[i + 2] - _v).magnitude >= tolerance:
+            _v2, _v1 = self[i - skip], self[i + 2]
+            _a = (_v2 - _v).cross(_v1 - _v).magnitude
+            b_dist = _v1.distance_to_point(_v2)
+            b_dist = tolerance if b_dist < tolerance else b_dist
+            tri_tol = (b_dist * tolerance) / 2  # area of triangle with tolerance height
+            if abs(_a) >= tri_tol:  # triangle area > tolerance; not colinear
                 new_vertices.append(_v)
+                skip = 0
+            else:
+                skip += 1
         new_vertices.append(self[-1])  # last vertex is always ok
         _new_poly = Polyline3D(new_vertices)
         self._transfer_properties(_new_poly)

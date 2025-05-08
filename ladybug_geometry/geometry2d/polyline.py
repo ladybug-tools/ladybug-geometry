@@ -153,9 +153,12 @@ class Polyline2D(Base2DIn2D):
         skip = 0  # track the number of vertices being skipped/removed
         # loop through vertices and remove all cases of colinear verts
         for i, _v in enumerate(self.vertices[1:-1]):
-            _a = self[i - skip].determinant(_v) + _v.determinant(self[i + 2]) + \
-                self[i + 2].determinant(self[i - skip])
-            if abs(_a) >= tolerance:
+            _v2, _v1 = self[i - skip], self[i + 2]
+            _a = _v2.determinant(_v) + _v.determinant(_v1) + _v1.determinant(_v2)
+            b_dist = _v1.distance_to_point(_v2)
+            b_dist = tolerance if b_dist < tolerance else b_dist
+            tri_tol = (b_dist * tolerance) / 2  # area of triangle with tolerance height
+            if abs(_a) >= tri_tol:  # triangle area > tolerance; not colinear
                 new_vertices.append(_v)
                 skip = 0
             else:
