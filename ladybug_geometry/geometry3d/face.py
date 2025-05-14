@@ -1477,6 +1477,53 @@ class Face3D(Base2DIn3D):
                 return _int_seg3d
         return None
 
+    def intersect_face(self, face, tolerance):
+        """Get the intersection between this face and another input Face3D.
+
+        Args:
+            face: A Face3D object for which intersection will be computed.
+            tolerance: The maximum difference between point values for them to be
+                considered distinct from one another.
+
+        Returns:
+            List of LineSegment3D objects for the intersection.
+            Will be None if no intersection exists.
+        """
+        # get the intersection of this face with the other plane
+        self_int = self.intersect_plane(face.plane)
+        if self_int is None:
+            return None
+        # get the intersection of the other face with this face's plane
+        other_int = face.intersect_plane(self.plane)
+        if other_int is None:
+            return None
+        # determine the overlapping parts of the two intersections
+        overlap_segs = []
+        for seg1 in self_int:
+            s1p1, s1p2 = seg1.p1, seg1.p2
+            for seg2 in other_int:
+                s2p1, s2p2 = seg2.p1, seg2.p2
+                use_s1p1 = seg2.distance_to_point(s1p1) <= tolerance
+                use_s1p2 = seg2.distance_to_point(s1p2) <= tolerance
+                use_s2p1 = seg1.distance_to_point(s2p1) <= tolerance
+                use_s2p2 = seg1.distance_to_point(s2p2) <= tolerance
+                if use_s1p1 and use_s1p2:
+                    overlap_segs.append(seg1)
+                elif use_s2p1 and use_s2p2:
+                    overlap_segs.append(seg2)
+                elif use_s1p1 and use_s2p1:
+                    overlap_segs.append(LineSegment3D.from_end_points(s1p1, s2p1))
+                elif use_s1p1 and use_s2p2:
+                    overlap_segs.append(LineSegment3D.from_end_points(s1p1, s2p2))
+                elif use_s1p2 and use_s2p1:
+                    overlap_segs.append(LineSegment3D.from_end_points(s1p2, s2p1))
+                elif use_s1p2 and use_s2p2:
+                    overlap_segs.append(LineSegment3D.from_end_points(s1p2, s2p2))
+        overlap_segs = [seg for seg in overlap_segs if seg.length > tolerance]
+        if len(overlap_segs) == 0:
+            return None
+        return overlap_segs
+
     def project_point(self, point):
         """Project a Point3D onto this face.
 
@@ -2308,9 +2355,12 @@ class Face3D(Base2DIn3D):
             # subtract the boolean polygons
             try:
                 b_poly1 = pb.difference(b_poly1, b_poly2, int_tol)
-            except Exception:
-                return [self]  # typically a tolerance issue causing failure
-
+            except Exception:  # tiny edge caused a failure; try with small tol
+                int_tol = int_tol / 100
+                try:
+                    b_poly1 = pb.difference(b_poly1, b_poly2, int_tol)
+                except Exception:
+                    return [self]  # the edge is just too tiny
         # rebuild the Face3D from the result of the subtraction
         return Face3D._from_bool_poly(b_poly1, prim_pl, tolerance)
 
@@ -2362,8 +2412,12 @@ class Face3D(Base2DIn3D):
         int_tol = tolerance / 1000
         try:
             poly_result = pb.union(b_poly1, b_poly2, int_tol)
-        except Exception:
-            return None  # typically a tolerance issue causing failure
+        except Exception:  # tiny edge caused a failure; try with small tol
+            int_tol = int_tol / 100
+            try:
+                poly_result = pb.union(b_poly1, b_poly2, int_tol)
+            except Exception:
+                return None  # the edge is just too tiny
         # rebuild the Face3D from the results and return them
         union_faces = Face3D._from_bool_poly(poly_result, prim_pl, tolerance)
         return union_faces[0]
@@ -2419,8 +2473,12 @@ class Face3D(Base2DIn3D):
         int_tol = tolerance / 1000
         try:
             poly_result = pb.intersect(b_poly1, b_poly2, int_tol)
-        except Exception:
-            return None  # typically a tolerance issue causing failure
+        except Exception:  # tiny edge caused a failure; try with small tol
+            int_tol = int_tol / 100
+            try:
+                poly_result = pb.intersect(b_poly1, b_poly2, int_tol)
+            except Exception:
+                return None  # the edge is just too tiny
         # rebuild the Face3D from the results and return them
         int_faces = Face3D._from_bool_poly(poly_result, prim_pl, tolerance)
         return int_faces
@@ -2491,8 +2549,13 @@ class Face3D(Base2DIn3D):
         int_tol = tolerance / 1000
         try:
             int_result, poly1_result, poly2_result = pb.split(b_poly1, b_poly2, int_tol)
-        except Exception:
-            return [face1], [face2]  # typically a tolerance issue causing failure
+        except Exception:  # tiny edge caused a failure; try one more time with small tol
+            int_tol = int_tol / 100
+            try:
+                int_result, poly1_result, poly2_result = \
+                    pb.split(b_poly1, b_poly2, int_tol)
+            except Exception:
+                return [face1], [face2]  # the edge is just too tiny
         # rebuild the Face3D from the results and return them
         int_faces = Face3D._from_bool_poly(int_result, prim_pl, tolerance)
         poly1_faces = Face3D._from_bool_poly(poly1_result, prim_pl, tolerance)
@@ -2561,11 +2624,15 @@ class Face3D(Base2DIn3D):
                 prev_poly.append(bool_pts)
         bool_polys.append(pb.BooleanPolygon(prev_poly))
         # union the boolean polygons with one another
-        int_tol = tolerance / 100
+        int_tol = tolerance / 1000
         try:
             poly_result = pb.union_all(bool_polys, int_tol)
-        except Exception:
-            return None  # typically a tolerance issue causing failure
+        except Exception:  # tiny edge caused a failure; try with small tol
+            int_tol = int_tol / 100
+            try:
+                poly_result = pb.union_all(bool_polys, int_tol)
+            except Exception:
+                return None  # the edge is just too tiny
         # rebuild the Face3D from the results and return them
         union_faces = Face3D._from_bool_poly(poly_result, prim_pl, tolerance)
         return union_faces
