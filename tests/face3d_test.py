@@ -1350,6 +1350,19 @@ def test_intersect_plane():
     assert len(face.intersect_plane(plane_5)) == 2
 
 
+def test_intersect_face():
+    """Test the Face3D intersect_face method."""
+    pts1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
+    pts2 = (Point3D(1, -1, 0), Point3D(1, -1, 3), Point3D(1, 1, 3), Point3D(1, 1, 0))
+    face1 = Face3D(pts1)
+    face2 = Face3D(pts2)
+
+    intersect = face1.intersect_face(face2, 0.01)
+    assert len(intersect) == 1
+    int_line = intersect[0]
+    assert int_line.length == pytest.approx(1.0, rel=1e-3)
+
+
 def test_project_point():
     """Test the Face3D project_point method."""
     pts = (Point3D(0, 0), Point3D(2, 0), Point3D(2, 1), Point3D(1, 1),
