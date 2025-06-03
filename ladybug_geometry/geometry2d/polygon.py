@@ -624,7 +624,7 @@ class Polygon2D(Base2DIn2D):
         for i, _v in enumerate(self.vertices):
             _v2, _v1 = self[i - 2 - skip], self[i - 1]
             _a = _v2.determinant(_v1) + _v1.determinant(_v) + _v.determinant(_v2)
-            b_dist = _v.distance_to_point(_v2)
+            b_dist = max(_v.distance_to_point(_v2), _v.distance_to_point(_v1))
             b_dist = tolerance if b_dist < tolerance else b_dist
             tri_tol = (b_dist * tolerance) / 2  # area of triangle with tolerance height
             if abs(_a) >= tri_tol:  # triangle area > tolerance; not colinear
@@ -641,7 +641,7 @@ class Polygon2D(Base2DIn2D):
                 'There must be at least 3 vertices for a Polygon2D.'
             _v2, _v1, _v = self[-2 - skip], self[-1], self[first_skip]
             _a = _v2.determinant(_v1) + _v1.determinant(_v) + _v.determinant(_v2)
-            b_dist = _v.distance_to_point(_v2)
+            b_dist = max(_v.distance_to_point(_v2), _v.distance_to_point(_v1))
             b_dist = tolerance if b_dist < tolerance else b_dist
             tri_tol = (b_dist * tolerance) / 2  # area of triangle with tolerance height
             if abs(_a) >= tri_tol:  # triangle area > area tolerance; not colinear

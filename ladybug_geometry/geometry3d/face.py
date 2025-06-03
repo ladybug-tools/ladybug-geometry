@@ -3037,7 +3037,7 @@ class Face3D(Base2DIn3D):
         for i, _v in enumerate(pts_2d):
             _v2, _v1 = pts_2d[i - 2 - skip], pts_2d[i - 1]
             _a = _v2.determinant(_v1) + _v1.determinant(_v) + _v.determinant(_v2)
-            b_dist = _v.distance_to_point(_v2)
+            b_dist = max(_v.distance_to_point(_v2), _v.distance_to_point(_v1))
             b_dist = tolerance if b_dist < tolerance else b_dist
             tri_tol = (b_dist * tolerance) / 2  # area of triangle with tolerance height
             if abs(_a) >= tri_tol:  # triangle area > area tolerance; not colinear
@@ -3054,7 +3054,7 @@ class Face3D(Base2DIn3D):
                 'There must be at least 3 vertices for a Face3D.'
             _v2, _v1, _v = pts_2d[-2 - skip], pts_2d[-1], pts_2d[first_skip]
             _a = _v2.determinant(_v1) + _v1.determinant(_v) + _v.determinant(_v2)
-            b_dist = _v.distance_to_point(_v2)
+            b_dist = max(_v.distance_to_point(_v2), _v.distance_to_point(_v1))
             b_dist = tolerance if b_dist < tolerance else b_dist
             tri_tol = (b_dist * tolerance) / 2  # area of triangle with tolerance height
             if abs(_a) >= tri_tol:  # triangle area > area tolerance; not colinear
