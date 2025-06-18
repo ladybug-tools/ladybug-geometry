@@ -1432,6 +1432,140 @@ class Face3D(Base2DIn3D):
             return split_faces
         return Face3D.merge_faces_to_holes(split_faces, tolerance)
 
+    def split_with_thick_line(self, line, thickness, tolerance):
+        """Split this face with a thickened LineSegment3D creating a gap in the geometry.
+
+        If the input line is found to not exist in the plane of this Face3D
+        or it does not intersect this Face3D, None will be returned.
+
+        Args:
+            line: A LineSegment3D object in the plane of this Face3D, which will
+                be thickened and then used to split it.
+            thickness: A number for the thickness to be applied to the line before
+                it is used to split the Face3D. The input line will essentially
+                be offset half of this distance in both directions before it is
+                used to split this Face3D.
+            tolerance: The maximum difference between point values for them to be
+                considered distinct from one another.
+
+        Returns:
+            A list of Face3D for the result of splitting this Face3D with the
+            input line. Will be None if the line is not in the plane of the
+            Face3D or if it does not intersect the Face3D.
+        """
+        # first check that the line is in the plane of the Face3D
+        if self.plane.distance_to_point(line.p1) > tolerance or \
+                self.plane.distance_to_point(line.p1) > tolerance:
+            return None
+        # extend the endpoints of the line so that tolerance will split it
+        tvc = line.v.normalize() * tolerance
+        line = LineSegment3D.from_end_points(line.p1.move(-tvc), line.p2.move(tvc))
+
+        # change the line and face to be in 2D and check that it can split the Face
+        prim_pl = self.plane
+        bnd_poly = self.boundary_polygon2d
+        line_2d = LineSegment2D.from_end_points(
+            prim_pl.xyz_to_xy(line.p1), prim_pl.xyz_to_xy(line.p2))
+        if not Polygon2D.overlapping_bounding_rect(bnd_poly, line_2d, tolerance):
+            return None
+
+        # get BooleanPolygons of the polygon and the line segment
+        offset_dist = thickness / 2
+        move_vec_1 = line_2d.v.rotate(math.pi / 2).normalize() * offset_dist
+        move_vec_2 = -move_vec_1
+        line_verts = (
+            line_2d.p1.move(move_vec_1), line_2d.p2.move(move_vec_1),
+            line_2d.p2.move(move_vec_2), line_2d.p1.move(move_vec_2))
+        line_poly = [(pb.BooleanPoint(pt.x, pt.y) for pt in line_verts)]
+        face_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in bnd_poly.vertices)]
+        if self.has_holes:
+            for hole in self.hole_polygon2d:
+                face_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+        b_poly1 = pb.BooleanPolygon(face_polys)
+        b_poly2 = pb.BooleanPolygon(line_poly)
+
+        # split the two boolean polygons with one another
+        int_tol = tolerance / 1000
+        try:
+            poly1_result = pb.difference(b_poly1, b_poly2, int_tol)
+        except Exception:
+            int_tol = int_tol / 100
+            try:
+                poly1_result = pb.difference(b_poly1, b_poly2, int_tol)
+            except Exception:
+                return None  # the edge is just too tiny
+
+        # rebuild the Face3D from the results and return them
+        return Face3D._from_bool_poly(poly1_result, prim_pl, tolerance)
+
+    def split_with_thick_polyline(self, polyline, thickness, tolerance):
+        """Split this face with a thickened Polyline3D creating a gap in the geometry.
+
+        If the input polyline is found to not exist in the plane of this Face3D
+        or it does not intersect this Face3D, None will be returned.
+
+        Args:
+            polyline: A Polyline3D object in the plane of this Face3D, which will
+                be used to split it into two or more pieces.
+            thickness: A number for the thickness to be applied to the polyline before
+                it is used to split the Face3D. The input polyline will essentially
+                be offset half of this distance in both directions before it is
+                used to split this Face3D.
+            tolerance: The maximum difference between point values for them to be
+                considered distinct from one another.
+
+        Returns:
+            A list of Face3D for the result of splitting this Face3D with the
+            input polyline. Will be None if the polyline is not in the plane of
+            the Face3D or if it does not intersect the Face3D.
+        """
+        # first check that the line is in the plane of the Face3D
+        for pl_pt in polyline.vertices:
+            if self.plane.distance_to_point(pl_pt) > tolerance:
+                return None
+        # extend the endpoints of the polyline so that tolerance will split it
+        st_mv = polyline[0] - polyline[1]
+        end_mv = polyline[-1] - polyline[-2]
+        st_mv = st_mv.normalize() * tolerance
+        end_mv = end_mv.normalize() * tolerance
+        new_pts = [polyline[0].move(st_mv)]
+        new_pts.extend(polyline[1:-1])
+        new_pts.append(polyline[-1].move(end_mv))
+
+        # change the polyline and face to be in 2D and check that it can split the Face
+        prim_pl = self.plane
+        bnd_poly = self.boundary_polygon2d
+        polyline_2d = Polyline2D([prim_pl.xyz_to_xy(pt) for pt in new_pts])
+        if not Polygon2D.overlapping_bounding_rect(bnd_poly, polyline_2d, tolerance):
+            return None
+
+        # get BooleanPolygons of the polygon and the polyline
+        offset_dist = thickness / 2
+        off_p_line_1 = polyline_2d.offset(offset_dist)
+        off_p_line_2 = polyline_2d.offset(-offset_dist)
+        P_line_verts = off_p_line_2.vertices + tuple(reversed(off_p_line_1.vertices))
+        line_poly = [(pb.BooleanPoint(pt.x, pt.y) for pt in P_line_verts)]
+        face_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in bnd_poly.vertices)]
+        if self.has_holes:
+            for hole in self.hole_polygon2d:
+                face_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+        b_poly1 = pb.BooleanPolygon(face_polys)
+        b_poly2 = pb.BooleanPolygon(line_poly)
+
+        # split the two boolean polygons with one another
+        int_tol = tolerance / 1000
+        try:
+            poly1_result = pb.difference(b_poly1, b_poly2, int_tol)
+        except Exception:
+            int_tol = int_tol / 100
+            try:
+                poly1_result = pb.difference(b_poly1, b_poly2, int_tol)
+            except Exception:
+                return None  # the edge is just too tiny
+
+        # rebuild the Face3D from the results and return them
+        return Face3D._from_bool_poly(poly1_result, prim_pl, tolerance)
+
     def intersect_line_ray(self, line_ray):
         """Get the intersection between this face and the input LineSegment3D or Ray3D.
 

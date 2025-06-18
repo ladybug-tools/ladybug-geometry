@@ -1303,6 +1303,45 @@ def test_split_with_lines_hashtag():
     assert sum(int_f.area for int_f in int_result) == pytest.approx(face.area, rel=1e-2)
 
 
+def test_split_with_thick_line():
+    """Test the split_with_thick_line method with a face with hole shape."""
+    f_pts = (Point3D(0, 0, 2), Point3D(4, 0, 2), Point3D(4, 4, 2), Point3D(0, 4, 2))
+    h_pts = (Point3D(1, 1, 2), Point3D(3, 1, 2), Point3D(3, 3, 2), Point3D(1, 3, 2))
+    face = Face3D(f_pts, holes=[h_pts])
+
+    l_pts = (Point3D(-1, 2, 2), Point3D(2, 2, 2))
+    line = LineSegment3D.from_end_points(*l_pts)
+    int_result = face.split_with_thick_line(line, 0.2, 0.01)
+    assert len(int_result) == 1
+    assert len(int_result[0].vertices) == 12
+
+    l_pts = (Point3D(-1, 2, 2), Point3D(5, 2, 2))
+    line = LineSegment3D.from_end_points(*l_pts)
+    int_result = face.split_with_thick_line(line, 0.2, 0.01)
+    assert len(int_result) == 2
+    assert len(int_result[0].vertices) == 8
+
+
+def test_split_with_thick_polyline():
+    """Test the split_with_thick_polyline method with a face with hole shape."""
+    f_pts = (Point3D(0, 0, 2), Point3D(4, 0, 2), Point3D(4, 4, 2), Point3D(0, 4, 2))
+    h_pts = (Point3D(1, 1, 2), Point3D(3, 1, 2), Point3D(3, 3, 2), Point3D(1, 3, 2))
+    face = Face3D(f_pts, holes=[h_pts])
+
+    l_pts = (Point3D(-1, 2, 2), Point3D(2, 2, 2), Point3D(2, 2.5, 2))
+    line = Polyline3D(l_pts)
+    int_result = face.split_with_thick_polyline(line, 0.2, 0.01)
+    assert len(int_result) == 1
+    assert len(int_result[0].vertices) == 12
+
+    l_pts = (Point3D(-1, 2, 2), Point3D(2, 2, 2), Point3D(2, 5, 2))
+    line = Polyline3D(l_pts)
+    int_result = face.split_with_thick_polyline(line, 0.2, 0.01)
+    assert len(int_result) == 2
+    assert len(int_result[0].vertices) == 10 or len(int_result[0].vertices) == 6
+    assert len(int_result[1].vertices) == 10 or len(int_result[1].vertices) == 6
+
+
 def test_intersect_line_ray():
     """Test the Face3D intersect_line_ray method."""
     pts = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 1, 2), Point3D(1, 1, 2),

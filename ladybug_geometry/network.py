@@ -615,7 +615,7 @@ class DirectedGraphNetwork(object):
                 remaining_nodes.insert(0, remaining_nodes.pop(j))
             iter_count += 1
 
-        # if we wer not able to address all nodes, see if they are all in the same loop
+        # if we were not able to address all nodes, see if they are all in the same loop
         if len(remaining_nodes) >= 3:
             current_node = remaining_nodes.pop(0)
             current_node_adj = [node.key for node in node.adj_lst]
