@@ -3337,7 +3337,7 @@ class Face3D(Base2DIn3D):
         except (AssertionError, ZeroDivisionError):  # zero area Face3D; use center
             return self.center
 
-        move_vec = move_vec * (tolerance + 0.00001)
+        move_vec = move_vec * (math.sqrt(2 * (tolerance ** 2)) + 0.00001)
         point_on_face = face.boundary[0] + move_vec
         vert2d = face.plane.xyz_to_xy(point_on_face)
         if not face.polygon2d.is_point_inside(vert2d):

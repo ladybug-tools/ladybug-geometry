@@ -172,7 +172,7 @@ class Polyface3D(Base2DIn3D):
         # get the polyface object and assign correct faces to it
         face_obj = cls(vertices, face_indices)
         if face_obj._is_solid:
-            face_obj._faces = cls.get_outward_faces(faces, 0.01)
+            face_obj._faces = cls.get_outward_faces(faces, tolerance)
         else:
             face_obj._faces = tuple(faces)
         return face_obj
@@ -806,7 +806,7 @@ class Polyface3D(Base2DIn3D):
 
         Args:
             faces: A list of Face3D objects that together form a solid.
-            tolerance: Optional tolerance for the permissable size of gap between
+            tolerance: Optional tolerance for the permissible size of gap between
                 faces at which point the faces are considered to have a single edge.
 
         Returns:
