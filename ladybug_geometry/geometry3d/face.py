@@ -1002,6 +1002,22 @@ class Face3D(Base2DIn3D):
         _new_face = Face3D(_boundary, self.plane, _holes, enforce_right_hand=False)
         return _new_face
 
+    def remove_outside_holes(self):
+        """Get a this face with any invalid holes outside of the boundary removed.
+
+        This is intended to help fix highly invalid cases.
+        """
+        if not self.has_holes:
+            return self
+        b_poly = self.boundary_polygon2d
+        new_holes = []
+        for hole, h_poly in zip(self.holes, self.hole_polygon2d):
+            if b_poly.is_polygon_inside(h_poly):
+                new_holes.append(hole)
+        _new_face = Face3D(self._boundary, self.plane, new_holes,
+                           enforce_right_hand=False)
+        return _new_face
+
     def separate_boundary_and_holes(self, tolerance):
         """Get a version of this face with boundaries and holes separated.
 
@@ -1201,6 +1217,7 @@ class Face3D(Base2DIn3D):
         for hole in holes:
             if Polygon2D._are_clockwise(hole) is bound_direction:
                 hole.reverse()
+
         # try to split the polygon neatly in two
         s_result = Polygon2D._merge_boundary_and_holes(boundary, holes, split=True)
         if s_result is not None:
@@ -1210,8 +1227,10 @@ class Face3D(Base2DIn3D):
             face_1 = Face3D(vert_1, plane=self.plane)
             face_2 = Face3D(vert_2, plane=self.plane)
             return face_1, face_2
-        # if splitting in two did not work, then triangulate it and merge them together
-        tri_mesh = self.triangulated_mesh3d
+
+        # if splitting in two did not work, then triangulate it and merge faces together
+        valid_face = self.remove_outside_holes()  # ensure all holes are inside boundary
+        tri_mesh = valid_face.triangulated_mesh3d
         tri_verts = tri_mesh.vertices
         rel_f = tri_mesh.faces[0]
         tri_faces = [[tuple(tri_verts[pt] for pt in rel_f)]]
@@ -1239,6 +1258,7 @@ class Face3D(Base2DIn3D):
                     tri_edge_sets.append(set((f[i - 1], f[i]) for i in range(3)))
                 else:
                     faces_to_test.append(f)
+
         # create Face3Ds from the triangle groups
         final_faces = []
         for tf in tri_faces:
