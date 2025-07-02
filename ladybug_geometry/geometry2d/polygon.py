@@ -1786,22 +1786,22 @@ class Polygon2D(Base2DIn2D):
         # if some groups were found, recursively merge groups together
         old_group_len = len(polygons)
         while len(grouped_polys) != old_group_len:
-            new_groups, g_to_remove = grouped_polys[:], []
+            g_to_remove, merge_found = None, False
             for i, group_1 in enumerate(grouped_polys):
+                if merge_found:
+                    break
                 try:
                     for j, group_2 in enumerate(grouped_polys[i + 1:]):
                         if Polygon2D._groups_overlap(group_1, group_2, tolerance):
-                            new_groups[i] = new_groups[i] + group_2
-                            g_to_remove.append(i + j + 1)
+                            grouped_polys[i] = grouped_polys[i] + group_2
+                            g_to_remove = i + j + 1
+                            merge_found = True
+                            break
                 except IndexError:
                     pass  # we have reached the end of the list of polygons
-            if len(g_to_remove) != 0:
-                g_to_remove = list(set(g_to_remove))
-                g_to_remove.sort()
-                for ri in reversed(g_to_remove):
-                    new_groups.pop(ri)
             old_group_len = len(grouped_polys)
-            grouped_polys = new_groups
+            if g_to_remove is not None:
+                grouped_polys.pop(g_to_remove)
         return grouped_polys
 
     @staticmethod
@@ -1853,22 +1853,22 @@ class Polygon2D(Base2DIn2D):
         # if some groups were found, recursively merge groups together
         old_group_len = len(polygons)
         while len(grouped_polys) != old_group_len:
-            new_groups, g_to_remove = grouped_polys[:], []
+            g_to_remove, merge_found = None, False
             for i, group_1 in enumerate(grouped_polys):
+                if merge_found:
+                    break
                 try:
                     for j, group_2 in enumerate(grouped_polys[i + 1:]):
                         if Polygon2D._groups_touch(group_1, group_2, tolerance):
-                            new_groups[i] = new_groups[i] + group_2
-                            g_to_remove.append(i + j + 1)
+                            grouped_polys[i] = grouped_polys[i] + group_2
+                            g_to_remove = i + j + 1
+                            merge_found = True
+                            break
                 except IndexError:
                     pass  # we have reached the end of the list of polygons
-            if len(g_to_remove) != 0:
-                g_to_remove = list(set(g_to_remove))
-                g_to_remove.sort()
-                for ri in reversed(g_to_remove):
-                    new_groups.pop(ri)
             old_group_len = len(grouped_polys)
-            grouped_polys = new_groups
+            if g_to_remove is not None:
+                grouped_polys.pop(g_to_remove)
         return grouped_polys
 
     @staticmethod
@@ -2205,7 +2205,7 @@ class Polygon2D(Base2DIn2D):
 
     @staticmethod
     def common_axes(polygons, direction, min_distance, merge_distance, angle_tolerance,
-                    filter_tolerance=0):
+                    filter_tolerance=None):
         """Get LineSegment2Ds for the most common axes across a set of Polygon2Ds.
 
         This is often useful as a step before aligning a set of polygons to these
@@ -2231,9 +2231,18 @@ class Polygon2D(Base2DIn2D):
                 segments are not factored into this calculation of common axes.
             filter_tolerance: A number that can be used to filter out axes in the
                 result, which are already perfectly aligned with the input polygon
-                segments. Setting this to zero wil guarantee that no axes are
-                filtered out no matter how close they are to the existing polygon
-                segments. (Default: 0).
+                segments. Setting this to None will yield a common axes result that
+                is not snapped to the segments of input polygons but is instead
+                formed by averaging the possible axes together based on shared
+                length with the input polygon segments (thereby getting close to
+                the center lines between the input polygons). Setting this to zero
+                will yield a result where common axes are snapped to the input
+                polygon segments, resulting in a smaller change to the input
+                polygons if the common axes are used for alignment. Setting this
+                result to a positive number (like model tolerance) will cause
+                common axes that are are already perfectly aligned with the input
+                polygon segments within the tolerance (after snapping) to be
+                filtered out. (Default: None).
 
             Returns:
                 A tuple with two elements.
@@ -2339,12 +2348,18 @@ class Polygon2D(Base2DIn2D):
                     m_vecs.append(pt - close_pt)
             sort_vecs = [v for _, v in sorted(zip(dists, m_vecs),
                                               key=lambda pair: pair[0])]
-            m_vec = sort_vecs[0]
+            if filter_tolerance is not None:  # snap to the closest segment
+                m_vec = sort_vecs[0]
+            else:  # move it to the average location
+                avg_vec = sort_vecs[0]
+                for o_vec in sort_vecs[1:]:
+                    avg_vec = avg_vec + o_vec
+                m_vec = avg_vec / len(sort_vecs)
             common_axes.append(com_ax.move(m_vec))
             axis_values.append(ax_val)
 
         # filter out axes that are already aligned
-        if filter_tolerance > 0:  # evaluate whether axis is already aligned
+        if filter_tolerance is not None and filter_tolerance > 0:
             final_axes, final_values = [], []
             for com_ax, ax_val in zip(common_axes, axis_values):
                 dists = []

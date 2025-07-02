@@ -1215,7 +1215,7 @@ def test_common_axes():
 
     axes, values = Polygon2D.common_axes(
         polygons, Vector2D(1, 0), min_distance=0.1, merge_distance=0.3,
-        angle_tolerance=math.pi / 180)
+        angle_tolerance=math.pi / 180, filter_tolerance=0)
 
     assert len(axes) == 52
     for item in axes:
