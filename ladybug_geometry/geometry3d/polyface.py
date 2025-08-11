@@ -421,7 +421,7 @@ class Polyface3D(Base2DIn3D):
         """
         return self._is_solid
 
-    def merge_overlapping_edges(self, tolerance, angle_tolerance):
+    def merge_overlapping_edges(self, tolerance, angle_tolerance=None):
         """Get this object with overlapping naked edges merged into single internal edges
 
         This can be used to determine if a polyface is truly solid since this check
@@ -447,8 +447,11 @@ class Polyface3D(Base2DIn3D):
         Args:
             tolerance: The minimum distance between a vertex and the boundary segments
                 at which point the vertex is considered colinear.
-            angle_tolerance: The max angle in radians that vertices are allowed to
-                 differ from one another in order to consider them colinear.
+            angle_tolerance: An optional maximum angle in radians to dictate
+                whether polyface edges are colinear with one another. If None,
+                the solidity of the polyface will be determined using only the
+                absolute distance of vertices to polyface edges in relation to
+                the tolerance. (Default: None).
         """
         # get naked edges
         naked_edges = list(self.naked_edges)

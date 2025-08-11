@@ -3,6 +3,7 @@
 from __future__ import division
 
 from .pointvector import Point3D, Vector3D
+from ..intersection3d import closest_point3d_on_line3d_infinite
 from ._1d import Base1DIn3D
 
 
@@ -122,6 +123,32 @@ class LineSegment3D(Base1DIn3D):
                 and end coordinates at which the line segment is considered horizontal.
         """
         return abs(self.v.x) <= tolerance and abs(self.v.y) <= tolerance
+
+    def is_colinear(self, line_ray, tolerance, angle_tolerance=None):
+        """Test whether this object is colinear to another LineSegment3D or Ray3D.
+
+        Args:
+            line_ray: Another LineSegment3D or Ray3D for which co-linearity
+                with this object will be tested.
+            tolerance: The maximum distance between the line_ray and the infinite
+                extension of this object for them to be considered colinear.
+            angle_tolerance: The max angle in radians that the direction between
+                this object and another can vary for them to be considered
+                parallel. If None, the angle tolerance will not be used to
+                evaluate co-linearity and the lines will only be considered
+                colinear if the endpoints of one line are within the tolerance
+                distance of the other line. (Default: None).
+        """
+        if angle_tolerance is not None and \
+                not self.is_parallel(line_ray, angle_tolerance):
+            return False
+        _close_pt = closest_point3d_on_line3d_infinite(self.p1, line_ray)
+        if self.p1.distance_to_point(_close_pt) >= tolerance:
+            return False
+        _close_pt = closest_point3d_on_line3d_infinite(self.p2, line_ray)
+        if self.p2.distance_to_point(_close_pt) >= tolerance:
+            return False
+        return True
 
     def flip(self):
         """Get a copy of this line segment that is flipped."""
