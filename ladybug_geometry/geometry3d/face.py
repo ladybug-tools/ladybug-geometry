@@ -2953,7 +2953,9 @@ class Face3D(Base2DIn3D):
             clean_face_polys, tolerance)
 
         # convert the boundary polygons back to Face3D
-        if len(joined_bounds) == 1:  # can be represented with a single Face3D
+        if len(joined_bounds) == 0:
+            return []
+        elif len(joined_bounds) == 1:  # can be represented with a single Face3D
             verts3d = tuple(base_plane.xy_to_xyz(_v) for _v in joined_bounds[0])
             return [Face3D(verts3d, plane=base_plane)]
         else:  # need to separate holes from distinct Face3Ds
