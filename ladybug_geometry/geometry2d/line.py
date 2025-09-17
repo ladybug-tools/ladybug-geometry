@@ -28,6 +28,7 @@ class LineSegment2D(Base1DIn2D):
         * endpoints
         * length
         * vertices
+        * segments
     """
     __slots__ = ()
 
@@ -96,6 +97,14 @@ class LineSegment2D(Base1DIn2D):
     def vertices(self):
         """Tuple of both vertices in this object."""
         return (self.p1, self.p2)
+
+    @property
+    def segments(self):
+        """Always equal to a tuple with self.
+
+        Provided here for ease of coordination with Polyline2D and Polygon2D classes.
+        """
+        return (self,)
 
     def is_equivalent(self, other, tolerance):
         """Boolean noting equivalence (within tolerance) between this line and another.

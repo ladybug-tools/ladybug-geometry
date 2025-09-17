@@ -26,6 +26,7 @@ class LineSegment3D(Base1DIn3D):
         * endpoints
         * length
         * vertices
+        * segments
     """
     __slots__ = ()
 
@@ -105,6 +106,14 @@ class LineSegment3D(Base1DIn3D):
     def vertices(self):
         """Tuple of both vertices in this object."""
         return (self.p1, self.p2)
+
+    @property
+    def segments(self):
+        """Always equal to a tuple with self.
+
+        Provided here for ease of coordination with Polyline3D and Face3D classes.
+        """
+        return (self,)
 
     def is_horizontal(self, tolerance):
         """Test whether this line segment is horizontal within a certain tolerance.
