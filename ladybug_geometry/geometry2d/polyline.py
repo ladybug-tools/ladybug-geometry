@@ -146,9 +146,13 @@ class Polyline2D(Base2DIn2D):
         Args:
             tolerance: The minimum distance that a vertex can be from a line
                 before it is considered colinear.
+
+        Returns:
+            A Polyline2D with colinear vertices removed. If the removing of colinear
+            vertices creates a shape with two or fewer vertices, then a LineSegment2D
+            will be returned (which may be zero length if all vertices in the
+            Polyline are equal to one another).
         """
-        if len(self.vertices) == 3:
-            return self  # Polyline2D cannot have fewer than 3 vertices
         new_vertices = [self.vertices[0]]  # first vertex is always ok
         skip = 0  # track the number of vertices being skipped/removed
         # loop through vertices and remove all cases of colinear verts
@@ -164,6 +168,9 @@ class Polyline2D(Base2DIn2D):
             else:
                 skip += 1
         new_vertices.append(self[-1])  # last vertex is always ok
+        # count the number of vertices to return the correct type of object
+        if len(new_vertices) == 2:
+            return LineSegment2D.from_end_points(*new_vertices)
         _new_poly = Polyline2D(new_vertices)
         self._transfer_properties(_new_poly)
         return _new_poly

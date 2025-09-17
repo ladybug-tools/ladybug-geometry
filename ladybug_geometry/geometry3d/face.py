@@ -66,6 +66,7 @@ class Face3D(Base2DIn3D):
         * triangulated_mesh3d
         * boundary_segments
         * hole_segments
+        * segments
         * normal
         * min
         * max
@@ -390,7 +391,7 @@ class Face3D(Base2DIn3D):
 
     @property
     def boundary_segments(self):
-        """Tuple of all line segments bordering the face.
+        """Tuple of the line segments on the outer boundary of the face.
 
         Note that this does not include segments for any holes in the face.
         Just the outer boundary.
@@ -421,6 +422,19 @@ class Face3D(Base2DIn3D):
                 _all_segs.append(_segs)
             self._hole_segments = tuple(tuple(_s) for _s in _all_segs)
         return self._hole_segments
+
+    @property
+    def segments(self):
+        """Tuple of all line segments bordering the face.
+
+        This includes the boundary segments followed by the hole segments.
+        """
+        if not self.has_holes:
+            return self.boundary_segments
+        all_segs = list(self.boundary_segments)
+        for hs in self.hole_segments:
+            all_segs.extend(hs)
+        return tuple(all_segs)
 
     @property
     def boundary_polygon2d(self):
