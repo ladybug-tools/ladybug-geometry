@@ -162,7 +162,14 @@ class Mesh2D(MeshBase):
                         'to use from_polygon_triangulated. Got {}.'.format(type(hole))
             _vertices, _faces = Mesh2D._ear_clipping_triangulation(
                 boundary_polygon, hole_polygons)
-            _new_mesh = cls(_vertices, _faces)
+            if len(_faces) != 0:
+                _new_mesh = cls(_vertices, _faces)
+            else:
+                if len(_vertices) >= 3:
+                    _faces = ((0, 1, 2),)
+                else:
+                    _faces = ((0, 0, 0),)
+                _new_mesh = cls(_vertices, _faces)
 
         return _new_mesh
 

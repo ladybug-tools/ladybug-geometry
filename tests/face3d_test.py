@@ -882,6 +882,37 @@ def test_triangulated_mesh_edge_case():
     assert face_geo.triangulated_mesh3d.area != 0
 
 
+def test_triangulated_mesh_zero_area():
+    """Test triangulation properties of a zero area Face3D."""
+    verts = (
+        Point3D(40, 94, 41),
+        Point3D(46, 99, 40),
+        Point3D(35, 99, 40),
+        Point3D(35, 99, 40),
+        Point3D(46, 99, 40),
+        Point3D(40, 94, 41),
+        Point3D(35, 99, 40),
+        Point3D(35, 99, 40)
+    )
+    face = Face3D(verts)
+    mesh_1 = face.triangulated_mesh3d
+
+    assert len(mesh_1.vertices) == 8
+    assert len(mesh_1.faces) == 1
+
+    verts2 = (
+        Point3D(0, 0, 0),
+        Point3D(0, 0, 0),
+        Point3D(0, 0, 0)
+    )
+
+    face2 = Face3D(verts2)
+    mesh_2 = face2.triangulated_mesh3d
+
+    assert len(mesh_2.vertices) == 3
+    assert len(mesh_2.faces) == 1
+
+
 def test_check_planar():
     """Test the check_planar method of Face3D."""
     pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
