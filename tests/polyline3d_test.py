@@ -98,6 +98,19 @@ def test_min_max_center():
     assert pline.center == Point3D(1, 1, 3)
 
 
+def test_distance_to_point():
+    """Test the Polyline3D distance_to_point method."""
+    pts = (Point3D(0, 0), Point3D(2, 2), Point3D(2, 4))
+    pline = Polyline3D(pts)
+
+    near_pt = Point3D(3, 3)
+    assert pline.distance_to_point(near_pt) == 1
+    near_pt = Point3D(2, 0)
+    assert 1 < pline.distance_to_point(near_pt) < 2
+    near_pt = Point3D(2, 5)
+    assert pline.distance_to_point(near_pt) == 1
+
+
 def test_remove_colinear_vertices():
     """Test the remove_colinear_vertices method of Polyline3D."""
     pts_1 = (Point3D(0, 0, 3), Point3D(2, 0, 3), Point3D(2, 2, 3), Point3D(0, 2, 3))
