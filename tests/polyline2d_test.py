@@ -122,6 +122,19 @@ def test_min_max_center():
     assert pline.center == Point2D(1, 1)
 
 
+def test_distance_to_point():
+    """Test the Polyline2D distance_to_point method."""
+    pts = (Point2D(0, 0), Point2D(2, 2), Point2D(2, 4))
+    pline = Polyline2D(pts)
+
+    near_pt = Point2D(3, 3)
+    assert pline.distance_to_point(near_pt) == 1
+    near_pt = Point2D(2, 0)
+    assert 1 < pline.distance_to_point(near_pt) < 2
+    near_pt = Point2D(2, 5)
+    assert pline.distance_to_point(near_pt) == 1
+
+
 def test_remove_colinear_vertices():
     """Test the remove_colinear_vertices method of Polyline2D."""
     pts_1 = (Point2D(0, 0), Point2D(2, 0), Point2D(2, 2), Point2D(0, 2))

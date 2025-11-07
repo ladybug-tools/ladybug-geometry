@@ -9,7 +9,7 @@ from ._2d import Base2DIn3D
 from .pointvector import Point3D
 from .line import LineSegment3D
 from .plane import Plane
-from ..intersection3d import intersect_line3d_plane
+from ..intersection3d import intersect_line3d_plane, closest_point3d_on_line3d
 from .._polyline import _group_vertices
 
 
@@ -127,6 +127,33 @@ class Polyline3D(Base2DIn3D):
                 are considered the same.
         """
         return self._vertices[0].is_equivalent(self._vertices[-1], tolerance)
+
+    def closest_point(self, point):
+        """Get the closest Point3D on this object to another Point3D.
+
+        Args:
+            point: A Point3D object to which the closest point on this object
+                will be computed.
+
+        Returns:
+            Point3D for the closest point on this line/ray to the input point.
+        """
+        close_pts = [closest_point3d_on_line3d(point, seg) for seg in self.segments]
+        pt_dts = [point.distance_to_point(close_pt) for close_pt in close_pts]
+        s_pts = [p for _, p in sorted(zip(pt_dts, close_pts), key=lambda pair: pair[0])]
+        return s_pts[0]
+
+    def distance_to_point(self, point):
+        """Get the minimum distance between this object and the input point.
+
+        Args:
+            point: A Point3D object to which the minimum distance will be computed.
+
+        Returns:
+            The distance to the input point.
+        """
+        close_pt = self.closest_point(point)
+        return point.distance_to_point(close_pt)
 
     def remove_colinear_vertices(self, tolerance):
         """Get a version of this polyline without colinear or duplicate vertices.
