@@ -90,7 +90,7 @@ class Face3D(Base2DIn3D):
         * upper_left_counter_clockwise_vertices
         * lower_left_counter_clockwise_vertices
         * lower_right_counter_clockwise_vertices
-        * upper_right_counter_clockwise_boundary
+        * upper_right_counter_clockwise_vertices
         * upper_left_counter_clockwise_boundary
         * lower_left_counter_clockwise_boundary
         * lower_right_counter_clockwise_boundary
@@ -1209,7 +1209,8 @@ class Face3D(Base2DIn3D):
         Returns:
             A list of Face3D without holes that together form a geometric
             representation of this Face3D. If this Face3D has no holes a list
-            with a single Face3D is returned.
+            with a single Face3D is returned. Note that it is possible for this
+            method to return 
         """
         def _shared_vertex_count(vert_set, verts):
             """Get the number of shared vertices."""
@@ -1280,8 +1281,58 @@ class Face3D(Base2DIn3D):
             ed_len = (seg.length for seg in t_mesh.naked_edges)
             tol = min(ed_len) / 10
             f_bound = Polyline3D.join_segments(t_mesh.naked_edges, tol)
-            final_faces.append(Face3D(f_bound[0].vertices, plane=self.plane))
+            joined_face = Face3D(f_bound[0].vertices, plane=self.plane)
+            final_faces.append(joined_face)
         return final_faces
+
+    def split_through_hole_center_lines(self, tolerance):
+        """Get this Face3D split through holes using lines passing through hole centers.
+
+        Rather than trying to return the minimum number of non-holed shapes that
+        represent this Face3D, this method simply draws lines through the center
+        points of the shape holes and used them to split the face until no more
+        holes remain. While less systematic and more computational intensive
+        than using Face3D.split_through_holes(), this method tends to produce cleaner
+        results for highly complex shapes with holes.
+
+        Args:
+            tolerance: The maximum difference between point values for them to be
+                considered distinct from one another.
+
+        Returns:
+            A list of Face3D without holes that together form a geometric
+            representation of this Face3D. If this Face3D has no holes a list
+            with a single Face3D is returned.
+        """
+        # first, be sure that there are holes to split
+        if not self.has_holes:
+            return (self,)
+        valid_face = self.remove_outside_holes()  # ensure all holes are inside boundary
+        try:
+            valid_face = valid_face.remove_colinear_vertices(tolerance)
+        except AssertionError:
+            return (self,)
+
+        # iteratively split the shape with lines
+        valid_faces = [valid_face]
+        while any(f.has_holes for f in valid_faces):
+            # find one of the faces to split
+            for i, face in enumerate(valid_faces):
+                if face.has_holes:
+                    split_hole = Face3D(face.holes[0])
+                    break
+            # get a point in the center of the hole
+            hole_center = split_hole.center if split_hole.is_convex else \
+                split_hole.pole_of_inaccessibility(tolerance)
+            # make a line with which to split the face
+            line_len = face.min.distance_to_point(face.max)
+            line_vec = self.plane.x * line_len
+            split_line = LineSegment3D.from_end_points(
+                hole_center - line_vec, hole_center + line_vec)
+            # split the face with the line
+            valid_faces.extend(face.split_with_line(split_line, tolerance))
+            valid_faces.pop(i)
+        return valid_faces
 
     def split_with_line(self, line, tolerance):
         """Split this face into two or more Face3D given a LineSegment3D.

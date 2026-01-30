@@ -42,7 +42,7 @@ class Polyface3D(Base2DIn3D):
                 list. An integer of 0 denotes a naked edge, an integer of 1
                 denotes an internal edge. Anything higher is a non-manifold edge.
 
-    Properties:
+    Properties: 
         * vertices
         * faces
         * edges

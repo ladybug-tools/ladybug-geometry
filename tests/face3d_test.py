@@ -396,6 +396,8 @@ def test_face3d_split_through_holes():
 
     face_1, face_2 = face.split_through_holes()
     assert len(face_1.vertices) + len(face_2.vertices) == 12
+    center_splits = face.split_through_hole_center_lines(0.01)
+    assert len(center_splits) > 1
 
     bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
     hole_pts = [Point3D(2, 2), Point3D(3, 2), Point3D(3, 3), Point3D(2, 3)]
@@ -403,6 +405,8 @@ def test_face3d_split_through_holes():
 
     face_1, face_2 = face.split_through_holes()
     assert len(face_1.vertices) + len(face_2.vertices) == 12
+    center_splits = face.split_through_hole_center_lines(0.01)
+    assert len(center_splits) > 1
 
     bound_pts = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
     hole_pts_1 = [Point3D(1, 1), Point3D(1.5, 1), Point3D(1.5, 1.5), Point3D(1, 1.5)]
@@ -411,6 +415,8 @@ def test_face3d_split_through_holes():
 
     face_1, face_2 = face.split_through_holes()
     assert len(face_1.vertices) + len(face_2.vertices) == 18
+    center_splits = face.split_through_hole_center_lines(0.01)
+    assert len(center_splits) > 1
 
 
 def test_face3d_split_through_holes_detailed():
