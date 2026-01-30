@@ -257,11 +257,16 @@ class DirectedGraphNetwork(object):
         if holes is not None:
             split_holes = []
             for hole in holes:
-                hole = hole.remove_colinear_vertices(tolerance)
-                hole_sgs = cls._intersect_segments(
-                    hole.segments, split_segments, tolerance)
-                hole_pts = [seg.p1 for seg in hole_sgs]
-                split_holes.append(boundary.__class__(hole_pts))
+                try:
+                    hole = hole.remove_colinear_vertices(tolerance)
+                    hole_sgs = cls._intersect_segments(
+                        hole.segments, split_segments, tolerance)
+                    hole_pts = [seg.p1 for seg in hole_sgs]
+                    split_holes.append(boundary.__class__(hole_pts))
+                except AssertionError:
+                    pass  # degenerate hole to ignore
+            if len(split_holes) == 0:
+                split_holes = None
 
         # make the directed graph for the boundary + holes
         dg = cls.from_shape_with_holes(split_boundary, split_holes, tolerance)
