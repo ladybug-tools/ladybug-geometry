@@ -203,6 +203,26 @@ class Polyline2D(Base2DIn2D):
         self._transfer_properties(_new_poly)
         return _new_poly
 
+    def smooth(self, strength=1):
+        """Get a smoothed version of this Polyline3D by averaging adjacent vertices.
+
+        Args:
+            strength: A number between 0 and 1 to represent the strength of smoothing.
+                One represents maximum smoothing. Zero represents no smoothing.
+        """
+        low_wgt = strength * (1 / 3)
+        pt_wgts = (low_wgt, 1 - (low_wgt * 2), low_wgt)
+        new_pts = [self._vertices[0]]
+        for i in range(1, len(self._vertices) - 2):
+            rel_pts = self._vertices[i - 1: i + 2]
+            sm_pt = Point2D(
+                sum(pt.x * w for pt, w in zip(rel_pts, pt_wgts)),
+                sum(pt.y * w for pt, w in zip(rel_pts, pt_wgts))
+            )
+            new_pts.append(sm_pt)
+        new_pts.append(self._vertices[-1])
+        return Polyline2D(new_pts)
+
     def reverse(self):
         """Get a copy of this polyline where the vertices are reversed."""
         _new_poly = Polyline2D(tuple(pt for pt in reversed(self.vertices)))
