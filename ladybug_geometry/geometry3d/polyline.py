@@ -200,7 +200,7 @@ class Polyline3D(Base2DIn3D):
         low_wgt = strength * (1 / 3)
         pt_wgts = (low_wgt, 1 - (low_wgt * 2), low_wgt)
         new_pts = [self._vertices[0]]
-        for i in range(1, len(self._vertices) - 2):
+        for i in range(1, len(self._vertices) - 1):
             rel_pts = self._vertices[i - 1: i + 2]
             sm_pt = Point3D(
                 sum(pt.x * w for pt, w in zip(rel_pts, pt_wgts)),
