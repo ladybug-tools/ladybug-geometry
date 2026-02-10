@@ -1,0 +1,7 @@
+ladybug\_geometry.bounding module
+=================================
+
+.. automodule:: ladybug_geometry.bounding
+   :members:
+   :undoc-members:
+   :show-inheritance:
