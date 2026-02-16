@@ -312,6 +312,24 @@ class Arc3D(object):
         close_pt = self.closest_point(point)
         return point.distance_to_point(close_pt)
 
+    def distance_to_plane(self, plane):
+        """Get the minimum distance between this object and the input plane.
+
+        Args:
+            plane: A Plane object to which the minimum distance will be computed.
+        """
+        vertices = self.subdivide_evenly(13)
+        return min(plane.distance_to_point(pt) for pt in vertices)
+
+    def furthest_distance_to_plane(self, plane):
+        """Get the maximum distance between this object and the input plane.
+
+        Args:
+            plane: A Plane object to which the maximum distance will be computed.
+        """
+        vertices = self.subdivide_evenly(13)
+        return max(plane.distance_to_point(pt) for pt in vertices)
+
     def intersect_plane(self, plane):
         """Get the intersection between this Arc3D and a Plane.
 

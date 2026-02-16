@@ -159,6 +159,22 @@ class LineSegment3D(Base1DIn3D):
             return False
         return True
 
+    def distance_to_plane(self, plane):
+        """Get the minimum distance between this object and the input plane.
+
+        Args:
+            plane: A Plane object to which the minimum distance will be computed.
+        """
+        return min(plane.distance_to_point(pt) for pt in self.vertices)
+
+    def furthest_distance_to_plane(self, plane):
+        """Get the maximum distance between this object and the input point.
+
+        Args:
+            plane: A Plane object to which the maximum distance will be computed.
+        """
+        return max(plane.distance_to_point(pt) for pt in self.vertices)
+
     def flip(self):
         """Get a copy of this line segment that is flipped."""
         return LineSegment3D(self.p2, self.v.reverse())

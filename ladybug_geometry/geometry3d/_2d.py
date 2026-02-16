@@ -54,6 +54,44 @@ class Base2DIn3D(object):
                 (min.x + max.x) / 2, (min.y + max.y) / 2, (min.z + max.z) / 2)
         return self._center
 
+    def closest_point(self, point):
+        """Get the closest vertex on this object to a Point3D.
+
+        Args:
+            point: A Point3D object to which the closest point on this object
+                will be computed.
+
+        Returns:
+            Point3D for the closest vertex to the input point.
+        """
+        dists = [point.distance_to_point(vert) for vert in self.vertices]
+        _, sorted_points = zip(*sorted(zip(dists, self.vertices)))
+        return sorted_points[0]
+
+    def distance_to_point(self, point):
+        """Get the distance between the closest vertex on this object to a Point3D.
+
+        Args:
+            point: A Point3D object to which the minimum distance will be computed.
+        """
+        return min(point.distance_to_point(pt) for pt in self.vertices)
+
+    def distance_to_plane(self, plane):
+        """Get the distance between the closest vertex on this object to a Plane.
+
+        Args:
+            plane: A Plane object to which the minimum distance will be computed.
+        """
+        return min(plane.distance_to_point(pt) for pt in self.vertices)
+
+    def furthest_distance_to_plane(self, plane):
+        """Get the distance between the farthest vertex on this object to a Plane.
+
+        Args:
+            plane: A Plane object to which the maximum distance will be computed.
+        """
+        return max(plane.distance_to_point(pt) for pt in self.vertices)
+
     def duplicate(self):
         """Get a copy of this object."""
         return self.__copy__()
