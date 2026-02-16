@@ -502,9 +502,32 @@ class Point3D(Vector3D):
         return self - normal * trans_self.dot(normal)
 
     def distance_to_point(self, point):
-        """Get the distance from this point to another Point3D."""
+        """Get the distance from this point to another Point3D.
+
+        Args:
+            point: A Point3D to which the distance will be computed.
+        """
         vec = (self.x - point.x, self.y - point.y, self.z - point.z)
         return math.sqrt(vec[0] ** 2 + vec[1] ** 2 + vec[2] ** 2)
+
+    def distance_to_plane(self, plane):
+        """Get the distance from this point to a Plane.
+
+        Args:
+            plane: A Plane object to which the distance will be computed.
+        """
+        return plane.distance_to_point(self)
+
+    def furthest_distance_to_plane(self, plane):
+        """Get the distance from this point to a Plane.
+
+        Equivalent to distance_to_plane. Provided for consistency with other
+        geometry classes.
+
+        Args:
+            plane: A Plane object to which the distance will be computed.
+        """
+        return self.distance_to_plane(plane)
 
     def to_dict(self):
         """Get Point3D as a dictionary."""
