@@ -824,6 +824,19 @@ def test_separate_boundary_and_holes():
     assert clean_face_3.area == face_3.area
 
 
+def test_separate_boundary_and_holes_2():
+    """Test the separate_boundary_and_holes with a more complex case."""
+    geo_file = './tests/json/face_with_hole.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    face_geo = Face3D.from_dict(geo_dict)
+    face_geo = face_geo.remove_colinear_vertices(0.01)
+
+    collapsed_geo = Face3D(face_geo.vertices)
+    rebuilt_geo = collapsed_geo.separate_boundary_and_holes(0.01)
+    assert len(rebuilt_geo.holes) == 2
+
+
 def test_triangulated_mesh_and_centroid():
     """Test the triangulation properties of Face3D."""
     pts_1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
