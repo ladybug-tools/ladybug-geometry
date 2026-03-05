@@ -1093,12 +1093,15 @@ class Face3D(Base2DIn3D):
         if len(dup_pairs) == 0:
             return vertices, None  # no holes were detected
         # find the duplicate pair with no other duplicates between them (inner most)
+        all_valid_pairs = []
         for pair_low, pair_high in dup_pairs:
             for btw_pt_i in range(pair_low + 1, pair_high):
                 if btw_pt_i in all_dups:
-                    break  # not an inner-most hole
+                    break
             else:
-                break  # the current pair is an inner-most one
+                all_valid_pairs.append((pair_low, pair_high))
+        if len(all_valid_pairs) > 0:
+            pair_low, pair_high = all_valid_pairs[-1]
         # separate the inner-most hole from the boundary
         hole = vertices[pair_low:pair_high]
         remain_vertices = vertices[:pair_low] + vertices[pair_high + 2:]
