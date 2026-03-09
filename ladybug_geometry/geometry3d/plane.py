@@ -4,6 +4,7 @@ from __future__ import division
 
 from .pointvector import Point3D, Vector3D
 from .ray import Ray3D
+from .line import LineSegment3D
 from ..intersection3d import intersect_line3d_plane, intersect_line3d_plane_infinite, \
     intersect_plane_plane, closest_point3d_on_plane, \
     closest_point3d_between_line3d_plane
@@ -334,7 +335,7 @@ class Plane(object):
 
         Args:
             point: A Point3D to be projected onto the plane.
-            projection_direction: A Line3D or Ray3D object to set the direction
+            projection_direction: A Vector3D object to set the direction
                 of projection. If None, this Plane's normal will be
                 used. (Default: None).
 
@@ -350,8 +351,8 @@ class Plane(object):
         """Project an array of points onto this Plane.
 
         Args:
-            point: A list of Point3Ds to be projected onto the plane.
-            projection_direction: A Line3D or Ray3D object to set the direction
+            points: A list of Point3Ds to be projected onto the plane.
+            projection_direction: A Vector3D object to set the direction
                 of projection. If None, this Plane's normal will be
                 used. (Default: None).
 
@@ -364,6 +365,48 @@ class Plane(object):
         for pt in points:
             proj_points.append(intersect_line3d_plane_infinite(Ray3D(pt, p_dir), self))
         return proj_points
+
+    def project_line(self, line, projection_direction=None):
+        """Project a line onto this Plane given a certain projection direction.
+
+        Args:
+            line: A LineSegment3Ds to be projected onto the plane.
+            projection_direction: A Vector3D object to set the direction
+                of projection. If None, this Plane's normal will be
+                used. (Default: None).
+
+        Returns:
+            Point3D for the projected point. Will be None if the projection_direction
+            is parallel to the plane.
+        """
+        p_dir = self.n if projection_direction is None else projection_direction
+        p1 = intersect_line3d_plane_infinite(Ray3D(line.p1, p_dir), self)
+        p2 = intersect_line3d_plane_infinite(Ray3D(line.p2, p_dir), self)
+        if p1 is not None and p2 is not None:
+            return LineSegment3D.from_end_points(p1, p2)
+
+    def project_lines(self, lines, projection_direction=None):
+        """Project an array of lines onto this Plane.
+
+        Args:
+            lines: A list of LineSegment3Ds to be projected onto the plane.
+            projection_direction: A Vector3D object to set the direction
+                of projection. If None, this Plane's normal will be
+                used. (Default: None).
+
+        Returns:
+            A list of LineSegment3Ds for the projected lines. This list will
+            be empty if the projection_direction is parallel to the plane.
+        """
+        proj_lines = []
+        p_dir = self.n if projection_direction is None else projection_direction
+        for line in lines:
+            p1 = intersect_line3d_plane_infinite(Ray3D(line.p1, p_dir), self)
+            p2 = intersect_line3d_plane_infinite(Ray3D(line.p2, p_dir), self)
+            if p1 is not None and p2 is not None:
+                proj_line = LineSegment3D.from_end_points(p1, p2)
+                proj_lines.append(proj_line)
+        return proj_lines
 
     def intersect_line_ray(self, line_ray):
         """Get the intersection between this plane and the input Line3D or Ray3D.

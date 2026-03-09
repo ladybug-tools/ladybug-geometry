@@ -1337,6 +1337,26 @@ class Face3D(Base2DIn3D):
             valid_faces.pop(i)
         return valid_faces
 
+    def split_with_plane(self, plane, tolerance):
+        """Split this face into two or more Face3D given a Plane.
+
+        If the input plane is found to not intersect this Face3D in a manner that
+        splits it into two or more pieces, None will be returned.
+
+        Args:
+            plane: A Plane object that intersects this Face3D, which will
+                be used to split it into two or more pieces.
+            tolerance: The maximum difference between point values for them to be
+                considered distinct from one another.
+
+        Returns:
+            A list of Face3D for the result of splitting this Face3D with the
+            input plane. Will be None if the plane does not intersect this Face3D.
+        """
+        int_lines = self.intersect_plane(plane)
+        if int_lines is not None:
+            return self.split_with_lines(int_lines, tolerance)
+
     def split_with_line(self, line, tolerance):
         """Split this face into two or more Face3D given a LineSegment3D.
 
