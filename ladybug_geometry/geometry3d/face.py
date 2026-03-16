@@ -2931,6 +2931,63 @@ class Face3D(Base2DIn3D):
         return face_3d
 
     @staticmethod
+    def group_by_coplanarity(faces, tolerance, angle_tolerance=None):
+        """Group Face3Ds depending on whether they are coplanar with one another.
+
+        This is useful as a pre-step before running Face3D.group_by_coplanar_overlap()
+        in order to assess whether Face3Ds are, in fact, coplanar with one
+        another before the question of whether or not they overlap is evaluated.
+
+        Args:
+            faces: A list of Face3D to be grouped by their overlapping.
+            tolerance: The minimum difference between the coordinate values of two
+                planes at which they can be considered coplanar.
+            angle_tolerance: An optional angle_tolerance in radians for the
+                minimum angle difference at which point two Face3Ds are considered
+                to be within different planes. If None, only the tolerance will
+                be used to determine co-planarity, which is usually sufficient
+                at tolerances smaller than any Face3D geometry.
+
+        Returns:
+            A list of lists where each sub-list represents a group of Face3Ds
+            that are coplanar with one another.
+        """
+        # check to be sure that there are faces to evaluate
+        if len(faces) <= 1:
+            return [faces]
+        grouped_faces = [[faces[0]]]
+
+        # loop through the faces and check to see if it is coplanar with the others
+        if angle_tolerance is not None:
+            for face in faces[1:]:
+                group_found = False
+                for face_group in grouped_faces:
+                    for oth_face in face_group:
+                        if face.plane.is_coplanar_tolerance(
+                                oth_face.plane, tolerance, angle_tolerance):
+                            face_group.append(face)
+                            group_found = True
+                            break
+                    if group_found:
+                        break
+                if not group_found:  # the face is not coplanar with any of the others
+                    grouped_faces.append([face])  # make a new group for the face
+        else:
+            for face in faces[1:]:
+                group_found = False
+                for face_group in grouped_faces:
+                    for oth_face in face_group:
+                        if face.is_coplanar(oth_face, tolerance):
+                            face_group.append(face)
+                            group_found = True
+                            break
+                    if group_found:
+                        break
+                if not group_found:  # the face is not coplanar with any of the others
+                    grouped_faces.append([face])  # make a new group for the face
+        return grouped_faces
+
+    @staticmethod
     def group_by_coplanar_overlap(faces, tolerance):
         """Group coplanar Face3Ds depending on whether they overlap one another.
 
@@ -2938,7 +2995,7 @@ class Face3D(Base2DIn3D):
         in order to assess whether union-ing is necessary and to ensure that
         it is only performed among the necessary groups of faces.
 
-        This method will return the minimal number of overlapping polygon groups
+        This method will return the minimal number of overlapping groups
         thanks to a recursive check of whether groups can be merged.
 
         Args:
