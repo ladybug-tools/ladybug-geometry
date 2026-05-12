@@ -804,7 +804,7 @@ class Polygon2D(Base2DIn2D):
         """Offset the polygon by a given distance inwards or outwards.
 
         Note that the resulting shape may be self-intersecting if the distance
-        is large enough and the is_self_intersecting property may be used to identify
+        is large enough. The is_self_intersecting property may be used to identify
         these shapes.
 
         Args:
