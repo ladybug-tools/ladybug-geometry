@@ -1117,6 +1117,28 @@ class Face3D(Base2DIn3D):
             _new_face._holes = self._holes
         return _new_face
 
+    def offset_edges(self, distance):
+        """Offset the edges of this Face3D by a given distance inwards or outwards.
+
+        Note that the resulting shape may be self-intersecting if the distance
+        is large enough. The is_self_intersecting property may be used to identify
+        these shapes.
+
+        Args:
+            distance: The distance inwards that the Face3D will be offset.
+                Positive values will always be offset inwards while negative ones
+                will be offset outwards.
+        """
+        offset_bound2d = self.boundary_polygon2d.offset(distance)
+        offset_bound3d = tuple(self.plane.xy_to_xyz(pt) for pt in offset_bound2d)
+        holes = None
+        if self._holes is not None:
+            holes = []
+            for hole in self.hole_polygon2d:
+                offset_hole2d = hole.offset(-distance)
+                holes.append(tuple(self.plane.xy_to_xyz(pt) for pt in offset_hole2d))
+        return Face3D(offset_bound3d, self.plane, holes, enforce_right_hand=False)
+
     def move(self, moving_vec):
         """Get a face that has been moved along a vector.
 
@@ -2939,7 +2961,7 @@ class Face3D(Base2DIn3D):
         another before the question of whether or not they overlap is evaluated.
 
         Args:
-            faces: A list of Face3D to be grouped by their overlapping.
+            faces: A list of Face3D to be grouped by their coplanarity.
             tolerance: The minimum difference between the coordinate values of two
                 planes at which they can be considered coplanar.
             angle_tolerance: An optional angle_tolerance in radians for the

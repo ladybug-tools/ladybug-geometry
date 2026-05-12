@@ -1899,7 +1899,7 @@ def test_coplanar_split():
 
 
 def test_group_by_coplanarity():
-    """Test the group_by_coplanar_overlap method."""
+    """Test the group_by_coplanarity method."""
     bound_pts1 = [Point3D(0, 0), Point3D(4, 0), Point3D(4, 4), Point3D(0, 4)]
     bound_pts2 = [Point3D(2, 2), Point3D(6, 2), Point3D(6, 6), Point3D(2, 6)]
     bound_pts3 = [Point3D(6, 6, 0.45), Point3D(7, 6, 0.4), Point3D(7, 7, 0.4), Point3D(6, 7, 0.45)]
