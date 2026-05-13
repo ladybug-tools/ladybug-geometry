@@ -1,0 +1,7 @@
+ladybug\_geometry.geometry3d.plane module
+=========================================
+
+.. automodule:: ladybug_geometry.geometry3d.plane
+   :members:
+   :undoc-members:
+   :show-inheritance:
