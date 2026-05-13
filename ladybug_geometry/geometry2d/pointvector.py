@@ -275,7 +275,10 @@ class Vector2D(object):
             raise TypeError('Cannot add {} and {}'.format(
                 self.__class__.__name__, type(other)))
 
-    __radd__ = __add__
+    def __radd__(self, other):
+        if other == 0:
+            return self
+        return self.__add__(other)
 
     def __sub__(self, other):
         # Vector - Point -> Point
