@@ -800,7 +800,7 @@ class Polygon2D(Base2DIn2D):
         else:
             return Polygon2D(tuple(pt.scale(factor, origin) for pt in self.vertices))
 
-    def offset(self, distance, check_intersection=False):
+    def offset(self, distance, check_intersection=False, min_angle=0):
         """Offset the polygon by a given distance inwards or outwards.
 
         Note that the resulting shape may be self-intersecting if the distance
@@ -814,6 +814,11 @@ class Polygon2D(Base2DIn2D):
             check_intersection: A boolean to note whether the resulting operation
                 should be checked for self intersection and, if so, None will be
                 returned instead of the self-intersecting polygon.
+            min_angle: An optional angle in radians that sets the smallest, most
+                acute angle that is acceptable in the result. Setting a non-zero
+                value here can help ensure that highly acute angles in the input
+                do not result in vertices that are far away from the starting
+                polygon. (Default: 0).
         """
         # make sure the offset is not zero
         if distance == 0:
@@ -825,6 +830,8 @@ class Polygon2D(Base2DIn2D):
         init_verts = [pt for i, pt in enumerate(base_verts) if pt != base_verts[i - 1]]
         if len(init_verts) < 3:  # degenerate polygon
             return self  # cannot be offset into a valid shape
+        min_angle = min_angle / 2  # divide by two to get the angle in the middle
+        max_angle = math.pi - min_angle
         move_vecs, max_i = [], len(init_verts) - 1
         for i, pt in enumerate(init_verts):
             v1 = init_verts[i - 1] - pt
@@ -835,13 +842,23 @@ class Polygon2D(Base2DIn2D):
                 if ang == 0:
                     ang = math.pi / 2
                 m_vec = v1.rotate(-ang).normalize()
-                m_dist = distance / math.sin(ang)
+                if ang < min_angle:
+                    m_dist = distance / math.sin(min_angle)
+                elif ang > max_angle:
+                    m_dist = distance / math.sin(max_angle)
+                else:
+                    m_dist = distance / math.sin(ang)
             else:
                 ang = v1.angle_counterclockwise(v2) / 2
                 if ang == 0:
                     ang = math.pi / 2
                 m_vec = v1.rotate(ang).normalize()
-                m_dist = -distance / math.sin(ang)
+                if ang < min_angle:
+                    m_dist = -distance / math.sin(min_angle)
+                elif ang > max_angle:
+                    m_dist = -distance / math.sin(max_angle)
+                else:
+                    m_dist = -distance / math.sin(ang)
             m_vec = m_vec * m_dist
             move_vecs.append(m_vec)
 
@@ -2023,11 +2040,18 @@ class Polygon2D(Base2DIn2D):
     def gap_crossing_boundary(polygons, min_separation, tolerance):
         """Get the boundary around several Polygon2D, crossing gaps of min_separation.
 
-        This method is less reliable than the joined_intersected_boundary because
-        higher values of min_separation that are greater than the lengths of polygon
-        segments can cause important details of the polygons to disappear. However,
-        when used appropriately, it can provide a boundary that jumps across gaps
-        to give resulting polygons that effectively bound all of the input polygons.
+        This method is more computationally intense than the joined_intersected_boundary.
+        However, it does not require the polygons to be touching one another in order to
+        produce a result that bounds all of the input polygons, effectively jumping
+        across gaps between polygons to create the boundary.
+
+        The only major limitations in terms of requirements for the input polygons
+        is that do not overlap with one another and they do not contain many
+        consecutive segments that are all smaller than the min_separation within
+        the input polygons.
+
+        When these cases exist in the input, the offset_unioned_boundary may produce
+        a more desirable result for the polygons.
 
         Args:
             polygons: The polygons to be joined into a boundary. These polygons
@@ -2202,6 +2226,123 @@ class Polygon2D(Base2DIn2D):
                         pass
 
         return closed_polys
+
+    @staticmethod
+    def offset_unioned_boundary(polygons, min_separation, tolerance, min_angle=0):
+        """Get the boundary around several Polygon2D, crossing gaps of min_separation.
+
+        This method is more computationally intense than the joined_intersected_boundary
+        or the gap_crossing_boundary method. However, it has very few limitations
+        in terms of the input polygons and is able to accept cases of overlapping
+        polygons and (some) cases of self-intersecting polygons.
+
+        This is thanks to the fact that this method works by offsetting the
+        polygons outwards by half of the min_separation, boolean unioning all
+        input polygons together, then offsetting the result back so that it
+        exists close to where it originally was.
+
+        Args:
+            polygons: The polygons to be joined into a boundary. These polygons
+                should have colinear vertices removed and they should not contain
+                degenerate polygons at the tolerance. The remove_colinear_vertices
+                method can be used to pre-process the input polygons to ensure they
+                meet these criteria.
+            min_separation: A number for the minimum distance between Polygon2D that
+                is considered a meaningful separation. In other words, this is
+                the maximum distance of the gap across
+            tolerance: The maximum difference between coordinate values of two
+                vertices at which they can be considered equivalent.
+            min_angle: An optional angle in radians that sets the smallest, most
+                acute angle that is acceptable when offsetting. Setting a non-zero
+                value here can help ensure that highly acute angles in the input
+                polygons do not result in vertices that are far away from the starting
+                polygon. (Default: 0).
+
+        Returns:
+            A list of Polygon2D that represent the boundary around the input polygons.
+            Note that some of these Polygon2D may represent 'holes' within others
+            and it may be necessary to assess this when interpreting the result.
+        """
+        # offset the polygons outwards to get them to overlap with one another
+        all_poly = []
+        for poly2d in polygons:
+            try:
+                poly2d = poly2d.remove_colinear_vertices(tolerance)
+            except AssertionError:  # degenerate room to ignore
+                continue
+            if poly2d.is_self_intersecting:
+                polys = poly2d.split_through_self_intersection(tolerance)
+                poly2d = max(polys, key=lambda p: p.area)
+            offset_poly = poly2d.offset(-min_separation / 2, min_angle=min_angle)
+            all_poly.append(offset_poly)
+
+        # boolean union the polygons together
+        all_poly = Polygon2D.snap_polygons(all_poly, tolerance)
+        bool_polys = []  # create BooleanPolygons
+        for ply in all_poly:
+            bool_pts = [pb.BooleanPoint(pt.x, pt.y) for pt in ply.vertices]
+            bool_polys.append(pb.BooleanPolygon([bool_pts]))
+        int_tol = tolerance / 1000
+        try:
+            poly_result = pb.union_all(bool_polys, int_tol)
+        except Exception:  # tiny edge caused a failure; try with small tol
+            int_tol = int_tol / 100
+            try:
+                poly_result = pb.union_all(bool_polys, int_tol)
+            except Exception:
+                poly_result = None  # the edge is just too tiny
+
+        # serialize the BooleanPolygon into Polygon2D
+        polys = []
+        if poly_result is not None:
+            for new_poly in poly_result.regions:
+                if len(new_poly) > 2:
+                    poly = Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
+                    try:
+                        poly = poly.remove_duplicate_vertices(tolerance)
+                        polys.append(poly)
+                    except AssertionError:
+                        pass  # degenerate polygon to be removed
+        if len(polys) == 0:
+            poly_groups = []
+        if len(polys) == 1:
+            poly_groups = [polys]
+        # sort the polygons by area and check if any are inside the others
+        polys.sort(key=lambda x: x.area, reverse=True)
+        poly_groups = [[polys[0]]]
+        for sub_poly in polys[1:]:
+            for i, pg in enumerate(poly_groups):
+                if pg[0].is_polygon_inside(sub_poly):  # it's a hole
+                    poly_groups[i].append(sub_poly)
+                    break
+            else:  # it's a separate Face3D
+                poly_groups.append([sub_poly])
+
+        # offset the polygons back to where they originally were
+        boundary_poly = []
+        for poly_group in poly_groups:
+            clean_group = []
+            for poly2d in poly_group:
+                try:
+                    poly2d = poly2d.remove_colinear_vertices(tolerance)
+                except AssertionError:
+                    continue  # degenerate polygon to be removed
+                if poly2d.is_self_intersecting:
+                    polys = poly2d.split_through_self_intersection(tolerance)
+                    poly2d = max(polys, key=lambda p: p.area)
+                clean_group.append(poly2d)
+            if len(clean_group) != 0:
+                bound, holes = clean_group[0], clean_group[1:]
+                # offset the first polygon inwards
+                offset_bound = bound.offset(min_separation / 2, min_angle=min_angle)
+                offset_bound = offset_bound.remove_colinear_vertices(tolerance)
+                boundary_poly.append(offset_bound)
+                # offset any remaining polygons outwards
+                for hole in holes:
+                    offset_hole = hole.offset(-min_separation / 2, min_angle=min_angle)
+                    offset_hole = offset_hole.remove_colinear_vertices(tolerance)
+                    boundary_poly.append(offset_hole)
+        return boundary_poly
 
     @staticmethod
     def common_axes(polygons, direction, min_distance, merge_distance, angle_tolerance,
