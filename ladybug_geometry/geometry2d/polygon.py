@@ -2282,15 +2282,19 @@ class Polygon2D(Base2DIn2D):
         for ply in all_poly:
             bool_pts = [pb.BooleanPoint(pt.x, pt.y) for pt in ply.vertices]
             bool_polys.append(pb.BooleanPolygon([bool_pts]))
-        int_tol = tolerance / 1000
+        int_tol = tolerance / 300
         try:
             poly_result = pb.union_all(bool_polys, int_tol)
         except Exception:  # tiny edge caused a failure; try with small tol
-            int_tol = int_tol / 100
+            int_tol = int_tol / 10
             try:
                 poly_result = pb.union_all(bool_polys, int_tol)
             except Exception:
-                poly_result = None  # the edge is just too tiny
+                int_tol = int_tol / 10
+                try:
+                    poly_result = pb.union_all(bool_polys, int_tol)
+                except Exception:
+                    poly_result = None  # the edge is just too tiny
 
         # serialize the BooleanPolygon into Polygon2D
         polys = []
@@ -2305,18 +2309,18 @@ class Polygon2D(Base2DIn2D):
                         pass  # degenerate polygon to be removed
         if len(polys) == 0:
             poly_groups = []
-        if len(polys) == 1:
+        elif len(polys) == 1:
             poly_groups = [polys]
-        # sort the polygons by area and check if any are inside the others
-        polys.sort(key=lambda x: x.area, reverse=True)
-        poly_groups = [[polys[0]]]
-        for sub_poly in polys[1:]:
-            for i, pg in enumerate(poly_groups):
-                if pg[0].is_polygon_inside(sub_poly):  # it's a hole
-                    poly_groups[i].append(sub_poly)
-                    break
-            else:  # it's a separate Face3D
-                poly_groups.append([sub_poly])
+        else:  # sort the polygons by area and check if any are inside the others
+            polys.sort(key=lambda x: x.area, reverse=True)
+            poly_groups = [[polys[0]]]
+            for sub_poly in polys[1:]:
+                for i, pg in enumerate(poly_groups):
+                    if pg[0].is_polygon_inside(sub_poly):  # it's a hole
+                        poly_groups[i].append(sub_poly)
+                        break
+                else:  # it's a separate Face3D
+                    poly_groups.append([sub_poly])
 
         # offset the polygons back to where they originally were
         boundary_poly = []
