@@ -648,6 +648,102 @@ class Polygon2D(Base2DIn2D):
                 new_vertices.append(_v1)
         return Polygon2D(new_vertices)
 
+    def remove_short_segments(self, distance, angle_tolerance):
+        """Get a version of this polygon with consecutive short segments removed.
+
+        Will be None if the removal of short segments means the entire polygon
+        would be removed.
+
+        To eliminate the short segments, an attempt will first be made to find the
+        intersection of the two neighboring segments. If these two lines are parallel,
+        they will simply be connected with a segment.
+
+        Note that highly irregular polygons used with this method can sometimes
+        return a self-intersecting result. So it may be desirable to check the
+        output in this case and split_through_self_intersection.
+
+        Args:
+            distance: The maximum length of a segment below which the segment
+                will be considered for removal.
+            angle_tolerance: The max angle difference in radians that vertices
+                are allowed to differ from one another in order to consider them
+                colinear. (Default: 1).
+        """
+        # first check if there are contiguous short segments to be removed
+        p_segs = self.segments
+        sh_seg_i = [i for i, s in enumerate(p_segs) if s.length <= distance]
+        if len(p_segs) - len(sh_seg_i) < 3:
+            return None  # large distance means the whole Polygon becomes removed
+        if len(sh_seg_i) <= 1:
+            return self  # no short segments to remove
+        del_seg = set()
+        for i, seg_i in enumerate(sh_seg_i):
+            test_val = seg_i - sh_seg_i[i - 1]
+            if test_val == 1 or (seg_i == 0 and test_val < 0):
+                del_seg.add(sh_seg_i[i - 1])
+                del_seg.add(seg_i)
+        if 0 in sh_seg_i and len(sh_seg_i) - 1 in sh_seg_i:
+            del_seg.add(0)
+            del_seg.add(len(sh_seg_i) - 1)
+        del_i = sorted(list(del_seg))
+        if len(del_i) == 0:
+            return self  # there are short segments but they're not contiguous
+
+        # contiguous short segments found
+        # set up variables to handle getting the last vertex to connect to
+        a_tol = angle_tolerance
+        new_points, in_del, post_del = [], False, False
+        # loop through the segments and delete the short ones
+        for i, lin in enumerate(p_segs):
+            if i in del_i:
+                if not in_del:
+                    last_i = i
+                in_del = True
+                rel_i = i + 1 if i + 1 != len(p_segs) else 0
+                if rel_i not in del_i:  # we are at the end of the deletion
+                    # see if we can repair the loop by extending segments
+                    l3a, l3b = p_segs[last_i - 1], p_segs[rel_i]
+                    l2a = Ray2D(Point2D(l3a.p.x, l3a.p.y),
+                                Vector2D(l3a.v.x, l3a.v.y))
+                    l2b = Ray2D(Point2D(l3b.p.x, l3b.p.y),
+                                Vector2D(l3b.v.x, l3b.v.y))
+                    v_ang = l2a.v.angle(l2b.v)
+                    if v_ang <= a_tol or v_ang >= math.pi - a_tol:  # parallel
+                        new_points.append(p_segs[last_i].p)
+                    else:  # extend lines to the intersection
+                        int_pt = self._intersect_line2d_infinite(l2a, l2b)
+                        new_points.append(int_pt)
+                        post_del = True
+                    in_del = False
+            else:
+                if not post_del:
+                    new_points.append(lin.p)
+                post_del = False
+        if post_del:
+            new_points.pop(0)  # put back the last property
+        if len(new_points) >= 3:
+            return Polygon2D(new_points)
+
+    @staticmethod
+    def _intersect_line2d_infinite(line_ray_a, line_ray_b):
+        """Get the intersection between two Ray2Ds both extended infinitely.
+
+        Args:
+            line_ray_a: A Ray2D object.
+            line_ray_b: Another Ray2D object.
+
+        Returns:
+            Point2D of intersection if it exists. None if lines are parallel.
+        """
+        d = line_ray_b.v.y * line_ray_a.v.x - line_ray_b.v.x * line_ray_a.v.y
+        if d == 0:
+            return None
+        dy = line_ray_a.p.y - line_ray_b.p.y
+        dx = line_ray_a.p.x - line_ray_b.p.x
+        ua = (line_ray_b.v.x * dy - line_ray_b.v.y * dx) / d
+        return Point2D(line_ray_a.p.x + ua * line_ray_a.v.x,
+                       line_ray_a.p.y + ua * line_ray_a.v.y)
+
     def split_through_self_intersection(self, tolerance):
         """Get a list of non-intersecting Polygon2D if this polygon intersects itself.
 
