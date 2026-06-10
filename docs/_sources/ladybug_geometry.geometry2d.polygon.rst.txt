@@ -1,0 +1,7 @@
+ladybug\_geometry.geometry2d.polygon module
+===========================================
+
+.. automodule:: ladybug_geometry.geometry2d.polygon
+   :members:
+   :undoc-members:
+   :show-inheritance:
