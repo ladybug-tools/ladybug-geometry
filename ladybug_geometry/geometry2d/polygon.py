@@ -1483,7 +1483,7 @@ class Polygon2D(Base2DIn2D):
         all_poly = Polygon2D.snap_polygons(all_poly, tolerance)
 
         # round all coordinates to something derived from the tolerance
-        rtol, base = rounding_tolerance(tolerance / 10)
+        rtol, base = rounding_tolerance(tolerance / 100)
         clean_poly = []
         for poly in all_poly:
             clean_pts = []
