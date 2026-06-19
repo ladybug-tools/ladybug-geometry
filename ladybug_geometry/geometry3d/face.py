@@ -2571,21 +2571,20 @@ class Face3D(Base2DIn3D):
             A List of Face3D representing the original Face3D with the input faces
             subtracted from it.
         """
-        # define the primary boolean polygon
-        prim_pl = self.plane
-        f1_poly = self.boundary_polygon2d
-        try:
-            f1_poly = f1_poly.remove_colinear_vertices(tolerance)
+        try:  # first be sure that the input is not degenerate
+            f1_poly = self.boundary_polygon2d.remove_colinear_vertices(tolerance)
         except AssertionError:  # degenerate face input
             return [self]
-        f1_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f1_poly.vertices)]
+
+        # get the primary plane and polygons
+        prim_pl = self.plane
+        all_poly, are_holes = [f1_poly], [False]
         if self.has_holes:
             for hole in self.hole_polygon2d:
-                f1_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
-        b_poly1 = pb.BooleanPolygon(f1_polys)
+                all_poly.append(hole)
+                are_holes.append(True)
 
-        # pre-process the Face3Ds to be intersected
-        relevant_b_polys = []
+        # add all of the secondary polygons
         for face2 in faces:
             # test whether the faces are coplanar
             if not prim_pl.is_coplanar_tolerance(face2.plane, tolerance, angle_tolerance):
@@ -2594,24 +2593,24 @@ class Face3D(Base2DIn3D):
             f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
             if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
                 continue
-            # snap the polygons to one another to avoid tolerance issues
             try:
                 f2_poly = f2_poly.remove_colinear_vertices(tolerance)
             except AssertionError:  # degenerate faces input
                 continue
-            s2_poly = f1_poly.snap_to_polygon(f2_poly, tolerance)
-            # get BooleanPolygons of the two faces
-            f2_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in s2_poly.vertices)]
+            all_poly.append(f2_poly)
+            are_holes.append(False)
             if face2.has_holes:
                 for hole in face2.holes:
-                    h_pt2d = (prim_pl.xyz_to_xy(pt) for pt in hole)
-                    f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in h_pt2d))
-            b_poly2 = pb.BooleanPolygon(f2_polys)
-            relevant_b_polys.append(b_poly2)
+                    h_pt2d = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in hole))
+                    all_poly.append(h_pt2d)
+                    are_holes.append(True)
 
-        # if no relevant polygons were found, return self
-        if len(relevant_b_polys) == 0:
+        # preprocess the polygons for a boolean operation
+        b_polys = Polygon2D.preprocess_polygons_for_boolean(all_poly, tolerance, are_holes)
+        if len(b_polys) <= 1:
             return [self]
+        b_poly1 = b_polys[0]
+        relevant_b_polys = b_polys[1:]
 
         # loop through the boolean polygons and subtract them
         int_tol = tolerance / 1000
@@ -2653,25 +2652,32 @@ class Face3D(Base2DIn3D):
         f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
         if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
             return None
-        # snap the polygons to one another to avoid tolerance issues
+        # check that neither of the inputs are degenerate
         try:
             f1_poly = f1_poly.remove_colinear_vertices(tolerance)
             f2_poly = f2_poly.remove_colinear_vertices(tolerance)
         except AssertionError:  # degenerate faces input
             return None
-        s2_poly = f1_poly.snap_to_polygon(f2_poly, tolerance)
-        # get BooleanPolygons of the two faces
-        f1_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f1_poly.vertices)]
-        f2_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in s2_poly.vertices)]
+        # convert the polygons to all be in the same plane
+        all_poly, are_holes = [f1_poly], [False]
         if face1.has_holes:
             for hole in face1.hole_polygon2d:
-                f1_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+                all_poly.append(hole)
+                are_holes.append(True)
+        all_poly.append(f2_poly)
+        are_holes.append(False)
         if face2.has_holes:
             for hole in face2.holes:
-                h_pt2d = (prim_pl.xyz_to_xy(pt) for pt in hole)
-                f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in h_pt2d))
-        b_poly1 = pb.BooleanPolygon(f1_polys)
-        b_poly2 = pb.BooleanPolygon(f2_polys)
+                h_pt2d = Polygon2D(prim_pl.xyz_to_xy(pt) for pt in hole)
+                all_poly.append(h_pt2d)
+                are_holes.append(True)
+
+        # preprocess the polygons for a boolean operation
+        b_polys = Polygon2D.preprocess_polygons_for_boolean(all_poly, tolerance, are_holes)
+        if len(b_polys) <= 1:
+            return None
+        b_poly1, b_poly2 = b_polys[0], b_polys[1]
+
         # union the two boolean polygons with one another
         int_tol = tolerance / 1000
         try:
@@ -2714,25 +2720,32 @@ class Face3D(Base2DIn3D):
         f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
         if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
             return None
-        # snap the polygons to one another to avoid tolerance issues
+        # check that neither of the inputs are degenerate
         try:
             f1_poly = f1_poly.remove_colinear_vertices(tolerance)
             f2_poly = f2_poly.remove_colinear_vertices(tolerance)
         except AssertionError:  # degenerate faces input
             return None
-        s2_poly = f1_poly.snap_to_polygon(f2_poly, tolerance)
-        # get BooleanPolygons of the two faces
-        f1_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f1_poly.vertices)]
-        f2_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in s2_poly.vertices)]
+        # convert the polygons to all be in the same plane
+        all_poly, are_holes = [f1_poly], [False]
         if face1.has_holes:
             for hole in face1.hole_polygon2d:
-                f1_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
+                all_poly.append(hole)
+                are_holes.append(True)
+        all_poly.append(f2_poly)
+        are_holes.append(False)
         if face2.has_holes:
             for hole in face2.holes:
-                h_pt2d = (prim_pl.xyz_to_xy(pt) for pt in hole)
-                f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in h_pt2d))
-        b_poly1 = pb.BooleanPolygon(f1_polys)
-        b_poly2 = pb.BooleanPolygon(f2_polys)
+                h_pt2d = Polygon2D(prim_pl.xyz_to_xy(pt) for pt in hole)
+                all_poly.append(h_pt2d)
+                are_holes.append(True)
+
+        # preprocess the polygons for a boolean operation
+        b_polys = Polygon2D.preprocess_polygons_for_boolean(all_poly, tolerance, are_holes)
+        if len(b_polys) <= 1:
+            return None
+        b_poly1, b_poly2 = b_polys[0], b_polys[1]
+
         # intersect the two boolean polygons with one another
         int_tol = tolerance / 1000
         try:
@@ -2778,37 +2791,32 @@ class Face3D(Base2DIn3D):
         f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
         if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
             return [face1], [face2]
-        # snap the polygons to one another to avoid tolerance issues
+        # check that neither of the inputs are degenerate
         try:
             f1_poly = f1_poly.remove_colinear_vertices(tolerance)
             f2_poly = f2_poly.remove_colinear_vertices(tolerance)
         except AssertionError:  # degenerate faces input
             return [face1], [face2]
-        s2_poly = f1_poly.snap_to_polygon(f2_poly, tolerance)
-        # get BooleanPolygons of the two faces
-        f1_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in f1_poly.vertices)]
-        f2_polys = [(pb.BooleanPoint(pt.x, pt.y) for pt in s2_poly.vertices)]
-        if face1.has_holes and face2.has_holes:  # snap corresponding holes together
-            f1h_polys = face1.hole_polygon2d
-            f2h_polys = [Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in h_pts))
-                         for h_pts in face2.holes]
-            for f1hp in f1h_polys:
-                for hi, f2hp in enumerate(f2h_polys):
-                    if f1hp.center.distance_to_point(f2hp.center) < tolerance:
-                        f2h_polys[hi] = f1hp.snap_to_polygon(f2hp, tolerance)
-            for hole in f1h_polys:
-                f1_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
-            for hole in f2h_polys:
-                f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
-        elif face1.has_holes:
+        # convert the polygons to all be in the same plane
+        all_poly, are_holes = [f1_poly], [False]
+        if face1.has_holes:
             for hole in face1.hole_polygon2d:
-                f1_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in hole.vertices))
-        elif face2.has_holes:
+                all_poly.append(hole)
+                are_holes.append(True)
+        all_poly.append(f2_poly)
+        are_holes.append(False)
+        if face2.has_holes:
             for hole in face2.holes:
-                h_pt2d = (prim_pl.xyz_to_xy(pt) for pt in hole)
-                f2_polys.append((pb.BooleanPoint(pt.x, pt.y) for pt in h_pt2d))
-        b_poly1 = pb.BooleanPolygon(f1_polys)
-        b_poly2 = pb.BooleanPolygon(f2_polys)
+                h_pt2d = Polygon2D(prim_pl.xyz_to_xy(pt) for pt in hole)
+                all_poly.append(h_pt2d)
+                are_holes.append(True)
+
+        # preprocess the polygons for a boolean operation
+        b_polys = Polygon2D.preprocess_polygons_for_boolean(all_poly, tolerance, are_holes)
+        if len(b_polys) <= 1:
+            return None
+        b_poly1, b_poly2 = b_polys[0], b_polys[1]
+
         # split the two boolean polygons with one another
         int_tol = tolerance / 1000
         try:
@@ -2820,6 +2828,7 @@ class Face3D(Base2DIn3D):
                     pb.split(b_poly1, b_poly2, int_tol)
             except Exception:
                 return [face1], [face2]  # the edge is just too tiny
+
         # rebuild the Face3D from the results and return them
         int_faces = Face3D._from_bool_poly(int_result, prim_pl, tolerance)
         poly1_faces = Face3D._from_bool_poly(poly1_result, prim_pl, tolerance)
@@ -2846,55 +2855,59 @@ class Face3D(Base2DIn3D):
 
         Returns:
             A list of Face3D for the Union of all the input Face3D. When the faces
-            are not coplanar, None will be returned.
+            are not all coplanar with one another, None will be returned.
         """
-        # test whether the faces are coplanar
-        prim_pl = faces[0].plane
-        for of in faces[1:]:
-            if not prim_pl.is_coplanar_tolerance(of.plane, tolerance, angle_tolerance):
-                return None
-        # convert all boundaries and holes to 2D space
-        hole_decoder = [False]
-        all_poly = [faces[0].boundary_polygon2d]
-        if faces[0].has_holes:
-            for hole in faces[0].hole_polygon2d:
-                all_poly.append(hole)
-                hole_decoder.append(True)
-        for of in faces[1:]:
-            of_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in of.boundary))
-            all_poly.append(of_poly)
-            hole_decoder.append(False)
-            if of.has_holes:
-                for hole in of.holes:
-                    h_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in hole))
-                    all_poly.append(h_poly)
-                    hole_decoder.append(True)
-        # snap the polygons to one another to avoid tolerance issues
+        # first be sure that the input is not empty or degenerate
+        if len(faces) == 0:
+            return []
+        f1 = faces[0]
         try:
-            all_poly = [ply.remove_colinear_vertices(tolerance) for ply in all_poly]
-        except AssertionError:  # degenerate faces input
+            f1_poly = f1.boundary_polygon2d.remove_colinear_vertices(tolerance)
+        except AssertionError:  # degenerate face input
             return None
-        all_poly = Polygon2D.snap_polygons(all_poly, tolerance)
-        # create BooleanPolygons of the faces
-        bool_polys = []
-        prev_poly = None
-        for ply, is_hole in zip(all_poly, hole_decoder):
-            bool_pts = (pb.BooleanPoint(pt.x, pt.y) for pt in ply.vertices)
-            if not is_hole:
-                if prev_poly is not None:
-                    bool_polys.append(pb.BooleanPolygon(prev_poly))
-                prev_poly = [bool_pts]
-            else:
-                prev_poly.append(bool_pts)
-        bool_polys.append(pb.BooleanPolygon(prev_poly))
+
+        # get the primary plane and polygons
+        prim_pl = f1.plane
+        all_poly, are_holes = [f1_poly], [False]
+        if f1.has_holes:
+            for hole in f1.hole_polygon2d:
+                all_poly.append(hole)
+                are_holes.append(True)
+
+        # add all of the secondary polygons
+        for face2 in faces[1:]:
+            # test whether the faces are coplanar
+            if not prim_pl.is_coplanar_tolerance(face2.plane, tolerance, angle_tolerance):
+                continue
+            # test whether the two polygons have any overlap in 2D space
+            f2_poly = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in face2.boundary))
+            if f1_poly.polygon_relationship(f2_poly, tolerance) == -1:
+                continue
+            try:
+                f2_poly = f2_poly.remove_colinear_vertices(tolerance)
+            except AssertionError:  # degenerate face input
+                continue
+            all_poly.append(f2_poly)
+            are_holes.append(False)
+            if face2.has_holes:
+                for hole in face2.holes:
+                    h_pt2d = Polygon2D(tuple(prim_pl.xyz_to_xy(pt) for pt in hole))
+                    all_poly.append(h_pt2d)
+                    are_holes.append(True)
+
+        # preprocess the polygons for a boolean operation
+        b_polys = Polygon2D.preprocess_polygons_for_boolean(all_poly, tolerance, are_holes)
+        if len(b_polys) <= 1:
+            return None
+
         # union the boolean polygons with one another
         int_tol = tolerance / 1000
         try:
-            poly_result = pb.union_all(bool_polys, int_tol)
+            poly_result = pb.union_all(b_polys, int_tol)
         except Exception:  # tiny edge caused a failure; try with small tol
             int_tol = int_tol / 100
             try:
-                poly_result = pb.union_all(bool_polys, int_tol)
+                poly_result = pb.union_all(b_polys, int_tol)
             except Exception:
                 return None  # the edge is just too tiny
         # rebuild the Face3D from the results and return them

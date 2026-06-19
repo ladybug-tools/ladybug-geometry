@@ -14,6 +14,7 @@ from .pointvector import Point2D, Vector2D
 from .line import LineSegment2D
 from .ray import Ray2D
 from .polyline import Polyline2D
+from ..util import rounding_tolerance
 from ..triangulation import _linked_list, _eliminate_holes
 from ..intersection2d import intersect_line2d, intersect_line2d_infinite, \
     does_intersection_exist_line2d, closest_point2d_on_line2d, \
@@ -1415,15 +1416,6 @@ class Polygon2D(Base2DIn2D):
         b_pts = (pb.BooleanPoint(pt.x, pt.y) for pt in self.vertices)
         return pb.BooleanPolygon([b_pts])
 
-    def _to_snapped_bool_poly(self, snap_ref_polygon, tolerance):
-        """Snap a Polygon2D to this one and translate it to a BooleanPolygon.
-
-        This is necessary to ensure that boolean operations will succeed between
-        two polygons.
-        """
-        new_poly = snap_ref_polygon.snap_to_polygon(self, tolerance)
-        return new_poly._to_bool_poly()
-
     @staticmethod
     def _from_bool_poly(bool_polygon, tolerance=None):
         """Get a list of Polygon2D from a BooleanPolygon object.
@@ -1448,6 +1440,74 @@ class Polygon2D(Base2DIn2D):
                     polys.append(poly)
         return polys
 
+    @staticmethod
+    def preprocess_polygons_for_boolean(polygons, tolerance, are_holes=None):
+        """Clean a set of polygons before performing boolean operations.
+
+        This cleaning is performed by removing all duplicate and colinear vertices
+        from the polygons. Next, the polygon segments are intersected with one
+        another and the polygon vertices are snapped together withing the tolerance.
+        Lastly, the coordinate values os the vertices are rounded to a number
+        of digits derived from the tolerance such that floating point issues
+        do not arise.
+
+        Args:
+            polygons: A list of Polygon2D objects to be processed for boolean
+                operations.
+            tolerance: The minimum distance between points before they are
+                considered distinct from one another.
+            are_holes: An optional list of True/False values to note whether
+                each polygon represents a hole in the previous polygon.
+                These values will be taken into account in the BooleanPolygon
+                objects returned from this method.
+
+        Returns:
+            A lit of BooleanPolygon objects that are ready for boolean operations.
+        """
+        # remove colinear vertices from the polygons within the tolerance
+        all_poly, holes_to_remove = [], []
+        for i, ply in enumerate(polygons):
+            try:
+                all_poly.append(ply.remove_colinear_vertices(tolerance))
+            except AssertionError:  # degenerate polygon to ignore
+                if are_holes is not None:
+                    holes_to_remove.append(i)
+        if len(all_poly) <= 1:
+            return all_poly
+        if len(holes_to_remove) != 0:
+            for h in reversed(holes_to_remove):
+                are_holes.pop(h)
+
+        # next, intersect segments and snap them together
+        all_poly = Polygon2D.intersect_polygon_segments(all_poly, tolerance)
+        all_poly = Polygon2D.snap_polygons(all_poly, tolerance)
+
+        # round all coordinates to something derived from the tolerance
+        rtol, base = rounding_tolerance(tolerance / 10)
+        clean_poly = []
+        for poly in all_poly:
+            clean_pts = []
+            for pt in poly:
+                clean_pt = Point2D(
+                    base * round(pt.x / base, rtol),
+                    base * round(pt.y / base, rtol)
+                )
+                clean_pts.append(clean_pt)
+            clean_poly.append(Polygon2D(clean_pts))
+
+        # create the boolean polygons
+        if are_holes is None:
+            return [poly._to_bool_poly() for poly in clean_poly]
+        else:
+            bool_polys = []
+            for poly, is_hole in zip(clean_poly, are_holes):
+                b_poly = (pb.BooleanPoint(pt.x, pt.y) for pt in poly.vertices)
+                if is_hole:
+                    bool_polys[-1].append(b_poly)
+                else:
+                    bool_polys.append([b_poly])
+            return [pb.BooleanPolygon(bp) for bp in bool_polys]
+
     def boolean_union(self, polygon, tolerance):
         """Get a list of Polygon2D for the union of this Polygon and another.
 
@@ -1468,11 +1528,10 @@ class Polygon2D(Base2DIn2D):
         Returns:
             A list of Polygon2D representing the union of the two polygons.
         """
-        result = pb.union(
-            self._to_bool_poly(),
-            polygon._to_snapped_bool_poly(self, tolerance),
-            tolerance / 1000
-        )
+        bool_polys = self.preprocess_polygons_for_boolean([self, polygon], tolerance)
+        if len(bool_polys) <= 1:
+            return []
+        result = pb.union(bool_polys[0], bool_polys[1], tolerance / 1000)
         return Polygon2D._from_bool_poly(result, tolerance)
 
     def boolean_intersect(self, polygon, tolerance):
@@ -1488,11 +1547,10 @@ class Polygon2D(Base2DIn2D):
             A list of Polygon2D representing the intersection of the two polygons.
             Will be an empty list if no overlap exists between the polygons.
         """
-        result = pb.intersect(
-            self._to_bool_poly(),
-            polygon._to_snapped_bool_poly(self, tolerance),
-            tolerance / 1000
-        )
+        bool_polys = self.preprocess_polygons_for_boolean([self, polygon], tolerance)
+        if len(bool_polys) <= 1:
+            return []
+        result = pb.intersect(bool_polys[0], bool_polys[1], tolerance / 1000)
         return Polygon2D._from_bool_poly(result, tolerance)
 
     def boolean_difference(self, polygon, tolerance):
@@ -1510,11 +1568,10 @@ class Polygon2D(Base2DIn2D):
             elimination of this polygon. Will be the original polygon when there
             is no overlap between the polygons.
         """
-        result = pb.difference(
-            self._to_bool_poly(),
-            polygon._to_snapped_bool_poly(self, tolerance),
-            tolerance / 1000
-        )
+        bool_polys = self.preprocess_polygons_for_boolean([self, polygon], tolerance)
+        if len(bool_polys) <= 1:
+            return []
+        result = pb.difference(bool_polys[0], bool_polys[1], tolerance / 1000)
         return Polygon2D._from_bool_poly(result, tolerance)
 
     def boolean_xor(self, polygon, tolerance):
@@ -1542,11 +1599,10 @@ class Polygon2D(Base2DIn2D):
             two polygons. Will be the original polygons when there is no overlap
             in the two.
         """
-        result = pb.xor(
-            self._to_bool_poly(),
-            polygon._to_snapped_bool_poly(self, tolerance),
-            tolerance / 1000
-        )
+        bool_polys = self.preprocess_polygons_for_boolean([self, polygon], tolerance)
+        if len(bool_polys) <= 1:
+            return []
+        result = pb.xor(bool_polys[0], bool_polys[1], tolerance / 1000)
         return Polygon2D._from_bool_poly(result, tolerance)
 
     @staticmethod
@@ -1596,8 +1652,9 @@ class Polygon2D(Base2DIn2D):
         Returns:
             A list of Polygon2D representing the union of all the polygons.
         """
-        polygons = Polygon2D.snap_polygons(polygons, tolerance)
-        bool_polys = [poly._to_bool_poly() for poly in polygons]
+        bool_polys = Polygon2D.preprocess_polygons_for_boolean(polygons, tolerance)
+        if len(bool_polys) <= 1:
+            return []
         result = pb.union_all(bool_polys, tolerance / 1000)
         return Polygon2D._from_bool_poly(result, tolerance)
 
@@ -1626,8 +1683,9 @@ class Polygon2D(Base2DIn2D):
             A list of Polygon2D representing the intersection of all the polygons.
             Will be an empty list if no overlap exists between the polygons.
         """
-        polygons = Polygon2D.snap_polygons(polygons, tolerance)
-        bool_polys = [poly._to_bool_poly() for poly in polygons]
+        bool_polys = Polygon2D.preprocess_polygons_for_boolean(polygons, tolerance)
+        if len(bool_polys) <= 1:
+            return []
         result = pb.intersect_all(bool_polys, tolerance / 1000)
         return Polygon2D._from_bool_poly(result, tolerance)
 
@@ -1666,11 +1724,12 @@ class Polygon2D(Base2DIn2D):
             not overlap with polygon1. When combined with the intersection, this
             makes a split version of polygon2.
         """
-        int_result, poly1_result, poly2_result = pb.split(
-            polygon1._to_bool_poly(),
-            polygon2._to_snapped_bool_poly(polygon1, tolerance),
-            tolerance / 1000
-        )
+        polygons = [polygon1, polygon2]
+        bool_polys = Polygon2D.preprocess_polygons_for_boolean(polygons, tolerance)
+        if len(bool_polys) <= 1:
+            return []
+        int_result, poly1_result, poly2_result = \
+            pb.split(bool_polys[0], bool_polys[1], tolerance / 1000)
         intersection = Polygon2D._from_bool_poly(int_result, tolerance)
         poly1_difference = Polygon2D._from_bool_poly(poly1_result, tolerance)
         poly2_difference = Polygon2D._from_bool_poly(poly2_result, tolerance)
@@ -2373,24 +2432,18 @@ class Polygon2D(Base2DIn2D):
             all_poly.append(offset_poly)
 
         # boolean union the polygons together
-        all_poly = Polygon2D.snap_polygons(all_poly, tolerance)
-        bool_polys = []  # create BooleanPolygons
-        for ply in all_poly:
-            bool_pts = [pb.BooleanPoint(pt.x, pt.y) for pt in ply.vertices]
-            bool_polys.append(pb.BooleanPolygon([bool_pts]))
-        int_tol = tolerance / 300
+        bool_polys = Polygon2D.preprocess_polygons_for_boolean(all_poly, tolerance)
+        if len(bool_polys) <= 1:
+            return []
+        int_tol = tolerance / 1000
         try:
             poly_result = pb.union_all(bool_polys, int_tol)
         except Exception:  # tiny edge caused a failure; try with small tol
-            int_tol = int_tol / 10
+            int_tol = int_tol / 100
             try:
                 poly_result = pb.union_all(bool_polys, int_tol)
             except Exception:
-                int_tol = int_tol / 10
-                try:
-                    poly_result = pb.union_all(bool_polys, int_tol)
-                except Exception:
-                    poly_result = None  # the edge is just too tiny
+                poly_result = None  # the edge is just too tiny
 
         # serialize the BooleanPolygon into Polygon2D
         polys = []
