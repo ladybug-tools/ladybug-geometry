@@ -3637,7 +3637,9 @@ class Face3D(Base2DIn3D):
         if v1.angle(v2) == math.pi:  # colinear vertices; prevent averaging to zero
             return v1.rotate(face.normal, math.pi / 2).normalize()
         else:  # average the two edge vectors together
-            avg_coords = ((v1.x + v2.x) / 2), ((v1.y + v2.y) / 2), ((v1.z + v2.z) / 2)
+            v1 = v1.normalize()
+            v2 = v2.normalize()
+            avg_coords = ((v1.x + v2.x)), ((v1.y + v2.y)), ((v1.z + v2.z))
             return Vector3D(*avg_coords).normalize()
 
     @staticmethod

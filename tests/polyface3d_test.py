@@ -752,3 +752,14 @@ def test_polyface3d_merge_overlap():
     merged_polyface = polyface.merge_overlapping_edges(0.1, math.radians(1))
     assert len(merged_polyface.naked_edges) == 0
     assert merged_polyface.is_solid
+
+
+def test_polyface3d_negative_volume_bug():
+    """Test Polyface3D that triggered a negative volume calculation."""
+    geo_file = './tests/json/neg_volume_polyface_bug.json'
+    with open(geo_file, 'r') as fp:
+        geo_dict = json.load(fp)
+    polyface = Polyface3D.from_dict(geo_dict)
+
+    assert polyface.is_solid
+    assert polyface.volume > 0
