@@ -536,9 +536,9 @@ class Polyface3D(Base2DIn3D):
                 remove_i.extend(coll_i)  # remove overlapping edges from the list
                 verts = [self.vertices[j] for j in final_vi]
                 dir_vec = verts[0] - verts[1]
-                if dir_vec.x != 0:
+                if dir_vec.x > dir_vec.y and dir_vec.x > dir_vec.z:
                     vert_coor = [v.x for v in verts]
-                elif dir_vec.y != 0:
+                elif dir_vec.y > dir_vec.x and dir_vec.y > dir_vec.z:
                     vert_coor = [v.y for v in verts]
                 else:
                     vert_coor = [v.z for v in verts]
