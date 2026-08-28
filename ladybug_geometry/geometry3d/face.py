@@ -2220,7 +2220,7 @@ class Face3D(Base2DIn3D):
         base_plane = Plane(norm, bottom_seg.p, bottom_seg.v)
         sub_faces = Face3D.sub_rects_from_rect_dimensions(
             base_plane, bottom_seg.length, height_seg.length, sub_rect_height,
-            sub_rect_width, sill_height, horizontal_separation)
+            sub_rect_width, sill_height, horizontal_separation, tolerance)
         return sub_faces
 
     def get_top_bottom_horizontal_edges(self, tolerance):
@@ -2466,7 +2466,7 @@ class Face3D(Base2DIn3D):
     @staticmethod
     def sub_rects_from_rect_dimensions(
             base_plane, parent_base, parent_height, sub_rect_height, sub_rect_width,
-            sill_height, horizontal_separation):
+            sill_height, horizontal_separation, tolerance=None):
         """Get a list of rectangular Face3D objects from dimensions and parameters.
 
         All of the resulting Face3D objects lie within a parent rectangle defined
@@ -2489,19 +2489,25 @@ class Face3D(Base2DIn3D):
             horizontal_separation: A number for the target separation between
                 individual sub-rectangle center lines.  If this number is larger than
                 the parent rectangle base, only one sub-rectangle will be produced.
+            tolerance: Optional tolerance value to determine the offset of the
+                sub-rectangles from the geometry of the parent rectangle. If None,
+                this offset will be determined as a fraction of the parent
+                width and height. (Default: None).
 
         Returns:
             A list of Face3D objects for sub faces.
         """
+        # determine the offset values to be used
+        height_offset = 0.01 * parent_height if tolerance is None else tolerance
+        width_offset = 0.01 * parent_base if tolerance is None else tolerance
         # if sub_rect_height > parent_height, set it to just under parent_height
-        sub_rect_height = parent_height - 0.02 * parent_height if \
+        sub_rect_height = parent_height - (2 * height_offset) if \
             sub_rect_height >= parent_height else sub_rect_height
         # if sill_height is close to 0, set it to just above 0
-        sill_hgt = 0.01 * parent_height if sill_height < 0.01 * parent_height \
-            else sill_height
+        sill_hgt = height_offset if sill_height < height_offset else sill_height
         # adjust sill_hgt if sum of it and sub_rect_height > parent_height
         if sub_rect_height + sill_hgt >= parent_height:
-            sill_hgt = parent_height - sub_rect_height - (parent_height * 0.01)
+            sill_hgt = parent_height - sub_rect_height - height_offset
 
         # ensure that the horizontal_separation is always greater than sub_rect_width
         if sub_rect_width >= horizontal_separation:
@@ -2544,7 +2550,7 @@ class Face3D(Base2DIn3D):
                                   base_plane) for line in btm_div_segs]
         else:  # make a single sub-rectangle at an appropriate sill height
             if sub_rect_width >= parent_base:
-                sub_rect_width = parent_base * 0.98
+                sub_rect_width = parent_base - (2 * width_offset)
             scale_fac = sub_rect_width / parent_base
             rect_seg = bottom_seg.scale(scale_fac, bottom_seg.point_at(0.5))
             seg = rect_seg.move(sill_vec)
