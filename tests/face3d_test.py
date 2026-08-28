@@ -1811,14 +1811,14 @@ def test_sub_faces_by_dimension_rectangle():
         sub_face_height, 3.0, sill_height, div_dist, 0.1)
     assert len(sub_faces_1) == 1
     segs_1 = sub_faces_1[0].boundary_segments
-    assert segs_1[1].length == sub_face_height
+    assert segs_1[1].length == pytest.approx(sub_face_height, rel=1e-10)
 
     sub_faces_2 = face_2.sub_faces_by_dimension_rectangle(
         sub_face_height, 1.0, sill_height, div_dist, 0.1)
     assert len(sub_faces_2) == 3
     segs_2 = sub_faces_2[0].boundary_segments
-    assert segs_2[0].length == 1.0
-    assert segs_2[1].length == sub_face_height
+    assert segs_2[0].length == pytest.approx(1.0, rel=1e-10)
+    assert segs_2[1].length == pytest.approx(sub_face_height, rel=1e-10)
 
 
 def test_sub_faces_by_ratio_sub_rectangle_tol_issue():
