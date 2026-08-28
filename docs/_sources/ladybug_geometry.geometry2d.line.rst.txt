@@ -1,0 +1,7 @@
+ladybug\_geometry.geometry2d.line module
+========================================
+
+.. automodule:: ladybug_geometry.geometry2d.line
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+ladybug\_geometry.interop.stl module
+====================================
+
+.. automodule:: ladybug_geometry.interop.stl
+   :members:
+   :undoc-members:
+   :show-inheritance:

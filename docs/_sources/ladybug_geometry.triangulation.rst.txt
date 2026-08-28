@@ -1,0 +1,7 @@
+ladybug\_geometry.triangulation module
+======================================
+
+.. automodule:: ladybug_geometry.triangulation
+   :members:
+   :undoc-members:
+   :show-inheritance:

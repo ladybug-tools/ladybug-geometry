@@ -1,0 +1,7 @@
+ladybug\_geometry.geometry3d.sphere module
+==========================================
+
+.. automodule:: ladybug_geometry.geometry3d.sphere
+   :members:
+   :undoc-members:
+   :show-inheritance:
