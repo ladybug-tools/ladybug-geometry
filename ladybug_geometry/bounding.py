@@ -1,6 +1,7 @@
 # coding=utf-8
 """Utility functions for computing bounding boxes and extents around geometry."""
 from __future__ import division
+import math
 
 from ladybug_geometry.geometry2d.pointvector import Point2D
 from ladybug_geometry.geometry3d.pointvector import Point3D
@@ -271,3 +272,53 @@ def overlapping_bounding_boxes(geometry_1, geometry_2, distance):
         return False   # overlap impossible
 
     return True  # overlap exists
+
+
+def min_area_bounding_rectange(points, angle_tolerance=math.pi/180):
+    """Get the four Point2Ds for the bounding rectangle with the smallest area around points.
+
+    Args:
+        points: An array of Point2Ds or Point3Ds geometry objects.
+        angle_tolerance: The smallest angle in radians that is meaningful for
+            the bounding rectangle calculation. (Default: math.pi/180).
+
+    Returns:
+        A tuple with 4 points corresponding to the corners of the smallest area
+        bounding rectangle. The first two points will always have the longer
+        dimension of the rectangle.
+    """
+    # compute all of the angles to check
+    angles = [0]
+    ang, max_ang = 0, math.pi / 4
+    while ang < max_ang:
+        ang += angle_tolerance
+        angles.append(ang)
+
+    # loop through the angles and evaluate the area of the bounding rectangle
+    cpt = points[0]  # geometry rotation point
+    areas, x_doms, y_doms = [], [], []
+    for axis_angle in angles:
+        rot_pts = _orient_geometry(points, axis_angle, cpt)
+        xx = bounding_domain_x(rot_pts)
+        yy = bounding_domain_y(rot_pts)
+        x_doms.append(xx)
+        y_doms.append(yy)
+        areas.append((xx[1] - xx[0]) * (yy[1] - yy[0]))
+
+    # compute the bounding rectangle points from the smallest area
+    areas, angles, x_doms, y_doms = zip(*sorted(zip(areas, angles, x_doms, y_doms)))
+    axis_angle, xx, yy = angles[0], x_doms[0], y_doms[0]
+    min_pt = Point2D(xx[0], yy[0])
+    pt_2 = Point2D(xx[1], yy[0])
+    max_pt = Point2D(xx[1], yy[1])
+    pt_4 = Point2D(xx[0], yy[1])
+    if axis_angle != 0:  # rotate the points back
+        cpt = Point2D(cpt.x, cpt.y)  # cast Point3D to Point2D
+        min_pt = min_pt.rotate(axis_angle, cpt)
+        pt_2 = pt_2.rotate(axis_angle, cpt)
+        max_pt = max_pt.rotate(axis_angle, cpt)
+        pt_4 = pt_4.rotate(axis_angle, cpt)
+
+    if xx[1] - xx[0] > yy[1] - yy[0]:
+        return (min_pt, pt_2, max_pt, pt_4)
+    return (pt_2, max_pt, pt_4, min_pt)
