@@ -274,11 +274,11 @@ def overlapping_bounding_boxes(geometry_1, geometry_2, distance):
     return True  # overlap exists
 
 
-def min_area_bounding_rectange(points, angle_tolerance=math.pi/180):
+def min_area_bounding_rectangle(geometries, angle_tolerance=math.pi/180):
     """Get the four Point2Ds for the bounding rectangle with the smallest area around points.
 
     Args:
-        points: An array of Point2Ds or Point3Ds geometry objects.
+        geometries: An array of 2D or 3D geometry objects.
         angle_tolerance: The smallest angle in radians that is meaningful for
             the bounding rectangle calculation. (Default: math.pi/180).
 
@@ -287,6 +287,16 @@ def min_area_bounding_rectange(points, angle_tolerance=math.pi/180):
         bounding rectangle. The first two points will always have the longer
         dimension of the rectangle.
     """
+    # extract points from the geometry
+    points = []
+    for geo in geometries:
+        if isinstance(geo, (Point2D, Point3D)):
+            points.append(geo)
+        try:
+            points.extend(geo.vertices)
+        except AttributeError:  # not a geometry that can be bounded
+            pass
+
     # compute all of the angles to check
     angles = [0]
     ang, max_ang = 0, math.pi / 4
