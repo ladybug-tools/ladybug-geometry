@@ -1,0 +1,7 @@
+ladybug\_geometry.geometry2d.arc module
+=======================================
+
+.. automodule:: ladybug_geometry.geometry2d.arc
+   :members:
+   :undoc-members:
+   :show-inheritance:
