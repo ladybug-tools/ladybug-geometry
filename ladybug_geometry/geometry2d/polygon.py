@@ -2488,13 +2488,19 @@ class Polygon2D(Base2DIn2D):
                 bound, holes = clean_group[0], clean_group[1:]
                 # offset the first polygon inwards
                 offset_bound = bound.offset(min_separation / 2, min_angle=min_angle)
-                offset_bound = offset_bound.remove_colinear_vertices(tolerance)
-                boundary_poly.append(offset_bound)
-                # offset any remaining polygons outwards
-                for hole in holes:
-                    offset_hole = hole.offset(-min_separation / 2, min_angle=min_angle)
-                    offset_hole = offset_hole.remove_colinear_vertices(tolerance)
-                    boundary_poly.append(offset_hole)
+                try:
+                    offset_bound = offset_bound.remove_colinear_vertices(tolerance)
+                    boundary_poly.append(offset_bound)
+                    # offset any remaining polygons outwards
+                    for hole in holes:
+                        offset_hole = hole.offset(-min_separation / 2, min_angle=min_angle)
+                        try:
+                            offset_hole = offset_hole.remove_colinear_vertices(tolerance)
+                            boundary_poly.append(offset_hole)
+                        except AssertionError:
+                            continue  # degenerate polygon to be removed
+                except AssertionError:
+                    continue  # degenerate polygon to be removed
         return boundary_poly
 
     @staticmethod
