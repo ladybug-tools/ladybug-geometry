@@ -1,0 +1,7 @@
+ladybug\_geometry.boolean module
+================================
+
+.. automodule:: ladybug_geometry.boolean
+   :members:
+   :undoc-members:
+   :show-inheritance:
