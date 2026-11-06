@@ -1365,6 +1365,20 @@ class Polygon2D(Base2DIn2D):
         Returns:
             A version of the polygon that is snapped to this Polygon2D.
         """
+        # bounding rectangle check
+        if not Polygon2D.overlapping_bounding_rect(self, polygon, tolerance):
+            return polygon
+
+        # precompute segment bounding boxes
+        s_boxes = []
+        for s in self.segments:
+            p1, p2 = s.p1, s.p2
+            min_x = (p1.x if p1.x < p2.x else p2.x) - tolerance
+            max_x = (p2.x if p1.x < p2.x else p1.x) + tolerance
+            min_y = (p1.y if p1.y < p2.y else p2.y) - tolerance
+            max_y = (p2.y if p1.y < p2.y else p1.y) + tolerance
+            s_boxes.append((min_x, max_x, min_y, max_y))
+
         new_verts = []
         for pt in polygon.vertices:
             # first check if the point can be snapped to a vertex
@@ -1374,13 +1388,15 @@ class Polygon2D(Base2DIn2D):
                     break
             else:
                 # check if the point can be snapped to a segment
-                for seg in self.segments:
-                    s_pt = seg.closest_point(pt)
-                    if s_pt.distance_to_point(pt) <= tolerance:
-                        new_verts.append(s_pt)
-                        break
+                for seg, box in zip(self.segments, s_boxes):
+                    if box[0] <= pt.x <= box[1] and box[2] <= pt.y <= box[3]:
+                        s_pt = seg.closest_point(pt)
+                        if s_pt.distance_to_point(pt) <= tolerance:
+                            new_verts.append(s_pt)
+                            break
                 else:  # point could not be snapped
                     new_verts.append(pt)
+
         return Polygon2D(new_verts)
 
     def snap_to_grid(self, grid_increment):
