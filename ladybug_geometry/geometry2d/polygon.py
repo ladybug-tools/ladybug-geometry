@@ -1621,11 +1621,10 @@ class Polygon2D(Base2DIn2D):
         """
         new_polygons = list(polygons)
         for i, poly_1 in enumerate(new_polygons):
-            try:
-                for j, poly_2 in enumerate(new_polygons[i + 1:]):
-                    new_polygons[i + j + 1] = poly_1.snap_to_polygon(poly_2, tolerance)
-            except IndexError:
-                pass  # we have reached the end of the list of polygons
+            for j, poly_2 in enumerate(new_polygons[i + 1:]):
+                if not Polygon2D.overlapping_bounding_rect(poly_1, poly_2, tolerance):
+                    continue
+                new_polygons[i + j + 1] = poly_1.snap_to_polygon(poly_2, tolerance)
         return new_polygons
 
     @staticmethod
