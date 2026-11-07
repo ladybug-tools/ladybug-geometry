@@ -1855,33 +1855,55 @@ class Polygon2D(Base2DIn2D):
         Returns:
             Two polygon objects with extra vertices inserted if necessary.
         """
-        polygon1_updates = []
-        polygon2_updates = []
-
         # bounding rectangle check
         if not Polygon2D.overlapping_bounding_rect(polygon1, polygon2, tolerance):
             return polygon1, polygon2  # no overlap
 
+        polygon1_updates = []
+        polygon2_updates = []
+
+        # precompute segment bounding boxes for polygon2
+        s2_boxes = []
+        for s in polygon2.segments:
+            p1, p2 = s.p1, s.p2
+            min_x = (p1.x if p1.x < p2.x else p2.x) - tolerance
+            max_x = (p2.x if p1.x < p2.x else p1.x) + tolerance
+            min_y = (p1.y if p1.y < p2.y else p2.y) - tolerance
+            max_y = (p2.y if p1.y < p2.y else p1.y) + tolerance
+            s2_boxes.append((min_x, max_x, min_y, max_y))
+
         # test if each point of polygon2 is within the tolerance distance of any segment
-        # of polygon1.  If so, add the closest point on the segment to the polygon1
+        # of polygon1. If so, add the closest point on the segment to the polygon1
         # update list. And vice versa (testing polygon2 against polygon1).
         for i1, seg1 in enumerate(polygon1.segments):
+            p1_1, p1_2 = seg1.p1, seg1.p2
+            s1_min_x = (p1_1.x if p1_1.x < p1_2.x else p1_2.x) - tolerance
+            s1_max_x = (p1_2.x if p1_1.x < p1_2.x else p1_1.x) + tolerance
+            s1_min_y = (p1_1.y if p1_1.y < p1_2.y else p1_2.y) - tolerance
+            s1_max_y = (p1_2.y if p1_1.y < p1_2.y else p1_1.y) + tolerance
+
             for i2, seg2 in enumerate(polygon2.segments):
-                # Test polygon1 against polygon2
-                x = closest_point2d_on_line2d(seg2.p1, seg1)
-                if all(p.distance_to_point(x) > tolerance for p in polygon1.vertices) \
-                        and x.distance_to_point(seg2.p1) <= tolerance:
-                    polygon1_updates.append((i1, x))
-                # Test polygon2 against polygon1
-                y = closest_point2d_on_line2d(seg1.p1, seg2)
-                if all(p.distance_to_point(y) > tolerance for p in polygon2.vertices) \
-                        and y.distance_to_point(seg1.p1) <= tolerance:
-                    polygon2_updates.append((i2, y))
+                p2_1 = seg2.p1
+
+                # test polygon1 against polygon2: seg2.p1 along seg1
+                if s1_min_x <= p2_1.x <= s1_max_x and s1_min_y <= p2_1.y <= s1_max_y:
+                    x = closest_point2d_on_line2d(p2_1, seg1)
+                    if x.distance_to_point(p2_1) <= tolerance and \
+                            all(p.distance_to_point(x) > tolerance for p in polygon1.vertices):
+                        polygon1_updates.append((i1, x))
+
+                # test polygon2 against polygon1: seg1.p1 along seg2
+                b2 = s2_boxes[i2]
+                if b2[0] <= p1_1.x <= b2[1] and b2[2] <= p1_1.y <= b2[3]:
+                    y = closest_point2d_on_line2d(p1_1, seg2)
+                    if y.distance_to_point(p1_1) <= tolerance and \
+                            all(p.distance_to_point(y) > tolerance for p in polygon2.vertices):
+                        polygon2_updates.append((i2, y))
 
         # apply any updates to polygon1
         polygon1 = Polygon2D._insert_updates_in_order(polygon1, polygon1_updates)
 
-        # Apply any updates to polygon2
+        # apply any updates to polygon2
         polygon2 = Polygon2D._insert_updates_in_order(polygon2, polygon2_updates)
 
         return polygon1, polygon2
