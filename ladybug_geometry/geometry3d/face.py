@@ -2615,21 +2615,63 @@ class Face3D(Base2DIn3D):
         b_polys = Polygon2D.preprocess_polygons_for_boolean(all_poly, tolerance, are_holes)
         if len(b_polys) <= 1:
             return [self]
+
         b_poly1 = b_polys[0]
         relevant_b_polys = b_polys[1:]
-
-        # loop through the boolean polygons and subtract them
         int_tol = tolerance / 1000
-        for b_poly2 in relevant_b_polys:
-            # subtract the boolean polygons
+
+        # hierarchical tree union: merge subtracting polygons pairwise to dissolve
+        # shared internal edges early in O(N log N) rather than an O(N^2) monolithic sweep
+        if len(relevant_b_polys) == 1:
+            b_poly_sub = relevant_b_polys[0]
+        else:
+            def _xy_sort(bp):
+                p0 = bp.regions[0][0]
+                return p0.x + p0.y
+
+            current_level = sorted(relevant_b_polys, key=_xy_sort)
+            while len(current_level) > 1:
+                next_level = []
+                num_p = len(current_level)
+                for i in range(0, num_p, 2):
+                    if i + 1 < num_p:
+                        p1, p2 = current_level[i], current_level[i + 1]
+                        try:
+                            merged = pb.union(p1, p2, int_tol)
+                        except Exception:
+                            try:
+                                merged = pb.union(p1, p2, int_tol / 100)
+                            except Exception:
+                                merged = p1
+                        next_level.append(merged)
+                    else:
+                        next_level.append(current_level[i])
+                current_level = next_level
+
+            b_poly_sub = current_level[0]
+
+        # single difference pass
+        if b_poly_sub is not None:
             try:
-                b_poly1 = pb.difference(b_poly1, b_poly2, int_tol)
-            except Exception:  # tiny edge caused a failure; try with small tol
+                b_poly1 = pb.difference(b_poly1, b_poly_sub, int_tol)
+            except Exception:
                 int_tol = int_tol / 100
+                try:
+                    b_poly1 = pb.difference(b_poly1, b_poly_sub, int_tol)
+                except Exception:
+                    return [self]
+        else:
+            # fallback to sequential subtraction if tree union failed completely
+            for b_poly2 in relevant_b_polys:
                 try:
                     b_poly1 = pb.difference(b_poly1, b_poly2, int_tol)
                 except Exception:
-                    return [self]  # the edge is just too tiny
+                    int_tol = int_tol / 100
+                    try:
+                        b_poly1 = pb.difference(b_poly1, b_poly2, int_tol)
+                    except Exception:
+                        return [self]
+
         # rebuild the Face3D from the result of the subtraction
         return Face3D._from_bool_poly(b_poly1, prim_pl, tolerance)
 
