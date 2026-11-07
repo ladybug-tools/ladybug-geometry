@@ -2233,12 +2233,17 @@ class Polygon2D(Base2DIn2D):
             else:
                 cclock_poly.append(poly)
 
+        # precompute polygon bounding boxes
+        poly_boxes = [(p.min.x, p.min.y, p.max.x, p.max.y) for p in cclock_poly]
+
         # determine which Polygon2D segments are 'exterior' using the min_separation
         right_ang = -math.pi / 2
         ext_segs = []
         for i, poly in enumerate(cclock_poly):
             # remove any short segments
             rel_segs = [s for s in poly.segments if s.length > min_separation]
+            if not rel_segs:
+                continue
 
             # create min_separation line segments to be used to test intersection
             test_segs = []
@@ -2255,22 +2260,48 @@ class Polygon2D(Base2DIn2D):
                     spec_test_segs.append(LineSegment2D(m_pt, d_vec * min_separation))
                 test_segs.append(spec_test_segs)
 
-            # intersect the test line segments to asses which parts are exterior
+            # pre-filter other polygons within min_separation of this polygon
+            p_box = poly_boxes[i]
+            p_exp_min_x = p_box[0] - min_separation - tolerance
+            p_exp_min_y = p_box[1] - min_separation - tolerance
+            p_exp_max_x = p_box[2] + min_separation + tolerance
+            p_exp_max_y = p_box[3] + min_separation + tolerance
+
+            cand_polys = []
+            cand_boxes = []
+            for k, (oth_p, oth_b) in enumerate(zip(cclock_poly, poly_boxes)):
+                if k != i:
+                    if not (oth_b[2] < p_exp_min_x or oth_b[0] > p_exp_max_x or
+                            oth_b[3] < p_exp_min_y or oth_b[1] > p_exp_max_y):
+                        cand_polys.append(oth_p)
+                        cand_boxes.append(oth_b)
+
+            # intersect the test line segments to assess which parts are exterior
             non_int_segs = []
-            other_poly = [p for j, p in enumerate(cclock_poly) if j != i]
             for j, (_s, int_lins) in enumerate(zip(rel_segs, test_segs)):
                 int_vals = [0] * len(int_lins)
                 for m, int_lin in enumerate(int_lins):
-                    for _oth_p in other_poly:
-                        if _oth_p.intersect_line_ray(int_lin):  # intersection!
-                            int_vals[m] = 1
-                            break
+                    lp1, lp2 = int_lin.p1, int_lin.p2
+                    l_min_x = (lp1.x if lp1.x < lp2.x else lp2.x) - tolerance
+                    l_max_x = (lp2.x if lp1.x < lp2.x else lp1.x) + tolerance
+                    l_min_y = (lp1.y if lp1.y < lp2.y else lp2.y) - tolerance
+                    l_max_y = (lp2.y if lp1.y < lp2.y else lp1.y) + tolerance
+
+                    for _oth_p, _oth_b in zip(cand_polys, cand_boxes):
+                        if not (_oth_b[2] < l_min_x or _oth_b[0] > l_max_x or
+                                _oth_b[3] < l_min_y or _oth_b[1] > l_max_y):
+                            if _oth_p.intersect_line_ray(int_lin):  # intersection!
+                                int_vals[m] = 1
+                                break
+
                 if sum(int_vals) == len(int_lins):  # fully internal line
                     continue
                 else:  # if the polygon is concave, also check for self intersection
                     if not poly.is_convex:
                         _other_segs = [x for k, x in enumerate(rel_segs) if k != j]
                         for m, int_lin in enumerate(int_lins):
+                            if int_vals[m] == 1:
+                                continue
                             for _oth_s in _other_segs:
                                 if int_lin.intersect_line_ray(_oth_s) is not None:
                                     int_vals[m] = 1
@@ -2310,14 +2341,28 @@ class Polygon2D(Base2DIn2D):
 
         # loop through exterior segments and add segments across the min_separation
         joining_segs = []
-        for i, e_seg in enumerate(ext_segs):
-            try:
-                for o_seg in ext_segs[i + 1:]:
+        ext_boxes = []
+        for s in ext_segs:
+            p1, p2 = s.p1, s.p2
+            min_x = (p1.x if p1.x < p2.x else p2.x) - min_separation
+            max_x = (p2.x if p1.x < p2.x else p1.x) + min_separation
+            min_y = (p1.y if p1.y < p2.y else p2.y) - min_separation
+            max_y = (p2.y if p1.y < p2.y else p1.y) + min_separation
+            ext_boxes.append((min_x, max_x, min_y, max_y))
+
+        num_ext = len(ext_segs)
+        for i in range(num_ext - 1):
+            e_seg = ext_segs[i]
+            b1 = ext_boxes[i]
+            for j in range(i + 1, num_ext):
+                o_seg = ext_segs[j]
+                op1, op2 = o_seg.p1, o_seg.p2
+                # quick endpoint rejection
+                if (b1[0] <= op1.x <= b1[1] and b1[2] <= op1.y <= b1[3]) or \
+                    (b1[0] <= op2.x <= b1[1] and b1[2] <= op2.y <= b1[3]):
                     dist, pts = closest_end_point2d_between_line2d(e_seg, o_seg)
                     if tolerance < dist <= min_separation:
                         joining_segs.append(LineSegment2D.from_end_points(*pts))
-            except IndexError:
-                pass  # we have reached the end of the list
 
         # join all of the segments together into polylines
         all_segs = ext_segs + joining_segs
