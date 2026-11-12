@@ -2731,9 +2731,8 @@ class Face3D(Base2DIn3D):
         try:
             poly_result = pb.union(b_poly1, b_poly2, int_tol)
         except Exception:  # tiny edge caused a failure; try with small tol
-            int_tol = int_tol / 100
             try:
-                poly_result = pb.union(b_poly1, b_poly2, int_tol)
+                poly_result = pb.union(b_poly1, b_poly2, int_tol / 100)
             except Exception:
                 return None  # the edge is just too tiny
         # rebuild the Face3D from the results and return them
@@ -2799,9 +2798,8 @@ class Face3D(Base2DIn3D):
         try:
             poly_result = pb.intersect(b_poly1, b_poly2, int_tol)
         except Exception:  # tiny edge caused a failure; try with small tol
-            int_tol = int_tol / 100
             try:
-                poly_result = pb.intersect(b_poly1, b_poly2, int_tol)
+                poly_result = pb.intersect(b_poly1, b_poly2, int_tol / 100)
             except Exception:
                 return None  # the edge is just too tiny
         # rebuild the Face3D from the results and return them
@@ -2870,10 +2868,9 @@ class Face3D(Base2DIn3D):
         try:
             int_result, poly1_result, poly2_result = pb.split(b_poly1, b_poly2, int_tol)
         except Exception:  # tiny edge caused a failure; try one more time with small tol
-            int_tol = int_tol / 100
             try:
                 int_result, poly1_result, poly2_result = \
-                    pb.split(b_poly1, b_poly2, int_tol)
+                    pb.split(b_poly1, b_poly2, int_tol / 100)
             except Exception:
                 return [face1], [face2]  # the edge is just too tiny
 
@@ -2948,16 +2945,39 @@ class Face3D(Base2DIn3D):
         if len(b_polys) <= 1:
             return None
 
+        def _xy_sort(bp):
+            p0 = bp.regions[0][0]
+            return p0.x + p0.y
+
+        b_polys = sorted(b_polys, key=_xy_sort)
+
         # union the boolean polygons with one another
-        int_tol = tolerance / 1000
-        try:
-            poly_result = pb.union_all(b_polys, int_tol)
-        except Exception:  # tiny edge caused a failure; try with small tol
-            int_tol = int_tol / 100
+        def _union_pair(p1, p2, tol):
             try:
-                poly_result = pb.union_all(b_polys, int_tol)
-            except Exception:
-                return None  # the edge is just too tiny
+                return pb.union(p1, p2, tol)
+            except Exception:  # fall back on using a finer tolerance
+                return pb.union(p1, p2, tol / 100.0)
+
+        int_tol = tolerance / 1000
+        current, max_iter, iter_count = b_polys, len(all_poly), 0
+        try:
+            while len(current) > 1 and iter_count < max_iter:
+                next_round = []
+                for k in range(0, len(current), 2):
+                    if k + 1 < len(current):
+                        next_round.append(
+                            _union_pair(current[k], current[k + 1], int_tol)
+                        )
+                    else:
+                        next_round.append(current[k])
+                current = next_round
+                iter_count += 1
+            poly_result = current[0] if current else None
+        except Exception:  # no boolean union solution could be found
+            poly_result = None
+        if poly_result is None:
+            return None  # the edge is just too tiny
+
         # rebuild the Face3D from the results and return them
         union_faces = Face3D._from_bool_poly(poly_result, prim_pl, tolerance)
         return union_faces
