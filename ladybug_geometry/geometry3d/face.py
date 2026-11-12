@@ -2630,7 +2630,8 @@ class Face3D(Base2DIn3D):
                 return p0.x + p0.y
 
             current_level = sorted(relevant_b_polys, key=_xy_sort)
-            while len(current_level) > 1:
+            max_iter, iter_count = len(relevant_b_polys), 0
+            while len(current_level) > 1 and iter_count < max_iter:
                 next_level = []
                 num_p = len(current_level)
                 for i in range(0, num_p, 2):
@@ -2638,7 +2639,7 @@ class Face3D(Base2DIn3D):
                         p1, p2 = current_level[i], current_level[i + 1]
                         try:
                             merged = pb.union(p1, p2, int_tol)
-                        except Exception:
+                        except Exception:  # tiny edge caused a failure; try with small tol
                             try:
                                 merged = pb.union(p1, p2, int_tol / 100)
                             except Exception:
@@ -2647,6 +2648,7 @@ class Face3D(Base2DIn3D):
                     else:
                         next_level.append(current_level[i])
                 current_level = next_level
+                iter_count += 1
 
             b_poly_sub = current_level[0]
 
@@ -2654,10 +2656,9 @@ class Face3D(Base2DIn3D):
         if b_poly_sub is not None:
             try:
                 b_poly1 = pb.difference(b_poly1, b_poly_sub, int_tol)
-            except Exception:
-                int_tol = int_tol / 100
+            except Exception:  # tiny edge caused a failure; try with small tol
                 try:
-                    b_poly1 = pb.difference(b_poly1, b_poly_sub, int_tol)
+                    b_poly1 = pb.difference(b_poly1, b_poly_sub, int_tol / 100)
                 except Exception:
                     return [self]
         else:
@@ -2665,10 +2666,9 @@ class Face3D(Base2DIn3D):
             for b_poly2 in relevant_b_polys:
                 try:
                     b_poly1 = pb.difference(b_poly1, b_poly2, int_tol)
-                except Exception:
-                    int_tol = int_tol / 100
+                except Exception:  # tiny edge caused a failure; try with small tol
                     try:
-                        b_poly1 = pb.difference(b_poly1, b_poly2, int_tol)
+                        b_poly1 = pb.difference(b_poly1, b_poly2, int_tol / 100)
                     except Exception:
                         return [self]
 
