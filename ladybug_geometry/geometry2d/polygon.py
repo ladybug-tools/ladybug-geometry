@@ -2505,7 +2505,7 @@ class Polygon2D(Base2DIn2D):
         for poly2d in polygons:
             try:
                 poly2d = poly2d.remove_colinear_vertices(tolerance)
-            except AssertionError:  # degenerate room to ignore
+            except AssertionError:  # degenerate polygon to ignore
                 continue
             if poly2d.is_self_intersecting:
                 polys = poly2d.split_through_self_intersection(tolerance)
@@ -2513,44 +2513,68 @@ class Polygon2D(Base2DIn2D):
             offset_poly = poly2d.offset(-min_separation / 2, min_angle=min_angle)
             all_poly.append(offset_poly)
 
-        # boolean union the polygons together
-        bool_polys = Polygon2D.preprocess_polygons_for_boolean(all_poly, tolerance)
-        if len(bool_polys) <= 1:
+        if len(all_poly) == 0:
             return []
-        int_tol = tolerance / 1000
-        try:
-            poly_result = pb.union_all(bool_polys, int_tol)
-        except Exception:  # tiny edge caused a failure; try with small tol
-            int_tol = int_tol / 100
-            try:
-                poly_result = pb.union_all(bool_polys, int_tol)
-            except Exception:
-                poly_result = None  # the edge is just too tiny
+        elif len(all_poly) == 1:
+            # single polygon: bypass boolean union and proceed directly to pullback
+            polys = all_poly
+        else:
+            # multiple polygons: sort spatially and perform tree union
+            all_poly.sort(key=lambda p: (p.min.x + p.min.y))
 
-        # serialize the BooleanPolygon into Polygon2D
-        polys = []
-        if poly_result is not None:
-            for new_poly in poly_result.regions:
-                if len(new_poly) > 2:
-                    poly = Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
-                    try:
-                        poly = poly.remove_duplicate_vertices(tolerance)
-                        polys.append(poly)
-                    except AssertionError:
-                        pass  # degenerate polygon to be removed
+            bool_polys = Polygon2D.preprocess_polygons_for_boolean(all_poly, tolerance)
+            if len(bool_polys) <= 1:
+                return []
+            int_tol = tolerance / 1000
+
+            def _union_pair(p1, p2, tol):
+                try:
+                    return pb.union(p1, p2, tol)
+                except Exception:  # fall back on using a finer tolerance
+                    return pb.union(p1, p2, tol / 100.0)
+
+            current, max_iter, iter_count = bool_polys, len(all_poly), 0
+            try:
+                while len(current) > 1 and iter_count < max_iter:
+                    next_round = []
+                    for k in range(0, len(current), 2):
+                        if k + 1 < len(current):
+                            next_round.append(
+                                _union_pair(current[k], current[k + 1], int_tol)
+                            )
+                        else:
+                            next_round.append(current[k])
+                    current = next_round
+                    iter_count += 1
+                poly_result = current[0] if current else None
+            except Exception:  # no boolean union solution could be found
+                poly_result = None
+
+            # serialize the BooleanPolygon into Polygon2D
+            polys = []
+            if poly_result is not None:
+                for new_poly in poly_result.regions:
+                    if len(new_poly) > 2:
+                        poly = Polygon2D(tuple(Point2D(pt.x, pt.y) for pt in new_poly))
+                        try:
+                            poly = poly.remove_duplicate_vertices(tolerance)
+                            polys.append(poly)
+                        except AssertionError:
+                            pass  # degenerate polygon to be removed
+
         if len(polys) == 0:
             poly_groups = []
         elif len(polys) == 1:
             poly_groups = [polys]
-        else:  # sort the polygons by area and check if any are inside the others
+        else:
             polys.sort(key=lambda x: x.area, reverse=True)
             poly_groups = [[polys[0]]]
             for sub_poly in polys[1:]:
                 for i, pg in enumerate(poly_groups):
-                    if pg[0].is_polygon_inside(sub_poly):  # it's a hole
+                    if pg[0].is_polygon_inside(sub_poly):
                         poly_groups[i].append(sub_poly)
                         break
-                else:  # it's a separate Face3D
+                else:
                     poly_groups.append([sub_poly])
 
         # offset the polygons back to where they originally were
@@ -2562,27 +2586,28 @@ class Polygon2D(Base2DIn2D):
                     poly2d = poly2d.remove_colinear_vertices(tolerance)
                 except AssertionError:
                     continue  # degenerate polygon to be removed
+                # Resolve self-intersection created when the narrow slit closed
                 if poly2d.is_self_intersecting:
                     polys = poly2d.split_through_self_intersection(tolerance)
                     poly2d = max(polys, key=lambda p: p.area)
                 clean_group.append(poly2d)
             if len(clean_group) != 0:
                 bound, holes = clean_group[0], clean_group[1:]
-                # offset the first polygon inwards
+                # offset the outer boundary inwards
                 offset_bound = bound.offset(min_separation / 2, min_angle=min_angle)
                 try:
                     offset_bound = offset_bound.remove_colinear_vertices(tolerance)
                     boundary_poly.append(offset_bound)
-                    # offset any remaining polygons outwards
+                    # offset any holes outwards
                     for hole in holes:
                         offset_hole = hole.offset(-min_separation / 2, min_angle=min_angle)
                         try:
                             offset_hole = offset_hole.remove_colinear_vertices(tolerance)
                             boundary_poly.append(offset_hole)
                         except AssertionError:
-                            continue  # degenerate polygon to be removed
+                            continue
                 except AssertionError:
-                    continue  # degenerate polygon to be removed
+                    continue
         return boundary_poly
 
     @staticmethod
