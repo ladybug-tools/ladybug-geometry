@@ -2423,7 +2423,7 @@ class Polygon2D(Base2DIn2D):
         for poly2d in polygons:
             try:
                 poly2d = poly2d.remove_colinear_vertices(tolerance)
-            except AssertionError:  # degenerate room to ignore
+            except AssertionError:  # degenerate polygon to ignore
                 continue
             if poly2d.is_self_intersecting:
                 polys = poly2d.split_through_self_intersection(tolerance)
@@ -2434,10 +2434,10 @@ class Polygon2D(Base2DIn2D):
         if len(all_poly) == 0:
             return []
         elif len(all_poly) == 1:
-            # single room: bypass boolean union and proceed directly to pullback
+            # single polygon: bypass boolean union and proceed directly to pullback
             polys = all_poly
         else:
-            # multiple rooms: sort spatially and perform tree union
+            # multiple polygons: sort spatially and perform tree union
             all_poly.sort(key=lambda p: (p.min.x + p.min.y))
 
             bool_polys = Polygon2D.preprocess_polygons_for_boolean(all_poly, tolerance)
@@ -2448,24 +2448,24 @@ class Polygon2D(Base2DIn2D):
             def _union_pair(p1, p2, tol):
                 try:
                     return pb.union(p1, p2, tol)
-                except Exception:
-                    try:
-                        return pb.union(p1, p2, tol / 100.0)
-                    except Exception:
-                        return pb.union_all([p1, p2], tol)
+                except Exception:  # fall back on using a finer tolerance
+                    return pb.union(p1, p2, tol / 100.0)
 
-            current = bool_polys
+            current, max_iter, iter_count = bool_polys, len(all_poly), 0
             try:
-                while len(current) > 1:
+                while len(current) > 1 and iter_count < max_iter:
                     next_round = []
                     for k in range(0, len(current), 2):
                         if k + 1 < len(current):
-                            next_round.append(_union_pair(current[k], current[k + 1], int_tol))
+                            next_round.append(
+                                _union_pair(current[k], current[k + 1], int_tol)
+                            )
                         else:
                             next_round.append(current[k])
                     current = next_round
+                    iter_count += 1
                 poly_result = current[0] if current else None
-            except Exception:
+            except Exception:  # no boolean union solution could be found
                 poly_result = None
 
             # serialize the BooleanPolygon into Polygon2D
