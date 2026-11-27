@@ -1453,6 +1453,18 @@ def test_intersect_plane():
     assert len(face.intersect_plane(plane_5)) == 2
 
 
+def test_intersect_plane_vertical_cut_of_concave_face():
+    """Pair crossings along the cut even when their local x values tie."""
+    xy = ((4, 1), (1, 1), (1, 3), (4, 3), (4, 4), (0, 4), (0, 0), (4, 0))
+    face = Face3D(tuple(Point3D(x, y, 0) for x, y in xy), Plane())
+    plane = Plane(Vector3D(1, 0, 0), Point3D(2, 0, 0))
+
+    sections = face.intersect_plane(plane)
+
+    assert all(p.x == 2 and p.z == 0 for s in sections for p in (s.p1, s.p2))
+    assert sorted(sorted((s.p1.y, s.p2.y)) for s in sections) == [[0, 1], [3, 4]]
+
+
 def test_intersect_face():
     """Test the Face3D intersect_face method."""
     pts1 = (Point3D(0, 0, 2), Point3D(2, 0, 2), Point3D(2, 2, 2), Point3D(0, 2, 2))
