@@ -1732,7 +1732,8 @@ class Face3D(Base2DIn3D):
             _int_pt2d = self.polygon2d.intersect_line_infinite(_int_ray2d)
             if len(_int_pt2d) != 0:
                 if len(_int_pt2d) > 2:  # sort the points along the intersection line
-                    _int_pt2d.sort(key=lambda pt: pt.x)
+                    direction = _v2d if _v2d.x >= 0 else -_v2d
+                    _int_pt2d.sort(key=lambda pt: (pt - _p12d).dot(direction))
                 _int_pt3d = [self._plane.xy_to_xyz(pt) for pt in _int_pt2d]
                 _int_seg3d = []
                 for i in xrange(0, len(_int_pt3d) - 1, 2):
